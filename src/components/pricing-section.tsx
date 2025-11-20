@@ -1,9 +1,7 @@
 'use client';
 
 import { Check } from 'lucide-react';
-import Link from 'next/link';
 import { PricingButton } from './pricing-button';
-import { useState, useEffect } from 'react';
 
 const plans = [
   {
@@ -55,26 +53,11 @@ const plans = [
   },
 ];
 
-export function PricingSection() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+type Props = {
+  isAuthenticated?: boolean;
+};
 
-  useEffect(() => {
-    // Vérifier si l'utilisateur est connecté en vérifiant les cookies
-    const checkAuth = async () => {
-      try {
-        const response = await fetch('/api/auth/check', { method: 'GET' });
-        if (response.ok) {
-          setIsAuthenticated(true);
-        }
-      } catch {
-        // Si l'endpoint n'existe pas, on vérifie autrement
-        // Pour l'instant, on laisse à false et on redirigera vers login
-        setIsAuthenticated(false);
-      }
-    };
-    checkAuth();
-  }, []);
-
+export function PricingSection({ isAuthenticated = false }: Props) {
   return (
     <section id="pricing" className="mx-auto max-w-7xl px-6 py-20">
       <div className="mx-auto max-w-2xl text-center">

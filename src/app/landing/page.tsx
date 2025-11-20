@@ -1,13 +1,25 @@
 import Link from 'next/link';
 import { Check, Zap, Users, QrCode, Brain, Calendar } from 'lucide-react';
 import { PricingSection } from '@/components/pricing-section';
+import { createSupabaseServerClient } from '@/lib/supabase/server';
 
 export const metadata = {
   title: 'ChantiFlow - Gestion de chantiers simplifiée avec IA',
   description: 'Gérez vos chantiers efficacement avec planification IA, QR codes pour les employés, et suivi en temps réel.',
 };
 
-export default function LandingPage() {
+export default async function LandingPage() {
+  // Vérifier si l'utilisateur est connecté
+  let isAuthenticated = false;
+  try {
+    const supabase = await createSupabaseServerClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    isAuthenticated = !!user;
+  } catch {
+    isAuthenticated = false;
+  }
   return (
     <div className="min-h-screen bg-white dark:bg-zinc-950">
       {/* Header */}
@@ -162,7 +174,7 @@ export default function LandingPage() {
       </section>
 
       {/* Pricing Section */}
-      <PricingSection />
+      <PricingSection isAuthenticated={isAuthenticated} />
 
       {/* CTA Section */}
       <section className="mx-auto max-w-7xl px-6 py-20">
