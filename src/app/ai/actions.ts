@@ -1,0 +1,80 @@
+'use server';
+
+import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { generateAIPlanning } from '@/lib/ai/openai-planning';
+
+export type GenerateAIPlanningState = {
+  error?: string;
+  planning?: {
+    orderedTasks: Array<{
+      taskId: string;
+      order: number;
+      startDate: string;
+      endDate: string;
+      assignedWorkerId: string | null;
+      priority: 'high' | 'medium' | 'low';
+      taskTitle: string;
+    }>;
+    warnings: string[];
+    reasoning: string;
+  };
+};
+
+export async function generateAIPlanningAction(
+  siteId: string,
+): Promise<GenerateAIPlanningState> {
+  try {
+    const supabase = await createSupabaseServerClient();
+
+    // Récupérer les tâches et workers
+    const [{ data: tasks }, { data: workers }, { data: site }] = await Promise.all([
+      supabase
+        .from('tasks')
+        .select('id, title, required_role, duration_hours, status')
+        .eq('site_id', siteId),
+      supabase
+        .from('workers')
+        .select('id, name, email, role')
+        .eq('site_id', siteId),
+      supabase
+        .from('sites')
+        .select('deadline, name')
+        .eq('id', siteId)
+        .single(),
+    ]);
+
+    if (!tasks || !site) {
+      return { error: 'Impossible de charger les données du chantier.' };
+    }
+
+    const pendingTasks = tasks.filter((task) => task.status === 'pending');
+
+    if (pendingTasks.length === 0) {
+      return { error: 'Aucune tâche en attente à planifier.' };
+    }
+
+    // Générer le planning avec l'IA OpenAI
+    const planning = await generateAIPlanning(
+      pendingTasks,
+      workers || [],
+      site.deadline,
+      site.name,
+    );
+
+    return {
+      planning: {
+        orderedTasks: planning.orderedTasks.map((task) => ({
+          ...task,
+          taskTitle: pendingTasks.find((t) => t.id === task.taskId)?.title || 'Tâche inconnue',
+        })),
+        warnings: planning.warnings,
+        reasoning: planning.reasoning,
+      },
+    };
+  } catch (error) {
+    return {
+      error: error instanceof Error ? error.message : 'Erreur lors de la génération du planning',
+    };
+  }
+}
+

@@ -11,6 +11,7 @@ import {
   QrCode,
   FileText,
   FolderKanban,
+  Sparkles,
 } from 'lucide-react';
 import { ThemeToggle } from './theme-toggle';
 
@@ -37,6 +38,7 @@ type AppShellProps = {
 const baseNavItems: NavItem[] = [
   { href: '/home', label: 'Accueil', icon: Home },
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/ai', label: 'IA Planning', icon: Sparkles },
   { href: '/tasks', label: 'Tâches', icon: ListChecks },
   { href: '/team', label: 'Équipe', icon: UsersRound },
   { href: '/reports', label: 'Rapports', icon: FileText },
