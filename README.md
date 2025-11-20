@@ -1,36 +1,96 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ChantiFlow
 
-## Getting Started
+Application web de gestion de chantiers avec planification IA et accès QR codes pour les employés.
 
-First, run the development server:
+## 🚀 Technologies
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- **Next.js 16** (App Router)
+- **Supabase** (Auth, Postgres, Storage)
+- **Tailwind CSS**
+- **TypeScript**
+- **React 19**
+
+## 📋 Fonctionnalités
+
+- ✅ Création et gestion de chantiers
+- ✅ Ajout de tâches et d'employés
+- ✅ Génération de planning IA
+- ✅ QR codes pour accès employés
+- ✅ Upload de photos et rapports
+- ✅ Tableau de bord avec statistiques
+- ✅ Mode sombre/clair
+
+## 🛠️ Installation locale
+
+1. **Cloner le projet** :
+   ```bash
+   git clone https://github.com/VOTRE_USERNAME/chantiflow.git
+   cd chantiflow
+   ```
+
+2. **Installer les dépendances** :
+   ```bash
+   npm install
+   ```
+
+3. **Configurer les variables d'environnement** :
+   ```bash
+   cp env.example .env.local
+   ```
+   
+   Remplir `.env.local` avec vos clés Supabase :
+   ```
+   NEXT_PUBLIC_APP_BASE_URL=http://localhost:3000
+   NEXT_PUBLIC_SUPABASE_URL=votre_url_supabase
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=votre_anon_key
+   SUPABASE_SERVICE_ROLE_KEY=votre_service_role_key
+   ```
+
+4. **Créer les tables Supabase** :
+   - Connectez-vous à [app.supabase.com](https://app.supabase.com)
+   - Allez dans **SQL Editor**
+   - Exécutez les scripts SQL pour créer les tables `sites`, `tasks`, `workers`, `reports`
+   - Créez un bucket Storage nommé `reports` avec accès public
+
+5. **Lancer le serveur de développement** :
+   ```bash
+   npm run dev
+   ```
+
+6. **Ouvrir dans le navigateur** :
+   [http://localhost:3000](http://localhost:3000)
+
+## 📦 Déploiement
+
+Consultez le guide complet : **[DEPLOY.md](./DEPLOY.md)**
+
+### Déploiement rapide sur Vercel
+
+1. Créer un compte sur [vercel.com](https://vercel.com)
+2. Importer le dépôt GitHub
+3. Configurer les variables d'environnement
+4. Connecter le domaine `chantiflow.com`
+
+## 📚 Structure du projet
+
+```
+src/
+├── app/              # Pages Next.js (App Router)
+│   ├── dashboard/    # Tableau de bord
+│   ├── site/[id]/    # Détails d'un chantier
+│   ├── qr/[siteId]/  # Accès employé via QR
+│   └── report/       # Rapports et photos
+├── components/       # Composants React réutilisables
+└── lib/             # Utilitaires (Supabase, etc.)
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🔐 Sécurité
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- Authentification via Supabase Auth
+- Row Level Security (RLS) activé sur toutes les tables
+- Variables d'environnement pour les clés sensibles
+- HTTPS obligatoire en production
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 📝 Licence
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Propriétaire - Tous droits réservés
