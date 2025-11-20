@@ -1,5 +1,3 @@
-'use server';
-
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 
 export type Plan = 'basic' | 'plus' | 'pro';
