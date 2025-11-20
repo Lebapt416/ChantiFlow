@@ -120,16 +120,58 @@ export function AIPlanningSection({ sites }: Props) {
         <div className="space-y-4">
           {/* Raisonnement de l'IA */}
           {result.reasoning && (
-            <section className="rounded-2xl border border-emerald-200 bg-emerald-50 p-6 dark:border-emerald-900/60 dark:bg-emerald-900/20">
+            <section
+              className={`rounded-2xl border p-6 ${
+                result.reasoning.includes('algorithme de base') ||
+                result.reasoning.includes('Erreur lors de l\'appel OpenAI')
+                  ? 'border-amber-200 bg-amber-50 dark:border-amber-900/60 dark:bg-amber-900/20'
+                  : 'border-emerald-200 bg-emerald-50 dark:border-emerald-900/60 dark:bg-emerald-900/20'
+              }`}
+            >
               <div className="flex items-start gap-3">
-                <Sparkles className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+                <Sparkles
+                  className={`h-5 w-5 ${
+                    result.reasoning.includes('algorithme de base') ||
+                    result.reasoning.includes('Erreur lors de l\'appel OpenAI')
+                      ? 'text-amber-600 dark:text-amber-400'
+                      : 'text-emerald-600 dark:text-emerald-400'
+                  }`}
+                />
                 <div className="flex-1">
-                  <h3 className="text-sm font-semibold text-emerald-900 dark:text-emerald-100">
-                    Analyse IA
+                  <h3
+                    className={`text-sm font-semibold ${
+                      result.reasoning.includes('algorithme de base') ||
+                      result.reasoning.includes('Erreur lors de l\'appel OpenAI')
+                        ? 'text-amber-900 dark:text-amber-100'
+                        : 'text-emerald-900 dark:text-emerald-100'
+                    }`}
+                  >
+                    {result.reasoning.includes('algorithme de base') ||
+                    result.reasoning.includes('Erreur lors de l\'appel OpenAI')
+                      ? '⚠️ Mode basique (OpenAI non disponible)'
+                      : 'Analyse IA'}
                   </h3>
-                  <p className="mt-2 text-sm text-emerald-800 dark:text-emerald-200">
+                  <p
+                    className={`mt-2 text-sm ${
+                      result.reasoning.includes('algorithme de base') ||
+                      result.reasoning.includes('Erreur lors de l\'appel OpenAI')
+                        ? 'text-amber-800 dark:text-amber-200'
+                        : 'text-emerald-800 dark:text-emerald-200'
+                    }`}
+                  >
                     {result.reasoning}
                   </p>
+                  {(result.reasoning.includes('algorithme de base') ||
+                    result.reasoning.includes('Erreur lors de l\'appel OpenAI')) && (
+                    <div className="mt-4 rounded-lg bg-white/50 p-3 text-xs dark:bg-black/20">
+                      <p className="font-semibold mb-1">Pour activer l'IA OpenAI :</p>
+                      <ol className="list-decimal list-inside space-y-1">
+                        <li>Vérifiez que OPENAI_API_KEY est bien configurée dans Vercel</li>
+                        <li>Redéployez votre application après avoir ajouté la variable</li>
+                        <li>Vérifiez les logs Vercel pour voir les erreurs détaillées</li>
+                      </ol>
+                    </div>
+                  )}
                 </div>
               </div>
             </section>

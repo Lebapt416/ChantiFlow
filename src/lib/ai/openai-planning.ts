@@ -43,11 +43,13 @@ export async function generateAIPlanning(
   const apiKey = process.env.OPENAI_API_KEY;
 
   // Si pas d'API key, utiliser la version basique
-  if (!apiKey) {
+  if (!apiKey || apiKey.trim() === '') {
+    console.log('[AI Planning] Pas d\'API key OpenAI, utilisation du fallback basique');
     return generateBasicPlanning(tasks, workers, deadline);
   }
 
   try {
+    console.log('[AI Planning] Appel OpenAI avec', tasks.length, 'tâches');
     // Préparer le prompt pour OpenAI
     const tasksDescription = tasks
       .map(
@@ -108,7 +110,7 @@ Réponds UNIQUEMENT avec un JSON valide dans ce format:
           {
             role: 'system',
             content:
-              'Tu es un expert en gestion de projets de construction. Tu génères des plannings optimisés en JSON.',
+              'Tu es un expert en gestion de projets de construction. Tu génères des plannings optimisés en JSON. Réponds UNIQUEMENT en JSON valide.',
           },
           {
             role: 'user',
@@ -121,17 +123,29 @@ Réponds UNIQUEMENT avec un JSON valide dans ce format:
     });
 
     if (!response.ok) {
-      throw new Error(`OpenAI API error: ${response.statusText}`);
+      const errorText = await response.text();
+      console.error('[AI Planning] Erreur OpenAI:', response.status, errorText);
+      throw new Error(`OpenAI API error: ${response.status} ${response.statusText}`);
     }
 
     const data = await response.json();
     const content = data.choices[0]?.message?.content;
 
     if (!content) {
+      console.error('[AI Planning] Réponse OpenAI vide:', data);
       throw new Error('Réponse OpenAI vide');
     }
 
-    const planning = JSON.parse(content) as PlanningResult;
+    console.log('[AI Planning] Réponse OpenAI reçue, longueur:', content.length);
+
+    let planning: PlanningResult;
+    try {
+      planning = JSON.parse(content) as PlanningResult;
+    } catch (parseError) {
+      console.error('[AI Planning] Erreur parsing JSON:', parseError);
+      console.error('[AI Planning] Contenu reçu:', content.substring(0, 500));
+      throw new Error('Erreur lors du parsing de la réponse OpenAI');
+    }
 
     // Valider et compléter les dates
     const startDate = new Date();
@@ -153,11 +167,20 @@ Réponds UNIQUEMENT avec un JSON valide dans ce format:
       };
     });
 
+    // Valider que le planning contient les bonnes données
+    if (!planning.orderedTasks || !Array.isArray(planning.orderedTasks)) {
+      console.error('[AI Planning] Format de planning invalide');
+      throw new Error('Format de planning invalide depuis OpenAI');
+    }
+
+    console.log('[AI Planning] Planning généré avec succès:', planning.orderedTasks.length, 'tâches');
     return planning;
   } catch (error) {
-    // En cas d'erreur, utiliser la version basique
-    console.error('Erreur OpenAI:', error);
-    return generateBasicPlanning(tasks, workers, deadline);
+    // En cas d'erreur, utiliser la version basique mais avec un message d'erreur
+    console.error('[AI Planning] Erreur OpenAI, fallback basique:', error);
+    const basicPlanning = generateBasicPlanning(tasks, workers, deadline);
+    basicPlanning.reasoning = `Erreur lors de l'appel OpenAI: ${error instanceof Error ? error.message : 'Erreur inconnue'}. Planning généré avec algorithme de base.`;
+    return basicPlanning;
   }
 }
 
