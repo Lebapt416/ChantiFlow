@@ -2,9 +2,9 @@
 
 import { useActionState, useEffect } from "react";
 import { useFormStatus } from "react-dom";
-import { addWorkerAction } from './actions';
+import { addWorkerAction, type ActionState } from './actions';
 
-const initialState = {};
+const initialState: ActionState = {};
 
 function SubmitButton() {
   const { pending } = useFormStatus();

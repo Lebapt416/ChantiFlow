@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 
-export export type ReportState = {
+export type ReportState = {
   error?: string;
   success?: boolean;
 };
