@@ -22,11 +22,18 @@ html[data-theme='dark'] {
   --font-mono: var(--font-geist-mono);
 }
 
+/* Utiliser les préférences du navigateur, sombre par défaut */
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme='light']) {
+  :root {
     --background: #0a0a0a;
     --foreground: #ededed;
   }
+}
+
+/* Par défaut, mode sombre si pas de préférence */
+:root:not([data-theme]) {
+  --background: #0a0a0a;
+  --foreground: #ededed;
 }
 
 body {

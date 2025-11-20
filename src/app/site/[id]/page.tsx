@@ -7,6 +7,7 @@ import { CompleteTaskButton } from './complete-task-button';
 import { SiteQrCard } from './qr-card';
 import { GeneratePlanningButton } from './generate-planning-button';
 import { AppShell } from '@/components/app-shell';
+import { SiteSelector } from '@/components/site-selector';
 
  type Params = {
   params: Promise<{
@@ -68,6 +69,13 @@ export default async function SitePage({ params }: Params) {
     notFound();
   }
 
+  // Récupérer tous les chantiers pour le sélecteur
+  const { data: allSites } = await supabase
+    .from('sites')
+    .select('id, name, deadline')
+    .eq('created_by', user.id)
+    .order('created_at', { ascending: false });
+
   const [{ data: tasks }, { data: workers }] = await Promise.all([
     supabase
       .from('tasks')
@@ -98,7 +106,10 @@ export default async function SitePage({ params }: Params) {
       userEmail={user.email}
       primarySite={{ id: site.id, name: site.name }}
       actions={
-        <div className="flex gap-2">
+        <div className="flex flex-wrap items-center gap-3">
+          {allSites && allSites.length > 1 && (
+            <SiteSelector sites={allSites} currentSiteId={site.id} />
+          )}
           <Link
             href={`/qr/${site.id}`}
             className="rounded-full border border-zinc-200 px-4 py-2 text-sm font-medium text-zinc-700 transition hover:border-zinc-900 hover:text-zinc-900 dark:border-zinc-700 dark:text-zinc-200 dark:hover:border-white dark:hover:text-white"

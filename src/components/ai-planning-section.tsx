@@ -3,6 +3,7 @@
 import { useState, useTransition } from 'react';
 import { Sparkles, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
 import { generateAIPlanningAction } from '@/app/ai/actions';
+import { WeeklyCalendar } from './weekly-calendar';
 
 type Site = {
   id: string;
@@ -28,10 +29,18 @@ type PlanningResult = {
   reasoning: string;
 };
 
+type Worker = {
+  id: string;
+  name: string;
+  email: string;
+  role: string | null;
+};
+
 export function AIPlanningSection({ sites }: Props) {
   const [selectedSiteId, setSelectedSiteId] = useState<string>('');
   const [isPending, startTransition] = useTransition();
   const [result, setResult] = useState<PlanningResult | null>(null);
+  const [workers, setWorkers] = useState<Worker[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   function handleGenerate() {
@@ -48,11 +57,16 @@ export function AIPlanningSection({ sites }: Props) {
         const response = await generateAIPlanningAction(selectedSiteId);
         if (response.error) {
           setError(response.error);
+          setResult(null);
+          setWorkers([]);
         } else if (response.planning) {
           setResult(response.planning);
+          setWorkers(response.workers || []);
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Erreur inconnue');
+        setResult(null);
+        setWorkers([]);
       }
     });
   }
@@ -251,6 +265,17 @@ export function AIPlanningSection({ sites }: Props) {
               ))}
             </div>
           </section>
+
+          {/* Calendrier hebdomadaire */}
+          {result.orderedTasks.length > 0 && workers.length > 0 && (
+            <WeeklyCalendar
+              planning={result.orderedTasks.map((task) => ({
+                ...task,
+                taskTitle: task.taskTitle,
+              }))}
+              workers={workers}
+            />
+          )}
 
           {/* Avertissements */}
           {result.warnings.length > 0 && (

@@ -9,7 +9,7 @@ const plans = [
     price: 'Gratuit',
     description: 'Parfait pour commencer',
     features: [
-      'Jusqu\'à 3 chantiers actifs',
+      '1 chantier actif',
       'Planification IA basique',
       'QR codes pour les employés',
       'Upload de photos et rapports',
@@ -24,7 +24,7 @@ const plans = [
     period: '/mois',
     description: 'Pour les équipes en croissance',
     features: [
-      'Chantiers illimités',
+      'Jusqu\'à 5 chantiers actifs',
       'Planification IA avancée',
       'Classement intelligent des tâches',
       'Analytics détaillés',

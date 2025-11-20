@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { AppShell } from '@/components/app-shell';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { AddTaskForm } from './add-task-form';
 
 export const metadata = {
   title: 'Tâches | ChantiFlow',
@@ -80,6 +81,22 @@ export default async function TasksPage() {
           <p className="text-sm text-emerald-800/80 dark:text-emerald-100">
             tâches terminées
           </p>
+        </div>
+      </section>
+
+      <section className="mt-8 rounded-3xl border border-zinc-100 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 className="text-lg font-semibold text-zinc-900 dark:text-white">
+              Ajouter une tâche
+            </h2>
+            <p className="text-sm text-zinc-500 dark:text-zinc-400">
+              Créez une nouvelle tâche pour un chantier.
+            </p>
+          </div>
+        </div>
+        <div className="mb-8">
+          <AddTaskForm sites={sites ?? []} />
         </div>
       </section>
 

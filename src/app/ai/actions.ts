@@ -22,7 +22,7 @@ export type GenerateAIPlanningState = {
 
 export async function generateAIPlanningAction(
   siteId: string,
-): Promise<GenerateAIPlanningState> {
+): Promise<GenerateAIPlanningState & { workers?: Array<{ id: string; name: string; email: string; role: string | null }> }> {
   try {
     const supabase = await createSupabaseServerClient();
 
@@ -70,6 +70,7 @@ export async function generateAIPlanningAction(
         warnings: planning.warnings,
         reasoning: planning.reasoning,
       },
+      workers: workers || [],
     };
   } catch (error) {
     return {

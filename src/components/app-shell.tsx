@@ -12,8 +12,8 @@ import {
   FileText,
   FolderKanban,
   Sparkles,
+  User,
 } from 'lucide-react';
-import { ThemeToggle } from './theme-toggle';
 
 type NavItem = {
   href: string;
@@ -43,6 +43,7 @@ const baseNavItems: NavItem[] = [
   { href: '/team', label: 'Équipe', icon: UsersRound },
   { href: '/reports', label: 'Rapports', icon: FileText },
   { href: '/qr', label: 'QR codes', icon: QrCode },
+  { href: '/account', label: 'Mon compte', icon: User },
 ];
 
 export function AppShell({
@@ -134,7 +135,6 @@ export function AppShell({
               </div>
               <div className="flex items-center gap-3">
                 {actions}
-                <ThemeToggle />
                 {userEmail ? (
                   <div className="rounded-full border border-zinc-200 px-4 py-2 text-sm font-medium text-zinc-700 dark:border-zinc-700 dark:text-zinc-200">
                     {userEmail}
