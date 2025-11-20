@@ -2,7 +2,9 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { AppShell } from '@/components/app-shell';
-import { FolderKanban, Plus } from 'lucide-react';
+import { FolderKanban } from 'lucide-react';
+import { CreateSiteCard } from './create-site-card';
+import { getUserPlan, getPlanLimits, canCreateSite } from '@/lib/plans';
 
 export const metadata = {
   title: 'Chantiers | ChantiFlow',
@@ -57,6 +59,12 @@ export default async function SitesPage() {
       siteStats[worker.site_id].workers++;
     });
   }
+
+  // Vérifier les limites du plan
+  const plan = await getUserPlan(user);
+  const limits = getPlanLimits(plan);
+  const { allowed: canCreate, reason: limitReason } = await canCreateSite(user.id);
+  const currentCount = sites?.length ?? 0;
 
   return (
     <AppShell
@@ -137,22 +145,12 @@ export default async function SitesPage() {
           })}
 
           {/* Carte pour créer un nouveau chantier */}
-          <Link
-            href="/dashboard"
-            className="flex-shrink-0 w-80 rounded-2xl border-2 border-dashed border-zinc-300 bg-zinc-50 p-6 shadow-lg shadow-black/5 transition hover:border-zinc-400 hover:bg-zinc-100 hover:shadow-xl hover:scale-105 dark:border-zinc-700 dark:bg-zinc-900 dark:hover:border-zinc-600"
-          >
-            <div className="flex h-full flex-col items-center justify-center text-center">
-              <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full border-2 border-zinc-300 bg-white dark:border-zinc-700 dark:bg-zinc-800">
-                <Plus className="h-8 w-8 text-zinc-500 dark:text-zinc-400" />
-              </div>
-              <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">
-                Nouveau chantier
-              </h3>
-              <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
-                Créez un nouveau projet de construction
-              </p>
-            </div>
-          </Link>
+          <CreateSiteCard
+            canCreate={canCreate}
+            limitReason={limitReason}
+            currentCount={currentCount}
+            maxSites={limits.maxSites}
+          />
         </div>
       </div>
     </AppShell>

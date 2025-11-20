@@ -47,6 +47,7 @@ export async function createSiteAction(
   }
 
   revalidatePath('/dashboard');
+  revalidatePath('/sites');
   return { success: true };
 }
 

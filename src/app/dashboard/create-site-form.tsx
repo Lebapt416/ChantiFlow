@@ -2,6 +2,7 @@
 
 import { useActionState, useEffect } from "react";
 import { useFormStatus } from "react-dom";
+import { useRouter } from "next/navigation";
 import { createSiteAction, type CreateSiteState } from './actions';
 
 const initialState: CreateSiteState = {};
@@ -20,15 +21,26 @@ function SubmitButton() {
   );
 }
 
-export function CreateSiteForm() {
+type Props = {
+  onSuccess?: () => void;
+};
+
+export function CreateSiteForm({ onSuccess }: Props) {
+  const router = useRouter();
   const [state, formAction] = useActionState(createSiteAction, initialState);
 
   useEffect(() => {
     if (state?.success) {
       const form = document.getElementById('create-site-form') as HTMLFormElement | null;
       form?.reset();
+      if (onSuccess) {
+        onSuccess();
+      } else {
+        router.push('/sites');
+        router.refresh();
+      }
     }
-  }, [state?.success]);
+  }, [state?.success, router, onSuccess]);
 
   return (
     <form
