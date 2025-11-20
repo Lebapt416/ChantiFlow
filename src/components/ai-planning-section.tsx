@@ -3,7 +3,7 @@
 import { useState, useTransition } from 'react';
 import { Sparkles, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
 import { generateAIPlanningAction } from '@/app/ai/actions';
-import { WeeklyCalendar } from './weekly-calendar';
+import { InteractiveCalendar } from './interactive-calendar';
 
 type Site = {
   id: string;
@@ -266,14 +266,20 @@ export function AIPlanningSection({ sites }: Props) {
             </div>
           </section>
 
-          {/* Calendrier hebdomadaire */}
+          {/* Calendrier hebdomadaire interactif */}
           {result.orderedTasks.length > 0 && workers.length > 0 && (
-            <WeeklyCalendar
+            <InteractiveCalendar
               planning={result.orderedTasks.map((task) => ({
                 ...task,
                 taskTitle: task.taskTitle,
+                hours: 8, // Par défaut 8h
               }))}
               workers={workers}
+              taskDetails={{}}
+              onUpdate={(taskId, workerId, day, hours) => {
+                // Mise à jour via action serveur (à implémenter)
+                console.log('Update:', { taskId, workerId, day, hours });
+              }}
             />
           )}
 

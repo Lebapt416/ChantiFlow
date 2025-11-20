@@ -39,6 +39,7 @@ export async function generateAIPlanning(
   workers: Worker[],
   deadline: string | null,
   siteName: string,
+  siteId?: string,
 ): Promise<PlanningResult> {
   const apiKey = process.env.OPENAI_API_KEY;
 
@@ -46,7 +47,15 @@ export async function generateAIPlanning(
   if (!apiKey || apiKey.trim() === '') {
     console.log('[AI Planning] Pas d\'API key OpenAI, utilisation de l\'IA locale');
     const { generateLocalAIPlanning } = await import('./local-planning');
-    return generateLocalAIPlanning(tasks, workers, deadline, siteName);
+    const planning = await generateLocalAIPlanning(tasks, workers, deadline, siteName);
+    
+    // Enregistrer pour l'entraînement même pour l'IA locale
+    if (siteId) {
+      const { savePlanningResult } = await import('./training');
+      await savePlanningResult(siteId, tasks, workers, planning, siteName, deadline);
+    }
+    
+    return planning;
   }
 
   try {
@@ -188,6 +197,13 @@ Réponds UNIQUEMENT avec un JSON valide dans ce format:
     }
 
     console.log('[AI Planning] Planning généré avec succès:', planning.orderedTasks.length, 'tâches');
+    
+    // Enregistrer pour l'entraînement
+    if (siteId) {
+      const { savePlanningResult } = await import('./training');
+      await savePlanningResult(siteId, tasks, workers, planning, siteName, deadline);
+    }
+    
     return planning;
   } catch (error) {
     // En cas d'erreur, utiliser l'IA locale avancée

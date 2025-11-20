@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 import { AppShell } from '@/components/app-shell';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { CopyButton } from '@/components/copy-button';
+import { SiteQrCard } from '@/app/site/[id]/qr-card';
 
 export const metadata = {
   title: 'QR Codes | ChantiFlow',
@@ -43,32 +44,18 @@ export default async function QrHubPage() {
           </p>
         </div>
         {sites?.length ? (
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid gap-6 md:grid-cols-2">
             {sites.map((site) => {
               const url = `${appUrl.replace(/\/$/, '')}/qr/${site.id}`;
               return (
-                <div
-                  key={site.id}
-                  className="rounded-2xl border border-zinc-200 p-4 dark:border-zinc-700"
-                >
-                  <p className="text-sm font-semibold text-zinc-900 dark:text-white">
-                    {site.name}
-                  </p>
-                  <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                    Deadline{' '}
-                    {site.deadline
-                      ? new Date(site.deadline).toLocaleDateString('fr-FR')
-                      : 'Non définie'}
-                  </p>
-                  <p className="mt-2 break-all text-xs text-zinc-500 dark:text-zinc-400">
-                    {url}
-                  </p>
-                  <div className="mt-3 flex gap-2">
+                <div key={site.id} className="space-y-4">
+                  <SiteQrCard siteName={site.name} targetUrl={url} />
+                  <div className="flex gap-2">
                     <Link
                       href={`/qr/${site.id}`}
-                      className="rounded-full border border-zinc-200 px-3 py-1 text-xs font-semibold text-zinc-700 dark:border-zinc-600 dark:text-zinc-100"
+                      className="flex-1 rounded-full border border-zinc-200 bg-white px-4 py-2 text-center text-xs font-semibold text-zinc-700 transition hover:border-zinc-900 hover:bg-zinc-50 dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:border-white"
                     >
-                      Ouvrir la page
+                      Ouvrir la page employé
                     </Link>
                     <CopyButton value={url} />
                   </div>

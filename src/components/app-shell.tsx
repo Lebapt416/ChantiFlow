@@ -37,6 +37,7 @@ type AppShellProps = {
 
 const baseNavItems: NavItem[] = [
   { href: '/home', label: 'Accueil', icon: Home },
+  { href: '/sites', label: 'Chantiers', icon: FolderKanban },
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/ai', label: 'IA Planning', icon: Sparkles },
   { href: '/tasks', label: 'Tâches', icon: ListChecks },
@@ -57,16 +58,8 @@ export function AppShell({
   const pathname = usePathname();
 
   const navItems = useMemo(() => {
-    const items = [...baseNavItems];
-    if (primarySite) {
-      items.unshift({
-        href: `/site/${primarySite.id}`,
-        label: `Chantier: ${primarySite.name}`,
-        icon: FolderKanban,
-      });
-    }
-    return items;
-  }, [primarySite]);
+    return [...baseNavItems];
+  }, []);
 
   return (
     <div className="min-h-screen bg-zinc-50 text-zinc-900 dark:bg-zinc-950 dark:text-white">

@@ -4,6 +4,7 @@ import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { CreateSiteForm } from './create-site-form';
 import { signOutAction } from '../actions';
 import { AppShell } from '@/components/app-shell';
+import { DashboardCharts } from './dashboard-charts';
 
 export const metadata = {
   title: 'Dashboard | ChantiFlow',
@@ -158,38 +159,13 @@ export default async function DashboardPage() {
         </div>
 
         <div className="space-y-6">
-          <div className="rounded-3xl border border-zinc-100 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-            <h2 className="text-lg font-semibold text-zinc-900 dark:text-white">
-              Prochaines deadlines
-            </h2>
-            <ul className="mt-4 space-y-3">
-              {nextDeadlines.length ? (
-                nextDeadlines.map((site) => (
-                  <li
-                    key={site.id}
-                    className="rounded-2xl border border-zinc-200 px-4 py-3 dark:border-zinc-700"
-                  >
-                    <p className="text-sm font-semibold text-zinc-900 dark:text-white">
-                      {site.name}
-                    </p>
-                    <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                      {site.deadline
-                        ? new Date(site.deadline).toLocaleDateString('fr-FR', {
-                            day: '2-digit',
-                            month: 'short',
-                            year: 'numeric',
-                          })
-                        : 'Deadline à planifier'}
-                    </p>
-                  </li>
-                ))
-              ) : (
-                <li className="rounded-2xl border border-dashed border-zinc-200 px-4 py-3 text-sm text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">
-                  Pas encore de date prévue.
-                </li>
-              )}
-            </ul>
-          </div>
+          <DashboardCharts
+            sites={sites ?? []}
+            totalTasks={totalTasks}
+            doneTasks={doneTasks}
+            pendingTasks={pendingTasks}
+            nextDeadlines={nextDeadlines}
+          />
           <div className="rounded-3xl border border-zinc-100 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
             <h2 className="text-lg font-semibold text-zinc-900 dark:text-white">
               Centralisation
@@ -211,10 +187,10 @@ export default async function DashboardPage() {
                 📑 Rapports chef
               </Link>
               <Link
-                href="/home"
+                href="/sites"
                 className="rounded-2xl border border-zinc-200 px-4 py-3 text-sm font-semibold transition hover:border-zinc-900 dark:border-zinc-700 dark:hover:border-white"
               >
-                🏠 Accueil global
+                🏗️ Tous les chantiers
               </Link>
             </div>
           </div>
