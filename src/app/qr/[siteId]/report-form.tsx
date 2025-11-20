@@ -2,9 +2,9 @@
 
 import { startTransition, useActionState, useEffect, useMemo, useState } from "react";
 import { useFormStatus } from "react-dom";
-import { submitReportAction } from './actions';
+import { submitReportAction, type ReportState } from './actions';
 
-const initialState = {};
+const initialState: ReportState = {};
 
 type TaskOption = {
   id: string;
