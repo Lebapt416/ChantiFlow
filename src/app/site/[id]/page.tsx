@@ -5,6 +5,7 @@ import { AddTaskForm } from './add-task-form';
 import { AddWorkerForm } from './add-worker-form';
 import { CompleteTaskButton } from './complete-task-button';
 import { SiteQrCard } from './qr-card';
+import { GeneratePlanningButton } from './generate-planning-button';
 import { AppShell } from '@/components/app-shell';
 
  type Params = {
@@ -143,9 +144,9 @@ export default async function SitePage({ params }: Params) {
         </div>
         <div className="rounded-2xl border border-zinc-100 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
           <p className="text-xs uppercase tracking-[0.3em] text-zinc-500">Planning IA</p>
-          <p className="mt-2 text-base text-zinc-500">
-            Disponible bientôt — prépare tes tâches pour l’automatisation.
-          </p>
+          <div className="mt-2">
+            <GeneratePlanningButton siteId={site.id} />
+          </div>
         </div>
       </section>
 

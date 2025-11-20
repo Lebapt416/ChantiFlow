@@ -10,7 +10,7 @@ export default async function Home() {
       data: { session },
     } = await supabase.auth.getSession();
 
-    redirect(session ? '/home' : '/login');
+    redirect(session ? '/home' : '/landing');
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Erreur inconnue';
     
