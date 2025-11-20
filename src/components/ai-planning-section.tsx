@@ -154,15 +154,21 @@ export function AIPlanningSection({ sites }: Props) {
                   <p
                     className={`mt-2 text-sm ${
                       result.reasoning.includes('algorithme de base') ||
-                      result.reasoning.includes('Erreur lors de l\'appel OpenAI')
-                        ? 'text-amber-800 dark:text-amber-200'
+                      result.reasoning.includes('Erreur lors de l\'appel OpenAI') ||
+                      result.reasoning.includes('OpenAI non disponible')
+                        ? result.reasoning.includes('429') || result.reasoning.includes('Quota')
+                          ? 'text-amber-800 dark:text-amber-200'
+                          : 'text-blue-800 dark:text-blue-200'
                         : 'text-emerald-800 dark:text-emerald-200'
                     }`}
                   >
-                    {result.reasoning}
+                    {result.reasoning.includes('OpenAI non disponible') && !result.reasoning.includes('429')
+                      ? result.reasoning.replace('⚠️ OpenAI non disponible (', '').split('). ')[1] || result.reasoning
+                      : result.reasoning}
                   </p>
                   {(result.reasoning.includes('algorithme de base') ||
-                    result.reasoning.includes('Erreur lors de l\'appel OpenAI')) && (
+                    result.reasoning.includes('Erreur lors de l\'appel OpenAI') ||
+                    (result.reasoning.includes('OpenAI non disponible') && result.reasoning.includes('429'))) && (
                     <div className="mt-4 rounded-lg bg-white/50 p-3 text-xs dark:bg-black/20">
                       {result.reasoning.includes('429') || result.reasoning.includes('Quota') ? (
                         <>

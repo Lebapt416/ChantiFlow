@@ -42,10 +42,11 @@ export async function generateAIPlanning(
 ): Promise<PlanningResult> {
   const apiKey = process.env.OPENAI_API_KEY;
 
-  // Si pas d'API key, utiliser la version basique
+  // Si pas d'API key, utiliser l'IA locale avancée
   if (!apiKey || apiKey.trim() === '') {
-    console.log('[AI Planning] Pas d\'API key OpenAI, utilisation du fallback basique');
-    return generateBasicPlanning(tasks, workers, deadline);
+    console.log('[AI Planning] Pas d\'API key OpenAI, utilisation de l\'IA locale');
+    const { generateLocalAIPlanning } = await import('./local-planning');
+    return generateLocalAIPlanning(tasks, workers, deadline, siteName);
   }
 
   try {
@@ -189,16 +190,17 @@ Réponds UNIQUEMENT avec un JSON valide dans ce format:
     console.log('[AI Planning] Planning généré avec succès:', planning.orderedTasks.length, 'tâches');
     return planning;
   } catch (error) {
-    // En cas d'erreur, utiliser la version basique mais avec un message d'erreur
-    console.error('[AI Planning] Erreur OpenAI, fallback basique:', error);
-    const basicPlanning = generateBasicPlanning(tasks, workers, deadline);
-    basicPlanning.reasoning = `Erreur lors de l'appel OpenAI: ${error instanceof Error ? error.message : 'Erreur inconnue'}. Planning généré avec algorithme de base.`;
-    return basicPlanning;
+    // En cas d'erreur, utiliser l'IA locale avancée
+    console.error('[AI Planning] Erreur OpenAI, fallback IA locale:', error);
+    const { generateLocalAIPlanning } = await import('./local-planning');
+    const localPlanning = await generateLocalAIPlanning(tasks, workers, deadline, siteName);
+    localPlanning.reasoning = `⚠️ OpenAI non disponible (${error instanceof Error ? error.message : 'Erreur inconnue'}). ${localPlanning.reasoning}`;
+    return localPlanning;
   }
 }
 
 /**
- * Version basique sans OpenAI (fallback)
+ * Version basique sans IA (fallback ultime - ne devrait plus être utilisé)
  */
 function generateBasicPlanning(
   tasks: Task[],
