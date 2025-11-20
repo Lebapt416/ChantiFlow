@@ -124,7 +124,9 @@ export function AIPlanningSection({ sites }: Props) {
               className={`rounded-2xl border p-6 ${
                 result.reasoning.includes('algorithme de base') ||
                 result.reasoning.includes('Erreur lors de l\'appel OpenAI')
-                  ? 'border-amber-200 bg-amber-50 dark:border-amber-900/60 dark:bg-amber-900/20'
+                  ? result.reasoning.includes('429') || result.reasoning.includes('Quota')
+                    ? 'border-amber-200 bg-amber-50 dark:border-amber-900/60 dark:bg-amber-900/20'
+                    : 'border-blue-200 bg-blue-50 dark:border-blue-900/60 dark:bg-blue-900/20'
                   : 'border-emerald-200 bg-emerald-50 dark:border-emerald-900/60 dark:bg-emerald-900/20'
               }`}
             >
@@ -133,7 +135,9 @@ export function AIPlanningSection({ sites }: Props) {
                   className={`h-5 w-5 ${
                     result.reasoning.includes('algorithme de base') ||
                     result.reasoning.includes('Erreur lors de l\'appel OpenAI')
-                      ? 'text-amber-600 dark:text-amber-400'
+                      ? result.reasoning.includes('429') || result.reasoning.includes('Quota')
+                        ? 'text-amber-600 dark:text-amber-400'
+                        : 'text-blue-600 dark:text-blue-400'
                       : 'text-emerald-600 dark:text-emerald-400'
                   }`}
                 />
@@ -142,17 +146,22 @@ export function AIPlanningSection({ sites }: Props) {
                     className={`text-sm font-semibold ${
                       result.reasoning.includes('algorithme de base') ||
                       result.reasoning.includes('Erreur lors de l\'appel OpenAI')
-                        ? 'text-amber-900 dark:text-amber-100'
+                        ? result.reasoning.includes('429') || result.reasoning.includes('Quota')
+                          ? 'text-amber-900 dark:text-amber-100'
+                          : 'text-blue-900 dark:text-blue-100'
                         : 'text-emerald-900 dark:text-emerald-100'
                     }`}
                   >
-                    {result.reasoning.includes('algorithme de base') ||
-                    result.reasoning.includes('Erreur lors de l\'appel OpenAI')
-                      ? '⚠️ Mode basique (OpenAI non disponible)'
-                      : 'Analyse IA'}
+                    {result.reasoning.includes('429') || result.reasoning.includes('Quota')
+                      ? '⚠️ Quota OpenAI dépassé'
+                      : result.reasoning.includes('algorithme de base')
+                        ? '⚠️ Mode basique'
+                        : result.reasoning.includes('OpenAI non disponible')
+                          ? '🤖 IA Locale Avancée'
+                          : 'Analyse IA'}
                   </h3>
                   <p
-                    className={`mt-2 text-sm ${
+                    className={`mt-2 text-sm whitespace-pre-line ${
                       result.reasoning.includes('algorithme de base') ||
                       result.reasoning.includes('Erreur lors de l\'appel OpenAI') ||
                       result.reasoning.includes('OpenAI non disponible')
@@ -163,7 +172,7 @@ export function AIPlanningSection({ sites }: Props) {
                     }`}
                   >
                     {result.reasoning.includes('OpenAI non disponible') && !result.reasoning.includes('429')
-                      ? result.reasoning.replace('⚠️ OpenAI non disponible (', '').split('). ')[1] || result.reasoning
+                      ? result.reasoning.split('). ')[1] || result.reasoning
                       : result.reasoning}
                   </p>
                   {(result.reasoning.includes('algorithme de base') ||
