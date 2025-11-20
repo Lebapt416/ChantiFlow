@@ -125,6 +125,19 @@ Réponds UNIQUEMENT avec un JSON valide dans ce format:
     if (!response.ok) {
       const errorText = await response.text();
       console.error('[AI Planning] Erreur OpenAI:', response.status, errorText);
+      
+      // Gestion spécifique de l'erreur 429 (rate limit)
+      if (response.status === 429) {
+        throw new Error(
+          'Quota OpenAI dépassé (429). Vous avez fait trop de requêtes. Attendez quelques minutes ou vérifiez votre quota sur platform.openai.com/usage',
+        );
+      }
+      
+      // Gestion de l'erreur 401 (clé invalide)
+      if (response.status === 401) {
+        throw new Error('Clé API OpenAI invalide. Vérifiez votre clé sur platform.openai.com/api-keys');
+      }
+      
       throw new Error(`OpenAI API error: ${response.status} ${response.statusText}`);
     }
 
