@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { canCreateSite } from '@/lib/plans';
 
 export type CreateSiteState = {
   error?: string;
@@ -27,6 +28,12 @@ export async function createSiteAction(
 
   if (userError || !user) {
     return { error: 'Session expirée, reconnecte-toi.' };
+  }
+
+  // Vérifier les limites du plan
+  const { allowed, reason } = await canCreateSite(user.id);
+  if (!allowed) {
+    return { error: reason || 'Limite de chantiers atteinte pour votre plan.' };
   }
 
   const { error } = await supabase.from('sites').insert({

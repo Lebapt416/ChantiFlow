@@ -3,34 +3,12 @@ import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { AppShell } from '@/components/app-shell';
 import { signOutAction } from '../actions';
 import { SignOutButton } from './sign-out-button';
+import { ChangePlanButton } from './change-plan-button';
+import { getUserPlan, type Plan } from '@/lib/plans';
 
 export const metadata = {
   title: 'Mon compte | ChantiFlow',
 };
-
-type Plan = 'basic' | 'plus' | 'pro';
-
-async function getUserPlan(userId: string): Promise<Plan> {
-  // Pour l'instant, on détermine le plan selon le nombre de chantiers
-  // Plus tard, cela viendra de la base de données ou de Stripe
-  const supabase = await createSupabaseServerClient();
-  const { data: sites } = await supabase
-    .from('sites')
-    .select('id')
-    .eq('created_by', userId);
-
-  const siteCount = sites?.length ?? 0;
-
-  if (siteCount === 0) {
-    return 'basic';
-  } else if (siteCount <= 1) {
-    return 'basic';
-  } else if (siteCount <= 5) {
-    return 'plus';
-  } else {
-    return 'pro';
-  }
-}
 
 export default async function AccountPage() {
   const supabase = await createSupabaseServerClient();
@@ -42,7 +20,7 @@ export default async function AccountPage() {
     redirect('/login');
   }
 
-  const plan = await getUserPlan(user.id);
+  const plan = await getUserPlan(user);
 
   const planNames: Record<Plan, string> = {
     basic: 'Basic',
@@ -148,20 +126,7 @@ export default async function AccountPage() {
                     <li key={index}>• {feature}</li>
                   ))}
                 </ul>
-                <button
-                  type="button"
-                  disabled
-                  className={`w-full rounded-lg px-3 py-2 text-xs font-semibold transition ${
-                    p === plan
-                      ? 'bg-emerald-600 text-white dark:bg-emerald-400 dark:text-zinc-900'
-                      : p === 'basic'
-                        ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900'
-                        : 'bg-zinc-200 text-zinc-900 dark:bg-zinc-700 dark:text-white'
-                  } disabled:cursor-not-allowed disabled:opacity-50`}
-                >
-                  {p === plan ? 'Plan actuel' : 'Choisir'}{' '}
-                  {p !== plan && '(Stripe bientôt disponible)'}
-                </button>
+                <ChangePlanButton plan={p} currentPlan={plan} />
               </div>
             ))}
           </div>

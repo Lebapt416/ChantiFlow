@@ -2,6 +2,8 @@
 
 import { Check } from 'lucide-react';
 import Link from 'next/link';
+import { PricingButton } from './pricing-button';
+import { useState, useEffect } from 'react';
 
 const plans = [
   {
@@ -54,6 +56,25 @@ const plans = [
 ];
 
 export function PricingSection() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    // Vérifier si l'utilisateur est connecté en vérifiant les cookies
+    const checkAuth = async () => {
+      try {
+        const response = await fetch('/api/auth/check', { method: 'GET' });
+        if (response.ok) {
+          setIsAuthenticated(true);
+        }
+      } catch {
+        // Si l'endpoint n'existe pas, on vérifie autrement
+        // Pour l'instant, on laisse à false et on redirigera vers login
+        setIsAuthenticated(false);
+      }
+    };
+    checkAuth();
+  }, []);
+
   return (
     <section id="pricing" className="mx-auto max-w-7xl px-6 py-20">
       <div className="mx-auto max-w-2xl text-center">
@@ -114,19 +135,21 @@ export function PricingSection() {
             </ul>
 
             <div className="mt-8">
-              <button
-                type="button"
-                disabled
-                className={`w-full rounded-full px-6 py-3 text-sm font-semibold transition ${
+              <PricingButton
+                plan={plan.name.toLowerCase() as 'basic' | 'plus' | 'pro'}
+                isAuthenticated={isAuthenticated}
+                className={`w-full rounded-full px-6 py-3 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-50 ${
                   plan.popular
                     ? 'bg-emerald-600 text-white hover:bg-emerald-700 dark:bg-emerald-400 dark:text-zinc-900 dark:hover:bg-emerald-300'
                     : 'bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200'
-                } disabled:cursor-not-allowed disabled:opacity-50`}
+                }`}
               >
-                {plan.cta} (Stripe bientôt disponible)
-              </button>
+                {plan.cta}
+              </PricingButton>
               <p className="mt-2 text-center text-xs text-zinc-500 dark:text-zinc-400">
-                Le paiement sera disponible prochainement
+                {isAuthenticated
+                  ? 'Cliquez pour activer ce plan (gratuit)'
+                  : 'Connectez-vous pour choisir un plan'}
               </p>
             </div>
           </div>
