@@ -13,6 +13,7 @@ import {
   FolderKanban,
   Sparkles,
   User,
+  Calendar,
 } from 'lucide-react';
 
 type NavItem = {
@@ -36,9 +37,10 @@ type AppShellProps = {
 };
 
 const baseNavItems: NavItem[] = [
+  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/home', label: 'Accueil', icon: Home },
   { href: '/sites', label: 'Chantiers', icon: FolderKanban },
-  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/planning', label: 'Planning', icon: Calendar },
   { href: '/ai', label: 'IA Planning', icon: Sparkles },
   { href: '/tasks', label: 'Tâches', icon: ListChecks },
   { href: '/team', label: 'Équipe', icon: UsersRound },

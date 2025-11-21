@@ -5,6 +5,8 @@ import { CreateSiteForm } from './create-site-form';
 import { signOutAction } from '../actions';
 import { AppShell } from '@/components/app-shell';
 import { DashboardCharts } from './dashboard-charts';
+import { SitePlanningMini } from '@/components/site-planning-mini';
+import { generatePlanning } from '@/lib/ai/planning';
 
 export const metadata = {
   title: 'Dashboard | ChantiFlow',
@@ -47,6 +49,49 @@ export default async function DashboardPage() {
     .filter((site) => site.deadline)
     .sort((a, b) => (a.deadline ?? '').localeCompare(b.deadline ?? ''))
     .slice(0, 4);
+
+  // Récupérer les plannings de tous les chantiers (limité à 6 pour performance)
+  const sitesWithPlanning = await Promise.all(
+    (sites ?? []).slice(0, 6).map(async (site) => {
+      const [{ data: tasks }, { data: workers }] = await Promise.all([
+        supabase
+          .from('tasks')
+          .select('id, title, required_role, duration_hours, status')
+          .eq('site_id', site.id),
+        supabase
+          .from('workers')
+          .select('id, name, email, role')
+          .eq('site_id', site.id),
+      ]);
+
+      let planning: any[] = [];
+      if (tasks && tasks.length > 0) {
+        try {
+          const planningResult = await generatePlanning(
+            tasks || [],
+            workers || [],
+            site.deadline,
+          );
+          planning = planningResult.orderedTasks.map((p: any) => ({
+            taskId: p.taskId,
+            taskTitle: tasks.find((t) => t.id === p.taskId)?.title || 'Tâche',
+            startDate: p.startDate,
+            endDate: p.endDate,
+            assignedWorkerId: p.assignedWorkerId,
+          }));
+        } catch (error) {
+          console.error(`Erreur génération planning pour ${site.name}:`, error);
+        }
+      }
+
+      return {
+        site,
+        planning,
+        workerCount: workers?.length || 0,
+        taskCount: tasks?.length || 0,
+      };
+    }),
+  );
 
   return (
     <AppShell
@@ -159,6 +204,43 @@ export default async function DashboardPage() {
         </div>
 
         <div className="space-y-6">
+          {/* Graphique d'occupation des chantiers */}
+          <div className="rounded-3xl border border-zinc-100 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+            <div className="mb-4 flex items-center justify-between">
+              <div>
+                <h2 className="text-lg font-semibold text-zinc-900 dark:text-white">
+                  Occupation des chantiers
+                </h2>
+                <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                  Vue d'ensemble des plannings et de l'occupation
+                </p>
+              </div>
+              <Link
+                href="/planning"
+                className="text-xs font-semibold text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
+              >
+                Voir tout →
+              </Link>
+            </div>
+            {sitesWithPlanning.length > 0 ? (
+              <div className="grid gap-4 md:grid-cols-2">
+                {sitesWithPlanning.map(({ site, planning, workerCount, taskCount }) => (
+                  <SitePlanningMini
+                    key={site.id}
+                    site={site}
+                    planning={planning}
+                    workerCount={workerCount}
+                    taskCount={taskCount}
+                  />
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-zinc-500 dark:text-zinc-400 text-center py-4">
+                Aucun planning disponible. Générez un planning pour vos chantiers.
+              </p>
+            )}
+          </div>
+
           <DashboardCharts
             sites={sites ?? []}
             totalTasks={totalTasks}

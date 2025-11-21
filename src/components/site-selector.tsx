@@ -20,7 +20,13 @@ export function SiteSelector({ sites, currentSiteId }: Props) {
   function handleChange(e: React.ChangeEvent<HTMLSelectElement>) {
     const siteId = e.target.value;
     if (siteId) {
-      router.push(`/site/${siteId}`);
+      // Détecter si on est sur /planning ou /site
+      const path = window.location.pathname;
+      if (path.startsWith('/planning')) {
+        router.push(`/planning?site=${siteId}`);
+      } else {
+        router.push(`/site/${siteId}`);
+      }
     }
   }
 
