@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Check, Zap, Users, QrCode, Brain, Calendar } from 'lucide-react';
+import { Check, Zap, Users, QrCode, Brain, Calendar, Clock, AlertTriangle, MessageSquare, FileText, Camera, TrendingUp, Shield } from 'lucide-react';
 import { PricingSection } from '@/components/pricing-section';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 
@@ -56,27 +56,132 @@ export default async function LandingPage() {
       <section className="mx-auto max-w-7xl px-6 py-20">
         <div className="mx-auto max-w-3xl text-center">
           <h1 className="text-5xl font-bold tracking-tight text-zinc-900 dark:text-white sm:text-6xl">
-            Gérez vos chantiers avec{' '}
-            <span className="text-emerald-600 dark:text-emerald-400">l'intelligence artificielle</span>
+            Gérez vos chantiers{' '}
+            <span className="text-emerald-600 dark:text-emerald-400">30% plus vite</span>{' '}
+            grâce à l'IA
           </h1>
           <p className="mt-6 text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            ChantiFlow simplifie la gestion de vos chantiers avec planification automatique, QR codes
-            pour vos équipes, et suivi en temps réel. Optimisez vos projets de construction dès
-            aujourd'hui.
+            ChantiFlow automatise votre planning, centralise vos équipes, génère vos rapports, et suit l'avancement de vos chantiers en temps réel — sans Excel, sans appels inutiles.
           </p>
-          <div className="mt-10 flex items-center justify-center gap-x-6">
+          <div className="mt-10 flex flex-col items-center justify-center gap-4">
             <Link
               href="/login"
-              className="rounded-full bg-black px-6 py-3 text-base font-semibold text-white shadow-lg transition hover:bg-zinc-800 dark:bg-white dark:text-black dark:hover:bg-zinc-200"
+              className="rounded-full bg-black px-8 py-4 text-lg font-bold text-white shadow-xl transition hover:bg-zinc-800 dark:bg-white dark:text-black dark:hover:bg-zinc-200"
             >
               Démarrer gratuitement
             </Link>
-            <Link
-              href="#features"
-              className="text-base font-semibold leading-6 text-zinc-900 dark:text-white"
-            >
-              En savoir plus <span aria-hidden="true">→</span>
-            </Link>
+            <p className="text-sm text-zinc-500 dark:text-zinc-400">
+              ✓ Compatible smartphone et QR codes de chantier
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Comment ça marche */}
+      <section className="mx-auto max-w-7xl px-6 py-20">
+        <div className="mx-auto max-w-2xl text-center">
+          <h2 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-white sm:text-4xl">
+            Comment ça marche ?
+          </h2>
+          <p className="mt-4 text-lg text-zinc-600 dark:text-zinc-400">
+            En 3 étapes simples, transformez votre gestion de chantier
+          </p>
+        </div>
+
+        <div className="mx-auto mt-16 grid max-w-2xl grid-cols-1 gap-8 sm:grid-cols-3 lg:max-w-none">
+          <div className="rounded-2xl border border-zinc-200 bg-white p-8 text-center shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-900/30">
+              <span className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">1</span>
+            </div>
+            <h3 className="mt-6 text-lg font-semibold text-zinc-900 dark:text-white">
+              Créez votre chantier
+            </h3>
+            <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+              Définissez vos tâches, équipes et deadlines en quelques clics
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-zinc-200 bg-white p-8 text-center shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/30">
+              <span className="text-2xl font-bold text-blue-600 dark:text-blue-400">2</span>
+            </div>
+            <h3 className="mt-6 text-lg font-semibold text-zinc-900 dark:text-white">
+              Liez vos équipes
+            </h3>
+            <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+              Partagez un QR code : vos employés accèdent instantanément à leurs tâches
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-zinc-200 bg-white p-8 text-center shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-purple-100 dark:bg-purple-900/30">
+              <span className="text-2xl font-bold text-purple-600 dark:text-purple-400">3</span>
+            </div>
+            <h3 className="mt-6 text-lg font-semibold text-zinc-900 dark:text-white">
+              L'IA optimise tout
+            </h3>
+            <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+              Planification automatique, suivi en temps réel, rapports générés automatiquement
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Pourquoi ChantiFlow ? */}
+      <section className="mx-auto max-w-7xl px-6 py-20">
+        <div className="mx-auto max-w-2xl text-center">
+          <h2 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-white sm:text-4xl">
+            Pourquoi ChantiFlow ?
+          </h2>
+          <p className="mt-4 text-lg text-zinc-600 dark:text-zinc-400">
+            Les problèmes du BTP, résolus par l'IA
+          </p>
+        </div>
+
+        <div className="mx-auto mt-16 grid max-w-2xl grid-cols-1 gap-8 sm:grid-cols-3 lg:max-w-none">
+          <div className="rounded-2xl border border-zinc-200 bg-white p-8 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-rose-100 dark:bg-rose-900/30">
+              <Clock className="h-6 w-6 text-rose-600 dark:text-rose-400" />
+            </div>
+            <h3 className="mt-6 text-lg font-semibold text-zinc-900 dark:text-white">
+              Retards de chantier
+            </h3>
+            <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+              <span className="font-semibold text-rose-600 dark:text-rose-400">Problème :</span> Délais non respectés, planning désorganisé
+            </p>
+            <p className="mt-4 text-sm font-semibold text-emerald-600 dark:text-emerald-400">
+              ✓ Solution : Planning optimisé par IA, alertes automatiques, suivi en temps réel
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-zinc-200 bg-white p-8 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-amber-100 dark:bg-amber-900/30">
+              <MessageSquare className="h-6 w-6 text-amber-600 dark:text-amber-400" />
+            </div>
+            <h3 className="mt-6 text-lg font-semibold text-zinc-900 dark:text-white">
+              Mauvaise communication
+            </h3>
+            <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+              <span className="font-semibold text-rose-600 dark:text-rose-400">Problème :</span> Appels multiples, informations perdues
+            </p>
+            <p className="mt-4 text-sm font-semibold text-emerald-600 dark:text-emerald-400">
+              ✓ Solution : QR codes instantanés, rapports centralisés, notifications automatiques
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-zinc-200 bg-white p-8 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-indigo-100 dark:bg-indigo-900/30">
+              <FileText className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
+            </div>
+            <h3 className="mt-6 text-lg font-semibold text-zinc-900 dark:text-white">
+              Perte d'informations
+            </h3>
+            <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+              <span className="font-semibold text-rose-600 dark:text-rose-400">Problème :</span> Photos perdues, rapports éparpillés
+            </p>
+            <p className="mt-4 text-sm font-semibold text-emerald-600 dark:text-emerald-400">
+              ✓ Solution : Stockage centralisé, photos liées aux rapports, historique complet
+            </p>
           </div>
         </div>
       </section>
@@ -85,96 +190,102 @@ export default async function LandingPage() {
       <section id="features" className="mx-auto max-w-7xl px-6 py-20">
         <div className="mx-auto max-w-2xl text-center">
           <h2 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-white sm:text-4xl">
-            Tout ce dont vous avez besoin pour gérer vos chantiers
+            Tout ce dont vous avez besoin
           </h2>
           <p className="mt-4 text-lg text-zinc-600 dark:text-zinc-400">
             Des outils puissants pour optimiser vos projets de construction
           </p>
         </div>
 
-        <div className="mx-auto mt-16 grid max-w-2xl grid-cols-1 gap-8 sm:grid-cols-2 lg:max-w-none lg:grid-cols-3">
-          <div className="rounded-2xl border border-zinc-200 bg-white p-8 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-emerald-100 dark:bg-emerald-900/30">
-              <Brain className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
+        {/* Image placeholder - À remplacer par une vraie maquette */}
+        <div className="mx-auto mt-12 max-w-5xl">
+          <div className="rounded-2xl border border-zinc-200 bg-gradient-to-br from-zinc-50 to-zinc-100 p-8 dark:border-zinc-800 dark:from-zinc-900 dark:to-zinc-950">
+            <div className="aspect-video rounded-lg bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center">
+              <p className="text-zinc-500 dark:text-zinc-400 text-sm">
+                [Maquette de l'application - À remplacer par une capture d'écran ou design Figma]
+              </p>
             </div>
-            <h3 className="mt-6 text-lg font-semibold text-zinc-900 dark:text-white">
-              Planification IA
-            </h3>
-            <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-              Notre IA génère automatiquement un planning optimisé en fonction de vos tâches, équipes
-              et deadlines. Les tâches sont classées par ordre logique et priorité.
-            </p>
+          </div>
+        </div>
+
+        <div className="mx-auto mt-16 grid max-w-2xl grid-cols-1 gap-6 sm:grid-cols-2 lg:max-w-none lg:grid-cols-3">
+          <div className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+            <div className="flex items-center gap-3">
+              <Brain className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+              <h3 className="text-base font-semibold text-zinc-900 dark:text-white">
+                Planning automatique
+              </h3>
+            </div>
           </div>
 
-          <div className="rounded-2xl border border-zinc-200 bg-white p-8 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/30">
-              <QrCode className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+          <div className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+            <div className="flex items-center gap-3">
+              <QrCode className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+              <h3 className="text-base font-semibold text-zinc-900 dark:text-white">
+                QR codes pour les équipes
+              </h3>
             </div>
-            <h3 className="mt-6 text-lg font-semibold text-zinc-900 dark:text-white">
-              Accès QR codes
-            </h3>
-            <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-              Vos employés accèdent à leurs tâches via QR code, sans compte. Ils peuvent uploader
-              des photos et envoyer des rapports directement depuis leur téléphone.
-            </p>
           </div>
 
-          <div className="rounded-2xl border border-zinc-200 bg-white p-8 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-purple-100 dark:bg-purple-900/30">
-              <Users className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+          <div className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+            <div className="flex items-center gap-3">
+              <FileText className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+              <h3 className="text-base font-semibold text-zinc-900 dark:text-white">
+                Rapports auto
+              </h3>
             </div>
-            <h3 className="mt-6 text-lg font-semibold text-zinc-900 dark:text-white">
-              Gestion d'équipe
-            </h3>
-            <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-              Ajoutez vos équipes, assignez des rôles, et suivez l'avancement de chaque projet en
-              temps réel avec des statistiques détaillées.
-            </p>
           </div>
 
-          <div className="rounded-2xl border border-zinc-200 bg-white p-8 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-amber-100 dark:bg-amber-900/30">
-              <Calendar className="h-6 w-6 text-amber-600 dark:text-amber-400" />
+          <div className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+            <div className="flex items-center gap-3">
+              <Camera className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+              <h3 className="text-base font-semibold text-zinc-900 dark:text-white">
+                Photos & documents
+              </h3>
             </div>
-            <h3 className="mt-6 text-lg font-semibold text-zinc-900 dark:text-white">
-              Suivi en temps réel
-            </h3>
-            <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-              Visualisez l'avancement de vos chantiers, les tâches terminées, et recevez des
-              rapports avec photos directement depuis le terrain.
-            </p>
           </div>
 
-          <div className="rounded-2xl border border-zinc-200 bg-white p-8 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-rose-100 dark:bg-rose-900/30">
-              <Zap className="h-6 w-6 text-rose-600 dark:text-rose-400" />
+          <div className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+            <div className="flex items-center gap-3">
+              <TrendingUp className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+              <h3 className="text-base font-semibold text-zinc-900 dark:text-white">
+                Suivi en temps réel
+              </h3>
             </div>
-            <h3 className="mt-6 text-lg font-semibold text-zinc-900 dark:text-white">
-              Interface simple
-            </h3>
-            <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-              Une interface intuitive et moderne, accessible depuis n'importe quel appareil. Mode
-              sombre inclus pour travailler dans toutes les conditions.
-            </p>
           </div>
 
-          <div className="rounded-2xl border border-zinc-200 bg-white p-8 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-indigo-100 dark:bg-indigo-900/30">
-              <Check className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
+          <div className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+            <div className="flex items-center gap-3">
+              <AlertTriangle className="h-5 w-5 text-rose-600 dark:text-rose-400" />
+              <h3 className="text-base font-semibold text-zinc-900 dark:text-white">
+                Alerte retards
+              </h3>
             </div>
-            <h3 className="mt-6 text-lg font-semibold text-zinc-900 dark:text-white">
-              Optimisation automatique
-            </h3>
-            <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-              L'IA classe automatiquement vos tâches par ordre logique, identifie les dépendances,
-              et optimise l'utilisation de vos ressources.
-            </p>
           </div>
         </div>
       </section>
 
       {/* Pricing Section */}
       <PricingSection isAuthenticated={isAuthenticated} />
+
+      {/* À propos */}
+      <section className="mx-auto max-w-7xl px-6 py-20">
+        <div className="mx-auto max-w-3xl">
+          <div className="rounded-3xl border border-zinc-200 bg-white p-12 text-center dark:border-zinc-800 dark:bg-zinc-900">
+            <h2 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-white sm:text-4xl">
+              Qui sommes-nous ?
+            </h2>
+            <p className="mt-6 text-lg leading-8 text-zinc-600 dark:text-zinc-400">
+              Nous sommes deux jeunes entrepreneurs passionnés par la modernisation du BTP. 
+              Face aux défis quotidiens des chantiers — retards, communication difficile, perte d'informations — 
+              nous avons créé ChantiFlow pour apporter une solution simple, efficace et assistée par l'IA.
+            </p>
+            <p className="mt-4 text-base text-zinc-600 dark:text-zinc-400">
+              Notre mission : rendre la gestion de chantier accessible à tous, sans complexité inutile.
+            </p>
+          </div>
+        </div>
+      </section>
 
       {/* CTA Section */}
       <section className="mx-auto max-w-7xl px-6 py-20">
@@ -189,7 +300,7 @@ export default async function LandingPage() {
           <div className="mt-10 flex items-center justify-center gap-x-6">
             <Link
               href="/login"
-              className="rounded-full bg-white px-6 py-3 text-base font-semibold text-zinc-900 shadow-lg transition hover:bg-zinc-100"
+              className="rounded-full bg-white px-8 py-4 text-lg font-bold text-zinc-900 shadow-xl transition hover:bg-zinc-100"
             >
               Commencer gratuitement
             </Link>
@@ -198,24 +309,87 @@ export default async function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-zinc-200 dark:border-zinc-800">
+      <footer className="border-t border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900">
         <div className="mx-auto max-w-7xl px-6 py-12">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-black text-white dark:bg-white dark:text-black">
-                <Zap className="h-5 w-5" />
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
+            {/* Logo et description */}
+            <div className="col-span-1 md:col-span-2">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-black text-white dark:bg-white dark:text-black">
+                  <Zap className="h-5 w-5" />
+                </div>
+                <span className="text-lg font-bold text-zinc-900 dark:text-white">
+                  ChantiFlow
+                </span>
               </div>
-              <span className="text-lg font-bold text-zinc-900 dark:text-white">
-                ChantiFlow
-              </span>
+              <p className="text-sm text-zinc-600 dark:text-zinc-400 max-w-md">
+                La gestion de chantier simplifiée, assistée par l'intelligence artificielle.
+              </p>
             </div>
-            <p className="text-sm text-zinc-600 dark:text-zinc-400">
-              © 2025 ChantiFlow. Tous droits réservés.
-            </p>
+
+            {/* Liens légaux */}
+            <div>
+              <h3 className="text-sm font-semibold text-zinc-900 dark:text-white mb-4">
+                Légal
+              </h3>
+              <ul className="space-y-2">
+                <li>
+                  <Link
+                    href="/mentions-legales"
+                    className="text-sm text-zinc-600 transition hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
+                  >
+                    Mentions légales
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/politique-confidentialite"
+                    className="text-sm text-zinc-600 transition hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
+                  >
+                    Politique de confidentialité
+                  </Link>
+                </li>
+              </ul>
+            </div>
+
+            {/* Contact */}
+            <div>
+              <h3 className="text-sm font-semibold text-zinc-900 dark:text-white mb-4">
+                Contact
+              </h3>
+              <ul className="space-y-2">
+                <li>
+                  <a
+                    href="mailto:contact@chantiflow.com"
+                    className="text-sm text-zinc-600 transition hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
+                  >
+                    contact@chantiflow.com
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="mailto:admin@chantiflow.com"
+                    className="text-sm text-zinc-600 transition hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
+                  >
+                    admin@chantiflow.com
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="mt-8 border-t border-zinc-200 pt-8 dark:border-zinc-800">
+            <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
+              <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                © 2025 ChantiFlow. Tous droits réservés.
+              </p>
+              <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                ChantiFlow SAS
+              </p>
+            </div>
           </div>
         </div>
       </footer>
     </div>
   );
 }
-
