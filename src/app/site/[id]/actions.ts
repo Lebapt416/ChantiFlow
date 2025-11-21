@@ -9,6 +9,7 @@ import { generateAccessCode } from '@/lib/access-code';
 export type ActionState = {
   error?: string;
   success?: boolean;
+  message?: string;
 };
 
 export async function addTaskAction(
@@ -424,6 +425,9 @@ export async function completeSiteAction(
     });
   }
 
+  let emailMessage: string | undefined;
+  let emailError: string | undefined;
+
   // Envoyer les emails
   if (emailRecipients.length > 0) {
     const emailPromises = emailRecipients.map((recipient) =>
@@ -431,15 +435,17 @@ export async function completeSiteAction(
         workerEmail: recipient.email,
         workerName: recipient.name,
         siteName: site.name,
-      })
+      }),
     );
 
     try {
       const results = await Promise.allSettled(emailPromises);
       const successCount = results.filter((r) => r.status === 'fulfilled').length;
       const failureCount = results.filter((r) => r.status === 'rejected').length;
-      console.log(`✅ Emails de fin de chantier: ${successCount} envoyé(s), ${failureCount} échec(s)`);
-      
+      console.log(
+        `✅ Emails de fin de chantier: ${successCount} envoyé(s), ${failureCount} échec(s)`,
+      );
+
       if (failureCount > 0) {
         results.forEach((result, index) => {
           if (result.status === 'rejected') {
@@ -447,12 +453,26 @@ export async function completeSiteAction(
           }
         });
       }
+
+      if (successCount === 0) {
+        emailError =
+          "Impossible d'envoyer les emails de notification. Vérifie la configuration Resend.";
+      } else {
+        emailMessage = `Notification envoyée (${successCount}/${emailRecipients.length}).${
+          failureCount > 0 ? ` ${failureCount} email(s) n'ont pas pu être envoyés.` : ''
+        }`;
+        if (failureCount > 0) {
+          emailError = `${failureCount} email(s) n'ont pas pu être envoyés.`;
+        }
+      }
     } catch (error) {
       console.error('❌ Erreur envoi emails fin de chantier:', error);
-      // Ne pas bloquer si l'envoi d'email échoue
+      emailError = "Erreur lors de l'envoi des emails de notification.";
     }
   } else {
-    console.warn('⚠️ Aucun destinataire d\'email trouvé pour la notification de fin de chantier');
+    emailMessage =
+      'Aucun email disponible pour notifier ce chantier (aucun employé avec email).';
+    console.warn("⚠️ Aucun destinataire d'email trouvé pour la notification de fin de chantier");
   }
 
   // Enregistrer le chantier comme terminé dans les métadonnées de l'utilisateur
@@ -480,6 +500,11 @@ export async function completeSiteAction(
   revalidatePath(`/site/${siteId}`);
   revalidatePath('/dashboard');
   revalidatePath('/sites');
-  return { success: true };
+
+  return {
+    success: true,
+    message: emailMessage ?? 'Chantier terminé. Aucune notification envoyée.',
+    ...(emailError ? { error: emailError } : {}),
+  };
 }
 

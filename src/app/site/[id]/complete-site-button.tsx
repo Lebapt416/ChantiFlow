@@ -26,13 +26,10 @@ const initialState: ActionState = {};
 
 export function CompleteSiteButton({ siteId, siteName }: Props) {
   const [showConfirm, setShowConfirm] = useState(false);
-  const completeSiteFormAction = completeSiteAction as unknown as (
-    state: ActionState,
-    formData: FormData,
-  ) => Promise<ActionState>;
-  // @ts-expect-error React useFormState typings n'acceptent pas encore les Server Actions avec FormData
-  const [state, formAction] = useFormState<ActionState>(completeSiteFormAction, initialState);
+  // @ts-expect-error Next.js types n'acceptent pas encore les Server Actions directement avec useFormState
+  const [state, formAction] = useFormState<ActionState>(completeSiteAction, initialState);
   const [error, setError] = useState<string | null>(null);
+  const [info, setInfo] = useState<string | null>(null);
 
   useEffect(() => {
     if (state?.error) {
@@ -41,6 +38,9 @@ export function CompleteSiteButton({ siteId, siteName }: Props) {
     } else if (state?.success) {
       setError(null);
       setShowConfirm(false);
+      setInfo(state.message ?? 'Chantier terminé.');
+    } else if (state?.message) {
+      setInfo(state.message);
     }
   }, [state]);
 
@@ -79,16 +79,23 @@ export function CompleteSiteButton({ siteId, siteName }: Props) {
   }
 
   return (
-    <button
-      type="button"
-      onClick={() => {
-        setError(null);
-        setShowConfirm(true);
-      }}
-      className="rounded-full border border-rose-600 bg-rose-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-rose-700 dark:border-rose-500 dark:bg-rose-500 dark:hover:bg-rose-600"
-    >
-      Terminer le chantier
-    </button>
+    <div className="space-y-3">
+      <button
+        type="button"
+        onClick={() => {
+          setError(null);
+          setShowConfirm(true);
+        }}
+        className="rounded-full border border-rose-600 bg-rose-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-rose-700 dark:border-rose-500 dark:bg-rose-500 dark:hover:bg-rose-600"
+      >
+        Terminer le chantier
+      </button>
+      {info && (
+        <p className="text-xs text-emerald-700 dark:text-emerald-300">
+          {info}
+        </p>
+      )}
+    </div>
   );
 }
 

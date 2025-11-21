@@ -7,6 +7,7 @@ type Site = {
   id: string;
   name: string;
   deadline: string | null;
+  completed_at?: string | null;
 };
 
 type PlanningTask = {
@@ -48,10 +49,17 @@ export function SitePlanningMini({ site, planning, workerCount, taskCount }: Pro
 
   const occupation = calculateOccupation();
 
+  const isCompleted = Boolean(site.completed_at);
+  const badgeLabel = isCompleted ? 'Terminé' : 'Actif';
+  const badgeColor = isCompleted ? 'bg-zinc-200 text-zinc-600' : 'bg-emerald-100 text-emerald-700';
+  const barColor = isCompleted ? '#94a3b8' : '#10b981';
+
   return (
     <Link
       href={`/planning?site=${site.id}`}
-      className="block rounded-2xl border border-zinc-200 bg-white p-4 transition hover:border-zinc-900 hover:shadow-lg dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-white"
+      className={`block rounded-2xl border bg-white p-4 transition hover:border-zinc-900 hover:shadow-lg dark:bg-zinc-900 dark:hover:border-white ${
+        isCompleted ? 'border-zinc-200 dark:border-zinc-800 opacity-80' : 'border-zinc-200 dark:border-zinc-800'
+      }`}
     >
       <div className="flex items-start justify-between mb-3">
         <div className="flex-1">
@@ -64,7 +72,14 @@ export function SitePlanningMini({ site, planning, workerCount, taskCount }: Pro
             </p>
           )}
         </div>
-        <Calendar className="h-5 w-5 text-zinc-400 flex-shrink-0" />
+        <div className="flex flex-col items-end gap-1">
+          <span
+            className={`rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${badgeColor}`}
+          >
+            {badgeLabel}
+          </span>
+          <Calendar className="h-5 w-5 text-zinc-400 flex-shrink-0" />
+        </div>
       </div>
 
       <div className="space-y-2">
@@ -75,7 +90,7 @@ export function SitePlanningMini({ site, planning, workerCount, taskCount }: Pro
         <div className="h-2 rounded-full bg-zinc-200 dark:bg-zinc-800 overflow-hidden">
           <div
             className="h-full bg-emerald-500 transition-all"
-            style={{ width: `${Math.min(occupation, 100)}%` }}
+            style={{ width: `${Math.min(occupation, 100)}%`, backgroundColor: barColor }}
           />
         </div>
         <div className="flex items-center justify-between text-xs text-zinc-500 dark:text-zinc-400 pt-1">

@@ -24,11 +24,13 @@ export default async function DashboardPage() {
 
   const { data: sites, error } = await supabase
     .from('sites')
-    .select('id, name, deadline, created_at')
+    .select('id, name, deadline, created_at, completed_at')
     .eq('created_by', user.id)
     .order('created_at', { ascending: false });
 
   const siteIds = sites?.map((site) => site.id) ?? [];
+  const completedSites = (sites ?? []).filter((site) => site.completed_at);
+  const activeSites = (sites ?? []).filter((site) => !site.completed_at);
 
   let totalTasks = 0;
   let doneTasks = 0;
@@ -45,14 +47,14 @@ export default async function DashboardPage() {
 
   const pendingTasks = totalTasks - doneTasks;
 
-  const nextDeadlines = (sites ?? [])
+  const nextDeadlines = (activeSites ?? [])
     .filter((site) => site.deadline)
     .sort((a, b) => (a.deadline ?? '').localeCompare(b.deadline ?? ''))
     .slice(0, 4);
 
   // Récupérer les plannings de tous les chantiers (limité à 6 pour performance)
   const sitesWithPlanning = await Promise.all(
-    (sites ?? []).slice(0, 6).map(async (site) => {
+    (activeSites ?? []).slice(0, 6).map(async (site) => {
       const [{ data: tasks }, { data: workers }] = await Promise.all([
         supabase
           .from('tasks')
@@ -114,7 +116,9 @@ export default async function DashboardPage() {
         <div className="rounded-2xl border border-zinc-100 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
           <p className="text-xs uppercase tracking-[0.3em] text-zinc-500">Chantiers</p>
           <p className="mt-2 text-3xl font-semibold">{sites?.length ?? 0}</p>
-          <p className="text-sm text-zinc-500">sites suivis</p>
+          <p className="text-sm text-zinc-500">
+            {completedSites.length} terminé{completedSites.length > 1 ? 's' : ''}
+          </p>
         </div>
         <div className="rounded-2xl border border-zinc-100 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
           <p className="text-xs uppercase tracking-[0.3em] text-zinc-500">Tâches</p>
@@ -179,9 +183,16 @@ export default async function DashboardPage() {
                         ? new Date(site.deadline).toLocaleDateString('fr-FR')
                         : 'Non définie'}
                     </p>
-                    <h3 className="mt-3 text-lg font-semibold text-zinc-900 dark:text-white">
-                      {site.name}
-                    </h3>
+                    <div className="mt-3 flex items-center justify-between">
+                      <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">
+                        {site.name}
+                      </h3>
+                      {site.completed_at && (
+                        <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300">
+                          Terminé
+                        </span>
+                      )}
+                    </div>
                     <p className="text-xs text-zinc-500 dark:text-zinc-400">
                       Créé le{' '}
                       {new Date(site.created_at ?? '').toLocaleDateString('fr-FR')}
@@ -241,8 +252,48 @@ export default async function DashboardPage() {
             )}
           </div>
 
+          {completedSites.length > 0 && (
+            <div className="rounded-3xl border border-zinc-100 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+              <div className="mb-4 flex items-center justify-between">
+                <h2 className="text-lg font-semibold text-zinc-900 dark:text-white">
+                  Chantiers terminés
+                </h2>
+                <span className="text-xs text-zinc-500 dark:text-zinc-400">
+                  {completedSites.length} chantier{completedSites.length > 1 ? 's' : ''}
+                </span>
+              </div>
+              <ul className="space-y-3">
+                {completedSites.slice(0, 4).map((site) => (
+                  <li
+                    key={site.id}
+                    className="rounded-2xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+                  >
+                    <div className="flex items-center justify-between">
+                      <p className="font-semibold text-zinc-900 dark:text-white">{site.name}</p>
+                      <span className="text-[10px] uppercase tracking-wide text-zinc-500">
+                        Terminé
+                      </span>
+                    </div>
+                    <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                      Clos le{' '}
+                      {site.completed_at
+                        ? new Date(site.completed_at).toLocaleDateString('fr-FR')
+                        : 'date inconnue'}
+                    </p>
+                    <Link
+                      href={`/site/${site.id}`}
+                      className="mt-2 inline-flex text-xs font-semibold text-emerald-600 hover:text-emerald-800 dark:text-emerald-300"
+                    >
+                      Voir le chantier →
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
           <DashboardCharts
-            sites={sites ?? []}
+            sites={activeSites}
             totalTasks={totalTasks}
             doneTasks={doneTasks}
             pendingTasks={pendingTasks}
