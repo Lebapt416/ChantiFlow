@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useTransition } from 'react';
+import { useRouter } from 'next/navigation';
 import { Trash2 } from 'lucide-react';
 import { deleteWorkerAction } from '@/app/team/actions';
 
@@ -10,6 +11,7 @@ type Props = {
 };
 
 export function DeleteWorkerButton({ workerId, workerName }: Props) {
+  const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [showConfirm, setShowConfirm] = useState(false);
 
@@ -26,8 +28,10 @@ export function DeleteWorkerButton({ workerId, workerName }: Props) {
       
       if (result.error) {
         alert(`Erreur: ${result.error}`);
-      } else {
         setShowConfirm(false);
+      } else {
+        // Rafraîchir la page pour afficher les changements
+        router.refresh();
       }
     });
   }
