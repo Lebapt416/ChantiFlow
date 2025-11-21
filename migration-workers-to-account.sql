@@ -27,7 +27,13 @@ CREATE UNIQUE INDEX IF NOT EXISTS workers_user_email_unique
   WHERE site_id IS NULL AND created_by IS NOT NULL AND email IS NOT NULL;
 
 -- 5. Mettre à jour les politiques RLS pour inclure les workers au niveau du compte
+-- Supprimer les anciennes politiques si elles existent
 DROP POLICY IF EXISTS "Users can view workers from their sites" ON public.workers;
+DROP POLICY IF EXISTS "Users can view workers from their sites or account" ON public.workers;
+DROP POLICY IF EXISTS "Users can create workers for their sites" ON public.workers;
+DROP POLICY IF EXISTS "Users can create workers for their sites or account" ON public.workers;
+
+-- Créer les nouvelles politiques
 CREATE POLICY "Users can view workers from their sites or account"
   ON public.workers FOR SELECT
   USING (
@@ -42,7 +48,6 @@ CREATE POLICY "Users can view workers from their sites or account"
     workers.created_by = auth.uid()
   );
 
-DROP POLICY IF EXISTS "Users can create workers for their sites" ON public.workers;
 CREATE POLICY "Users can create workers for their sites or account"
   ON public.workers FOR INSERT
   WITH CHECK (
