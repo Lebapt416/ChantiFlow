@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
-import { sendWorkerWelcomeEmail } from '@/lib/email';
+import { sendWorkerWelcomeEmail, sendSiteCompletedEmail } from '@/lib/email';
 import { generateAccessCode } from '@/lib/access-code';
 
 export type ActionState = {
@@ -312,5 +312,94 @@ export async function completeTaskAction(formData: FormData) {
     .eq('id', taskId);
 
   revalidatePath(`/site/${siteId}`);
+}
+
+export async function completeSiteAction(
+  _prevState: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  const siteId = String(formData.get('siteId') ?? '');
+
+  if (!siteId) {
+    return { error: 'Site requis.' };
+  }
+
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: 'Non authentifié.' };
+  }
+
+  // Vérifier que le chantier appartient à l'utilisateur
+  const { data: site } = await supabase
+    .from('sites')
+    .select('id, name, created_by')
+    .eq('id', siteId)
+    .eq('created_by', user.id)
+    .single();
+
+  if (!site) {
+    return { error: 'Chantier non trouvé ou accès refusé.' };
+  }
+
+  // Récupérer tous les workers du chantier avant de les retirer
+  const { data: workers } = await supabase
+    .from('workers')
+    .select('id, name, email, site_id')
+    .eq('site_id', siteId);
+
+  // Marquer le chantier comme terminé (ajouter un champ completed_at)
+  const { error: siteError } = await supabase
+    .from('sites')
+    .update({ 
+      completed_at: new Date().toISOString(),
+    })
+    .eq('id', siteId);
+
+  if (siteError) {
+    console.error('Erreur mise à jour chantier:', siteError);
+    return { error: `Erreur lors de la finalisation du chantier: ${siteError.message}` };
+  }
+
+  // Retirer tous les workers du chantier (mettre site_id à null)
+  // On ne supprime pas les workers, on les retire juste du chantier
+  const { error: workersError } = await supabase
+    .from('workers')
+    .update({ site_id: null })
+    .eq('site_id', siteId);
+
+  if (workersError) {
+    console.error('Erreur retrait workers:', workersError);
+    // Ne pas bloquer si on ne peut pas retirer les workers, mais log l'erreur
+  }
+
+  // Envoyer un email à tous les workers qui ont un email
+  if (workers && workers.length > 0) {
+    const emailPromises = workers
+      .filter((worker) => worker.email)
+      .map((worker) =>
+        sendSiteCompletedEmail({
+          workerEmail: worker.email!,
+          workerName: worker.name || 'Collaborateur',
+          siteName: site.name,
+        })
+      );
+
+    try {
+      await Promise.allSettled(emailPromises);
+      console.log(`✅ Emails de fin de chantier envoyés à ${emailPromises.length} employé(s)`);
+    } catch (error) {
+      console.error('Erreur envoi emails fin de chantier:', error);
+      // Ne pas bloquer si l'envoi d'email échoue
+    }
+  }
+
+  revalidatePath(`/site/${siteId}`);
+  revalidatePath('/dashboard');
+  revalidatePath('/sites');
+  return { success: true };
 }
 

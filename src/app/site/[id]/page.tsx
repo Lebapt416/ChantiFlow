@@ -9,6 +9,7 @@ import { GeneratePlanningButton } from './generate-planning-button';
 import { AppShell } from '@/components/app-shell';
 import { SiteSelector } from '@/components/site-selector';
 import { DeleteWorkerButton } from '@/components/delete-worker-button';
+import { CompleteSiteButton } from './complete-site-button';
 
  type Params = {
   params: Promise<{
@@ -334,10 +335,10 @@ export default async function SitePage({ params }: Params) {
               QR code à afficher
             </h2>
             <p className="mt-3 text-sm text-zinc-500 dark:text-zinc-400">
-              Affiche ce QR sur le chantier pour que les équipes accèdent à l’interface `/qr/{'{siteId}'}` sans authentification.
+              Affiche ce QR sur le chantier pour que les équipes accèdent à l'interface `/qr/{'{siteId}'}` sans authentification.
             </p>
             <Link href={`/qr/${site.id}`} className="mt-4 inline-flex text-sm font-medium text-black dark:text-white">
-              Ouvrir l’interface employé →
+              Ouvrir l'interface employé →
             </Link>
             <Link
               href={`/report/${site.id}`}
@@ -345,6 +346,22 @@ export default async function SitePage({ params }: Params) {
             >
               Voir les rapports →
             </Link>
+          </div>
+          
+          {/* Bouton terminer le chantier */}
+          <div className="rounded-2xl border border-rose-200 bg-white p-6 shadow-lg shadow-black/5 dark:border-rose-900/60 dark:bg-zinc-900">
+            <p className="text-xs uppercase tracking-[0.3em] text-zinc-500 dark:text-zinc-400">
+              Finalisation
+            </p>
+            <h2 className="text-xl font-semibold text-zinc-900 dark:text-white">
+              Terminer le chantier
+            </h2>
+            <p className="mt-3 text-sm text-zinc-500 dark:text-zinc-400">
+              Marquer ce chantier comme terminé. Tous les employés seront retirés et recevront un email de notification.
+            </p>
+            <div className="mt-4">
+              <CompleteSiteButton siteId={site.id} siteName={site.name} />
+            </div>
           </div>
         </div>
       </div>

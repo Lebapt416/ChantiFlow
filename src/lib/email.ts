@@ -379,3 +379,92 @@ export async function sendAccountCreatedEmail({
   }
 }
 
+export async function sendSiteCompletedEmail({
+  workerEmail,
+  workerName,
+  siteName,
+}: {
+  workerEmail: string;
+  workerName: string;
+  siteName: string;
+}) {
+  // Si Resend n'est pas configuré, on retourne silencieusement
+  if (!process.env.RESEND_API_KEY) {
+    console.warn('RESEND_API_KEY non configuré, email non envoyé');
+    return { success: false, error: 'Service email non configuré' };
+  }
+
+  // Vérifier que Resend est initialisé
+  if (!resend) {
+    console.warn('Resend non initialisé');
+    return { success: false, error: 'Service email non initialisé' };
+  }
+
+  const appUrl = process.env.NEXT_PUBLIC_APP_BASE_URL ?? '';
+
+  try {
+    const { data, error } = await resend.emails.send({
+      from: process.env.RESEND_FROM_EMAIL || 'ChantiFlow <onboarding@resend.dev>',
+      to: workerEmail,
+      subject: `Chantier terminé - ${siteName} - ChantiFlow`,
+      html: `
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Chantier terminé</title>
+          </head>
+          <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+            <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
+              <h1 style="color: white; margin: 0; font-size: 28px;">Chantier terminé</h1>
+            </div>
+            
+            <div style="background: #ffffff; padding: 30px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 10px 10px;">
+              <p style="font-size: 16px; margin-bottom: 20px;">
+                Bonjour <strong>${workerName}</strong>,
+              </p>
+              
+              <p style="font-size: 16px; margin-bottom: 20px;">
+                Nous vous informons que le chantier <strong>${siteName}</strong> a été marqué comme terminé.
+              </p>
+              
+              <div style="background: #f0fdf4; border: 2px solid #10b981; padding: 20px; border-radius: 8px; margin: 30px 0; text-align: center;">
+                <p style="color: #065f46; font-size: 16px; margin: 0; font-weight: 600;">
+                  ✅ Le chantier est maintenant terminé
+                </p>
+                <p style="color: #047857; font-size: 14px; margin: 10px 0 0 0;">
+                  Vous avez été retiré de ce chantier. Merci pour votre travail !
+                </p>
+              </div>
+              
+              <p style="font-size: 16px; margin-bottom: 20px;">
+                Si vous avez des questions ou besoin d'informations supplémentaires, n'hésitez pas à contacter votre chef de chantier.
+              </p>
+              
+              <p style="font-size: 14px; color: #6b7280; margin-top: 30px; border-top: 1px solid #e5e7eb; padding-top: 20px;">
+                Merci pour votre contribution au projet <strong>${siteName}</strong>.
+              </p>
+            </div>
+            
+            <div style="text-align: center; margin-top: 20px; color: #9ca3af; font-size: 12px;">
+              <p>ChantiFlow - Gestion de chantier simplifiée</p>
+            </div>
+          </body>
+        </html>
+      `,
+    });
+
+    if (error) {
+      console.error('❌ Erreur envoi email fin de chantier:', error);
+      return { success: false, error: error.message };
+    }
+
+    console.log('✅ Email fin de chantier envoyé à', workerEmail);
+    return { success: true, data };
+  } catch (error: any) {
+    console.error('❌ Exception envoi email fin de chantier:', error);
+    return { success: false, error: error?.message || 'Erreur inconnue' };
+  }
+}
+
