@@ -455,6 +455,28 @@ export async function completeSiteAction(
     console.warn('⚠️ Aucun destinataire d\'email trouvé pour la notification de fin de chantier');
   }
 
+  // Enregistrer le chantier comme terminé dans les métadonnées de l'utilisateur
+  try {
+    const { data: currentUser } = await admin.auth.admin.getUserById(user.id);
+    const currentMetadata = currentUser.user?.user_metadata ?? {};
+    const completedSitesMetadata = Array.isArray(currentMetadata.completedSites)
+      ? [...currentMetadata.completedSites]
+      : [];
+
+    if (!completedSitesMetadata.includes(siteId)) {
+      completedSitesMetadata.push(siteId);
+      await admin.auth.admin.updateUserById(user.id, {
+        user_metadata: {
+          ...currentMetadata,
+          completedSites: completedSitesMetadata,
+        },
+      });
+      console.log('✅ Metadata utilisateur mis à jour avec le chantier terminé');
+    }
+  } catch (error) {
+    console.warn('⚠️ Impossible de mettre à jour le metadata completedSites:', error);
+  }
+
   revalidatePath(`/site/${siteId}`);
   revalidatePath('/dashboard');
   revalidatePath('/sites');

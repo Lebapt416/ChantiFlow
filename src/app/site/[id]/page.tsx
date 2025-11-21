@@ -71,12 +71,16 @@ export default async function SitePage({ params }: Params) {
     notFound();
   }
 
-  const isCompleted = Boolean((site as { completed_at?: string | null }).completed_at);
-  const completedAt = (site as { completed_at?: string | null }).completed_at
-    ? new Date((site as { completed_at?: string | null }).completed_at!).toLocaleDateString(
-        'fr-FR',
-      )
+  const completedAtValue = (site as { completed_at?: string | null }).completed_at;
+  const completedAt = completedAtValue
+    ? new Date(completedAtValue).toLocaleDateString('fr-FR')
     : null;
+
+  const completedSitesMetadata = Array.isArray(user?.user_metadata?.completedSites)
+    ? (user?.user_metadata?.completedSites as string[])
+    : [];
+
+  const isCompleted = Boolean(completedAtValue || completedSitesMetadata.includes(site.id));
 
   // Récupérer tous les chantiers pour le sélecteur
   const { data: allSites } = await supabase
@@ -384,12 +388,22 @@ export default async function SitePage({ params }: Params) {
             <h2 className="text-xl font-semibold text-zinc-900 dark:text-white">
               Terminer le chantier
             </h2>
-            <p className="mt-3 text-sm text-zinc-500 dark:text-zinc-400">
-              Marquer ce chantier comme terminé. Tous les employés seront retirés et recevront un email de notification.
-            </p>
-            <div className="mt-4">
-              <CompleteSiteButton siteId={site.id} siteName={site.name} />
-            </div>
+            {isCompleted ? (
+              <>
+                <p className="mt-3 text-sm text-zinc-500 dark:text-zinc-400">
+                  Ce chantier est déjà terminé{completedAt ? ` (depuis le ${completedAt})` : ''}. Les employés ont été retirés et notifiés.
+                </p>
+              </>
+            ) : (
+              <>
+                <p className="mt-3 text-sm text-zinc-500 dark:text-zinc-400">
+                  Marquer ce chantier comme terminé. Tous les employés seront retirés et recevront un email de notification.
+                </p>
+                <div className="mt-4">
+                  <CompleteSiteButton siteId={site.id} siteName={site.name} />
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>
