@@ -23,9 +23,11 @@ export function PricingButton({ plan, isAuthenticated, className, children, user
       return;
     }
 
-    startTransition(async () => {
-      // Plan Basic : changement gratuit
-      if (plan === 'basic') {
+    console.log('🔄 Clic sur plan (landing):', plan);
+
+    // Plan Basic : changement gratuit
+    if (plan === 'basic') {
+      startTransition(async () => {
         try {
           const formData = new FormData();
           formData.append('plan', plan);
@@ -37,14 +39,16 @@ export function PricingButton({ plan, isAuthenticated, className, children, user
         } catch (error) {
           console.error('Error changing plan:', error);
         }
-        return;
-      }
+      });
+      return;
+    }
 
-      // Vérifier si c'est l'admin
-      const isAdmin = userEmail ? isAdminUser(userEmail) : false;
-      
-      // Plans payants : admin = gratuit, autres = Stripe
-      if (isAdmin) {
+    // Vérifier si c'est l'admin
+    const isAdmin = userEmail ? isAdminUser(userEmail) : false;
+    
+    // Plans payants : admin = gratuit, autres = Stripe
+    if (isAdmin) {
+      startTransition(async () => {
         try {
           const formData = new FormData();
           formData.append('plan', plan);
@@ -56,28 +60,38 @@ export function PricingButton({ plan, isAuthenticated, className, children, user
         } catch (error) {
           console.error('Error changing plan:', error);
         }
-        return;
+      });
+      return;
+    }
+
+    // Rediriger vers Stripe checkout pour les autres utilisateurs
+    console.log('💳 Redirection vers Stripe pour plan (landing):', plan);
+    try {
+      const response = await fetch('/api/stripe/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ plan }),
+      });
+
+      console.log('📡 Réponse API (landing):', response.status);
+
+      const data = await response.json();
+      console.log('📦 Données reçues (landing):', data);
+
+      if (data.url) {
+        console.log('✅ Redirection vers (landing):', data.url);
+        window.location.href = data.url;
+      } else if (data.error) {
+        console.error('❌ Erreur checkout (landing):', data.error);
+        alert(`Erreur: ${data.error}`);
+      } else {
+        console.error('❌ Pas d\'URL ni d\'erreur dans la réponse (landing)');
+        alert('Erreur: Réponse inattendue du serveur.');
       }
-
-      // Rediriger vers Stripe checkout pour les autres utilisateurs
-      try {
-        const response = await fetch('/api/stripe/checkout', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ plan }),
-        });
-
-        const data = await response.json();
-
-        if (data.url) {
-          window.location.href = data.url;
-        } else {
-          console.error('Erreur checkout:', data.error);
-        }
-      } catch (error) {
-        console.error('Error redirecting to checkout:', error);
-      }
-    });
+    } catch (error) {
+      console.error('❌ Exception (landing):', error);
+      alert('Erreur lors de la redirection vers le paiement.');
+    }
   }
 
   return (

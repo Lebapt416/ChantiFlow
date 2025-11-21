@@ -55,9 +55,10 @@ const plans = [
 
 type Props = {
   isAuthenticated?: boolean;
+  userEmail?: string | null;
 };
 
-export function PricingSection({ isAuthenticated = false }: Props) {
+export function PricingSection({ isAuthenticated = false, userEmail = null }: Props) {
   return (
     <section id="pricing" className="mx-auto max-w-7xl px-6 py-20">
       <div className="mx-auto max-w-2xl text-center">
@@ -121,7 +122,7 @@ export function PricingSection({ isAuthenticated = false }: Props) {
               <PricingButton
                 plan={plan.name.toLowerCase() as 'basic' | 'plus' | 'pro'}
                 isAuthenticated={isAuthenticated}
-                userEmail={null} // Sera récupéré côté serveur si nécessaire
+                userEmail={userEmail}
                 className={`w-full rounded-full px-6 py-3 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-50 ${
                   plan.popular
                     ? 'bg-emerald-600 text-white hover:bg-emerald-700 dark:bg-emerald-400 dark:text-zinc-900 dark:hover:bg-emerald-300'
