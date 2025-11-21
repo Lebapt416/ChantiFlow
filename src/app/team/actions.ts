@@ -56,57 +56,58 @@ export async function addWorkerAction(
   }
 
   // Créer un worker au niveau du compte (sans site_id)
-  // Essayer d'abord avec created_by (nouvelle structure)
-  let insertData: any = {
+  const insertData = {
+    created_by: user.id,
     name,
     email: email || null,
     role: role || null,
     site_id: null, // Worker au niveau du compte
   };
 
-  // Ajouter created_by seulement si la colonne existe (après migration)
-  // On essaie d'abord avec created_by
-  insertData.created_by = user.id;
-  const { error } = await supabase.from('workers').insert(insertData);
+  const { error, data: insertedWorker } = await supabase
+    .from('workers')
+    .insert(insertData)
+    .select('id')
+    .single();
 
   if (error) {
-    // Si l'erreur est liée à created_by, essayer sans (fallback)
-    if (error.message.includes('created_by') || error.message.includes('column') || error.code === '42703') {
-      // Fallback : créer un worker lié au premier chantier de l'utilisateur
-      const { data: firstSite } = await supabase
-        .from('sites')
-        .select('id')
-        .eq('created_by', user.id)
-        .limit(1)
-        .single();
-
-      if (firstSite) {
-        const { error: fallbackError } = await supabase.from('workers').insert({
-          site_id: firstSite.id,
-          name,
-          email: email || null,
-          role: role || null,
-        });
-
-        if (fallbackError) {
-          return { error: `Erreur lors de l'ajout. Veuillez exécuter la migration SQL dans Supabase (fichier migration-workers-to-account.sql). Détails: ${fallbackError.message}` };
-        }
-      } else {
-        return { error: 'Veuillez d\'abord créer un chantier, ou exécutez la migration SQL pour activer les workers au niveau du compte. Voir le fichier migration-workers-to-account.sql' };
-      }
-    } else {
-      return { error: error.message };
+    // Vérifier le type d'erreur
+    const errorMessage = error.message || '';
+    const errorCode = error.code || '';
+    
+    // Erreur de politique RLS
+    if (errorMessage.includes('policy') || errorMessage.includes('permission') || errorCode === '42501') {
+      return { 
+        error: `Erreur de permissions. Vérifiez que les politiques RLS sont correctement configurées. Détails: ${errorMessage}. Exécutez la migration SQL si ce n'est pas déjà fait.` 
+      };
     }
+    
+    // Erreur de contrainte unique
+    if (errorMessage.includes('unique') || errorMessage.includes('duplicate') || errorCode === '23505') {
+      return { error: 'Un membre avec cet email existe déjà dans votre équipe.' };
+    }
+    
+    // Autre erreur
+    return { 
+      error: `Erreur lors de l'ajout: ${errorMessage} (Code: ${errorCode}). Vérifiez les logs pour plus de détails.` 
+    };
   }
 
-  // Envoyer un email de bienvenue si l'email est fourni
+  if (!insertedWorker) {
+    return { error: 'Le worker a été créé mais aucune donnée n\'a été retournée.' };
+  }
+
+  // Envoyer un email de bienvenue si l'email est fourni (ne bloque pas si ça échoue)
   if (email) {
     try {
-      await sendWorkerWelcomeEmail({
+      const emailResult = await sendWorkerWelcomeEmail({
         workerEmail: email,
         workerName: name,
         managerName: user.email || undefined,
       });
+      if (!emailResult.success) {
+        console.warn('Email non envoyé:', emailResult.error);
+      }
     } catch (error) {
       // Ne pas bloquer l'ajout si l'email échoue
       console.error('Erreur envoi email bienvenue:', error);
