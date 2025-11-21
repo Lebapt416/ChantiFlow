@@ -74,19 +74,28 @@ export async function sendWorkerWelcomeEmail({
               
               ${siteName ? `
                 <p style="font-size: 16px; margin-bottom: 20px;">
-                  Vous avez été ajouté${managerName ? ` par ${managerName}` : ''} à l'équipe du chantier <strong>${siteName}</strong>.
+                  Vous avez été assigné${managerName ? ` par ${managerName}` : ''} au chantier <strong>${siteName}</strong>.
                 </p>
+                ${accessCode ? `
+                  <p style="font-size: 16px; margin-bottom: 20px;">
+                    Vous pouvez maintenant accéder aux informations de ce chantier et envoyer des rapports en utilisant votre code d'accès unique ci-dessous.
+                  </p>
+                ` : ''}
               ` : `
                 <p style="font-size: 16px; margin-bottom: 20px;">
                   Vous avez été ajouté${managerName ? ` par ${managerName}` : ''} à l'équipe ChantiFlow.
                 </p>
+                <p style="font-size: 16px; margin-bottom: 20px;">
+                  Lorsque vous serez assigné à un chantier spécifique, vous recevrez un code d'accès unique pour accéder aux informations de ce chantier.
+                </p>
               `}
               
               ${accessCode && accessCode.trim() !== '' ? `
-                <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 25px; border-radius: 8px; margin: 30px 0; text-align: center;">
-                  <p style="color: white; font-size: 14px; margin: 0 0 10px 0; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Votre code d'accès unique</p>
-                  <p style="color: white; font-size: 32px; margin: 0; font-weight: bold; letter-spacing: 4px; font-family: 'Courier New', monospace;">${String(accessCode).toUpperCase()}</p>
-                  <p style="color: rgba(255,255,255,0.9); font-size: 12px; margin: 10px 0 0 0;">Vous devrez entrer ce code après avoir scanné le QR code</p>
+                <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 25px; border-radius: 8px; margin: 30px 0; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                  <p style="color: white; font-size: 14px; margin: 0 0 10px 0; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Votre code d'accès unique pour ce chantier</p>
+                  <p style="color: white; font-size: 36px; margin: 15px 0; font-weight: bold; letter-spacing: 6px; font-family: 'Courier New', monospace; text-shadow: 0 2px 4px rgba(0,0,0,0.2);">${String(accessCode).toUpperCase()}</p>
+                  <p style="color: rgba(255,255,255,0.95); font-size: 13px; margin: 15px 0 0 0; font-weight: 500;">⚠️ Conservez ce code précieusement</p>
+                  <p style="color: rgba(255,255,255,0.9); font-size: 12px; margin: 5px 0 0 0;">Vous devrez entrer ce code après avoir scanné le QR code du chantier</p>
                 </div>
               ` : siteId ? `
                 <div style="background: #fef3c7; border: 2px solid #f59e0b; padding: 15px; border-radius: 8px; margin: 30px 0; text-align: center;">
@@ -95,9 +104,11 @@ export async function sendWorkerWelcomeEmail({
                 </div>
               ` : ''}
               
-              <p style="font-size: 16px; margin-bottom: 20px;">
-                Vous pouvez maintenant envoyer des rapports de terrain directement depuis votre téléphone.
-              </p>
+              ${!accessCode ? `
+                <p style="font-size: 16px; margin-bottom: 20px;">
+                  Vous pouvez maintenant envoyer des rapports de terrain directement depuis votre téléphone.
+                </p>
+              ` : ''}
               
               <div style="background: #f9fafb; padding: 20px; border-radius: 8px; margin: 30px 0; border-left: 4px solid #667eea;">
                 <h2 style="margin-top: 0; color: #1f2937; font-size: 20px;">Comment envoyer un rapport ?</h2>
