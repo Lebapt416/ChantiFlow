@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { AppShell } from '@/components/app-shell';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { AddWorkerForm } from './add-worker-form';
+import { DeleteWorkerButton } from '@/components/delete-worker-button';
 
 export const metadata = {
   title: 'Équipe | ChantiFlow',
@@ -187,7 +188,7 @@ export default async function TeamPage() {
               className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 dark:border-emerald-800 dark:bg-emerald-900/20"
             >
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <div>
+                <div className="flex-1">
                   <p className="text-sm font-semibold text-zinc-900 dark:text-white">
                     {worker.name}
                   </p>
@@ -198,9 +199,12 @@ export default async function TeamPage() {
                     {worker.email ?? 'Email non communiqué'}
                   </p>
                 </div>
-                <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">
-                  Disponible
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                    Disponible
+                  </span>
+                  <DeleteWorkerButton workerId={worker.id} workerName={worker.name} />
+                </div>
               </div>
             </div>
           ))}
@@ -217,7 +221,7 @@ export default async function TeamPage() {
               className="rounded-2xl border border-zinc-200 p-4 dark:border-zinc-700"
             >
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <div>
+                <div className="flex-1">
                   <p className="text-sm font-semibold text-zinc-900 dark:text-white">
                     {worker.name}
                   </p>
@@ -228,14 +232,17 @@ export default async function TeamPage() {
                     {worker.email ?? 'Email non communiqué'}
                   </p>
                 </div>
-                {worker.site_id ? (
-                  <Link
-                    href={`/site/${worker.site_id}`}
-                    className="text-xs font-semibold text-black hover:underline dark:text-white"
-                  >
-                    {siteMap[worker.site_id] ?? 'Site inconnu'} →
-                  </Link>
-                ) : null}
+                <div className="flex items-center gap-2">
+                  {worker.site_id ? (
+                    <Link
+                      href={`/site/${worker.site_id}`}
+                      className="text-xs font-semibold text-black hover:underline dark:text-white"
+                    >
+                      {siteMap[worker.site_id] ?? 'Site inconnu'} →
+                    </Link>
+                  ) : null}
+                  <DeleteWorkerButton workerId={worker.id} workerName={worker.name} />
+                </div>
               </div>
             </div>
           ))}

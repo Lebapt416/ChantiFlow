@@ -8,6 +8,7 @@ import { SiteQrCard } from './qr-card';
 import { GeneratePlanningButton } from './generate-planning-button';
 import { AppShell } from '@/components/app-shell';
 import { SiteSelector } from '@/components/site-selector';
+import { DeleteWorkerButton } from '@/components/delete-worker-button';
 
  type Params = {
   params: Promise<{
@@ -254,15 +255,20 @@ export default async function SitePage({ params }: Params) {
                     key={worker.id}
                     className="rounded-xl border border-zinc-100 bg-zinc-50 px-4 py-3 dark:border-zinc-800 dark:bg-zinc-900"
                   >
-                    <p className="text-sm font-semibold text-zinc-900 dark:text-white">
-                      {worker.name}
-                    </p>
-                    <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                      {worker.role ?? 'Rôle non défini'}
-                    </p>
-                    {worker.email ? (
-                      <p className="text-xs text-zinc-400 dark:text-zinc-500">{worker.email}</p>
-                    ) : null}
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex-1">
+                        <p className="text-sm font-semibold text-zinc-900 dark:text-white">
+                          {worker.name}
+                        </p>
+                        <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                          {worker.role ?? 'Rôle non défini'}
+                        </p>
+                        {worker.email ? (
+                          <p className="text-xs text-zinc-400 dark:text-zinc-500">{worker.email}</p>
+                        ) : null}
+                      </div>
+                      <DeleteWorkerButton workerId={worker.id} workerName={worker.name} />
+                    </div>
                   </div>
                 ))
               ) : (
