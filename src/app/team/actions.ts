@@ -98,19 +98,22 @@ export async function addWorkerAction(
   }
 
   // Envoyer un email de bienvenue si l'email est fourni (ne bloque pas si ça échoue)
+  // Note: Pour les workers au niveau du compte, pas de code d'accès car ils ne sont pas encore assignés à un chantier
+  // Le code sera généré et envoyé quand ils seront assignés à un chantier spécifique
   if (email) {
     try {
-      console.log('📧 Tentative d\'envoi email de bienvenue à:', email);
+      console.log('📧 Tentative d\'envoi email de bienvenue (niveau compte) à:', email);
       const emailResult = await sendWorkerWelcomeEmail({
         workerEmail: email,
         workerName: name,
         managerName: user.email || undefined,
+        // Pas de siteId ni accessCode car worker au niveau du compte
       });
       if (!emailResult.success) {
         console.warn('⚠️ Email non envoyé:', emailResult.error);
         // Ne pas retourner d'erreur, l'ajout du worker a réussi
       } else {
-        console.log('✅ Email de bienvenue envoyé avec succès');
+        console.log('✅ Email de bienvenue envoyé avec succès (niveau compte)');
       }
     } catch (error) {
       // Ne pas bloquer l'ajout si l'email échoue
