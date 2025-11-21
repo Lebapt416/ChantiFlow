@@ -1,6 +1,7 @@
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Initialiser Resend seulement si la clé API est disponible
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
 export async function sendWorkerWelcomeEmail({
   workerEmail,
@@ -15,9 +16,16 @@ export async function sendWorkerWelcomeEmail({
   siteId?: string;
   managerName?: string;
 }) {
+  // Si Resend n'est pas configuré, on retourne silencieusement
   if (!process.env.RESEND_API_KEY) {
     console.warn('RESEND_API_KEY non configuré, email non envoyé');
     return { success: false, error: 'Service email non configuré' };
+  }
+
+  // Vérifier que Resend est initialisé
+  if (!resend) {
+    console.warn('Resend non initialisé');
+    return { success: false, error: 'Service email non initialisé' };
   }
 
   const appUrl = process.env.NEXT_PUBLIC_APP_BASE_URL ?? '';
