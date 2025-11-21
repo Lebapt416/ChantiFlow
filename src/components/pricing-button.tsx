@@ -2,15 +2,18 @@
 
 import { useTransition } from 'react';
 import { useRouter } from 'next/navigation';
+import { changePlanAction } from '@/app/account/actions';
+import { isAdminUser } from '@/lib/stripe';
 
 type Props = {
   plan: 'basic' | 'plus' | 'pro';
   isAuthenticated: boolean;
   className?: string;
   children?: React.ReactNode;
+  userEmail?: string | null;
 };
 
-export function PricingButton({ plan, isAuthenticated, className, children }: Props) {
+export function PricingButton({ plan, isAuthenticated, className, children, userEmail }: Props) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
@@ -21,21 +24,58 @@ export function PricingButton({ plan, isAuthenticated, className, children }: Pr
     }
 
     startTransition(async () => {
+      // Plan Basic : changement gratuit
+      if (plan === 'basic') {
+        try {
+          const formData = new FormData();
+          formData.append('plan', plan);
+          const result = await changePlanAction({}, formData);
+          if (result.success) {
+            router.push('/account');
+            router.refresh();
+          }
+        } catch (error) {
+          console.error('Error changing plan:', error);
+        }
+        return;
+      }
+
+      // Vérifier si c'est l'admin
+      const isAdmin = userEmail ? isAdminUser(userEmail) : false;
+      
+      // Plans payants : admin = gratuit, autres = Stripe
+      if (isAdmin) {
+        try {
+          const formData = new FormData();
+          formData.append('plan', plan);
+          const result = await changePlanAction({}, formData);
+          if (result.success) {
+            router.push('/account');
+            router.refresh();
+          }
+        } catch (error) {
+          console.error('Error changing plan:', error);
+        }
+        return;
+      }
+
+      // Rediriger vers Stripe checkout pour les autres utilisateurs
       try {
-        const formData = new FormData();
-        formData.append('plan', plan);
-        
-        const response = await fetch('/api/account/change-plan', {
+        const response = await fetch('/api/stripe/checkout', {
           method: 'POST',
-          body: formData,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ plan }),
         });
 
-        if (response.ok) {
-          router.push('/account');
-          router.refresh();
+        const data = await response.json();
+
+        if (data.url) {
+          window.location.href = data.url;
+        } else {
+          console.error('Erreur checkout:', data.error);
         }
       } catch (error) {
-        console.error('Error changing plan:', error);
+        console.error('Error redirecting to checkout:', error);
       }
     });
   }

@@ -126,7 +126,7 @@ export default async function AccountPage() {
                     <li key={index}>• {feature}</li>
                   ))}
                 </ul>
-                <ChangePlanButton plan={p} currentPlan={plan} />
+                <ChangePlanButton plan={p} currentPlan={plan} userEmail={user.email} />
               </div>
             ))}
           </div>
