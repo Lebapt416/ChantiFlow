@@ -137,6 +137,8 @@ export async function addWorkerAction(
       }
     }
 
+    console.log('🔑 Code d\'accès généré pour worker existant:', accessCode);
+
     // Créer une copie du worker pour ce chantier avec le code d'accès
     const { data: newWorker, error } = await supabase
       .from('workers')
@@ -147,11 +149,36 @@ export async function addWorkerAction(
         role: existingWorker.role,
         access_code: accessCode,
       })
-      .select('id')
+      .select('id, access_code')
       .single();
 
     if (error) {
-      return { error: error.message };
+      console.error('❌ Erreur insertion worker avec code:', error);
+      // Si l'erreur est liée à access_code (colonne n'existe pas), continuer sans code
+      if (error.message.includes('access_code') || error.message.includes('column')) {
+        console.warn('⚠️ Colonne access_code non trouvée - migration SQL non exécutée');
+        // Réessayer sans access_code
+        const { data: retryWorker, error: retryError } = await supabase
+          .from('workers')
+          .insert({
+            site_id: siteId,
+            name: existingWorker.name,
+            email: existingWorker.email,
+            role: existingWorker.role,
+          })
+          .select('id')
+          .single();
+        
+        if (retryError) {
+          return { error: `Erreur: ${retryError.message}. Veuillez exécuter la migration SQL (migration-worker-access-code.sql)` };
+        }
+        // Continuer sans code d'accès
+        accessCode = undefined;
+      } else {
+        return { error: error.message };
+      }
+    } else {
+      console.log('✅ Worker créé avec code:', newWorker?.access_code || accessCode);
     }
 
     // Envoyer un email de bienvenue si l'email est fourni
@@ -199,6 +226,8 @@ export async function addWorkerAction(
       }
     }
 
+    console.log('🔑 Code d\'accès généré pour nouveau worker:', accessCode);
+
     const { data: newWorker, error } = await supabase
       .from('workers')
       .insert({
@@ -208,11 +237,36 @@ export async function addWorkerAction(
         role: role || null,
         access_code: accessCode,
       })
-      .select('id')
+      .select('id, access_code')
       .single();
 
     if (error) {
-      return { error: error.message };
+      console.error('❌ Erreur insertion worker avec code:', error);
+      // Si l'erreur est liée à access_code (colonne n'existe pas), continuer sans code
+      if (error.message.includes('access_code') || error.message.includes('column')) {
+        console.warn('⚠️ Colonne access_code non trouvée - migration SQL non exécutée');
+        // Réessayer sans access_code
+        const { data: retryWorker, error: retryError } = await supabase
+          .from('workers')
+          .insert({
+            site_id: siteId,
+            name,
+            email: email || null,
+            role: role || null,
+          })
+          .select('id')
+          .single();
+        
+        if (retryError) {
+          return { error: `Erreur: ${retryError.message}. Veuillez exécuter la migration SQL (migration-worker-access-code.sql)` };
+        }
+        // Continuer sans code d'accès
+        accessCode = undefined;
+      } else {
+        return { error: error.message };
+      }
+    } else {
+      console.log('✅ Worker créé avec code:', newWorker?.access_code || accessCode);
     }
 
     // Envoyer un email de bienvenue si l'email est fourni
