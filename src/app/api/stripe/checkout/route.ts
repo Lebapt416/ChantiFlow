@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
-import { stripe, STRIPE_PRICE_IDS, isAdminUser } from '@/lib/stripe';
+import { STRIPE_CHECKOUT_LINKS, isAdminUser } from '@/lib/stripe';
 
 export async function POST(request: Request) {
   try {
@@ -28,38 +28,15 @@ export async function POST(request: Request) {
       }, { status: 200 });
     }
 
-    // Vérifier que Stripe est configuré
-    if (!stripe) {
-      return NextResponse.json(
-        { error: 'Stripe non configuré. Vérifiez STRIPE_SECRET_KEY.' },
-        { status: 500 }
-      );
-    }
+    // Rediriger vers le lien Stripe Checkout direct
+    const checkoutLink = STRIPE_CHECKOUT_LINKS[plan as 'plus' | 'pro'];
+    
+    // Ajouter l'email comme paramètre pour faciliter l'identification
+    const urlWithEmail = `${checkoutLink}?prefilled_email=${encodeURIComponent(user.email)}`;
 
-    const priceId = STRIPE_PRICE_IDS[plan as 'plus' | 'pro'];
-
-    // Créer la session de checkout Stripe
-    const session = await stripe.checkout.sessions.create({
-      mode: 'subscription',
-      payment_method_types: ['card'],
-      line_items: [
-        {
-          price: priceId,
-          quantity: 1,
-        },
-      ],
-      customer_email: user.email,
-      metadata: {
-        userId: user.id,
-        plan,
-      },
-      success_url: `${process.env.NEXT_PUBLIC_APP_BASE_URL || 'http://localhost:3000'}/account/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_APP_BASE_URL || 'http://localhost:3000'}/account/cancel`,
-    });
-
-    return NextResponse.json({ url: session.url });
+    return NextResponse.json({ url: urlWithEmail });
   } catch (error) {
-    console.error('Erreur création checkout Stripe:', error);
+    console.error('Erreur redirection checkout Stripe:', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Erreur inconnue' },
       { status: 500 }

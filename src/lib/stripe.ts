@@ -7,9 +7,10 @@ export const stripe = process.env.STRIPE_SECRET_KEY
     })
   : null;
 
-export const STRIPE_PRICE_IDS = {
-  plus: process.env.STRIPE_PRICE_ID_PLUS || 'price_plus',
-  pro: process.env.STRIPE_PRICE_ID_PRO || 'price_pro',
+// Liens Stripe Checkout directs
+export const STRIPE_CHECKOUT_LINKS = {
+  plus: 'https://buy.stripe.com/6oUfZh8dFeSC3UbcG32VG00',
+  pro: 'https://buy.stripe.com/9B6dR951t6m6aizfSf2VG01',
 } as const;
 
 export function isAdminUser(email: string | null | undefined): boolean {
