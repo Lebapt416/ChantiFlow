@@ -141,17 +141,19 @@ export async function sendReportNotificationEmail({
   siteName: string;
   reportUrl: string;
 }) {
+  // Si Resend n'est pas configuré, on retourne silencieusement
   if (!process.env.RESEND_API_KEY) {
     console.warn('RESEND_API_KEY non configuré, email non envoyé');
     return { success: false, error: 'Service email non configuré' };
   }
 
+  // Vérifier que Resend est initialisé
+  if (!resend) {
+    console.warn('Resend non initialisé');
+    return { success: false, error: 'Service email non initialisé' };
+  }
+
   try {
-    // Vérifier que Resend est configuré
-    if (!process.env.RESEND_API_KEY) {
-      console.warn('RESEND_API_KEY non configuré, email non envoyé');
-      return { success: false, error: 'Service email non configuré' };
-    }
 
     const { data, error } = await resend.emails.send({
       from: process.env.RESEND_FROM_EMAIL || 'ChantiFlow <onboarding@resend.dev>',
