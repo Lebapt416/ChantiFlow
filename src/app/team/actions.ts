@@ -100,18 +100,24 @@ export async function addWorkerAction(
   // Envoyer un email de bienvenue si l'email est fourni (ne bloque pas si ça échoue)
   if (email) {
     try {
+      console.log('📧 Tentative d\'envoi email de bienvenue à:', email);
       const emailResult = await sendWorkerWelcomeEmail({
         workerEmail: email,
         workerName: name,
         managerName: user.email || undefined,
       });
       if (!emailResult.success) {
-        console.warn('Email non envoyé:', emailResult.error);
+        console.warn('⚠️ Email non envoyé:', emailResult.error);
+        // Ne pas retourner d'erreur, l'ajout du worker a réussi
+      } else {
+        console.log('✅ Email de bienvenue envoyé avec succès');
       }
     } catch (error) {
       // Ne pas bloquer l'ajout si l'email échoue
-      console.error('Erreur envoi email bienvenue:', error);
+      console.error('❌ Exception lors de l\'envoi email bienvenue:', error);
     }
+  } else {
+    console.log('ℹ️ Pas d\'email fourni, email de bienvenue non envoyé');
   }
 
   revalidatePath('/team');

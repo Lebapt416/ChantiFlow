@@ -113,13 +113,22 @@ export async function sendWorkerWelcomeEmail({
     });
 
     if (error) {
-      console.error('Erreur envoi email:', error);
+      console.error('❌ Erreur Resend lors de l\'envoi email:', {
+        message: error.message,
+        name: error.name,
+        to: workerEmail,
+      });
       return { success: false, error: error.message };
     }
 
+    console.log('✅ Email de bienvenue envoyé avec succès à:', workerEmail);
     return { success: true, data };
   } catch (error) {
-    console.error('Erreur envoi email:', error);
+    console.error('❌ Exception lors de l\'envoi email:', {
+      error: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+      to: workerEmail,
+    });
     return { success: false, error: error instanceof Error ? error.message : 'Erreur inconnue' };
   }
 }
@@ -211,13 +220,22 @@ export async function sendReportNotificationEmail({
     });
 
     if (error) {
-      console.error('Erreur envoi email notification:', error);
+      console.error('❌ Erreur Resend lors de l\'envoi notification:', {
+        message: error.message,
+        name: error.name,
+        to: managerEmail,
+      });
       return { success: false, error: error.message };
     }
 
+    console.log('✅ Email de notification envoyé avec succès à:', managerEmail);
     return { success: true, data };
   } catch (error) {
-    console.error('Erreur envoi email notification:', error);
+    console.error('❌ Exception lors de l\'envoi notification:', {
+      error: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+      to: managerEmail,
+    });
     return { success: false, error: error instanceof Error ? error.message : 'Erreur inconnue' };
   }
 }
