@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { sendWorkerWelcomeEmail } from '@/lib/email';
 
 export type ActionState = {
   error?: string;
@@ -61,10 +62,10 @@ export async function addWorkerAction(
     return { error: 'Non authentifié.' };
   }
 
-  // Vérifier que le chantier appartient à l'utilisateur
+  // Vérifier que le chantier appartient à l'utilisateur et récupérer ses infos
   const { data: site } = await supabase
     .from('sites')
-    .select('id')
+    .select('id, name')
     .eq('id', siteId)
     .eq('created_by', user.id)
     .single();
@@ -125,6 +126,22 @@ export async function addWorkerAction(
     if (error) {
       return { error: error.message };
     }
+
+    // Envoyer un email de bienvenue si l'email est fourni
+    if (existingWorker.email) {
+      try {
+        await sendWorkerWelcomeEmail({
+          workerEmail: existingWorker.email,
+          workerName: existingWorker.name,
+          siteName: site.name,
+          siteId: siteId,
+          managerName: user.email || undefined,
+        });
+      } catch (error) {
+        // Ne pas bloquer l'ajout si l'email échoue
+        console.error('Erreur envoi email bienvenue:', error);
+      }
+    }
   } else {
     // Créer un nouveau worker directement lié au chantier
     if (!name) {
@@ -140,6 +157,22 @@ export async function addWorkerAction(
 
     if (error) {
       return { error: error.message };
+    }
+
+    // Envoyer un email de bienvenue si l'email est fourni
+    if (email) {
+      try {
+        await sendWorkerWelcomeEmail({
+          workerEmail: email,
+          workerName: name,
+          siteName: site.name,
+          siteId: siteId,
+          managerName: user.email || undefined,
+        });
+      } catch (error) {
+        // Ne pas bloquer l'ajout si l'email échoue
+        console.error('Erreur envoi email bienvenue:', error);
+      }
     }
   }
 

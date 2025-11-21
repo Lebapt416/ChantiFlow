@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { sendWorkerWelcomeEmail } from '@/lib/email';
 
 export type ActionState = {
   error?: string;
@@ -55,6 +56,20 @@ export async function addWorkerAction(
 
   if (error) {
     return { error: error.message };
+  }
+
+  // Envoyer un email de bienvenue si l'email est fourni
+  if (email) {
+    try {
+      await sendWorkerWelcomeEmail({
+        workerEmail: email,
+        workerName: name,
+        managerName: user.email || undefined,
+      });
+    } catch (error) {
+      // Ne pas bloquer l'ajout si l'email échoue
+      console.error('Erreur envoi email bienvenue:', error);
+    }
   }
 
   revalidatePath('/team');

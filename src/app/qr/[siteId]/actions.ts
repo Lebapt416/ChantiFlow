@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
+import { sendReportNotificationEmail } from '@/lib/email';
 
 export type ReportState = {
   error?: string;
@@ -14,7 +15,7 @@ export async function submitReportAction(
   _prevState: ReportState,
   formData: FormData,
 ): Promise<ReportState> {
-  const siteId = String(formData.get('siteId') ?? '');
+  const siteIdParam = String(formData.get('siteId') ?? '');
   const taskId = String(formData.get('taskId') ?? '');
   const email = String(formData.get('email') ?? '').trim().toLowerCase();
   const name = String(formData.get('name') ?? '').trim();
@@ -23,9 +24,11 @@ export async function submitReportAction(
   const markDone = formData.get('mark_done') === 'on';
   const file = formData.get('photo') as File | null;
 
-  if (!siteId || !taskId || !email) {
+  if (!siteIdParam || !taskId || !email) {
     return { error: 'Site, tâche et email sont requis.' };
   }
+
+  const siteId = siteIdParam;
 
   const admin = createSupabaseAdminClient();
 
@@ -96,6 +99,45 @@ export async function submitReportAction(
 
   if (markDone) {
     await admin.from('tasks').update({ status: 'done' }).eq('id', taskId);
+  }
+
+  // Récupérer les infos du chantier et du manager pour l'email
+  const { data: task } = await admin
+    .from('tasks')
+    .select('title')
+    .eq('id', taskId)
+    .single();
+
+  const { data: site } = await admin
+    .from('sites')
+    .select('id, name, created_by')
+    .eq('id', siteId)
+    .single();
+
+  if (site && task) {
+    // Récupérer l'email du manager
+    const { data: manager } = await admin.auth.admin.getUserById(site.created_by);
+    
+    if (manager?.user?.email) {
+      const workerName = name || email;
+      const appUrl = process.env.NEXT_PUBLIC_APP_BASE_URL ?? '';
+      const reportUrl = `${appUrl}/reports`;
+
+      try {
+        await sendReportNotificationEmail({
+          managerEmail: manager.user.email,
+          managerName: manager.user.user_metadata?.full_name || undefined,
+          workerName,
+          workerEmail: email || undefined,
+          taskTitle: task.title,
+          siteName: site.name,
+          reportUrl,
+        });
+      } catch (error) {
+        // Ne pas bloquer l'envoi du rapport si l'email échoue
+        console.error('Erreur envoi email notification:', error);
+      }
+    }
   }
 
   revalidatePath(`/qr/${siteId}`);
