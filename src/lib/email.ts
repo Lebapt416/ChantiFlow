@@ -24,6 +24,12 @@ export async function sendWorkerWelcomeEmail({
   const reportUrl = siteId ? `${appUrl}/qr/${siteId}` : `${appUrl}/reports`;
 
   try {
+    // Vérifier que Resend est configuré
+    if (!process.env.RESEND_API_KEY) {
+      console.warn('RESEND_API_KEY non configuré, email non envoyé');
+      return { success: false, error: 'Service email non configuré' };
+    }
+
     const { data, error } = await resend.emails.send({
       from: process.env.RESEND_FROM_EMAIL || 'ChantiFlow <onboarding@resend.dev>',
       to: workerEmail,
@@ -133,6 +139,12 @@ export async function sendReportNotificationEmail({
   }
 
   try {
+    // Vérifier que Resend est configuré
+    if (!process.env.RESEND_API_KEY) {
+      console.warn('RESEND_API_KEY non configuré, email non envoyé');
+      return { success: false, error: 'Service email non configuré' };
+    }
+
     const { data, error } = await resend.emails.send({
       from: process.env.RESEND_FROM_EMAIL || 'ChantiFlow <onboarding@resend.dev>',
       to: managerEmail,

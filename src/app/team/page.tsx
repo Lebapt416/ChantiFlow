@@ -19,12 +19,24 @@ export default async function TeamPage() {
   }
 
   // Récupérer les workers au niveau du compte (sans site_id)
-  const { data: accountWorkers } = await supabase
-    .from('workers')
-    .select('id, name, email, role, created_at')
-    .eq('created_by', user.id)
-    .is('site_id', null)
-    .order('created_at', { ascending: true });
+  // Gérer le cas où created_by n'existe pas encore (migration non exécutée)
+  let accountWorkers: any[] = [];
+  try {
+    const { data, error } = await supabase
+      .from('workers')
+      .select('id, name, email, role, created_at')
+      .eq('created_by', user.id)
+      .is('site_id', null)
+      .order('created_at', { ascending: true });
+    
+    if (!error) {
+      accountWorkers = data ?? [];
+    }
+    // Si erreur (colonne n'existe pas), on continue avec un tableau vide
+  } catch (error) {
+    // Colonne created_by n'existe pas encore, on continue
+    accountWorkers = [];
+  }
 
   // Récupérer aussi les workers liés aux chantiers pour affichage
   const { data: sites } = await supabase
