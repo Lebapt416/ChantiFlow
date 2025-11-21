@@ -12,13 +12,12 @@ export async function addWorkerAction(
   _prevState: ActionState,
   formData: FormData,
 ): Promise<ActionState> {
-  const siteId = String(formData.get('siteId') ?? '');
   const name = String(formData.get('name') ?? '').trim();
   const email = String(formData.get('email') ?? '').trim();
   const role = String(formData.get('role') ?? '').trim();
 
-  if (!siteId || !name) {
-    return { error: 'Chantier et nom requis.' };
+  if (!name) {
+    return { error: 'Nom requis.' };
   }
 
   const supabase = await createSupabaseServerClient();
@@ -30,23 +29,28 @@ export async function addWorkerAction(
     return { error: 'Non authentifié.' };
   }
 
-  // Vérifier que le chantier appartient à l'utilisateur
-  const { data: site } = await supabase
-    .from('sites')
-    .select('id')
-    .eq('id', siteId)
-    .eq('created_by', user.id)
-    .single();
+  // Vérifier si un worker avec le même email existe déjà pour ce compte
+  if (email) {
+    const { data: existingWorker } = await supabase
+      .from('workers')
+      .select('id')
+      .eq('created_by', user.id)
+      .is('site_id', null)
+      .eq('email', email)
+      .maybeSingle();
 
-  if (!site) {
-    return { error: 'Chantier non trouvé ou accès refusé.' };
+    if (existingWorker) {
+      return { error: 'Un membre avec cet email existe déjà dans votre équipe.' };
+    }
   }
 
+  // Créer un worker au niveau du compte (sans site_id)
   const { error } = await supabase.from('workers').insert({
-    site_id: siteId,
+    created_by: user.id,
     name,
     email: email || null,
     role: role || null,
+    site_id: null, // Worker au niveau du compte
   });
 
   if (error) {
@@ -54,7 +58,6 @@ export async function addWorkerAction(
   }
 
   revalidatePath('/team');
-  revalidatePath(`/site/${siteId}`);
   return { success: true };
 }
 

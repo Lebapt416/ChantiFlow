@@ -43,24 +43,104 @@ export async function addWorkerAction(
   formData: FormData,
 ): Promise<ActionState> {
   const siteId = String(formData.get('siteId') ?? '');
+  const existingWorkerId = String(formData.get('existingWorkerId') ?? '').trim();
   const name = String(formData.get('name') ?? '').trim();
   const email = String(formData.get('email') ?? '').trim();
   const role = String(formData.get('role') ?? '').trim();
 
-  if (!siteId || !name) {
-    return { error: 'Site et nom requis.' };
+  if (!siteId) {
+    return { error: 'Site requis.' };
   }
 
   const supabase = await createSupabaseServerClient();
-  const { error } = await supabase.from('workers').insert({
-    site_id: siteId,
-    name,
-    email: email || null,
-    role: role || null,
-  });
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  if (error) {
-    return { error: error.message };
+  if (!user) {
+    return { error: 'Non authentifié.' };
+  }
+
+  // Vérifier que le chantier appartient à l'utilisateur
+  const { data: site } = await supabase
+    .from('sites')
+    .select('id')
+    .eq('id', siteId)
+    .eq('created_by', user.id)
+    .single();
+
+  if (!site) {
+    return { error: 'Chantier non trouvé ou accès refusé.' };
+  }
+
+  // Si un worker existant est sélectionné, le lier au chantier
+  if (existingWorkerId) {
+    // Vérifier que le worker appartient à l'utilisateur
+    const { data: existingWorker } = await supabase
+      .from('workers')
+      .select('id, name, email, role')
+      .eq('id', existingWorkerId)
+      .eq('created_by', user.id)
+      .is('site_id', null)
+      .single();
+
+    if (!existingWorker) {
+      return { error: 'Worker non trouvé ou déjà assigné à un chantier.' };
+    }
+
+    // Vérifier si le worker n'est pas déjà assigné à ce chantier
+    if (existingWorker.email) {
+      const { data: alreadyAssigned } = await supabase
+        .from('workers')
+        .select('id')
+        .eq('site_id', siteId)
+        .eq('email', existingWorker.email)
+        .maybeSingle();
+
+      if (alreadyAssigned) {
+        return { error: 'Ce membre est déjà assigné à ce chantier.' };
+      }
+    } else {
+      // Si pas d'email, vérifier par nom
+      const { data: alreadyAssigned } = await supabase
+        .from('workers')
+        .select('id')
+        .eq('site_id', siteId)
+        .eq('name', existingWorker.name)
+        .maybeSingle();
+
+      if (alreadyAssigned) {
+        return { error: 'Ce membre est déjà assigné à ce chantier.' };
+      }
+    }
+
+    // Créer une copie du worker pour ce chantier
+    const { error } = await supabase.from('workers').insert({
+      site_id: siteId,
+      name: existingWorker.name,
+      email: existingWorker.email,
+      role: existingWorker.role,
+    });
+
+    if (error) {
+      return { error: error.message };
+    }
+  } else {
+    // Créer un nouveau worker directement lié au chantier
+    if (!name) {
+      return { error: 'Nom requis.' };
+    }
+
+    const { error } = await supabase.from('workers').insert({
+      site_id: siteId,
+      name,
+      email: email || null,
+      role: role || null,
+    });
+
+    if (error) {
+      return { error: error.message };
+    }
   }
 
   revalidatePath(`/site/${siteId}`);

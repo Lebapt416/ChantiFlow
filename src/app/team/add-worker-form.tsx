@@ -19,16 +19,9 @@ function SubmitButton() {
   );
 }
 
-type Site = {
-  id: string;
-  name: string;
-};
+type Props = {};
 
-type Props = {
-  sites: Site[];
-};
-
-export function AddWorkerForm({ sites }: Props) {
+export function AddWorkerForm({}: Props) {
   const [state, formAction] = useActionState(addWorkerAction, initialState);
 
   useEffect(() => {
@@ -38,41 +31,12 @@ export function AddWorkerForm({ sites }: Props) {
     }
   }, [state?.success]);
 
-  if (sites.length === 0) {
-    return (
-      <div className="rounded-2xl border border-dashed border-zinc-200 p-6 text-center text-sm text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">
-        Créez d'abord un chantier pour ajouter des membres.
-      </div>
-    );
-  }
-
   return (
     <form
       id="add-worker-form"
       action={formAction}
       className="grid gap-4 rounded-2xl border border-zinc-100 bg-white p-6 shadow-lg shadow-black/5 md:grid-cols-3 dark:border-zinc-800 dark:bg-zinc-900"
     >
-      <div className="space-y-2">
-        <label
-          htmlFor="siteId"
-          className="text-sm font-medium text-zinc-600 dark:text-zinc-300"
-        >
-          Chantier
-        </label>
-        <select
-          id="siteId"
-          name="siteId"
-          className="w-full rounded-md border border-zinc-200 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-black/60 dark:border-zinc-700 dark:bg-zinc-950 dark:text-white"
-          required
-        >
-          <option value="">-- Sélectionner un chantier --</option>
-          {sites.map((site) => (
-            <option key={site.id} value={site.id}>
-              {site.name}
-            </option>
-          ))}
-        </select>
-      </div>
       <div className="space-y-2">
         <label
           htmlFor="name"
@@ -124,7 +88,9 @@ export function AddWorkerForm({ sites }: Props) {
         <p className="md:col-span-3 text-sm text-rose-400">{state.error}</p>
       ) : null}
       {state?.success ? (
-        <p className="md:col-span-3 text-sm text-emerald-400">Employé ajouté.</p>
+        <p className="md:col-span-3 text-sm text-emerald-400">
+          Membre ajouté à votre équipe. Vous pourrez l'assigner à un chantier plus tard.
+        </p>
       ) : null}
     </form>
   );

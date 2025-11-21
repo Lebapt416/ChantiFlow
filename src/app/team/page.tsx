@@ -18,6 +18,15 @@ export default async function TeamPage() {
     redirect('/login');
   }
 
+  // Récupérer les workers au niveau du compte (sans site_id)
+  const { data: accountWorkers } = await supabase
+    .from('workers')
+    .select('id, name, email, role, created_at')
+    .eq('created_by', user.id)
+    .is('site_id', null)
+    .order('created_at', { ascending: true });
+
+  // Récupérer aussi les workers liés aux chantiers pour affichage
   const { data: sites } = await supabase
     .from('sites')
     .select('id, name')
@@ -31,13 +40,16 @@ export default async function TeamPage() {
 
   const siteIds = Object.keys(siteMap);
 
-  const { data: workers } = siteIds.length
+  const { data: siteWorkers } = siteIds.length
     ? await supabase
         .from('workers')
         .select('id, name, email, role, site_id, created_at')
         .in('site_id', siteIds)
         .order('created_at', { ascending: true })
     : { data: [] };
+
+  // Combiner les workers du compte et des chantiers pour les stats
+  const workers = [...(accountWorkers ?? []), ...(siteWorkers ?? [])];
 
   const groupedByRole =
     workers?.reduce<Record<string, number>>((acc, worker) => {
@@ -115,7 +127,7 @@ export default async function TeamPage() {
         </div>
       </div>
       <div className="mb-8">
-        <AddWorkerForm sites={sites ?? []} />
+        <AddWorkerForm />
       </div>
     </section>
 
@@ -130,9 +142,42 @@ export default async function TeamPage() {
           </p>
         </div>
       </div>
-      {workers?.length ? (
+      {accountWorkers && accountWorkers.length > 0 ? (
         <div className="space-y-3">
-          {workers.map((worker) => (
+          <h3 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 mb-2">
+            Membres de votre équipe (disponibles pour tous les chantiers)
+          </h3>
+          {accountWorkers.map((worker) => (
+            <div
+              key={worker.id}
+              className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 dark:border-emerald-800 dark:bg-emerald-900/20"
+            >
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <p className="text-sm font-semibold text-zinc-900 dark:text-white">
+                    {worker.name}
+                  </p>
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                    {worker.role ?? 'Rôle non défini'}
+                  </p>
+                  <p className="text-xs text-zinc-400 dark:text-zinc-500">
+                    {worker.email ?? 'Email non communiqué'}
+                  </p>
+                </div>
+                <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                  Disponible
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : null}
+      {siteWorkers && siteWorkers.length > 0 ? (
+        <div className="space-y-3 mt-6">
+          <h3 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 mb-2">
+            Membres assignés à des chantiers spécifiques
+          </h3>
+          {siteWorkers.map((worker) => (
             <div
               key={worker.id}
               className="rounded-2xl border border-zinc-200 p-4 dark:border-zinc-700"
@@ -149,21 +194,24 @@ export default async function TeamPage() {
                     {worker.email ?? 'Email non communiqué'}
                   </p>
                 </div>
-                <Link
-                  href={`/site/${worker.site_id}`}
-                  className="text-xs font-semibold text-black hover:underline dark:text-white"
-                >
-                  {siteMap[worker.site_id] ?? 'Site inconnu'} →
-                </Link>
+                {worker.site_id ? (
+                  <Link
+                    href={`/site/${worker.site_id}`}
+                    className="text-xs font-semibold text-black hover:underline dark:text-white"
+                  >
+                    {siteMap[worker.site_id] ?? 'Site inconnu'} →
+                  </Link>
+                ) : null}
               </div>
             </div>
           ))}
         </div>
-      ) : (
+      ) : null}
+      {(!accountWorkers || accountWorkers.length === 0) && (!siteWorkers || siteWorkers.length === 0) ? (
         <p className="text-sm text-zinc-500 dark:text-zinc-400">
-          Aucune ressource pour l’instant. Ajoute des employés depuis une fiche chantier.
+          Aucune ressource pour l'instant. Ajoutez des membres à votre équipe ci-dessus.
         </p>
-      )}
+      ) : null}
     </section>
     </AppShell>
   );

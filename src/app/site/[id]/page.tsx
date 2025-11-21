@@ -76,6 +76,14 @@ export default async function SitePage({ params }: Params) {
     .eq('created_by', user.id)
     .order('created_at', { ascending: false });
 
+  // Récupérer les workers disponibles au niveau du compte pour sélection
+  const { data: availableWorkers } = await supabase
+    .from('workers')
+    .select('id, name, email, role')
+    .eq('created_by', user.id)
+    .is('site_id', null)
+    .order('name', { ascending: true });
+
   const [{ data: tasks }, { data: workers }] = await Promise.all([
     supabase
       .from('tasks')
@@ -237,7 +245,7 @@ export default async function SitePage({ params }: Params) {
               </div>
             </div>
 
-            <AddWorkerForm siteId={site.id} />
+            <AddWorkerForm siteId={site.id} availableWorkers={availableWorkers ?? []} />
 
             <div className="space-y-3">
               {workers?.length ? (
