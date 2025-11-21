@@ -32,20 +32,63 @@ export async function submitReportAction(
 
   const admin = createSupabaseAdminClient();
 
-  // upsert worker
+  // Récupérer les infos du chantier pour trouver le manager
+  const { data: site } = await admin
+    .from('sites')
+    .select('id, created_by')
+    .eq('id', siteId)
+    .single();
+
+  if (!site) {
+    return { error: 'Chantier non trouvé.' };
+  }
+
+  // Chercher d'abord un worker déjà assigné à ce chantier
   const { data: existingWorker, error: workerFetchError } = await admin
     .from('workers')
-    .select('id')
+    .select('id, name, role')
     .eq('site_id', siteId)
     .eq('email', email)
     .maybeSingle();
 
-  if (workerFetchError) {
+  if (workerFetchError && workerFetchError.code !== 'PGRST116') {
+    // PGRST116 = not found, ce qui est OK
     return { error: workerFetchError.message };
   }
 
   let workerId = existingWorker?.id;
 
+  // Si pas trouvé dans le chantier, chercher au niveau du compte (workers réutilisables)
+  if (!workerId && site.created_by) {
+    const { data: accountWorker } = await admin
+      .from('workers')
+      .select('id, name, role, created_by')
+      .eq('created_by', site.created_by)
+      .is('site_id', null)
+      .eq('email', email)
+      .maybeSingle();
+
+    if (accountWorker) {
+      // Worker trouvé au niveau du compte, créer une copie pour ce chantier
+      const { data: newSiteWorker, error: workerInsertError } = await admin
+        .from('workers')
+        .insert({
+          site_id: siteId,
+          name: accountWorker.name || name || email,
+          email,
+          role: accountWorker.role || role || null,
+        })
+        .select('id')
+        .single();
+
+      if (workerInsertError || !newSiteWorker) {
+        return { error: workerInsertError?.message ?? 'Impossible de créer le collaborateur pour ce chantier.' };
+      }
+      workerId = newSiteWorker.id;
+    }
+  }
+
+  // Si toujours pas de worker, créer un nouveau worker pour ce chantier
   if (!workerId) {
     const { data: newWorker, error: workerInsertError } = await admin
       .from('workers')
@@ -108,15 +151,15 @@ export async function submitReportAction(
     .eq('id', taskId)
     .single();
 
-  const { data: site } = await admin
+  const { data: siteInfo } = await admin
     .from('sites')
     .select('id, name, created_by')
     .eq('id', siteId)
     .single();
 
-  if (site && task) {
+  if (siteInfo && task) {
     // Récupérer l'email du manager
-    const { data: manager } = await admin.auth.admin.getUserById(site.created_by);
+    const { data: manager } = await admin.auth.admin.getUserById(siteInfo.created_by);
     
     if (manager?.user?.email) {
       const workerName = name || email;
@@ -130,7 +173,7 @@ export async function submitReportAction(
           workerName,
           workerEmail: email || undefined,
           taskTitle: task.title,
-          siteName: site.name,
+          siteName: siteInfo.name,
           reportUrl,
         });
       } catch (error) {
