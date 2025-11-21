@@ -172,8 +172,9 @@ export async function addWorkerAction(
         if (retryError) {
           return { error: `Erreur: ${retryError.message}. Veuillez exécuter la migration SQL (migration-worker-access-code.sql)` };
         }
-        // Continuer sans code d'accès
-        accessCode = undefined;
+        // Continuer sans code d'accès en base, mais on garde le code généré pour l'email
+        // Le code sera affiché dans l'email même s'il n'est pas sauvegardé
+        console.warn('⚠️ Code généré mais non sauvegardé (colonne manquante):', accessCode);
       } else {
         return { error: error.message };
       }
@@ -261,8 +262,9 @@ export async function addWorkerAction(
         if (retryError) {
           return { error: `Erreur: ${retryError.message}. Veuillez exécuter la migration SQL (migration-worker-access-code.sql)` };
         }
-        // Continuer sans code d'accès
-        accessCode = undefined;
+        // Continuer sans code d'accès en base, mais on garde le code généré pour l'email
+        // Le code sera affiché dans l'email même s'il n'est pas sauvegardé
+        console.warn('⚠️ Code généré mais non sauvegardé (colonne manquante):', accessCode);
       } else {
         return { error: error.message };
       }
