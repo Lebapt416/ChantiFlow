@@ -25,13 +25,18 @@ type Props = {
 
 export function CompleteSiteButton({ siteId, siteName }: Props) {
   const [showConfirm, setShowConfirm] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
   async function handleSubmit(formData: FormData) {
+    setError(null);
     const result = await completeSiteAction({}, formData);
     if (result.success) {
       router.push('/dashboard');
       router.refresh();
+    } else if (result.error) {
+      setError(result.error);
+      setShowConfirm(false);
     }
   }
 
@@ -44,6 +49,11 @@ export function CompleteSiteButton({ siteId, siteName }: Props) {
         <p className="mt-2 text-xs text-rose-700 dark:text-rose-300">
           Cette action va terminer le chantier <strong>{siteName}</strong>, retirer tous les employés et leur envoyer un email de notification. Cette action est irréversible.
         </p>
+        {error && (
+          <div className="mt-2 rounded-lg bg-rose-100 p-2 text-xs text-rose-800 dark:bg-rose-900/30 dark:text-rose-300">
+            {error}
+          </div>
+        )}
         <div className="mt-4 flex gap-2">
           <form action={handleSubmit}>
             <input type="hidden" name="siteId" value={siteId} />
@@ -51,7 +61,10 @@ export function CompleteSiteButton({ siteId, siteName }: Props) {
           </form>
           <button
             type="button"
-            onClick={() => setShowConfirm(false)}
+            onClick={() => {
+              setShowConfirm(false);
+              setError(null);
+            }}
             className="rounded-full border border-zinc-300 px-4 py-2 text-sm font-semibold text-zinc-700 transition hover:bg-zinc-100 dark:border-zinc-600 dark:text-zinc-300 dark:hover:bg-zinc-800"
           >
             Annuler

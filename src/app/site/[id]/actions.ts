@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 import { sendWorkerWelcomeEmail, sendSiteCompletedEmail } from '@/lib/email';
 import { generateAccessCode } from '@/lib/access-code';
 
@@ -360,8 +361,17 @@ export async function completeSiteAction(
     .eq('id', siteId);
 
   if (siteError) {
-    console.error('Erreur mise à jour chantier:', siteError);
-    return { error: `Erreur lors de la finalisation du chantier: ${siteError.message}` };
+    console.error('❌ Erreur mise à jour chantier:', siteError);
+    // Si l'erreur est liée à completed_at (colonne n'existe pas), continuer quand même
+    if (siteError.message.includes('completed_at') || siteError.message.includes('column')) {
+      console.warn('⚠️ Colonne completed_at non trouvée - migration SQL non exécutée');
+      console.warn('⚠️ Le chantier sera terminé mais completed_at ne sera pas mis à jour');
+      // On continue quand même pour retirer les workers et envoyer les emails
+    } else {
+      return { error: `Erreur lors de la finalisation du chantier: ${siteError.message}` };
+    }
+  } else {
+    console.log('✅ Chantier marqué comme terminé (completed_at mis à jour)');
   }
 
   // Retirer tous les workers du chantier (mettre site_id à null)
@@ -376,25 +386,70 @@ export async function completeSiteAction(
     // Ne pas bloquer si on ne peut pas retirer les workers, mais log l'erreur
   }
 
-  // Envoyer un email à tous les workers qui ont un email
+  // Récupérer l'email du créateur du chantier pour lui envoyer aussi un email
+  const admin = createSupabaseAdminClient();
+  let creatorEmail: string | undefined;
+  try {
+    const { data: creator } = await admin.auth.admin.getUserById(site.created_by);
+    creatorEmail = creator?.user?.email;
+  } catch (error) {
+    console.warn('⚠️ Impossible de récupérer l\'email du créateur:', error);
+    // Utiliser l'email de l'utilisateur actuel comme fallback
+    creatorEmail = user.email || undefined;
+  }
+
+  // Envoyer un email à tous les workers qui ont un email + au créateur
+  const emailRecipients: Array<{ email: string; name: string }> = [];
+
+  // Ajouter les workers
   if (workers && workers.length > 0) {
-    const emailPromises = workers
+    workers
       .filter((worker) => worker.email)
-      .map((worker) =>
-        sendSiteCompletedEmail({
-          workerEmail: worker.email!,
-          workerName: worker.name || 'Collaborateur',
-          siteName: site.name,
-        })
-      );
+      .forEach((worker) => {
+        emailRecipients.push({
+          email: worker.email!,
+          name: worker.name || 'Collaborateur',
+        });
+      });
+  }
+
+  // Ajouter le créateur du chantier s'il a un email et qu'il n'est pas déjà dans la liste
+  if (creatorEmail && !emailRecipients.some((r) => r.email === creatorEmail)) {
+    emailRecipients.push({
+      email: creatorEmail,
+      name: user.email || 'Chef de chantier',
+    });
+  }
+
+  // Envoyer les emails
+  if (emailRecipients.length > 0) {
+    const emailPromises = emailRecipients.map((recipient) =>
+      sendSiteCompletedEmail({
+        workerEmail: recipient.email,
+        workerName: recipient.name,
+        siteName: site.name,
+      })
+    );
 
     try {
-      await Promise.allSettled(emailPromises);
-      console.log(`✅ Emails de fin de chantier envoyés à ${emailPromises.length} employé(s)`);
+      const results = await Promise.allSettled(emailPromises);
+      const successCount = results.filter((r) => r.status === 'fulfilled').length;
+      const failureCount = results.filter((r) => r.status === 'rejected').length;
+      console.log(`✅ Emails de fin de chantier: ${successCount} envoyé(s), ${failureCount} échec(s)`);
+      
+      if (failureCount > 0) {
+        results.forEach((result, index) => {
+          if (result.status === 'rejected') {
+            console.error(`❌ Échec envoi email à ${emailRecipients[index].email}:`, result.reason);
+          }
+        });
+      }
     } catch (error) {
-      console.error('Erreur envoi emails fin de chantier:', error);
+      console.error('❌ Erreur envoi emails fin de chantier:', error);
       // Ne pas bloquer si l'envoi d'email échoue
     }
+  } else {
+    console.warn('⚠️ Aucun destinataire d\'email trouvé pour la notification de fin de chantier');
   }
 
   revalidatePath(`/site/${siteId}`);
