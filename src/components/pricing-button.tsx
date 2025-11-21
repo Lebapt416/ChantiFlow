@@ -18,15 +18,15 @@ export function PricingButton({ plan, isAuthenticated, className, children, user
   const [isPending, startTransition] = useTransition();
 
   async function handleClick() {
-    if (!isAuthenticated) {
-      router.push('/login');
-      return;
-    }
+    console.log('🔄 Clic sur plan (landing):', plan, 'Authentifié:', isAuthenticated);
 
-    console.log('🔄 Clic sur plan (landing):', plan);
-
-    // Plan Basic : changement gratuit
+    // Plan Basic : nécessite une connexion
     if (plan === 'basic') {
+      if (!isAuthenticated) {
+        router.push('/login');
+        return;
+      }
+      
       startTransition(async () => {
         try {
           const formData = new FormData();
@@ -43,29 +43,52 @@ export function PricingButton({ plan, isAuthenticated, className, children, user
       return;
     }
 
-    // Vérifier si c'est l'admin
-    const isAdmin = userEmail ? isAdminUser(userEmail) : false;
+    // Plans payants (Plus/Pro) : redirection directe vers Stripe
+    // Même si l'utilisateur n'est pas connecté, on peut le rediriger vers Stripe
+    // Le webhook mettra à jour le plan après le paiement si l'email correspond à un compte
     
-    // Plans payants : admin = gratuit, autres = Stripe
-    if (isAdmin) {
-      startTransition(async () => {
-        try {
-          const formData = new FormData();
-          formData.append('plan', plan);
-          const result = await changePlanAction({}, formData);
-          if (result.success) {
-            router.push('/account');
-            router.refresh();
+    // Si connecté, vérifier si c'est l'admin
+    if (isAuthenticated) {
+      const isAdmin = userEmail ? isAdminUser(userEmail) : false;
+      
+      // Admin : changement gratuit
+      if (isAdmin) {
+        startTransition(async () => {
+          try {
+            const formData = new FormData();
+            formData.append('plan', plan);
+            const result = await changePlanAction({}, formData);
+            if (result.success) {
+              router.push('/account');
+              router.refresh();
+            }
+          } catch (error) {
+            console.error('Error changing plan:', error);
           }
-        } catch (error) {
-          console.error('Error changing plan:', error);
-        }
-      });
-      return;
+        });
+        return;
+      }
     }
 
-    // Rediriger vers Stripe checkout pour les autres utilisateurs
+    // Rediriger vers Stripe checkout (connecté ou non)
     console.log('💳 Redirection vers Stripe pour plan (landing):', plan);
+    
+    // Si l'utilisateur n'est pas connecté, rediriger directement vers le lien Stripe
+    if (!isAuthenticated) {
+      const STRIPE_CHECKOUT_LINKS = {
+        plus: 'https://buy.stripe.com/6oUfZh8dFeSC3UbcG32VG00',
+        pro: 'https://buy.stripe.com/9B6dR951t6m6aizfSf2VG01',
+      };
+      
+      const checkoutLink = STRIPE_CHECKOUT_LINKS[plan as 'plus' | 'pro'];
+      if (checkoutLink) {
+        console.log('✅ Redirection directe vers Stripe (non connecté):', checkoutLink);
+        window.location.href = checkoutLink;
+        return;
+      }
+    }
+
+    // Si connecté, utiliser l'API pour pré-remplir l'email
     try {
       const response = await fetch('/api/stripe/checkout', {
         method: 'POST',

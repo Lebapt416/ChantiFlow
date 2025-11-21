@@ -70,7 +70,10 @@ export async function POST(request: Request) {
       const user = users.users.find((u) => u.email === customerEmail);
 
       if (!user) {
-        console.error(`Utilisateur non trouvé pour l'email: ${customerEmail}`);
+        console.warn(`⚠️ Utilisateur non trouvé pour l'email: ${customerEmail}`);
+        console.warn(`⚠️ Le paiement a été effectué mais aucun compte n'existe avec cet email.`);
+        console.warn(`⚠️ L'utilisateur devra créer un compte avec cet email pour que le plan soit activé.`);
+        // On pourrait créer un compte automatiquement ici, mais pour l'instant on log juste l'avertissement
         break;
       }
 
