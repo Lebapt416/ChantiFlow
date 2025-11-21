@@ -9,12 +9,14 @@ export async function sendWorkerWelcomeEmail({
   siteName,
   siteId,
   managerName,
+  accessCode,
 }: {
   workerEmail: string;
   workerName: string;
   siteName?: string;
   siteId?: string;
   managerName?: string;
+  accessCode?: string;
 }) {
   // Si Resend n'est pas configuré, on retourne silencieusement
   if (!process.env.RESEND_API_KEY) {
@@ -72,6 +74,14 @@ export async function sendWorkerWelcomeEmail({
                 </p>
               `}
               
+              ${accessCode ? `
+                <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 25px; border-radius: 8px; margin: 30px 0; text-align: center;">
+                  <p style="color: white; font-size: 14px; margin: 0 0 10px 0; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Votre code d'accès unique</p>
+                  <p style="color: white; font-size: 32px; margin: 0; font-weight: bold; letter-spacing: 4px; font-family: 'Courier New', monospace;">${accessCode}</p>
+                  <p style="color: rgba(255,255,255,0.9); font-size: 12px; margin: 10px 0 0 0;">Vous devrez entrer ce code après avoir scanné le QR code</p>
+                </div>
+              ` : ''}
+              
               <p style="font-size: 16px; margin-bottom: 20px;">
                 Vous pouvez maintenant envoyer des rapports de terrain directement depuis votre téléphone.
               </p>
@@ -79,7 +89,8 @@ export async function sendWorkerWelcomeEmail({
               <div style="background: #f9fafb; padding: 20px; border-radius: 8px; margin: 30px 0; border-left: 4px solid #667eea;">
                 <h2 style="margin-top: 0; color: #1f2937; font-size: 20px;">Comment envoyer un rapport ?</h2>
                 <ol style="margin: 10px 0; padding-left: 20px; color: #4b5563;">
-                  <li style="margin-bottom: 10px;">Cliquez sur le lien ci-dessous ou scannez le QR code sur le chantier</li>
+                  <li style="margin-bottom: 10px;">Scannez le QR code sur le chantier</li>
+                  ${accessCode ? '<li style="margin-bottom: 10px;">Entrez votre code d\'accès unique (ci-dessus)</li>' : ''}
                   <li style="margin-bottom: 10px;">Sélectionnez la tâche concernée</li>
                   <li style="margin-bottom: 10px;">Ajoutez une photo et décrivez l'avancement</li>
                   <li style="margin-bottom: 10px;">Envoyez votre rapport au chef de chantier</li>

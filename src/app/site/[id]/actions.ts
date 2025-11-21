@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { sendWorkerWelcomeEmail } from '@/lib/email';
+import { generateAccessCode } from '@/lib/access-code';
 
 export type ActionState = {
   error?: string;
@@ -115,13 +116,39 @@ export async function addWorkerAction(
       }
     }
 
-    // Créer une copie du worker pour ce chantier
-    const { error } = await supabase.from('workers').insert({
-      site_id: siteId,
-      name: existingWorker.name,
-      email: existingWorker.email,
-      role: existingWorker.role,
-    });
+    // Générer un code d'accès unique
+    let accessCode = generateAccessCode();
+    let attempts = 0;
+    let codeExists = true;
+    
+    // Vérifier que le code est unique (max 10 tentatives)
+    while (codeExists && attempts < 10) {
+      const { data: existing } = await supabase
+        .from('workers')
+        .select('id')
+        .eq('access_code', accessCode)
+        .maybeSingle();
+      
+      if (!existing) {
+        codeExists = false;
+      } else {
+        accessCode = generateAccessCode();
+        attempts++;
+      }
+    }
+
+    // Créer une copie du worker pour ce chantier avec le code d'accès
+    const { data: newWorker, error } = await supabase
+      .from('workers')
+      .insert({
+        site_id: siteId,
+        name: existingWorker.name,
+        email: existingWorker.email,
+        role: existingWorker.role,
+        access_code: accessCode,
+      })
+      .select('id')
+      .single();
 
     if (error) {
       return { error: error.message };
@@ -136,6 +163,7 @@ export async function addWorkerAction(
           siteName: site.name,
           siteId: siteId,
           managerName: user.email || undefined,
+          accessCode: accessCode,
         });
       } catch (error) {
         // Ne pas bloquer l'ajout si l'email échoue
@@ -148,12 +176,38 @@ export async function addWorkerAction(
       return { error: 'Nom requis.' };
     }
 
-    const { error } = await supabase.from('workers').insert({
-      site_id: siteId,
-      name,
-      email: email || null,
-      role: role || null,
-    });
+    // Générer un code d'accès unique
+    let accessCode = generateAccessCode();
+    let attempts = 0;
+    let codeExists = true;
+    
+    // Vérifier que le code est unique (max 10 tentatives)
+    while (codeExists && attempts < 10) {
+      const { data: existing } = await supabase
+        .from('workers')
+        .select('id')
+        .eq('access_code', accessCode)
+        .maybeSingle();
+      
+      if (!existing) {
+        codeExists = false;
+      } else {
+        accessCode = generateAccessCode();
+        attempts++;
+      }
+    }
+
+    const { data: newWorker, error } = await supabase
+      .from('workers')
+      .insert({
+        site_id: siteId,
+        name,
+        email: email || null,
+        role: role || null,
+        access_code: accessCode,
+      })
+      .select('id')
+      .single();
 
     if (error) {
       return { error: error.message };
@@ -168,6 +222,7 @@ export async function addWorkerAction(
           siteName: site.name,
           siteId: siteId,
           managerName: user.email || undefined,
+          accessCode: accessCode,
         });
       } catch (error) {
         // Ne pas bloquer l'ajout si l'email échoue

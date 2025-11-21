@@ -95,58 +95,20 @@ export default async function QrAccessPage({ params }: Params) {
           </p>
         </header>
 
-        <section className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
-          <ReportForm
-            siteId={site.id}
-            tasks={tasks?.map((task) => ({
-              id: task.id,
-              title: task.title,
-            })) ?? []}
-            workers={workers ?? []}
-          />
-
-          <div className="space-y-4 rounded-2xl border border-zinc-200 bg-white/80 p-6 backdrop-blur dark:border-white/10 dark:bg-white/5">
-            <p className="text-xs uppercase tracking-[0.4em] text-zinc-500 dark:text-white/70">
-              Tâches en cours
-            </p>
-            <div className="space-y-3">
-              {tasks?.length ? (
-                tasks.map((task) => (
-                  <div
-                    key={task.id}
-                    className="rounded-xl border border-zinc-200 bg-white p-4 dark:border-white/10 dark:bg-white/10"
-                  >
-                    <p className="text-sm font-semibold dark:text-white">
-                      {task.title}
-                    </p>
-                    <p className="text-xs text-zinc-500 dark:text-white/60">
-                      {task.required_role || 'Tout rôle'}
-                    </p>
-                    <p className="text-xs text-zinc-500 dark:text-white/50">
-                      {task.status === 'done' ? '✅ Terminé' : '⏳ À faire'}
-                    </p>
-                  </div>
-                ))
-              ) : (
-                <p className="text-sm text-zinc-600 dark:text-white/60">
-                  Aucune tâche disponible pour le moment. Contacte ton chef de
-                  chantier.
-                </p>
-              )}
-            </div>
-            <div className="rounded-xl border border-zinc-200 bg-black/5 p-4 text-xs text-zinc-600 dark:border-white/10 dark:bg-black/30 dark:text-white/60">
-              <p className="font-semibold text-zinc-900 dark:text-white">
-                Comment ça marche ?
-              </p>
-              <ol className="mt-2 list-decimal space-y-1 pl-5">
-                <li>Choisis ta tâche.</li>
-                <li>Renseigne ton email pro et ton rôle.</li>
-                <li>Ajoute une photo + ton rapport.</li>
-                <li>Marque la tâche comme terminée si applicable.</li>
-              </ol>
-            </div>
-          </div>
-        </section>
+        <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-6 dark:border-emerald-800 dark:bg-emerald-900/20">
+          <h2 className="text-xl font-semibold text-zinc-900 dark:text-white mb-2">
+            Accès sécurisé
+          </h2>
+          <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-4">
+            Pour accéder à vos informations et envoyer des rapports, vous devez d'abord entrer votre code d'accès unique.
+          </p>
+          <a
+            href={`/qr/${site.id}/verify`}
+            className="inline-block rounded-lg bg-emerald-600 px-6 py-3 text-base font-semibold text-white transition hover:bg-emerald-700"
+          >
+            Entrer mon code d'accès
+          </a>
+        </div>
       </div>
     </div>
   );
