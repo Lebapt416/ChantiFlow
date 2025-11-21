@@ -21,9 +21,11 @@ export function ChangePlanButton({ plan, currentPlan, userEmail }: Props) {
   async function handleClick() {
     if (isCurrent || isPending) return;
 
-    startTransition(async () => {
-      // Plan Basic : changement gratuit direct
-      if (plan === 'basic') {
+    console.log('🔄 Clic sur plan:', plan, 'Admin:', isAdmin);
+
+    // Plan Basic : changement gratuit direct
+    if (plan === 'basic') {
+      startTransition(async () => {
         const formData = new FormData();
         formData.append('plan', plan);
         const result = await changePlanAction({}, formData);
@@ -31,12 +33,14 @@ export function ChangePlanButton({ plan, currentPlan, userEmail }: Props) {
         if (result.success) {
           router.refresh();
         }
-        return;
-      }
+      });
+      return;
+    }
 
-      // Plans payants (Plus/Pro)
-      // Si admin : changement gratuit
-      if (isAdmin) {
+    // Plans payants (Plus/Pro)
+    // Si admin : changement gratuit
+    if (isAdmin) {
+      startTransition(async () => {
         const formData = new FormData();
         formData.append('plan', plan);
         const result = await changePlanAction({}, formData);
@@ -44,28 +48,38 @@ export function ChangePlanButton({ plan, currentPlan, userEmail }: Props) {
         if (result.success) {
           router.refresh();
         }
-        return;
+      });
+      return;
+    }
+
+    // Autres utilisateurs : rediriger vers Stripe checkout
+    console.log('💳 Redirection vers Stripe pour plan:', plan);
+    try {
+      const response = await fetch('/api/stripe/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ plan }),
+      });
+
+      console.log('📡 Réponse API:', response.status);
+
+      const data = await response.json();
+      console.log('📦 Données reçues:', data);
+
+      if (data.url) {
+        console.log('✅ Redirection vers:', data.url);
+        window.location.href = data.url;
+      } else if (data.error) {
+        console.error('❌ Erreur:', data.error);
+        setState({ error: data.error });
+      } else {
+        console.error('❌ Pas d\'URL ni d\'erreur dans la réponse');
+        setState({ error: 'Réponse inattendue du serveur.' });
       }
-
-      // Autres utilisateurs : rediriger vers Stripe checkout
-      try {
-        const response = await fetch('/api/stripe/checkout', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ plan }),
-        });
-
-        const data = await response.json();
-
-        if (data.url) {
-          window.location.href = data.url;
-        } else if (data.error) {
-          setState({ error: data.error });
-        }
-      } catch (error) {
-        setState({ error: 'Erreur lors de la redirection vers le paiement.' });
-      }
-    });
+    } catch (error) {
+      console.error('❌ Exception:', error);
+      setState({ error: 'Erreur lors de la redirection vers le paiement.' });
+    }
   }
 
   return (
