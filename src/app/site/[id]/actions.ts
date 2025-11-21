@@ -184,19 +184,20 @@ export async function addWorkerAction(
     // Envoyer un email de bienvenue si l'email est fourni
     if (existingWorker.email) {
       try {
-        console.log('📧 Envoi email avec code d\'accès:', accessCode);
-        await sendWorkerWelcomeEmail({
+        console.log('📧 Envoi email avec code d\'accès:', accessCode, 'type:', typeof accessCode);
+        console.log('📧 Worker email:', existingWorker.email, 'Worker name:', existingWorker.name);
+        const emailResult = await sendWorkerWelcomeEmail({
           workerEmail: existingWorker.email,
           workerName: existingWorker.name,
           siteName: site.name,
           siteId: siteId,
           managerName: user.email || undefined,
-          accessCode: accessCode,
+          accessCode: accessCode || undefined,
         });
-        console.log('✅ Email envoyé avec succès, code:', accessCode);
+        console.log('✅ Email envoyé avec succès, code:', accessCode, 'result:', emailResult);
       } catch (error) {
         // Ne pas bloquer l'ajout si l'email échoue
-        console.error('Erreur envoi email bienvenue:', error);
+        console.error('❌ Erreur envoi email bienvenue:', error);
       }
     }
   } else {
@@ -272,19 +273,20 @@ export async function addWorkerAction(
     // Envoyer un email de bienvenue si l'email est fourni
     if (email) {
       try {
-        console.log('📧 Envoi email avec code d\'accès:', accessCode);
-        await sendWorkerWelcomeEmail({
+        console.log('📧 Envoi email avec code d\'accès:', accessCode, 'type:', typeof accessCode);
+        console.log('📧 Worker email:', email, 'Worker name:', name);
+        const emailResult = await sendWorkerWelcomeEmail({
           workerEmail: email,
           workerName: name,
           siteName: site.name,
           siteId: siteId,
           managerName: user.email || undefined,
-          accessCode: accessCode,
+          accessCode: accessCode || undefined,
         });
-        console.log('✅ Email envoyé avec succès, code:', accessCode);
+        console.log('✅ Email envoyé avec succès, code:', accessCode, 'result:', emailResult);
       } catch (error) {
         // Ne pas bloquer l'ajout si l'email échoue
-        console.error('Erreur envoi email bienvenue:', error);
+        console.error('❌ Erreur envoi email bienvenue:', error);
       }
     }
   }
