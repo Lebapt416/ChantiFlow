@@ -21,20 +21,42 @@ export default async function TeamPage() {
   // Récupérer les workers au niveau du compte (sans site_id)
   // Gérer le cas où created_by n'existe pas encore (migration non exécutée)
   let accountWorkers: any[] = [];
+  
+  // Vérifier d'abord si la colonne created_by existe en essayant une requête simple
+  // Si elle échoue, on sait que la migration n'a pas été exécutée
   try {
+    // Essayer de récupérer les workers avec created_by
     const { data, error } = await supabase
       .from('workers')
       .select('id, name, email, role, created_at')
       .eq('created_by', user.id)
       .is('site_id', null)
-      .order('created_at', { ascending: true });
+      .order('created_at', { ascending: true })
+      .limit(1); // Limiter pour tester rapidement
     
-    if (!error) {
-      accountWorkers = data ?? [];
+    if (error) {
+      // Si l'erreur mentionne created_by ou column, la migration n'est pas exécutée
+      if (error.message.includes('created_by') || error.message.includes('column') || error.code === '42703') {
+        console.warn('Colonne created_by non trouvée - migration non exécutée');
+        accountWorkers = [];
+      } else {
+        // Autre erreur, on la propage
+        throw error;
+      }
+    } else {
+      // Si pas d'erreur, récupérer tous les workers
+      const { data: allAccountWorkers } = await supabase
+        .from('workers')
+        .select('id, name, email, role, created_at')
+        .eq('created_by', user.id)
+        .is('site_id', null)
+        .order('created_at', { ascending: true });
+      
+      accountWorkers = allAccountWorkers ?? [];
     }
-    // Si erreur (colonne n'existe pas), on continue avec un tableau vide
-  } catch (error) {
-    // Colonne created_by n'existe pas encore, on continue
+  } catch (error: any) {
+    // Colonne created_by n'existe pas encore, on continue avec un tableau vide
+    console.warn('Erreur récupération workers compte:', error?.message);
     accountWorkers = [];
   }
 
