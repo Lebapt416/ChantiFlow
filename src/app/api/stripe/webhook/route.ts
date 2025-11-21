@@ -2,6 +2,28 @@ import { NextResponse } from 'next/server';
 import { headers } from 'next/headers';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 import { stripe } from '@/lib/stripe';
+import { sendAccountCreatedEmail } from '@/lib/email';
+
+// Fonction pour générer un mot de passe sécurisé
+function generateSecurePassword(): string {
+  const length = 16;
+  const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*';
+  let password = '';
+  
+  // S'assurer d'avoir au moins un caractère de chaque type
+  password += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'[Math.floor(Math.random() * 26)]; // Majuscule
+  password += 'abcdefghijklmnopqrstuvwxyz'[Math.floor(Math.random() * 26)]; // Minuscule
+  password += '0123456789'[Math.floor(Math.random() * 10)]; // Chiffre
+  password += '!@#$%^&*'[Math.floor(Math.random() * 8)]; // Spécial
+  
+  // Remplir le reste
+  for (let i = password.length; i < length; i++) {
+    password += charset[Math.floor(Math.random() * charset.length)];
+  }
+  
+  // Mélanger les caractères
+  return password.split('').sort(() => Math.random() - 0.5).join('');
+}
 
 export async function POST(request: Request) {
   if (!stripe) {
@@ -67,13 +89,53 @@ export async function POST(request: Request) {
       
       // Chercher l'utilisateur par email
       const { data: users } = await admin.auth.admin.listUsers();
-      const user = users.users.find((u) => u.email === customerEmail);
+      let user = users.users.find((u) => u.email === customerEmail);
+
+      // Si l'utilisateur n'existe pas, créer un compte automatiquement
+      if (!user) {
+        console.log(`📝 Création automatique du compte pour ${customerEmail}`);
+        
+        // Générer un mot de passe aléatoire sécurisé
+        const randomPassword = generateSecurePassword();
+        
+        try {
+          // Créer l'utilisateur avec l'admin client
+          const { data: newUser, error: createError } = await admin.auth.admin.createUser({
+            email: customerEmail,
+            password: randomPassword,
+            email_confirm: true, // Confirmer l'email automatiquement
+            user_metadata: {
+              created_via: 'stripe_payment',
+              created_at: new Date().toISOString(),
+            },
+          });
+
+          if (createError || !newUser) {
+            console.error('❌ Erreur création compte:', createError);
+            // Continuer quand même pour essayer de déterminer le plan
+          } else {
+            console.log(`✅ Compte créé avec succès pour ${customerEmail}`);
+            user = newUser.user;
+            
+            // Envoyer un email avec les identifiants
+            try {
+              await sendAccountCreatedEmail({
+                userEmail: customerEmail,
+                temporaryPassword: randomPassword,
+              });
+            } catch (emailError) {
+              console.error('❌ Erreur envoi email identifiants:', emailError);
+              // Ne pas bloquer le processus si l'email échoue
+            }
+          }
+        } catch (error) {
+          console.error('❌ Exception lors de la création du compte:', error);
+          // Continuer pour essayer de déterminer le plan quand même
+        }
+      }
 
       if (!user) {
-        console.warn(`⚠️ Utilisateur non trouvé pour l'email: ${customerEmail}`);
-        console.warn(`⚠️ Le paiement a été effectué mais aucun compte n'existe avec cet email.`);
-        console.warn(`⚠️ L'utilisateur devra créer un compte avec cet email pour que le plan soit activé.`);
-        // On pourrait créer un compte automatiquement ici, mais pour l'instant on log juste l'avertissement
+        console.error(`❌ Impossible de créer ou trouver l'utilisateur pour ${customerEmail}`);
         break;
       }
 
