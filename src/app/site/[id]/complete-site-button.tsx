@@ -1,9 +1,8 @@
 'use client';
 
-import { useFormStatus } from 'react-dom';
-import { completeSiteAction } from './actions';
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { useFormState, useFormStatus } from 'react-dom';
+import { completeSiteAction, type ActionState } from './actions';
 
 function CompleteSiteSubmit({ disabled }: { disabled?: boolean }) {
   const { pending } = useFormStatus();
@@ -23,22 +22,27 @@ type Props = {
   siteName: string;
 };
 
+const initialState: ActionState = {};
+
 export function CompleteSiteButton({ siteId, siteName }: Props) {
   const [showConfirm, setShowConfirm] = useState(false);
+  const completeSiteFormAction = completeSiteAction as unknown as (
+    state: ActionState,
+    formData: FormData,
+  ) => Promise<ActionState>;
+  // @ts-expect-error React useFormState typings n'acceptent pas encore les Server Actions avec FormData
+  const [state, formAction] = useFormState<ActionState>(completeSiteFormAction, initialState);
   const [error, setError] = useState<string | null>(null);
-  const router = useRouter();
 
-  async function handleSubmit(formData: FormData) {
-    setError(null);
-    const result = await completeSiteAction({}, formData);
-    if (result.success) {
-      router.push('/dashboard');
-      router.refresh();
-    } else if (result.error) {
-      setError(result.error);
+  useEffect(() => {
+    if (state?.error) {
+      setError(state.error);
+      setShowConfirm(false);
+    } else if (state?.success) {
+      setError(null);
       setShowConfirm(false);
     }
-  }
+  }, [state]);
 
   if (showConfirm) {
     return (
@@ -49,13 +53,8 @@ export function CompleteSiteButton({ siteId, siteName }: Props) {
         <p className="mt-2 text-xs text-rose-700 dark:text-rose-300">
           Cette action va terminer le chantier <strong>{siteName}</strong>, retirer tous les employés et leur envoyer un email de notification. Cette action est irréversible.
         </p>
-        {error && (
-          <div className="mt-2 rounded-lg bg-rose-100 p-2 text-xs text-rose-800 dark:bg-rose-900/30 dark:text-rose-300">
-            {error}
-          </div>
-        )}
         <div className="mt-4 flex gap-2">
-          <form action={handleSubmit}>
+          <form action={formAction}>
             <input type="hidden" name="siteId" value={siteId} />
             <CompleteSiteSubmit />
           </form>
@@ -70,6 +69,11 @@ export function CompleteSiteButton({ siteId, siteName }: Props) {
             Annuler
           </button>
         </div>
+        {error && (
+          <div className="mt-3 rounded-lg bg-rose-100 p-2 text-xs text-rose-800 dark:bg-rose-900/30 dark:text-rose-300">
+            {error}
+          </div>
+        )}
       </div>
     );
   }
@@ -77,7 +81,10 @@ export function CompleteSiteButton({ siteId, siteName }: Props) {
   return (
     <button
       type="button"
-      onClick={() => setShowConfirm(true)}
+      onClick={() => {
+        setError(null);
+        setShowConfirm(true);
+      }}
       className="rounded-full border border-rose-600 bg-rose-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-rose-700 dark:border-rose-500 dark:bg-rose-500 dark:hover:bg-rose-600"
     >
       Terminer le chantier

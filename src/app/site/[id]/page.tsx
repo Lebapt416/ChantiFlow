@@ -71,6 +71,13 @@ export default async function SitePage({ params }: Params) {
     notFound();
   }
 
+  const isCompleted = Boolean((site as { completed_at?: string | null }).completed_at);
+  const completedAt = (site as { completed_at?: string | null }).completed_at
+    ? new Date((site as { completed_at?: string | null }).completed_at!).toLocaleDateString(
+        'fr-FR',
+      )
+    : null;
+
   // Récupérer tous les chantiers pour le sélecteur
   const { data: allSites } = await supabase
     .from('sites')
@@ -150,6 +157,13 @@ export default async function SitePage({ params }: Params) {
         </a>
       </nav>
 
+      {isCompleted && (
+        <div className="mb-6 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-900 dark:border-emerald-900/50 dark:bg-emerald-900/20 dark:text-emerald-200">
+          Ce chantier est terminé{completedAt ? ` depuis le ${completedAt}` : ''}. Les formulaires sont
+          verrouillés mais vous pouvez toujours consulter l'historique.
+        </div>
+      )}
+
       <section className="grid gap-4 md:grid-cols-3">
         <div className="rounded-2xl border border-zinc-100 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
           <p className="text-xs uppercase tracking-[0.3em] text-zinc-500">Tâches</p>
@@ -188,7 +202,13 @@ export default async function SitePage({ params }: Params) {
               </div>
             </div>
 
-            <AddTaskForm siteId={site.id} />
+            {isCompleted ? (
+              <p className="rounded-xl border border-dashed border-zinc-200 bg-zinc-50 p-4 text-sm text-zinc-500 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400">
+                Ce chantier est terminé. Vous ne pouvez plus ajouter de tâches.
+              </p>
+            ) : (
+              <AddTaskForm siteId={site.id} />
+            )}
 
             <div className="space-y-3">
               {tasks?.length ? (
@@ -219,7 +239,7 @@ export default async function SitePage({ params }: Params) {
                       <CompleteTaskButton
                         siteId={site.id}
                         taskId={task.id}
-                        disabled={task.status === 'done'}
+                        disabled={task.status === 'done' || isCompleted}
                       />
                     </div>
                   </div>
@@ -247,7 +267,13 @@ export default async function SitePage({ params }: Params) {
               </div>
             </div>
 
-            <AddWorkerForm siteId={site.id} availableWorkers={availableWorkers ?? []} />
+            {isCompleted ? (
+              <p className="rounded-xl border border-dashed border-zinc-200 bg-zinc-50 p-4 text-sm text-zinc-500 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400">
+                Ce chantier est terminé. Il n'est plus possible d'ajouter ou de supprimer des membres.
+              </p>
+            ) : (
+              <AddWorkerForm siteId={site.id} availableWorkers={availableWorkers ?? []} />
+            )}
 
             <div className="space-y-3">
               {workers?.length ? (
@@ -268,7 +294,9 @@ export default async function SitePage({ params }: Params) {
                           <p className="text-xs text-zinc-400 dark:text-zinc-500">{worker.email}</p>
                         ) : null}
                       </div>
-                      <DeleteWorkerButton workerId={worker.id} workerName={worker.name} />
+                      {!isCompleted && (
+                        <DeleteWorkerButton workerId={worker.id} workerName={worker.name} />
+                      )}
                     </div>
                   </div>
                 ))

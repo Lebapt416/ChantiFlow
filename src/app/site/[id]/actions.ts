@@ -326,6 +326,7 @@ export async function completeSiteAction(
   }
 
   const supabase = await createSupabaseServerClient();
+  const admin = createSupabaseAdminClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -355,7 +356,7 @@ export async function completeSiteAction(
   // Marquer le chantier comme terminé (ajouter un champ completed_at)
   const { error: siteError } = await supabase
     .from('sites')
-    .update({ 
+    .update({
       completed_at: new Date().toISOString(),
     })
     .eq('id', siteId);
@@ -363,7 +364,10 @@ export async function completeSiteAction(
   if (siteError) {
     console.error('❌ Erreur mise à jour chantier:', siteError);
     // Si l'erreur est liée à completed_at (colonne n'existe pas), continuer quand même
-    if (siteError.message.includes('completed_at') || siteError.message.includes('column')) {
+    if (
+      siteError.message.includes('completed_at') ||
+      siteError.message.includes('column')
+    ) {
       console.warn('⚠️ Colonne completed_at non trouvée - migration SQL non exécutée');
       console.warn('⚠️ Le chantier sera terminé mais completed_at ne sera pas mis à jour');
       // On continue quand même pour retirer les workers et envoyer les emails
@@ -376,7 +380,7 @@ export async function completeSiteAction(
 
   // Retirer tous les workers du chantier (mettre site_id à null)
   // On ne supprime pas les workers, on les retire juste du chantier
-  const { error: workersError } = await supabase
+  const { error: workersError } = await admin
     .from('workers')
     .update({ site_id: null })
     .eq('site_id', siteId);
@@ -387,7 +391,6 @@ export async function completeSiteAction(
   }
 
   // Récupérer l'email du créateur du chantier pour lui envoyer aussi un email
-  const admin = createSupabaseAdminClient();
   let creatorEmail: string | undefined;
   try {
     const { data: creator } = await admin.auth.admin.getUserById(site.created_by);
