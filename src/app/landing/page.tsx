@@ -313,7 +313,7 @@ export default async function LandingPage() {
               Qui sommes-nous ?
             </h2>
             <p className="mt-6 text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-              Nous sommes deux jeunes entrepreneurs passionnés par la modernisation du BTP. 
+              Nous sommes trois jeunes entrepreneurs passionnés par la modernisation du BTP. 
               Face aux défis quotidiens des chantiers — retards, communication difficile, perte d'informations — 
               nous avons créé ChantiFlow pour apporter une solution simple, efficace et assistée par l'IA.
             </p>
