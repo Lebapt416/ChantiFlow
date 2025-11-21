@@ -33,6 +33,9 @@ export async function sendWorkerWelcomeEmail({
   const appUrl = process.env.NEXT_PUBLIC_APP_BASE_URL ?? '';
   const reportUrl = siteId ? `${appUrl}/qr/${siteId}` : `${appUrl}/reports`;
 
+  // Log pour debug
+  console.log('📧 Préparation email - accessCode:', accessCode, 'siteId:', siteId);
+
   try {
     // Vérifier que Resend est configuré
     if (!process.env.RESEND_API_KEY) {
@@ -77,10 +80,10 @@ export async function sendWorkerWelcomeEmail({
               ${accessCode ? `
                 <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 25px; border-radius: 8px; margin: 30px 0; text-align: center;">
                   <p style="color: white; font-size: 14px; margin: 0 0 10px 0; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Votre code d'accès unique</p>
-                  <p style="color: white; font-size: 32px; margin: 0; font-weight: bold; letter-spacing: 4px; font-family: 'Courier New', monospace;">${accessCode}</p>
+                  <p style="color: white; font-size: 32px; margin: 0; font-weight: bold; letter-spacing: 4px; font-family: 'Courier New', monospace;">${accessCode || 'CODE_MANQUANT'}</p>
                   <p style="color: rgba(255,255,255,0.9); font-size: 12px; margin: 10px 0 0 0;">Vous devrez entrer ce code après avoir scanné le QR code</p>
                 </div>
-              ` : ''}
+              ` : '<p style="color: #ef4444; font-size: 14px; margin: 20px 0; padding: 10px; background: #fee2e2; border-radius: 4px;">⚠️ Code d\'accès non généré. Contactez votre chef de chantier.</p>'}
               
               <p style="font-size: 16px; margin-bottom: 20px;">
                 Vous pouvez maintenant envoyer des rapports de terrain directement depuis votre téléphone.

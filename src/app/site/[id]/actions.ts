@@ -157,6 +157,7 @@ export async function addWorkerAction(
     // Envoyer un email de bienvenue si l'email est fourni
     if (existingWorker.email) {
       try {
+        console.log('📧 Envoi email avec code d\'accès:', accessCode);
         await sendWorkerWelcomeEmail({
           workerEmail: existingWorker.email,
           workerName: existingWorker.name,
@@ -165,6 +166,7 @@ export async function addWorkerAction(
           managerName: user.email || undefined,
           accessCode: accessCode,
         });
+        console.log('✅ Email envoyé avec succès, code:', accessCode);
       } catch (error) {
         // Ne pas bloquer l'ajout si l'email échoue
         console.error('Erreur envoi email bienvenue:', error);
@@ -216,6 +218,7 @@ export async function addWorkerAction(
     // Envoyer un email de bienvenue si l'email est fourni
     if (email) {
       try {
+        console.log('📧 Envoi email avec code d\'accès:', accessCode);
         await sendWorkerWelcomeEmail({
           workerEmail: email,
           workerName: name,
@@ -224,6 +227,7 @@ export async function addWorkerAction(
           managerName: user.email || undefined,
           accessCode: accessCode,
         });
+        console.log('✅ Email envoyé avec succès, code:', accessCode);
       } catch (error) {
         // Ne pas bloquer l'ajout si l'email échoue
         console.error('Erreur envoi email bienvenue:', error);
