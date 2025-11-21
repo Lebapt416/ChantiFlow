@@ -11,14 +11,12 @@ export const metadata = {
 export default async function LandingPage() {
   // Vérifier si l'utilisateur est connecté
   let isAuthenticated = false;
-  let userEmail: string | null = null;
   try {
     const supabase = await createSupabaseServerClient();
     const {
       data: { user },
     } = await supabase.auth.getUser();
     isAuthenticated = !!user;
-    userEmail = user?.email || null;
   } catch {
     isAuthenticated = false;
   }
@@ -305,7 +303,7 @@ export default async function LandingPage() {
       </section>
 
       {/* Pricing Section */}
-      <PricingSection isAuthenticated={isAuthenticated} userEmail={userEmail} />
+      <PricingSection isAuthenticated={isAuthenticated} userEmail={null} />
 
       {/* À propos */}
       <section className="mx-auto max-w-7xl px-6 py-20">
