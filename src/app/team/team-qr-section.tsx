@@ -31,8 +31,8 @@ export function TeamQrSection({ qrUrl }: Props) {
       </div>
 
       {/* QR Code - visible à l'écran */}
-      <div className="mb-6 flex justify-center no-print">
-        <div className="rounded-2xl border-2 border-zinc-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900">
+      <div className="mb-6 flex justify-center">
+        <div className="rounded-2xl border-2 border-zinc-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900 no-print">
           <QRCodeSVG
             value={qrUrl}
             size={256}
@@ -44,11 +44,8 @@ export function TeamQrSection({ qrUrl }: Props) {
             Rejoindre l'équipe
           </p>
         </div>
-      </div>
-
-      {/* QR Code - visible uniquement à l'impression */}
-      <div className="mb-6 flex justify-center print-qr-only">
-        <div className="rounded-2xl border-2 border-black bg-white p-6">
+        {/* QR Code - visible uniquement à l'impression */}
+        <div className="rounded-2xl border-2 border-black bg-white p-6 print-qr-only" style={{ display: 'none' }}>
           <QRCodeSVG
             value={qrUrl}
             size={256}
