@@ -41,6 +41,11 @@ export function ReportsList({
 }: Props) {
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
 
+  const handleReportClick = (report: Report) => {
+    console.log('📋 Clic sur rapport:', report.id);
+    setSelectedReport(report);
+  };
+
   if (reports.length === 0) {
     return (
       <p className="text-sm text-zinc-500 dark:text-zinc-400">
@@ -62,8 +67,9 @@ export function ReportsList({
           return (
             <button
               key={report.id}
-              onClick={() => setSelectedReport(report)}
-              className="w-full text-left rounded-2xl border border-zinc-200 p-4 transition hover:border-zinc-300 hover:shadow-md dark:border-zinc-700 dark:hover:border-zinc-600"
+              onClick={() => handleReportClick(report)}
+              type="button"
+              className="w-full text-left rounded-2xl border border-zinc-200 p-4 transition hover:border-zinc-300 hover:shadow-md active:scale-[0.98] dark:border-zinc-700 dark:hover:border-zinc-600 cursor-pointer"
             >
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div className="flex-1">
@@ -93,13 +99,14 @@ export function ReportsList({
                 </p>
               )}
               {report.photo_url && (
-                <div className="mt-3 overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-700">
+                <div className="mt-3 overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-700 pointer-events-none">
                   <Image
                     src={report.photo_url}
                     alt="Photo rapport"
                     width={800}
                     height={320}
-                    className="h-48 w-full object-cover"
+                    className="h-48 w-full object-cover pointer-events-none"
+                    draggable={false}
                   />
                 </div>
               )}
