@@ -41,3 +41,31 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Styles d'impression pour les QR codes */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  
+  .print-qr-only,
+  .print-qr-only * {
+    visibility: visible;
+  }
+  
+  .print-qr-only {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
+  
+  .no-print {
+    display: none !important;
+  }
+  
+  @page {
+    margin: 1cm;
+    size: A4;
+  }
+}

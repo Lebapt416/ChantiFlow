@@ -156,29 +156,6 @@ export default async function ReportsHubPage() {
           </p>
         )}
       </section>
-
-      <section className="mt-8 rounded-3xl border border-zinc-100 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-        <h2 className="text-lg font-semibold text-zinc-900 dark:text-white">
-          Accès QR disponibles
-        </h2>
-        <div className="mt-4 grid gap-3 md:grid-cols-2">
-          {sites?.length ? (
-            sites.map((site) => (
-              <Link
-                key={site.id}
-                href={`/qr/${site.id}`}
-                className="rounded-2xl border border-zinc-200 p-4 text-sm font-semibold transition hover:border-zinc-900 dark:border-zinc-700 dark:hover:border-white"
-              >
-                QR – {site.name}
-              </Link>
-            ))
-          ) : (
-            <p className="text-sm text-zinc-500 dark:text-zinc-400">
-              Crée un chantier pour générer des QR codes.
-            </p>
-          )}
-        </div>
-      </section>
     </AppShell>
   );
 }
