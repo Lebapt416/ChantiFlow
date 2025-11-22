@@ -108,10 +108,10 @@ export function AppShell({
                   }`}
                   title={item.label}
                 >
-                  <span className={`absolute inset-0 rounded-xl transition-all duration-200 ${
+                  <span className={`absolute rounded-xl transition-all duration-200 ${
                     active
-                      ? 'bg-white'
-                      : 'bg-black/40 translate-x-1 group-hover/item:bg-black/60 group-hover/item:translate-x-1.5'
+                      ? 'inset-0 bg-white'
+                      : 'top-0 bottom-0 left-2 right-0 bg-black/50 group-hover/item:bg-black/70 group-hover/item:left-3'
                   }`}></span>
                   <span className="relative z-10">
                     <item.icon 
@@ -193,10 +193,10 @@ export function AppShell({
                           }`}
                           title={item.label}
                         >
-                          <span className={`absolute inset-0 rounded-xl transition-all duration-200 ${
+                          <span className={`absolute rounded-xl transition-all duration-200 ${
                             active
-                              ? 'bg-white'
-                              : 'bg-black/40 translate-x-1 group-hover/item:bg-black/60 group-hover/item:translate-x-1.5'
+                              ? 'inset-0 bg-white'
+                              : 'top-0 bottom-0 left-2 right-0 bg-black/50 group-hover/item:bg-black/70 group-hover/item:left-3'
                           }`}></span>
                           <span className="relative z-10">
                             <item.icon 
