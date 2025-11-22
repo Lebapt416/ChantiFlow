@@ -101,16 +101,16 @@ export function AppShell({
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`group/item relative flex items-center justify-center w-12 h-12 rounded-xl transition-all duration-200 ${
+                  className={`group/item relative flex items-center justify-center w-14 h-14 rounded-xl transition-all duration-200 ${
                     active
                       ? 'bg-white text-black shadow-lg shadow-white/20'
-                      : 'text-white/90 hover:bg-white/20 hover:text-white'
+                      : 'text-white hover:bg-white/20 hover:text-white'
                   }`}
                   title={item.label}
                 >
                   <item.icon 
-                    size={22} 
-                    strokeWidth={active ? 3 : 2.5}
+                    size={26} 
+                    strokeWidth={active ? 3.5 : 3}
                     className={active ? '' : 'group-hover/item:scale-110 transition-transform duration-200'}
                   />
                   {/* Tooltip pour affichage au survol */}
@@ -179,16 +179,16 @@ export function AppShell({
                           key={item.href}
                           href={item.href}
                           onClick={() => setMobileMenuOpen(false)}
-                          className={`group/item relative flex items-center justify-center w-12 h-12 rounded-xl transition-all duration-200 ${
+                          className={`group/item relative flex items-center justify-center w-14 h-14 rounded-xl transition-all duration-200 ${
                             active
                               ? 'bg-white text-black shadow-lg shadow-white/20'
-                              : 'text-white/90 hover:bg-white/20 hover:text-white'
+                              : 'text-white hover:bg-white/20 hover:text-white'
                           }`}
                           title={item.label}
                         >
                           <item.icon 
-                            size={22} 
-                            strokeWidth={active ? 3 : 2.5}
+                            size={26} 
+                            strokeWidth={active ? 3.5 : 3}
                             className={active ? '' : 'group-hover/item:scale-110 transition-transform duration-200'}
                           />
                           {/* Tooltip pour affichage au survol */}
