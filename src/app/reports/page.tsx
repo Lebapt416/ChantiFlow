@@ -1,9 +1,8 @@
 import Link from 'next/link';
-import Image from 'next/image';
 import { redirect } from 'next/navigation';
 import { AppShell } from '@/components/app-shell';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
-import { ReportsList } from './reports-list';
+import { CheckCircle2, Eye } from 'lucide-react';
 
 export const metadata = {
   title: 'Rapports | ChantiFlow',
@@ -115,13 +114,47 @@ export default async function ReportsHubPage() {
             </Link>
           ) : null}
         </div>
-        <ReportsList
-          reports={reports || []}
-          taskMap={taskMap}
-          workerMap={workerMap}
-          siteMap={siteMap}
-          taskStatusMap={taskStatusMap}
-        />
+        {reports?.length ? (
+          <div className="space-y-2">
+            {reports.map((report) => {
+              const task = taskMap[report.task_id ?? ''];
+              const taskStatus = taskStatusMap[report.task_id ?? ''];
+              const isTaskDone = taskStatus === 'done';
+
+              return (
+                <div
+                  key={report.id}
+                  className="flex items-center justify-between gap-4 rounded-lg border border-zinc-200 bg-white p-4 transition hover:border-zinc-300 hover:shadow-sm dark:border-zinc-700 dark:bg-zinc-900 dark:hover:border-zinc-600"
+                >
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    {isTaskDone && (
+                      <CheckCircle2 className="h-5 w-5 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-zinc-900 dark:text-white truncate">
+                        {task?.title ?? 'Tâche inconnue'}
+                      </p>
+                      <p className="text-xs text-zinc-500 dark:text-zinc-400 truncate">
+                        {siteMap[task?.site_id ?? ''] ?? 'Site inconnu'}
+                      </p>
+                    </div>
+                  </div>
+                  <Link
+                    href={`/reports/${report.id}`}
+                    className="flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-xs font-semibold text-white transition hover:bg-emerald-700 active:scale-95 shadow-sm hover:shadow-md whitespace-nowrap flex-shrink-0"
+                  >
+                    <Eye className="h-4 w-4" />
+                    <span>Inspecter</span>
+                  </Link>
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">
+            Aucun rapport pour le moment.
+          </p>
+        )}
       </section>
 
       <section className="mt-8 rounded-3xl border border-zinc-100 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
