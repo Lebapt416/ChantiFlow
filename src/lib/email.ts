@@ -496,6 +496,9 @@ export async function sendTeamJoinConfirmationEmail({
   }
 
   try {
+    console.log('📧 Resend: Préparation envoi email à:', workerEmail);
+    console.log('📧 Resend: From email:', process.env.RESEND_FROM_EMAIL || 'ChantiFlow <onboarding@resend.dev>');
+    
     const { data, error } = await resend.emails.send({
       from: process.env.RESEND_FROM_EMAIL || 'ChantiFlow <onboarding@resend.dev>',
       to: workerEmail,

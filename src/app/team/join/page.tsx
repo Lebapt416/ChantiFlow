@@ -9,6 +9,7 @@ export default function JoinTeamPage() {
   const [email, setEmail] = useState('');
   const [role, setRole] = useState('');
   const [error, setError] = useState('');
+  const [emailError, setEmailError] = useState('');
   const [success, setSuccess] = useState(false);
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
@@ -16,6 +17,7 @@ export default function JoinTeamPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError('');
+    setEmailError('');
     setSuccess(false);
 
     if (!name.trim()) {
@@ -87,9 +89,11 @@ export default function JoinTeamPage() {
       }
 
       // Envoyer un email de confirmation si l'email est fourni
-      if (email.trim()) {
+      if (email && email.trim()) {
         try {
           console.log('📧 Tentative d\'envoi email de confirmation à:', email.trim());
+          console.log('📧 Données envoyées:', { workerEmail: email.trim(), workerName: name.trim(), userId });
+          
           // Appel à l'API pour envoyer l'email (car c'est une fonction serveur)
           const emailResponse = await fetch('/api/team/join-confirmation', {
             method: 'POST',
@@ -101,20 +105,29 @@ export default function JoinTeamPage() {
             }),
           });
 
-          const emailResult = await emailResponse.json();
-          
-          if (!emailResponse.ok || !emailResult.success) {
-            console.error('❌ Erreur envoi email confirmation:', emailResult.error || 'Erreur inconnue');
-            // Ne pas bloquer l'ajout, mais logger l'erreur
+          console.log('📧 Réponse API status:', emailResponse.status, emailResponse.statusText);
+
+          if (!emailResponse.ok) {
+            const errorText = await emailResponse.text();
+            console.error('❌ Erreur HTTP envoi email confirmation:', emailResponse.status, errorText);
+            setEmailError(`Erreur lors de l'envoi de l'email de confirmation (${emailResponse.status}). Votre inscription a été enregistrée, mais l'email n'a pas pu être envoyé.`);
           } else {
-            console.log('✅ Email de confirmation envoyé avec succès');
+            const emailResult = await emailResponse.json();
+            console.log('📧 Résultat API:', emailResult);
+            
+            if (!emailResult.success) {
+              console.error('❌ Erreur envoi email confirmation:', emailResult.error || 'Erreur inconnue');
+              setEmailError(`Erreur lors de l'envoi de l'email: ${emailResult.error || 'Erreur inconnue'}. Votre inscription a été enregistrée.`);
+            } else {
+              console.log('✅ Email de confirmation envoyé avec succès');
+            }
           }
         } catch (emailError) {
           console.error('❌ Exception lors de l\'envoi email confirmation:', emailError);
-          // Ne pas bloquer l'ajout si l'email échoue
+          setEmailError('Erreur lors de l\'envoi de l\'email de confirmation. Votre inscription a été enregistrée, mais l\'email n\'a pas pu être envoyé.');
         }
       } else {
-        console.warn('⚠️ Pas d\'email fourni, email de confirmation non envoyé');
+        console.warn('⚠️ Pas d\'email fourni, email de confirmation non envoyé. Email:', email);
       }
 
       setSuccess(true);
@@ -189,6 +202,12 @@ export default function JoinTeamPage() {
               {error && (
                 <div className="rounded-lg bg-rose-50 p-3 text-sm text-rose-800 dark:bg-rose-900/30 dark:text-rose-300">
                   {error}
+                </div>
+              )}
+
+              {emailError && (
+                <div className="rounded-lg bg-amber-50 p-3 text-sm text-amber-800 dark:bg-amber-900/30 dark:text-amber-300">
+                  ⚠️ {emailError}
                 </div>
               )}
 
