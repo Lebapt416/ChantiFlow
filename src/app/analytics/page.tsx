@@ -53,7 +53,7 @@ export default async function AnalyticsPage() {
       // Toutes les tâches
       adminClient.from('tasks').select('id, site_id, status, created_at, required_role, duration_hours'),
       // Tous les rapports
-      adminClient.from('reports').select('id, task_id, worker_id, created_at, photo_url'),
+      adminClient.from('reports').select('id, task_id, worker_id, created_at, photo_url, description'),
       // Tous les workers
       adminClient.from('workers').select('id, site_id, name, email, role, status, created_at'),
     ]);
@@ -140,14 +140,105 @@ export default async function AnalyticsPage() {
   // Top 10 chantiers par nombre de tâches
   const sitesByTasks = allSites
     .map((site) => {
-      const taskCount = allTasks.filter((task) => task.site_id === site.id).length;
+      const siteTasks = allTasks.filter((task) => task.site_id === site.id);
+      const taskCount = siteTasks.length;
+      const doneCount = siteTasks.filter((t) => t.status === 'done').length;
+      const progress = taskCount > 0 ? Math.round((doneCount / taskCount) * 100) : 0;
       return {
         name: site.name,
         tasks: taskCount,
+        done: doneCount,
+        progress,
+        workers: allWorkers.filter((w) => w.site_id === site.id).length,
       };
     })
     .sort((a, b) => b.tasks - a.tasks)
     .slice(0, 10);
+
+  // Statistiques supplémentaires
+  const completionRate = totalTasks > 0 ? Math.round((doneTasks / totalTasks) * 100) : 0;
+  const avgTasksPerSite = totalSites > 0 ? Math.round((totalTasks / totalSites) * 100) / 100 : 0;
+  const avgWorkersPerSite = totalSites > 0 ? Math.round((totalWorkers / totalSites) * 100) / 100 : 0;
+  const reportsWithPhotos = allReports.filter((r) => r.photo_url).length;
+  const reportsWithoutPhotos = totalReports - reportsWithPhotos;
+  
+  // Total heures de travail estimées
+  const totalHours = allTasks.reduce((sum, task) => sum + (task.duration_hours || 0), 0);
+  const completedHours = allTasks
+    .filter((t) => t.status === 'done')
+    .reduce((sum, task) => sum + (task.duration_hours || 0), 0);
+
+  // Répartition par créateur de chantier
+  const sitesByCreator = allSites.reduce((acc, site) => {
+    const creatorId = site.created_by || 'unknown';
+    acc[creatorId] = (acc[creatorId] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+
+  // Top créateurs de chantiers
+  const topCreators = Object.entries(sitesByCreator)
+    .map(([creatorId, count]) => {
+      const creator = allUsers.find((u) => u.id === creatorId);
+      return {
+        name: creator?.email || creatorId.substring(0, 8) + '...',
+        sites: count as number,
+      };
+    })
+    .sort((a, b) => b.sites - a.sites)
+    .slice(0, 5);
+
+  // Statistiques par semaine (7 dernières semaines)
+  const last7Weeks = Array.from({ length: 7 }, (_, i) => {
+    const date = new Date();
+    date.setDate(date.getDate() - (6 - i) * 7);
+    const weekStart = new Date(date);
+    weekStart.setDate(date.getDate() - date.getDay());
+    return weekStart.toISOString().split('T')[0];
+  });
+
+  const sitesByWeek = last7Weeks.map((weekStart) => {
+    const weekEnd = new Date(weekStart);
+    weekEnd.setDate(weekEnd.getDate() + 7);
+    const count = allSites.filter((site) => {
+      const siteDate = new Date(site.created_at);
+      return siteDate >= new Date(weekStart) && siteDate < weekEnd;
+    }).length;
+    return { week: weekStart, sites: count };
+  });
+
+  const tasksByWeek = last7Weeks.map((weekStart) => {
+    const weekEnd = new Date(weekStart);
+    weekEnd.setDate(weekEnd.getDate() + 7);
+    const count = allTasks.filter((task) => {
+      const taskDate = new Date(task.created_at);
+      return taskDate >= new Date(weekStart) && taskDate < weekEnd;
+    }).length;
+    return { week: weekStart, tasks: count };
+  });
+
+  // Répartition des tâches par rôle requis
+  const tasksByRole = allTasks.reduce((acc, task) => {
+    const role = task.required_role || 'Non spécifié';
+    acc[role] = (acc[role] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+
+  const tasksByRoleData = Object.entries(tasksByRole)
+    .map(([name, value]) => ({ name, value }))
+    .sort((a, b) => b.value - a.value);
+
+  // Taux de croissance (comparaison avec la semaine précédente)
+  const thisWeekSites = sitesByWeek[sitesByWeek.length - 1]?.sites || 0;
+  const lastWeekSites = sitesByWeek[sitesByWeek.length - 2]?.sites || 0;
+  const sitesGrowth = lastWeekSites > 0 
+    ? Math.round(((thisWeekSites - lastWeekSites) / lastWeekSites) * 100) 
+    : 0;
+
+  const thisWeekTasks = tasksByWeek[tasksByWeek.length - 1]?.tasks || 0;
+  const lastWeekTasks = tasksByWeek[tasksByWeek.length - 2]?.tasks || 0;
+  const tasksGrowth = lastWeekTasks > 0 
+    ? Math.round(((thisWeekTasks - lastWeekTasks) / lastWeekTasks) * 100) 
+    : 0;
 
   return (
     <AnalyticsDashboard
@@ -169,6 +260,19 @@ export default async function AnalyticsPage() {
       rolesDistribution={rolesDistribution}
       taskStatusDistribution={taskStatusDistribution}
       sitesByTasks={sitesByTasks}
+      completionRate={completionRate}
+      avgTasksPerSite={avgTasksPerSite}
+      avgWorkersPerSite={avgWorkersPerSite}
+      reportsWithPhotos={reportsWithPhotos}
+      reportsWithoutPhotos={reportsWithoutPhotos}
+      totalHours={totalHours}
+      completedHours={completedHours}
+      topCreators={topCreators}
+      sitesByWeek={sitesByWeek}
+      tasksByWeek={tasksByWeek}
+      tasksByRoleData={tasksByRoleData}
+      sitesGrowth={sitesGrowth}
+      tasksGrowth={tasksGrowth}
     />
   );
 }

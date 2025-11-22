@@ -37,7 +37,20 @@ type AnalyticsDashboardProps = {
   usersByDay: Array<{ date: string; users: number }>;
   rolesDistribution: Record<string, number>;
   taskStatusDistribution: Record<string, number>;
-  sitesByTasks: Array<{ name: string; tasks: number }>;
+  sitesByTasks: Array<{ name: string; tasks: number; done: number; progress: number; workers: number }>;
+  completionRate: number;
+  avgTasksPerSite: number;
+  avgWorkersPerSite: number;
+  reportsWithPhotos: number;
+  reportsWithoutPhotos: number;
+  totalHours: number;
+  completedHours: number;
+  topCreators: Array<{ name: string; sites: number }>;
+  sitesByWeek: Array<{ week: string; sites: number }>;
+  tasksByWeek: Array<{ week: string; tasks: number }>;
+  tasksByRoleData: Array<{ name: string; value: number }>;
+  sitesGrowth: number;
+  tasksGrowth: number;
 };
 
 const COLORS = ['#10b981', '#f59e0b', '#3b82f6', '#ef4444', '#8b5cf6', '#ec4899'];
@@ -61,6 +74,19 @@ export function AnalyticsDashboard({
   rolesDistribution,
   taskStatusDistribution,
   sitesByTasks,
+  completionRate,
+  avgTasksPerSite,
+  avgWorkersPerSite,
+  reportsWithPhotos,
+  reportsWithoutPhotos,
+  totalHours,
+  completedHours,
+  topCreators,
+  sitesByWeek,
+  tasksByWeek,
+  tasksByRoleData,
+  sitesGrowth,
+  tasksGrowth,
 }: AnalyticsDashboardProps) {
   const [lastUpdate, setLastUpdate] = useState(new Date());
 
@@ -79,6 +105,7 @@ export function AnalyticsDashboard({
     const date = new Date(dateStr);
     return `${date.getDate()}/${date.getMonth() + 1}`;
   };
+
 
   // Données combinées pour le graphique d'activité
   const activityData = sitesByDay.map((site, index) => ({
@@ -163,6 +190,11 @@ export function AnalyticsDashboard({
             <p className="text-xs text-zinc-500 mt-1">
               {completedSites} terminés
             </p>
+            {sitesGrowth !== 0 && (
+              <p className={`text-xs mt-1 ${sitesGrowth > 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                {sitesGrowth > 0 ? '↑' : '↓'} {Math.abs(sitesGrowth)}% vs semaine dernière
+              </p>
+            )}
           </div>
           <div className="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 backdrop-blur">
             <p className="text-sm text-zinc-400 mb-2">Tâches</p>
@@ -170,12 +202,57 @@ export function AnalyticsDashboard({
               {doneTasks} <span className="text-lg text-zinc-500">/ {totalTasks}</span>
             </p>
             <p className="text-xs text-zinc-500 mt-1">
-              {pendingTasks} en attente
+              {pendingTasks} en attente • {completionRate}% complété
             </p>
+            {tasksGrowth !== 0 && (
+              <p className={`text-xs mt-1 ${tasksGrowth > 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                {tasksGrowth > 0 ? '↑' : '↓'} {Math.abs(tasksGrowth)}% vs semaine dernière
+              </p>
+            )}
           </div>
           <div className="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 backdrop-blur">
             <p className="text-sm text-zinc-400 mb-2">Rapports</p>
             <p className="text-3xl font-bold text-white">{totalReports}</p>
+            <p className="text-xs text-zinc-500 mt-1">
+              {reportsWithPhotos} avec photos
+            </p>
+          </div>
+        </div>
+
+        {/* Additional Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <div className="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 backdrop-blur">
+            <p className="text-sm text-zinc-400 mb-2">Taux de complétion</p>
+            <p className="text-3xl font-bold text-white">{completionRate}%</p>
+            <div className="mt-2 h-2 bg-zinc-800 rounded-full overflow-hidden">
+              <div 
+                className="h-full bg-emerald-500 transition-all duration-500"
+                style={{ width: `${completionRate}%` }}
+              ></div>
+            </div>
+          </div>
+          <div className="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 backdrop-blur">
+            <p className="text-sm text-zinc-400 mb-2">Moyenne tâches/chantier</p>
+            <p className="text-3xl font-bold text-white">{avgTasksPerSite}</p>
+            <p className="text-xs text-zinc-500 mt-1">
+              {avgWorkersPerSite} workers/chantier
+            </p>
+          </div>
+          <div className="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 backdrop-blur">
+            <p className="text-sm text-zinc-400 mb-2">Heures de travail</p>
+            <p className="text-3xl font-bold text-white">
+              {completedHours} <span className="text-lg text-zinc-500">/ {totalHours}h</span>
+            </p>
+            <p className="text-xs text-zinc-500 mt-1">
+              {totalHours > 0 ? Math.round((completedHours / totalHours) * 100) : 0}% complété
+            </p>
+          </div>
+          <div className="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 backdrop-blur">
+            <p className="text-sm text-zinc-400 mb-2">Workers</p>
+            <p className="text-3xl font-bold text-white">{totalWorkers}</p>
+            <p className="text-xs text-zinc-500 mt-1">
+              {approvedWorkers} approuvés • {pendingWorkers} en attente
+            </p>
           </div>
         </div>
 
@@ -321,6 +398,131 @@ export function AnalyticsDashboard({
                 <Bar dataKey="tasks" fill="#3b82f6" radius={[8, 8, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* Weekly Activity */}
+        <div className="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 backdrop-blur mb-8">
+          <h2 className="text-xl font-semibold mb-4">Activité hebdomadaire (7 dernières semaines)</h2>
+          <ResponsiveContainer width="100%" height={400}>
+            <BarChart data={sitesByWeek.map((site, index) => ({
+              week: `S${index + 1}`,
+              Sites: site.sites,
+              Tâches: tasksByWeek[index]?.tasks ?? 0,
+            }))}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+              <XAxis dataKey="week" stroke="#9ca3af" />
+              <YAxis stroke="#9ca3af" />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: '#1f2937',
+                  border: '1px solid #374151',
+                  borderRadius: '8px',
+                }}
+              />
+              <Legend />
+              <Bar dataKey="Sites" fill="#3b82f6" radius={[8, 8, 0, 0]} />
+              <Bar dataKey="Tâches" fill="#10b981" radius={[8, 8, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* Tasks by Role */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+          <div className="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 backdrop-blur">
+            <h2 className="text-xl font-semibold mb-4">Tâches par rôle requis</h2>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={tasksByRoleData.slice(0, 10)}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                <XAxis
+                  dataKey="name"
+                  stroke="#9ca3af"
+                  angle={-45}
+                  textAnchor="end"
+                  height={100}
+                />
+                <YAxis stroke="#9ca3af" />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: '#1f2937',
+                    border: '1px solid #374151',
+                    borderRadius: '8px',
+                  }}
+                />
+                <Bar dataKey="value" fill="#8b5cf6" radius={[8, 8, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+
+          <div className="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 backdrop-blur">
+            <h2 className="text-xl font-semibold mb-4">Top 5 créateurs de chantiers</h2>
+            <div className="space-y-4">
+              {topCreators.map((creator, index) => (
+                <div key={index} className="flex items-center justify-between p-4 rounded-lg bg-zinc-800/50">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold">
+                      {index + 1}
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-white">{creator.name}</p>
+                      <p className="text-xs text-zinc-400">{creator.sites} chantier{creator.sites > 1 ? 's' : ''}</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-lg font-bold text-emerald-400">{creator.sites}</p>
+                  </div>
+                </div>
+              ))}
+              {topCreators.length === 0 && (
+                <p className="text-zinc-400 text-center py-8">Aucune donnée disponible</p>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Detailed Sites Table */}
+        <div className="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 backdrop-blur mb-8">
+          <h2 className="text-xl font-semibold mb-4">Détails des chantiers</h2>
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-zinc-700">
+                  <th className="text-left py-3 px-4 text-sm font-semibold text-zinc-400">Chantier</th>
+                  <th className="text-right py-3 px-4 text-sm font-semibold text-zinc-400">Tâches</th>
+                  <th className="text-right py-3 px-4 text-sm font-semibold text-zinc-400">Terminées</th>
+                  <th className="text-right py-3 px-4 text-sm font-semibold text-zinc-400">Workers</th>
+                  <th className="text-right py-3 px-4 text-sm font-semibold text-zinc-400">Progression</th>
+                </tr>
+              </thead>
+              <tbody>
+                {sitesByTasks.map((site, index) => (
+                  <tr key={index} className="border-b border-zinc-800/50 hover:bg-zinc-800/30 transition-colors">
+                    <td className="py-3 px-4 text-white font-medium">{site.name}</td>
+                    <td className="py-3 px-4 text-right text-white">{site.tasks}</td>
+                    <td className="py-3 px-4 text-right text-emerald-400">{site.done}</td>
+                    <td className="py-3 px-4 text-right text-white">{site.workers}</td>
+                    <td className="py-3 px-4 text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        <div className="w-24 h-2 bg-zinc-800 rounded-full overflow-hidden">
+                          <div 
+                            className="h-full bg-emerald-500 transition-all duration-500"
+                            style={{ width: `${site.progress}%` }}
+                          ></div>
+                        </div>
+                        <span className="text-sm text-zinc-400 w-12 text-right">{site.progress}%</span>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+                {sitesByTasks.length === 0 && (
+                  <tr>
+                    <td colSpan={5} className="py-8 text-center text-zinc-400">
+                      Aucun chantier disponible
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
