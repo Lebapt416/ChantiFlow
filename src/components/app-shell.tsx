@@ -130,7 +130,7 @@ export function AppShell({
             })}
           </nav>
         </aside>
-        <div className={`min-h-screen flex-1 transition-all duration-300 lg:ml-16 ${mobileMenuOpen ? 'ml-16' : ''}`}>
+        <div className={`min-h-screen flex-1 transition-all duration-300 ease-in-out lg:ml-16 ${mobileMenuOpen ? 'translate-x-16' : 'translate-x-0'}`}>
           <header className="sticky top-0 z-10 border-b border-zinc-200 bg-white/80 px-4 py-4 backdrop-blur dark:border-zinc-800 dark:bg-zinc-950/80">
             <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
               <div className="flex items-center gap-3">
