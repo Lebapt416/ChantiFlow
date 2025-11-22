@@ -155,22 +155,21 @@ export default async function DashboardPage() {
             </div>
           </div>
 
-          <div className="rounded-3xl border border-zinc-100 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-            <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-zinc-900 dark:text-white">
-                Chantiers récents
-              </h2>
-              <span className="text-sm text-zinc-500">
-                {sites?.length ?? 0} chantier(s)
-              </span>
-            </div>
-            {error ? (
-              <p className="text-sm text-rose-400">
-                Impossible de charger les chantiers : {error.message}
-              </p>
-            ) : sites?.length ? (
+          {/* Section Chantiers en cours */}
+          {activeSites.length > 0 && (
+            <div className="rounded-3xl border border-zinc-100 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+              <div className="mb-4 flex items-center justify-between">
+                <div>
+                  <h2 className="text-lg font-semibold text-zinc-900 dark:text-white">
+                    Chantiers en cours
+                  </h2>
+                  <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                    {activeSites.length} chantier{activeSites.length > 1 ? 's' : ''} actif{activeSites.length > 1 ? 's' : ''}
+                  </p>
+                </div>
+              </div>
               <ul className="grid gap-4 md:grid-cols-2">
-                {sites.map((site) => (
+                {activeSites.map((site) => (
                   <li
                     key={site.id}
                     className="rounded-2xl border border-zinc-100 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-900"
@@ -187,18 +186,13 @@ export default async function DashboardPage() {
                       <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">
                         {site.name}
                       </h3>
-                      {site.completed_at && (
-                        <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300">
-                          Terminé
-                        </span>
-                      )}
                     </div>
                     <p className="text-xs text-zinc-500 dark:text-zinc-400">
                       Créé le{' '}
                       {new Date(site.created_at ?? '').toLocaleDateString('fr-FR')}
                     </p>
                     <Link
-                      href={`/site/${site.id}`}
+                      href={`/site/${site.id}/dashboard`}
                       className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-black dark:text-white"
                     >
                       Ouvrir le chantier →
@@ -206,12 +200,8 @@ export default async function DashboardPage() {
                   </li>
                 ))}
               </ul>
-            ) : (
-              <div className="rounded-xl border border-dashed border-zinc-200 bg-zinc-50 p-8 text-center text-sm text-zinc-500 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400">
-                Aucun chantier pour le moment. Crée ton premier projet ci-dessus.
-              </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
 
         <div className="space-y-6">
@@ -281,7 +271,7 @@ export default async function DashboardPage() {
                         : 'date inconnue'}
                     </p>
                     <Link
-                      href={`/site/${site.id}`}
+                      href={`/site/${site.id}/dashboard`}
                       className="mt-2 inline-flex text-xs font-semibold text-emerald-600 hover:text-emerald-800 dark:text-emerald-300"
                     >
                       Voir le chantier →

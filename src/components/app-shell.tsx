@@ -64,11 +64,11 @@ export function AppShell({
     const siteId = siteMatch ? siteMatch[1] : null;
 
     if (siteId) {
-      // Navigation contextuelle au chantier
+      // Navigation contextuelle au chantier sélectionné
       return [
         { href: `/site/${siteId}/dashboard`, label: 'Dashboard', icon: LayoutDashboard },
         { href: '/home', label: 'Accueil', icon: Home },
-        { href: '/sites', label: 'Chantiers', icon: FolderKanban },
+        { href: '/dashboard', label: 'Dashboard général', icon: LayoutDashboard },
         { href: `/site/${siteId}/planning`, label: 'Planning IA', icon: Calendar },
         { href: `/site/${siteId}/tasks`, label: 'Tâches', icon: ListChecks },
         { href: '/team', label: 'Équipe', icon: UsersRound },
@@ -78,7 +78,12 @@ export function AppShell({
       ];
     }
 
-    return [...baseNavItems];
+    // Navigation limitée quand aucun chantier n'est sélectionné
+    return [
+      { href: '/home', label: 'Accueil', icon: Home },
+      { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+      { href: '/account', label: 'Mon compte', icon: User },
+    ];
   }, [pathname]);
 
   return (

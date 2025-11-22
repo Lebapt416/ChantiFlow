@@ -28,6 +28,6 @@ export async function signInAction(
     return { error: error.message };
   }
 
-  redirect('/dashboard');
+  redirect('/home');
 }
 
