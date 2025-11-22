@@ -100,8 +100,8 @@ export default async function PlanningPage({ searchParams }: SearchParams) {
 
   return (
     <AppShell
-      heading="Planning"
-      subheading={`Planning du chantier ${currentSite.name}`}
+      heading="Planning IA"
+      subheading={`Planning optimisé par IA pour le chantier ${currentSite.name}`}
       userEmail={user.email}
       primarySite={{ id: currentSite.id, name: currentSite.name }}
       actions={
