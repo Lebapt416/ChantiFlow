@@ -97,10 +97,10 @@ export function AppShell({
         <aside className="fixed inset-y-0 left-0 z-50 w-16 flex-col items-center border-r border-zinc-800 bg-black/80 px-0 py-8 shadow-xl backdrop-blur dark:border-zinc-700 dark:bg-black/80 lg:hidden flex">
           <button
             onClick={() => setMobileMenuOpen(false)}
-            className="absolute top-4 right-4 flex items-center justify-center w-8 h-8 rounded-lg text-white/90 hover:bg-white/20 hover:text-white transition-colors"
+            className="absolute top-4 right-2 flex items-center justify-center w-10 h-10 rounded-lg bg-white/20 text-white hover:bg-white/30 hover:text-white transition-all shadow-lg z-50"
             aria-label="Fermer le menu"
           >
-            <X size={18} />
+            <X size={22} strokeWidth={2.5} />
           </button>
           <nav className="flex flex-1 flex-col items-center gap-2 w-full">
             {navItems.map((item) => {
