@@ -104,7 +104,7 @@ export function AppShell({
                   className={`group/item relative flex items-center justify-center w-14 h-14 rounded-xl transition-all duration-200 ${
                     active
                       ? 'bg-white text-black shadow-lg shadow-white/20'
-                      : 'text-white hover:bg-white/20 hover:text-white'
+                      : 'bg-black/40 text-white hover:bg-black/60 hover:text-white'
                   }`}
                   title={item.label}
                 >
@@ -182,7 +182,7 @@ export function AppShell({
                           className={`group/item relative flex items-center justify-center w-14 h-14 rounded-xl transition-all duration-200 ${
                             active
                               ? 'bg-white text-black shadow-lg shadow-white/20'
-                              : 'text-white hover:bg-white/20 hover:text-white'
+                              : 'bg-black/40 text-white hover:bg-black/60 hover:text-white'
                           }`}
                           title={item.label}
                         >
