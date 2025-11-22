@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
+import { LayoutDashboard, User } from 'lucide-react';
 import {
   LineChart,
   Line,
@@ -101,7 +103,33 @@ export function AnalyticsDashboard({
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950 text-white">
-      <div className="container mx-auto px-4 py-8">
+      {/* Menu latéral */}
+      <aside className="fixed inset-y-0 left-0 z-20 w-16 flex-col items-center border-r border-zinc-800 bg-black/80 px-0 py-8 shadow-xl backdrop-blur flex">
+        <nav className="flex flex-1 flex-col items-center gap-2 w-full">
+          <Link
+            href="/analytics"
+            className="group/item relative flex items-center justify-center w-14 h-14 rounded-xl transition-all duration-200 bg-white text-black shadow-lg shadow-white/20"
+            title="Analytics"
+          >
+            <span className="absolute rounded-xl transition-all duration-200 inset-0 bg-white"></span>
+            <span className="relative z-10">
+              <LayoutDashboard size={26} strokeWidth={3.5} />
+            </span>
+          </Link>
+          <Link
+            href="/analytics/profile"
+            className="group/item relative flex items-center justify-center w-14 h-14 rounded-xl transition-all duration-200 text-white hover:text-white"
+            title="Profil"
+          >
+            <span className="absolute rounded-xl transition-all duration-200 top-0 bottom-0 left-2 right-0 bg-black/50 group-hover/item:bg-black/70 group-hover/item:left-3"></span>
+            <span className="relative z-10">
+              <User size={26} strokeWidth={3} className="group-hover/item:scale-110 transition-transform duration-200" />
+            </span>
+          </Link>
+        </nav>
+      </aside>
+      <div className="ml-16">
+        <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center justify-between">
@@ -295,6 +323,7 @@ export function AnalyticsDashboard({
             </ResponsiveContainer>
           </div>
         </div>
+      </div>
       </div>
     </div>
   );
