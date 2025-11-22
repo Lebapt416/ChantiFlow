@@ -82,7 +82,7 @@ export async function addWorkerAction(
     // Vérifier que le worker appartient à l'utilisateur
     const { data: existingWorker } = await supabase
       .from('workers')
-      .select('id, name, email, role')
+      .select('id, name, email, role, status')
       .eq('id', existingWorkerId)
       .eq('created_by', user.id)
       .is('site_id', null)
@@ -90,6 +90,25 @@ export async function addWorkerAction(
 
     if (!existingWorker) {
       return { error: 'Worker non trouvé ou déjà assigné à un chantier.' };
+    }
+
+    // Si le worker était en attente, l'approuver automatiquement lors de l'assignation
+    if (existingWorker.status === 'pending') {
+      try {
+        const { error: updateStatusError } = await supabase
+          .from('workers')
+          .update({ status: 'approved' })
+          .eq('id', existingWorkerId);
+        
+        if (updateStatusError && !updateStatusError.message.includes('status') && !updateStatusError.message.includes('column')) {
+          console.warn('⚠️ Erreur mise à jour statut worker:', updateStatusError.message);
+        } else if (!updateStatusError) {
+          console.log('✅ Statut worker mis à jour: pending → approved');
+        }
+      } catch (statusError) {
+        // Ne pas bloquer si la colonne status n'existe pas
+        console.warn('⚠️ Impossible de mettre à jour le statut (colonne peut-être absente)');
+      }
     }
 
     // Vérifier si le worker n'est pas déjà assigné à ce chantier
