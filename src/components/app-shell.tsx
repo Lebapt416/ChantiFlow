@@ -92,6 +92,54 @@ export function AppShell({
 
   return (
     <div className="min-h-screen bg-zinc-50 text-zinc-900 dark:bg-zinc-950 dark:text-white">
+      {/* Menu mobile - Drawer - En dehors du flux pour rester fixe */}
+      {mobileMenuOpen && (
+        <aside className="fixed inset-y-0 left-0 z-50 w-16 flex-col items-center border-r border-zinc-800 bg-black/80 px-0 py-8 shadow-xl backdrop-blur dark:border-zinc-700 dark:bg-black/80 lg:hidden flex">
+          <button
+            onClick={() => setMobileMenuOpen(false)}
+            className="absolute top-4 right-4 flex items-center justify-center w-8 h-8 rounded-lg text-white/90 hover:bg-white/20 hover:text-white transition-colors"
+            aria-label="Fermer le menu"
+          >
+            <X size={18} />
+          </button>
+          <nav className="flex flex-1 flex-col items-center gap-2 w-full">
+            {navItems.map((item) => {
+              const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`group/item relative flex items-center justify-center w-14 h-14 rounded-xl transition-all duration-200 ${
+                    active
+                      ? 'bg-white text-black shadow-lg shadow-white/20'
+                      : 'text-white hover:text-white'
+                  }`}
+                  title={item.label}
+                >
+                  <span className={`absolute rounded-xl transition-all duration-200 ${
+                    active
+                      ? 'inset-0 bg-white'
+                      : 'top-0 bottom-0 left-2 right-0 bg-black/50 group-hover/item:bg-black/70 group-hover/item:left-3'
+                  }`}></span>
+                  <span className="relative z-10">
+                    <item.icon 
+                      size={26} 
+                      strokeWidth={active ? 3.5 : 3}
+                      className={active ? '' : 'group-hover/item:scale-110 transition-transform duration-200'}
+                    />
+                  </span>
+                  {/* Tooltip pour affichage au survol */}
+                  <span className="pointer-events-none absolute left-full ml-3 z-50 whitespace-nowrap rounded-lg bg-zinc-900 px-3 py-1.5 text-xs font-medium text-white opacity-0 shadow-xl transition-all duration-200 group-hover/item:opacity-100 group-hover/item:translate-x-0 -translate-x-1 dark:bg-zinc-100 dark:text-zinc-900">
+                    {item.label}
+                    <span className="absolute right-full top-1/2 -mr-1 h-2 w-2 -translate-y-1/2 rotate-45 bg-zinc-900 dark:bg-zinc-100"></span>
+                  </span>
+                </Link>
+              );
+            })}
+          </nav>
+        </aside>
+      )}
       <div className="lg:flex">
         <aside className="fixed inset-y-0 left-0 z-20 hidden w-16 flex-col items-center border-r border-zinc-800 bg-black/80 px-0 py-8 shadow-xl backdrop-blur dark:border-zinc-700 dark:bg-black/80 lg:flex">
           <nav className="flex flex-1 flex-col items-center gap-2 w-full">
@@ -160,58 +208,6 @@ export function AppShell({
                 ) : null}
               </div>
             </div>
-            
-            {/* Menu mobile - Drawer */}
-            {mobileMenuOpen && (
-              <>
-                {/* Drawer */}
-                <aside className="fixed inset-y-0 left-0 z-50 w-16 flex-col items-center border-r border-zinc-800 bg-black/80 px-0 py-8 shadow-xl backdrop-blur dark:border-zinc-700 dark:bg-black/80 lg:hidden flex">
-                  <button
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="absolute top-4 right-4 flex items-center justify-center w-8 h-8 rounded-lg text-white/90 hover:bg-white/20 hover:text-white transition-colors"
-                    aria-label="Fermer le menu"
-                  >
-                    <X size={18} />
-                  </button>
-                  <nav className="flex flex-1 flex-col items-center gap-2 w-full">
-                    {navItems.map((item) => {
-                      const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
-                      return (
-                        <Link
-                          key={item.href}
-                          href={item.href}
-                          onClick={() => setMobileMenuOpen(false)}
-                          className={`group/item relative flex items-center justify-center w-14 h-14 rounded-xl transition-all duration-200 ${
-                            active
-                              ? 'bg-white text-black shadow-lg shadow-white/20'
-                              : 'text-white hover:text-white'
-                          }`}
-                          title={item.label}
-                        >
-                          <span className={`absolute rounded-xl transition-all duration-200 ${
-                            active
-                              ? 'inset-0 bg-white'
-                              : 'top-0 bottom-0 left-2 right-0 bg-black/50 group-hover/item:bg-black/70 group-hover/item:left-3'
-                          }`}></span>
-                          <span className="relative z-10">
-                            <item.icon 
-                              size={26} 
-                              strokeWidth={active ? 3.5 : 3}
-                              className={active ? '' : 'group-hover/item:scale-110 transition-transform duration-200'}
-                            />
-                          </span>
-                          {/* Tooltip pour affichage au survol */}
-                          <span className="pointer-events-none absolute left-full ml-3 z-50 whitespace-nowrap rounded-lg bg-zinc-900 px-3 py-1.5 text-xs font-medium text-white opacity-0 shadow-xl transition-all duration-200 group-hover/item:opacity-100 group-hover/item:translate-x-0 -translate-x-1 dark:bg-zinc-100 dark:text-zinc-900">
-                            {item.label}
-                            <span className="absolute right-full top-1/2 -mr-1 h-2 w-2 -translate-y-1/2 rotate-45 bg-zinc-900 dark:bg-zinc-100"></span>
-                          </span>
-                        </Link>
-                      );
-                    })}
-                  </nav>
-                </aside>
-              </>
-            )}
           </header>
           <main className="px-4 py-8 lg:px-10">{children}</main>
         </div>
