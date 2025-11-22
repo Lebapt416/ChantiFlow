@@ -16,9 +16,14 @@ export default async function AnalyticsProfilePage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Vérifier que l'utilisateur est connecté et qu'il s'agit du compte autorisé
-  if (!user || user.email !== 'bcb83@icloud.com') {
-    redirect('/login');
+  // Vérifier que l'utilisateur est connecté
+  if (!user) {
+    redirect('/login?redirect=/analytics/profile');
+  }
+
+  // Vérifier que l'utilisateur est le compte autorisé
+  if (user.email !== 'bcb83@icloud.com') {
+    redirect('/login?error=unauthorized');
   }
 
   return (

@@ -14,11 +14,17 @@ export default async function AnalyticsPage() {
   const supabase = await createSupabaseServerClient();
   const {
     data: { user },
+    error: authError,
   } = await supabase.auth.getUser();
 
-  // Vérifier que l'utilisateur est connecté et qu'il s'agit du compte autorisé
-  if (!user || user.email !== 'bcb83@icloud.com') {
-    redirect('/login');
+  // Vérifier que l'utilisateur est connecté
+  if (authError || !user) {
+    redirect('/login?redirect=/analytics');
+  }
+
+  // Vérifier que l'utilisateur est le compte autorisé
+  if (user.email !== 'bcb83@icloud.com') {
+    redirect('/login?error=unauthorized');
   }
 
   // Utiliser le client admin pour récupérer tous les utilisateurs
