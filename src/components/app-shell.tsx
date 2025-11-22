@@ -70,7 +70,7 @@ export function AppShell({
         { href: '/home', label: 'Accueil', icon: Home },
         { href: `/site/${siteId}/planning`, label: 'Planning IA', icon: Calendar },
         { href: `/site/${siteId}/tasks`, label: 'Tâches', icon: ListChecks },
-        { href: '/team', label: 'Équipe', icon: UsersRound },
+        { href: `/site/${siteId}/team`, label: 'Équipe', icon: UsersRound },
         { href: `/site/${siteId}/reports`, label: 'Rapports', icon: FileText },
         { href: `/site/${siteId}/qr`, label: 'QR code', icon: QrCode },
         { href: '/account', label: 'Mon compte', icon: User },
