@@ -93,7 +93,7 @@ export function AppShell({
   return (
     <div className="min-h-screen bg-zinc-50 text-zinc-900 dark:bg-zinc-950 dark:text-white">
       <div className="lg:flex">
-        <aside className="fixed inset-y-0 left-0 z-20 hidden w-16 flex-col items-center border-r border-zinc-200 bg-white/80 px-0 py-8 shadow-lg shadow-black/5 backdrop-blur dark:border-zinc-800 dark:bg-zinc-900/80 lg:flex">
+        <aside className="fixed inset-y-0 left-0 z-20 hidden w-16 flex-col items-center border-r border-zinc-800 bg-black/80 px-0 py-8 shadow-xl backdrop-blur dark:border-zinc-700 dark:bg-black/80 lg:flex">
           <nav className="flex flex-1 flex-col items-center gap-2 w-full">
             {navItems.map((item) => {
               const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
@@ -103,8 +103,8 @@ export function AppShell({
                   href={item.href}
                   className={`group/item relative flex items-center justify-center w-12 h-12 rounded-xl transition-all duration-200 ${
                     active
-                      ? 'bg-zinc-900 text-white shadow-lg shadow-black/20 dark:bg-white dark:text-black'
-                      : 'text-zinc-600 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800'
+                      ? 'bg-white text-black shadow-lg shadow-white/20'
+                      : 'text-white/90 hover:bg-white/20 hover:text-white'
                   }`}
                   title={item.label}
                 >
@@ -163,10 +163,10 @@ export function AppShell({
                   onClick={() => setMobileMenuOpen(false)}
                 />
                 {/* Drawer */}
-                <aside className="fixed inset-y-0 left-0 z-50 w-16 flex-col items-center border-r border-zinc-200 bg-white/95 px-0 py-8 shadow-xl backdrop-blur dark:border-zinc-800 dark:bg-zinc-900/95 lg:hidden flex">
+                <aside className="fixed inset-y-0 left-0 z-50 w-16 flex-col items-center border-r border-zinc-800 bg-black/80 px-0 py-8 shadow-xl backdrop-blur dark:border-zinc-700 dark:bg-black/80 lg:hidden flex">
                   <button
                     onClick={() => setMobileMenuOpen(false)}
-                    className="absolute top-4 right-4 flex items-center justify-center w-8 h-8 rounded-lg text-zinc-600 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800 transition-colors"
+                    className="absolute top-4 right-4 flex items-center justify-center w-8 h-8 rounded-lg text-white/90 hover:bg-white/20 hover:text-white transition-colors"
                     aria-label="Fermer le menu"
                   >
                     <X size={18} />
@@ -181,14 +181,14 @@ export function AppShell({
                           onClick={() => setMobileMenuOpen(false)}
                           className={`group/item relative flex items-center justify-center w-12 h-12 rounded-xl transition-all duration-200 ${
                             active
-                              ? 'bg-zinc-900 text-white shadow-lg shadow-black/20 dark:bg-white dark:text-black'
-                              : 'text-zinc-600 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800'
+                              ? 'bg-white text-black shadow-lg shadow-white/20'
+                              : 'text-white/90 hover:bg-white/20 hover:text-white'
                           }`}
                           title={item.label}
                         >
                           <item.icon 
-                            size={20} 
-                            strokeWidth={active ? 2.5 : 2.2}
+                            size={22} 
+                            strokeWidth={active ? 3 : 2.5}
                             className={active ? '' : 'group-hover/item:scale-110 transition-transform duration-200'}
                           />
                           {/* Tooltip pour affichage au survol */}
