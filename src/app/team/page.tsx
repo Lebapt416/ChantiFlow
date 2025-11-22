@@ -28,33 +28,51 @@ export default async function TeamPage() {
   // Si elle échoue, on sait que la migration n'a pas été exécutée
   try {
     // Essayer de récupérer les workers avec created_by
-    const { data, error } = await supabase
+    // Tester d'abord si la colonne status existe
+    const { data: testData, error: testError } = await supabase
       .from('workers')
-      .select('id, name, email, role, created_at')
+      .select('id, name, email, role, created_at, status')
       .eq('created_by', user.id)
       .is('site_id', null)
-      .order('created_at', { ascending: true })
-      .limit(1); // Limiter pour tester rapidement
+      .limit(1);
     
-    if (error) {
+    if (testError) {
       // Si l'erreur mentionne created_by ou column, la migration n'est pas exécutée
-      if (error.message.includes('created_by') || error.message.includes('column') || error.code === '42703') {
-        console.warn('Colonne created_by non trouvée - migration non exécutée');
-        accountWorkers = [];
+      if (testError.message.includes('created_by') || testError.message.includes('column') || testError.code === '42703') {
+        console.warn('Colonne created_by ou status non trouvée - migration non exécutée');
+        // Essayer sans status
+        const { data: workersWithoutStatus } = await supabase
+          .from('workers')
+          .select('id, name, email, role, created_at')
+          .eq('created_by', user.id)
+          .is('site_id', null)
+          .order('created_at', { ascending: true });
+        accountWorkers = (workersWithoutStatus ?? []).map((w: any) => ({ ...w, status: null }));
       } else {
         // Autre erreur, on la propage
-        throw error;
+        throw testError;
       }
     } else {
-      // Si pas d'erreur, récupérer tous les workers
-      const { data: allAccountWorkers } = await supabase
+      // Si pas d'erreur, récupérer tous les workers avec status
+      const { data: allAccountWorkers, error: fetchError } = await supabase
         .from('workers')
         .select('id, name, email, role, created_at, status')
         .eq('created_by', user.id)
         .is('site_id', null)
         .order('created_at', { ascending: true });
       
-      accountWorkers = allAccountWorkers ?? [];
+      if (fetchError && fetchError.message.includes('status')) {
+        // Si la colonne status n'existe pas, récupérer sans status
+        const { data: workersWithoutStatus } = await supabase
+          .from('workers')
+          .select('id, name, email, role, created_at')
+          .eq('created_by', user.id)
+          .is('site_id', null)
+          .order('created_at', { ascending: true });
+        accountWorkers = (workersWithoutStatus ?? []).map((w: any) => ({ ...w, status: null }));
+      } else {
+        accountWorkers = allAccountWorkers ?? [];
+      }
     }
   } catch (error: any) {
     // Colonne created_by n'existe pas encore, on continue avec un tableau vide
@@ -201,8 +219,10 @@ export default async function TeamPage() {
       </div>
       {/* Séparer les workers en attente et approuvés */}
       {(() => {
-        const pendingWorkers = accountWorkers.filter((w: any) => w.status === 'pending');
-        const approvedWorkers = accountWorkers.filter((w: any) => !w.status || w.status === 'approved');
+        // Filtrer les workers en attente (status === 'pending')
+        const pendingWorkers = (accountWorkers || []).filter((w: any) => w.status === 'pending');
+        // Tous les autres workers sont considérés comme approuvés (status null, undefined, 'approved', ou inexistant)
+        const approvedWorkers = (accountWorkers || []).filter((w: any) => w.status !== 'pending');
         
         return (
           <>
