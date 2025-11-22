@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ReactNode, useMemo } from 'react';
+import { ReactNode, useMemo, useState } from 'react';
 import {
   Home,
   LayoutDashboard,
@@ -14,6 +14,8 @@ import {
   Sparkles,
   User,
   Calendar,
+  Menu,
+  X,
 } from 'lucide-react';
 
 type NavItem = {
@@ -57,6 +59,7 @@ export function AppShell({
   actions,
 }: AppShellProps) {
   const pathname = usePathname();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navItems = useMemo(() => {
     // Détecter si on est sur une page de chantier (/site/[id]/...)
@@ -123,14 +126,23 @@ export function AppShell({
         <div className="min-h-screen flex-1 transition-all duration-300 lg:ml-16">
           <header className="sticky top-0 z-10 border-b border-zinc-200 bg-white/80 px-4 py-4 backdrop-blur dark:border-zinc-800 dark:bg-zinc-950/80">
             <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-              <div>
-                <p className="text-xs uppercase tracking-[0.4em] text-zinc-500 dark:text-zinc-400">
-                  ChantiFlow
-                </p>
-                <h1 className="text-2xl font-semibold">{heading}</h1>
-                {subheading ? (
-                  <p className="text-sm text-zinc-500 dark:text-zinc-400">{subheading}</p>
-                ) : null}
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => setMobileMenuOpen(true)}
+                  className="lg:hidden flex items-center justify-center w-10 h-10 rounded-lg border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 transition-colors"
+                  aria-label="Ouvrir le menu"
+                >
+                  <Menu size={20} />
+                </button>
+                <div>
+                  <p className="text-xs uppercase tracking-[0.4em] text-zinc-500 dark:text-zinc-400">
+                    ChantiFlow
+                  </p>
+                  <h1 className="text-2xl font-semibold">{heading}</h1>
+                  {subheading ? (
+                    <p className="text-sm text-zinc-500 dark:text-zinc-400">{subheading}</p>
+                  ) : null}
+                </div>
               </div>
               <div className="flex items-center gap-3">
                 {actions}
@@ -141,27 +153,56 @@ export function AppShell({
                 ) : null}
               </div>
             </div>
-            <div className="mt-4 flex gap-2 lg:hidden">
-              {navItems.map((item) => {
-                const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className={`flex-1 rounded-full border px-3 py-2 text-center text-xs font-semibold transition ${
-                      active
-                        ? 'border-zinc-900 bg-zinc-900 text-white dark:border-white dark:bg-white dark:text-black'
-                        : 'border-zinc-200 text-zinc-600 dark:border-zinc-700 dark:text-zinc-300'
-                    }`}
+            
+            {/* Menu mobile - Drawer */}
+            {mobileMenuOpen && (
+              <>
+                {/* Overlay */}
+                <div
+                  className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm lg:hidden"
+                  onClick={() => setMobileMenuOpen(false)}
+                />
+                {/* Drawer */}
+                <aside className="fixed inset-y-0 left-0 z-50 w-16 flex-col items-center border-r border-zinc-200 bg-white/95 px-0 py-8 shadow-xl backdrop-blur dark:border-zinc-800 dark:bg-zinc-900/95 lg:hidden flex">
+                  <button
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="absolute top-4 right-4 flex items-center justify-center w-8 h-8 rounded-lg text-zinc-600 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800 transition-colors"
+                    aria-label="Fermer le menu"
                   >
-                    <div className="flex items-center justify-center gap-1">
-                      <item.icon size={14} />
-                      {item.label}
-                    </div>
-                  </Link>
-                );
-              })}
-            </div>
+                    <X size={18} />
+                  </button>
+                  <nav className="flex flex-1 flex-col items-center gap-2 w-full">
+                    {navItems.map((item) => {
+                      const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
+                      return (
+                        <Link
+                          key={item.href}
+                          href={item.href}
+                          onClick={() => setMobileMenuOpen(false)}
+                          className={`group/item relative flex items-center justify-center w-12 h-12 rounded-xl transition-all duration-200 ${
+                            active
+                              ? 'bg-zinc-900 text-white shadow-lg shadow-black/20 dark:bg-white dark:text-black'
+                              : 'text-zinc-600 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800'
+                          }`}
+                          title={item.label}
+                        >
+                          <item.icon 
+                            size={20} 
+                            strokeWidth={active ? 2.5 : 2.2}
+                            className={active ? '' : 'group-hover/item:scale-110 transition-transform duration-200'}
+                          />
+                          {/* Tooltip pour affichage au survol */}
+                          <span className="pointer-events-none absolute left-full ml-3 z-50 whitespace-nowrap rounded-lg bg-zinc-900 px-3 py-1.5 text-xs font-medium text-white opacity-0 shadow-xl transition-all duration-200 group-hover/item:opacity-100 group-hover/item:translate-x-0 -translate-x-1 dark:bg-zinc-100 dark:text-zinc-900">
+                            {item.label}
+                            <span className="absolute right-full top-1/2 -mr-1 h-2 w-2 -translate-y-1/2 rotate-45 bg-zinc-900 dark:bg-zinc-100"></span>
+                          </span>
+                        </Link>
+                      );
+                    })}
+                  </nav>
+                </aside>
+              </>
+            )}
           </header>
           <main className="px-4 py-8 lg:px-10">{children}</main>
         </div>
