@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import { SignInForm } from './sign-in-form';
+import { AuthForm } from './auth-form';
 
 export const metadata = {
   title: 'Connexion | ChantiFlow',
@@ -25,11 +25,11 @@ export default function LoginPage() {
               Espace chef de chantier
             </h1>
             <p className="text-sm text-zinc-500 dark:text-zinc-400">
-              Connecte-toi avec ton compte Supabase.
+              Connecte-toi ou crée un compte pour commencer.
             </p>
           </div>
         </div>
-        <SignInForm />
+        <AuthForm />
       </div>
     </div>
   );

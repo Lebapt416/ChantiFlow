@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ReactNode, useMemo, useState } from 'react';
+import { InstallPwaButton } from './install-pwa-button';
 import {
   Home,
   LayoutDashboard,
@@ -142,6 +143,10 @@ export function AppShell({
                 </Link>
               );
             })}
+            {/* Bouton d'installation PWA mobile */}
+            <div className="mt-auto pt-4">
+              <InstallPwaButton />
+            </div>
           </nav>
         </aside>
       )}
@@ -181,6 +186,10 @@ export function AppShell({
                 </Link>
               );
             })}
+            {/* Bouton d'installation PWA */}
+            <div className="mt-auto pt-4">
+              <InstallPwaButton />
+            </div>
           </nav>
         </aside>
         <div className={`min-h-screen flex-1 transition-all duration-300 ease-in-out lg:ml-16 ${mobileMenuOpen ? 'ml-16' : ''}`}>
