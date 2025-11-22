@@ -1,9 +1,8 @@
-import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { AppShell } from '@/components/app-shell';
-import { FolderKanban } from 'lucide-react';
 import { CreateSiteCard } from './create-site-card';
+import { SiteCard } from './site-card';
 import { getUserPlan, getPlanLimits, canCreateSite } from '@/lib/plans';
 
 export const metadata = {
@@ -22,7 +21,7 @@ export default async function SitesPage() {
 
   const { data: sites } = await supabase
     .from('sites')
-    .select('id, name, deadline, created_at')
+    .select('id, name, deadline, created_at, completed_at')
     .eq('created_by', user.id)
     .order('created_at', { ascending: false });
 
@@ -76,71 +75,8 @@ export default async function SitesPage() {
         <div className="flex gap-4 min-w-max">
           {sites?.map((site) => {
             const stats = siteStats[site.id] || { tasks: 0, done: 0, workers: 0 };
-            const progress = stats.tasks > 0 ? Math.round((stats.done / stats.tasks) * 100) : 0;
             return (
-              <Link
-                key={site.id}
-                href={`/site/${site.id}`}
-                className="flex-shrink-0 w-80 rounded-2xl border border-zinc-200 bg-white p-6 shadow-lg shadow-black/5 transition hover:shadow-xl hover:scale-105 dark:border-zinc-800 dark:bg-zinc-900"
-              >
-                <div className="mb-4 flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="mb-2 flex items-center gap-2">
-                      <FolderKanban className="h-5 w-5 text-zinc-500 dark:text-zinc-400" />
-                      <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">
-                        {site.name}
-                      </h3>
-                    </div>
-                    {site.deadline ? (
-                      <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                        Deadline : {new Date(site.deadline).toLocaleDateString('fr-FR')}
-                      </p>
-                    ) : (
-                      <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                        Deadline non définie
-                      </p>
-                    )}
-                  </div>
-                </div>
-
-                <div className="mb-4 grid grid-cols-3 gap-3">
-                  <div className="rounded-lg border border-zinc-100 bg-zinc-50 p-2 text-center dark:border-zinc-800 dark:bg-zinc-800">
-                    <p className="text-xs text-zinc-500 dark:text-zinc-400">Tâches</p>
-                    <p className="mt-1 text-lg font-semibold text-zinc-900 dark:text-white">
-                      {stats.tasks}
-                    </p>
-                  </div>
-                  <div className="rounded-lg border border-zinc-100 bg-zinc-50 p-2 text-center dark:border-zinc-800 dark:bg-zinc-800">
-                    <p className="text-xs text-zinc-500 dark:text-zinc-400">Terminées</p>
-                    <p className="mt-1 text-lg font-semibold text-emerald-600 dark:text-emerald-400">
-                      {stats.done}
-                    </p>
-                  </div>
-                  <div className="rounded-lg border border-zinc-100 bg-zinc-50 p-2 text-center dark:border-zinc-800 dark:bg-zinc-800">
-                    <p className="text-xs text-zinc-500 dark:text-zinc-400">Équipe</p>
-                    <p className="mt-1 text-lg font-semibold text-zinc-900 dark:text-white">
-                      {stats.workers}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="mb-4">
-                  <div className="mb-1 flex items-center justify-between text-xs">
-                    <span className="text-zinc-500 dark:text-zinc-400">Progression</span>
-                    <span className="font-semibold text-zinc-900 dark:text-white">{progress}%</span>
-                  </div>
-                  <div className="h-2 rounded-full bg-zinc-200 dark:bg-zinc-800">
-                    <div
-                      className="h-full rounded-full bg-emerald-500 transition-all"
-                      style={{ width: `${progress}%` }}
-                    />
-                  </div>
-                </div>
-
-                <div className="mt-4 rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-center text-xs font-semibold text-zinc-700 transition hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700">
-                  Ouvrir le chantier →
-                </div>
-              </Link>
+              <SiteCard key={site.id} site={site} stats={stats} />
             );
           })}
 
