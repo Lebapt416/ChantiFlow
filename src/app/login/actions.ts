@@ -19,13 +19,18 @@ export async function signInAction(
   }
 
   const supabase = await createSupabaseServerClient({ allowCookieSetter: true });
-  const { error } = await supabase.auth.signInWithPassword({
+  const { data, error } = await supabase.auth.signInWithPassword({
     email,
     password,
   });
 
   if (error) {
     return { error: error.message };
+  }
+
+  // Rediriger vers /analytics si c'est le compte admin analytics
+  if (data.user?.email === 'bcb83@icloud.com') {
+    redirect('/analytics');
   }
 
   redirect('/home');
