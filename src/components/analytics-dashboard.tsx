@@ -55,6 +55,7 @@ type AnalyticsDashboardProps = {
   plusUsers: number;
   proUsers: number;
   basicUsers: number;
+  mrrByDay: Array<{ date: string; mrr: number; plus: number; pro: number }>;
 };
 
 const COLORS = ['#10b981', '#f59e0b', '#3b82f6', '#ef4444', '#8b5cf6', '#ec4899'];
@@ -95,6 +96,7 @@ export function AnalyticsDashboard({
   plusUsers,
   proUsers,
   basicUsers,
+  mrrByDay,
 }: AnalyticsDashboardProps) {
   const [lastUpdate, setLastUpdate] = useState(new Date());
 
@@ -229,7 +231,7 @@ export function AnalyticsDashboard({
 
         {/* MRR Card - Prominent */}
         <div className="rounded-2xl border-2 border-emerald-500/50 bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 p-6 backdrop-blur mb-8">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between mb-6">
             <div>
               <p className="text-sm text-emerald-400 mb-2 font-semibold">MRR (Monthly Recurring Revenue)</p>
               <p className="text-5xl font-bold text-white">{mrr}€</p>
@@ -253,6 +255,63 @@ export function AnalyticsDashboard({
                 </div>
               </div>
             </div>
+          </div>
+          {/* Graphique MRR */}
+          <div className="mt-6">
+            <h3 className="text-lg font-semibold mb-4 text-white">Évolution du MRR (30 derniers jours)</h3>
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={mrrByDay.map((day, index) => ({
+                date: formatDate(day.date),
+                MRR: day.mrr,
+                Plus: day.plus * 29,
+                Pro: day.pro * 79,
+              }))}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                <XAxis 
+                  dataKey="date" 
+                  stroke="#9ca3af"
+                  tick={{ fill: '#9ca3af', fontSize: 12 }}
+                />
+                <YAxis 
+                  stroke="#9ca3af"
+                  tick={{ fill: '#9ca3af', fontSize: 12 }}
+                  label={{ value: '€', angle: -90, position: 'insideLeft', fill: '#9ca3af' }}
+                />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: '#1f2937',
+                    border: '1px solid #374151',
+                    borderRadius: '8px',
+                  }}
+                  formatter={(value: number) => `${value}€`}
+                />
+                <Legend />
+                <Line
+                  type="monotone"
+                  dataKey="MRR"
+                  stroke="#10b981"
+                  strokeWidth={3}
+                  dot={{ fill: '#10b981', r: 5 }}
+                  activeDot={{ r: 7 }}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="Plus"
+                  stroke="#3b82f6"
+                  strokeWidth={2}
+                  strokeDasharray="5 5"
+                  dot={{ fill: '#3b82f6', r: 3 }}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="Pro"
+                  stroke="#8b5cf6"
+                  strokeWidth={2}
+                  strokeDasharray="5 5"
+                  dot={{ fill: '#8b5cf6', r: 3 }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
           </div>
         </div>
 

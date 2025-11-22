@@ -90,6 +90,21 @@ export default async function AnalyticsPage() {
   }).length;
   const mrr = (plusUsers * 29) + (proUsers * 79);
 
+  // Calculer l'évolution du MRR sur les 30 derniers jours
+  const mrrByDay = last30Days.map((day) => {
+    // Pour chaque jour, compter les utilisateurs qui existaient déjà et avaient un plan payant
+    const usersBeforeDay = allUsers.filter((user) => {
+      const userDate = new Date(user.created_at).toISOString().split('T')[0];
+      return userDate <= day;
+    });
+
+    const plusCount = usersBeforeDay.filter((user) => user.user_metadata?.plan === 'plus').length;
+    const proCount = usersBeforeDay.filter((user) => user.user_metadata?.plan === 'pro').length;
+    const dayMrr = (plusCount * 29) + (proCount * 79);
+
+    return { date: day, mrr: dayMrr, plus: plusCount, pro: proCount };
+  });
+
   // Statistiques par date (30 derniers jours)
   const last30Days = Array.from({ length: 30 }, (_, i) => {
     const date = new Date();
@@ -286,6 +301,7 @@ export default async function AnalyticsPage() {
       plusUsers={plusUsers}
       proUsers={proUsers}
       basicUsers={basicUsers}
+      mrrByDay={mrrByDay}
     />
   );
 }
