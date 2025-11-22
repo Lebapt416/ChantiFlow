@@ -1,19 +1,22 @@
 {
   "headers": [
     {
-      "source": "/(.*)",
+      "source": "/reports(.*)",
       "headers": [
         {
           "key": "Cache-Control",
-          "value": "public, max-age=0, must-revalidate"
+          "value": "public, max-age=0, must-revalidate, s-maxage=0"
         }
       ]
-    }
-  ],
-  "rewrites": [
+    },
     {
-      "source": "/reports/:path*",
-      "destination": "/reports/:path*"
+      "source": "/reports/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate, s-maxage=0"
+        }
+      ]
     }
   ]
 }
