@@ -60,8 +60,28 @@ export function AppShell({
   const pathname = usePathname();
 
   const navItems = useMemo(() => {
+    // Détecter si on est sur une page de chantier (/site/[id]/...)
+    const siteMatch = pathname.match(/^\/site\/([^/]+)/);
+    const siteId = siteMatch ? siteMatch[1] : null;
+
+    if (siteId) {
+      // Navigation contextuelle au chantier
+      return [
+        { href: `/site/${siteId}/dashboard`, label: 'Dashboard', icon: LayoutDashboard },
+        { href: '/home', label: 'Accueil', icon: Home },
+        { href: '/sites', label: 'Chantiers', icon: FolderKanban },
+        { href: `/site/${siteId}/planning`, label: 'Planning', icon: Calendar },
+        { href: '/ai', label: 'IA Planning', icon: Sparkles },
+        { href: `/site/${siteId}/tasks`, label: 'Tâches', icon: ListChecks },
+        { href: '/team', label: 'Équipe', icon: UsersRound },
+        { href: `/site/${siteId}/reports`, label: 'Rapports', icon: FileText },
+        { href: '/qr', label: 'QR codes', icon: QrCode },
+        { href: '/account', label: 'Mon compte', icon: User },
+      ];
+    }
+
     return [...baseNavItems];
-  }, []);
+  }, [pathname]);
 
   return (
     <div className="min-h-screen bg-zinc-50 text-zinc-900 dark:bg-zinc-950 dark:text-white">

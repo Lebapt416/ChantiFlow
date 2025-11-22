@@ -20,12 +20,27 @@ export function SiteSelector({ sites, currentSiteId }: Props) {
   function handleChange(e: React.ChangeEvent<HTMLSelectElement>) {
     const siteId = e.target.value;
     if (siteId) {
-      // Détecter si on est sur /planning ou /site
+      // Détecter la route actuelle pour rediriger vers la même page du nouveau chantier
       const path = window.location.pathname;
-      if (path.startsWith('/planning')) {
+      
+      if (path.startsWith('/site/') && path.includes('/')) {
+        // Extraire la partie après /site/[id]/
+        const parts = path.split('/');
+        const siteIndex = parts.indexOf('site');
+        if (siteIndex !== -1 && parts[siteIndex + 1]) {
+          const subPath = parts.slice(siteIndex + 2).join('/');
+          if (subPath) {
+            router.push(`/site/${siteId}/${subPath}`);
+          } else {
+            router.push(`/site/${siteId}/dashboard`);
+          }
+        } else {
+          router.push(`/site/${siteId}/dashboard`);
+        }
+      } else if (path.startsWith('/planning')) {
         router.push(`/planning?site=${siteId}`);
       } else {
-        router.push(`/site/${siteId}`);
+        router.push(`/site/${siteId}/dashboard`);
       }
     }
   }

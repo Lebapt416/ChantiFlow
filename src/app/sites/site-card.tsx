@@ -164,7 +164,7 @@ export function SiteCard({ site, stats }: Props) {
       {/* Boutons d'action */}
       <div className="space-y-2">
         <Link
-          href={`/site/${site.id}`}
+          href={`/site/${site.id}/dashboard`}
           className="block w-full rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-center text-xs font-semibold text-zinc-700 transition hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
         >
           Ouvrir le chantier →
