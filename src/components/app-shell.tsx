@@ -68,12 +68,11 @@ export function AppShell({
       return [
         { href: `/site/${siteId}/dashboard`, label: 'Dashboard', icon: LayoutDashboard },
         { href: '/home', label: 'Accueil', icon: Home },
-        { href: '/dashboard', label: 'Dashboard général', icon: LayoutDashboard },
         { href: `/site/${siteId}/planning`, label: 'Planning IA', icon: Calendar },
         { href: `/site/${siteId}/tasks`, label: 'Tâches', icon: ListChecks },
         { href: '/team', label: 'Équipe', icon: UsersRound },
         { href: `/site/${siteId}/reports`, label: 'Rapports', icon: FileText },
-        { href: '/qr', label: 'QR codes', icon: QrCode },
+        { href: `/site/${siteId}/qr`, label: 'QR code', icon: QrCode },
         { href: '/account', label: 'Mon compte', icon: User },
       ];
     }

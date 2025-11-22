@@ -154,10 +154,10 @@ export default async function TeamPage() {
       <div className="mb-4 flex items-center justify-between">
         <div>
           <h2 className="text-lg font-semibold text-zinc-900 dark:text-white">
-            Ajouter un membre
+            Ajouter rapidement un membre au catalogue
           </h2>
           <p className="text-sm text-zinc-500 dark:text-zinc-400">
-            Ajoutez un nouveau membre à votre équipe.
+            Ajoutez un nouveau membre à votre catalogue d'équipe. Il sera disponible pour être assigné à n'importe quel chantier.
           </p>
         </div>
       </div>

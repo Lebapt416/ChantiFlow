@@ -4,7 +4,6 @@ import { AppShell } from '@/components/app-shell';
 import { DashboardCharts } from '@/app/dashboard/dashboard-charts';
 import { SitePlanningMini } from '@/components/site-planning-mini';
 import { generatePlanning } from '@/lib/ai/planning';
-import { SiteSelector } from '@/components/site-selector';
 
 type Params = {
   params: Promise<{
@@ -41,13 +40,6 @@ export default async function SiteDashboardPage({ params }: Params) {
   if (siteError || !site || site.created_by !== user.id) {
     notFound();
   }
-
-  // Récupérer tous les chantiers pour le sélecteur
-  const { data: allSites } = await supabase
-    .from('sites')
-    .select('id, name, deadline')
-    .eq('created_by', user.id)
-    .order('created_at', { ascending: false });
 
   // Récupérer les données du chantier
   const [{ data: tasks }, { data: workers }] = await Promise.all([
@@ -93,11 +85,6 @@ export default async function SiteDashboardPage({ params }: Params) {
       subheading="Vue d'ensemble du chantier"
       userEmail={user.email}
       primarySite={{ id: site.id, name: site.name }}
-      actions={
-        allSites && allSites.length > 1 ? (
-          <SiteSelector sites={allSites} currentSiteId={site.id} />
-        ) : null
-      }
     >
       <div className="space-y-6">
         {/* Stats du chantier */}

@@ -3,7 +3,6 @@ import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { AppShell } from '@/components/app-shell';
 import { PendingReportsList } from '@/app/reports/pending-reports-list';
 import { ValidatedReportsList } from '@/app/reports/validated-reports-list';
-import { SiteSelector } from '@/components/site-selector';
 
 type Params = {
   params: Promise<{
@@ -40,13 +39,6 @@ export default async function SiteReportsPage({ params }: Params) {
   if (siteError || !site || site.created_by !== user.id) {
     notFound();
   }
-
-  // Récupérer tous les chantiers pour le sélecteur
-  const { data: allSites } = await supabase
-    .from('sites')
-    .select('id, name, deadline')
-    .eq('created_by', user.id)
-    .order('created_at', { ascending: false });
 
   // Récupérer les tâches du chantier
   const { data: tasks } = await supabase
@@ -157,11 +149,6 @@ export default async function SiteReportsPage({ params }: Params) {
       subheading={`Tous les rapports du chantier ${site.name}`}
       userEmail={user.email}
       primarySite={{ id: site.id, name: site.name }}
-      actions={
-        allSites && allSites.length > 1 ? (
-          <SiteSelector sites={allSites} currentSiteId={site.id} />
-        ) : null
-      }
     >
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Colonne Rapports en attente */}

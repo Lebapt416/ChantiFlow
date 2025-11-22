@@ -4,7 +4,6 @@ import { AppShell } from '@/components/app-shell';
 import { WeeklyCalendar } from '@/components/weekly-calendar';
 import { GeneratePlanningButton } from '@/app/site/[id]/generate-planning-button';
 import { generatePlanning } from '@/lib/ai/planning';
-import { SiteSelector } from '@/components/site-selector';
 
 type Params = {
   params: Promise<{
@@ -41,13 +40,6 @@ export default async function SitePlanningPage({ params }: Params) {
   if (siteError || !site || site.created_by !== user.id) {
     notFound();
   }
-
-  // Récupérer tous les chantiers pour le sélecteur
-  const { data: allSites } = await supabase
-    .from('sites')
-    .select('id, name, deadline')
-    .eq('created_by', user.id)
-    .order('created_at', { ascending: false });
 
   // Récupérer les tâches et workers du chantier
   const [{ data: tasks }, { data: workers }] = await Promise.all([
@@ -91,11 +83,6 @@ export default async function SitePlanningPage({ params }: Params) {
       subheading={`Planning du chantier ${site.name}`}
       userEmail={user.email}
       primarySite={{ id: site.id, name: site.name }}
-      actions={
-        allSites && allSites.length > 1 ? (
-          <SiteSelector sites={allSites} currentSiteId={site.id} />
-        ) : null
-      }
     >
       <div className="space-y-6">
         <div className="flex items-center justify-between">

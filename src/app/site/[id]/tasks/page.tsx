@@ -4,7 +4,6 @@ import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { AppShell } from '@/components/app-shell';
 import { AddTaskForm } from '@/app/site/[id]/add-task-form';
 import { CompleteTaskButton } from '@/app/site/[id]/complete-task-button';
-import { SiteSelector } from '@/components/site-selector';
 
 type Params = {
   params: Promise<{
@@ -42,13 +41,6 @@ export default async function SiteTasksPage({ params }: Params) {
     notFound();
   }
 
-  // Récupérer tous les chantiers pour le sélecteur
-  const { data: allSites } = await supabase
-    .from('sites')
-    .select('id, name, deadline')
-    .eq('created_by', user.id)
-    .order('created_at', { ascending: false });
-
   // Récupérer les tâches du chantier
   const { data: tasks } = await supabase
     .from('tasks')
@@ -65,11 +57,6 @@ export default async function SiteTasksPage({ params }: Params) {
       subheading={`Toutes les tâches du chantier ${site.name}`}
       userEmail={user.email}
       primarySite={{ id: site.id, name: site.name }}
-      actions={
-        allSites && allSites.length > 1 ? (
-          <SiteSelector sites={allSites} currentSiteId={site.id} />
-        ) : null
-      }
     >
       <div className="space-y-6">
         {/* Stats */}
