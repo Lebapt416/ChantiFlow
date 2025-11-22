@@ -77,17 +77,11 @@ export function InstallPwaButton() {
     return null;
   }
 
-  // Afficher le bouton même si le prompt n'est pas encore disponible (il apparaîtra quand disponible)
-  // Le bouton sera désactivé si le prompt n'est pas disponible
-
   return (
     <button
       onClick={handleInstallClick}
-      className={`group/item relative flex items-center justify-center w-14 h-14 rounded-xl transition-all duration-200 text-white hover:text-white ${
-        !deferredPrompt ? 'opacity-50 cursor-not-allowed' : ''
-      }`}
-      title={deferredPrompt ? "Installer l'application" : "Installation disponible via le menu du navigateur"}
-      disabled={!deferredPrompt}
+      className="group/item relative flex items-center justify-center w-14 h-14 rounded-xl transition-all duration-200 text-white hover:text-white"
+      title="Installer l'application"
     >
       <span className="absolute rounded-xl transition-all duration-200 top-0 bottom-0 left-2 right-0 bg-black/50 group-hover/item:bg-black/70 group-hover/item:left-3"></span>
       <span className="relative z-10">
