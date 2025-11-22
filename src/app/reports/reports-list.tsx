@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import { CheckCircle2 } from 'lucide-react';
+import { CheckCircle2, Eye } from 'lucide-react';
 import { ReportDetailModal } from './report-detail-modal';
 
 type Report = {
@@ -65,11 +65,9 @@ export function ReportsList({
           const isTaskDone = taskStatus === 'done';
 
           return (
-            <button
+            <div
               key={report.id}
-              onClick={() => handleReportClick(report)}
-              type="button"
-              className="w-full text-left rounded-2xl border border-zinc-200 p-4 transition hover:border-zinc-300 hover:shadow-md active:scale-[0.98] dark:border-zinc-700 dark:hover:border-zinc-600 cursor-pointer"
+              className="rounded-2xl border border-zinc-200 p-4 dark:border-zinc-700"
             >
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div className="flex-1">
@@ -85,9 +83,19 @@ export function ReportsList({
                     {siteName}
                   </p>
                 </div>
-                <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                  {new Date(report.created_at ?? '').toLocaleString('fr-FR')}
-                </p>
+                <div className="flex items-center gap-3">
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                    {new Date(report.created_at ?? '').toLocaleString('fr-FR')}
+                  </p>
+                  <button
+                    onClick={() => handleReportClick(report)}
+                    type="button"
+                    className="flex items-center gap-2 rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-emerald-700 active:scale-95"
+                  >
+                    <Eye className="h-3.5 w-3.5" />
+                    Vérifier
+                  </button>
+                </div>
               </div>
               <p className="mt-2 text-xs text-zinc-400 dark:text-zinc-500">
                 {worker?.name ?? 'Employé inconnu'} •{' '}
@@ -99,13 +107,13 @@ export function ReportsList({
                 </p>
               )}
               {report.photo_url && (
-                <div className="mt-3 overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-700 pointer-events-none">
+                <div className="mt-3 overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-700">
                   <Image
                     src={report.photo_url}
                     alt="Photo rapport"
                     width={800}
                     height={320}
-                    className="h-48 w-full object-cover pointer-events-none"
+                    className="h-48 w-full object-cover"
                     draggable={false}
                   />
                 </div>
@@ -116,7 +124,7 @@ export function ReportsList({
                   <span className="font-medium">Tâche terminée</span>
                 </div>
               )}
-            </button>
+            </div>
           );
         })}
       </div>
