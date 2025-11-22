@@ -109,8 +109,8 @@ export function AppShell({
                   title={item.label}
                 >
                   <item.icon 
-                    size={20} 
-                    strokeWidth={active ? 2.5 : 2.2}
+                    size={22} 
+                    strokeWidth={active ? 3 : 2.5}
                     className={active ? '' : 'group-hover/item:scale-110 transition-transform duration-200'}
                   />
                   {/* Tooltip pour affichage au survol */}
