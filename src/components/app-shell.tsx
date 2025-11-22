@@ -88,14 +88,14 @@ export function AppShell({
   }, [pathname]);
 
   return (
-    <div className="min-h-screen bg-zinc-50 text-zinc-900 dark:bg-zinc-950 dark:text-white">
+    <div className="group/sidebar min-h-screen bg-zinc-50 text-zinc-900 dark:bg-zinc-950 dark:text-white">
       <div className="lg:flex">
-        <aside className="fixed inset-y-0 left-0 z-20 hidden w-64 flex-col border-r border-zinc-200 bg-white/80 px-5 py-8 shadow-lg shadow-black/5 backdrop-blur dark:border-zinc-800 dark:bg-zinc-900/80 lg:flex">
-          <div className="mb-10">
-            <p className="text-xs uppercase tracking-[0.4em] text-zinc-500 dark:text-zinc-400">
+        <aside className="group/sidebar fixed inset-y-0 left-0 z-20 hidden w-16 flex-col border-r border-zinc-200 bg-white/80 px-3 py-8 shadow-lg shadow-black/5 backdrop-blur transition-all duration-300 hover:w-64 dark:border-zinc-800 dark:bg-zinc-900/80 lg:flex">
+          <div className="mb-10 overflow-hidden">
+            <p className="whitespace-nowrap text-xs uppercase tracking-[0.4em] text-zinc-500 opacity-0 transition-opacity duration-300 group-hover/sidebar:opacity-100 dark:text-zinc-400">
               ChantiFlow
             </p>
-            <p className="mt-2 text-2xl font-semibold">Pilotage</p>
+            <p className="mt-2 whitespace-nowrap text-2xl font-semibold opacity-0 transition-opacity duration-300 group-hover/sidebar:opacity-100">Pilotage</p>
           </div>
           <nav className="flex flex-1 flex-col gap-2">
             {navItems.map((item) => {
@@ -104,14 +104,15 @@ export function AppShell({
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`inline-flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition ${
+                  className={`group/item relative inline-flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition ${
                     active
                       ? 'bg-zinc-900 text-white shadow-lg shadow-black/20 dark:bg-white dark:text-black'
                       : 'text-zinc-600 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800'
                   }`}
+                  title={item.label}
                 >
                   <span
-                    className={`flex h-9 w-9 items-center justify-center rounded-xl ${
+                    className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${
                       active
                         ? 'bg-white/20 text-white dark:bg-black/10 dark:text-black'
                         : 'bg-zinc-900/5 text-zinc-500 dark:bg-white/5 dark:text-zinc-200'
@@ -119,28 +120,34 @@ export function AppShell({
                   >
                     <item.icon size={18} strokeWidth={2.2} />
                   </span>
-                  {item.label}
+                  <span className="whitespace-nowrap opacity-0 transition-opacity duration-300 group-hover/sidebar:opacity-100">
+                    {item.label}
+                  </span>
+                  {/* Tooltip pour affichage au survol de l'item individuel */}
+                  <span className="pointer-events-none absolute left-full ml-2 rounded-lg bg-zinc-900 px-2 py-1 text-xs text-white opacity-0 shadow-lg transition-opacity duration-200 group-hover/item:opacity-100 dark:bg-zinc-100 dark:text-zinc-900">
+                    {item.label}
+                  </span>
                 </Link>
               );
             })}
           </nav>
-          <div className="mt-8 rounded-2xl border border-zinc-200 p-4 text-xs text-zinc-500 dark:border-zinc-800 dark:text-zinc-400">
+          <div className="mt-8 overflow-hidden rounded-2xl border border-zinc-200 p-4 text-xs text-zinc-500 opacity-0 transition-opacity duration-300 group-hover/sidebar:opacity-100 dark:border-zinc-800 dark:text-zinc-400">
             {primarySite ? (
               <>
                 <p className="text-sm font-semibold text-zinc-900 dark:text-white">
                   Site actif
                 </p>
-                <p>{primarySite.name}</p>
+                <p className="whitespace-nowrap">{primarySite.name}</p>
                 <p className="mt-2 text-[11px] uppercase tracking-wide text-zinc-500">
                   QR + Rapports dispo à gauche
                 </p>
               </>
             ) : (
-              <p>Aucun chantier sélectionné pour le moment.</p>
+              <p className="whitespace-nowrap">Aucun chantier sélectionné pour le moment.</p>
             )}
           </div>
         </aside>
-        <div className="min-h-screen flex-1 lg:ml-64">
+        <div className="min-h-screen flex-1 transition-all duration-300 lg:ml-16">
           <header className="sticky top-0 z-10 border-b border-zinc-200 bg-white/80 px-4 py-4 backdrop-blur dark:border-zinc-800 dark:bg-zinc-950/80">
             <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
               <div>
