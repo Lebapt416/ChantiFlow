@@ -16,6 +16,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
+    // Vérifier si on est en mode PWA (standalone)
+    const isPWA = window.matchMedia('(display-mode: standalone)').matches;
+
     // Restaurer la session au chargement de l'app (important pour PWA)
     const supabase = createSupabaseBrowserClient();
 
@@ -24,11 +27,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setIsChecking(false);
       
       if (session) {
-        console.log('✅ Session restaurée automatiquement pour PWA:', session.user.email);
+        console.log('✅ Session restaurée automatiquement:', session.user.email);
         
-        // Rediriger automatiquement si on est sur login ou landing
         const currentPath = window.location.pathname;
-        if (currentPath === '/login' || currentPath === '/landing') {
+        
+        // En PWA uniquement : rediriger automatiquement si on est sur login ou landing
+        if (isPWA && (currentPath === '/login' || currentPath === '/landing')) {
           // Vérifier si c'est le compte analytics
           const authorizedUserId = 'e78e437e-a817-4da2-a091-a7f4e5e02583';
           if (session.user.id === authorizedUserId || session.user.email === 'bcb83@icloud.com') {
@@ -37,6 +41,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             router.push('/home');
           }
         }
+        // Sur le site web : ne rien faire, laisser l'utilisateur sur la landing page
       } else {
         console.log('❌ Aucune session trouvée');
         
@@ -47,9 +52,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         
         if (isProtectedPath) {
           router.push('/login');
-        } else if (currentPath === '/') {
-          // Si on est sur la racine sans session, aller à landing
-          router.push('/landing');
         }
       }
     }).catch((error) => {
@@ -57,10 +59,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setIsChecking(false);
     });
 
-    // Écouter les changements d'authentification pour la PWA
+    // Écouter les changements d'authentification
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
+      const isPWA = window.matchMedia('(display-mode: standalone)').matches;
+      
       if (event === 'SIGNED_IN' && session) {
         console.log('✅ Utilisateur connecté:', session.user.email);
         setIsChecking(false);
@@ -68,9 +72,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // Rediriger automatiquement après connexion
         const currentPath = window.location.pathname;
         const authorizedUserId = 'e78e437e-a817-4da2-a091-a7f4e5e02583';
+        
         if (session.user.id === authorizedUserId || session.user.email === 'bcb83@icloud.com') {
           router.push('/analytics');
-        } else if (currentPath === '/login' || currentPath === '/landing') {
+        } else if (currentPath === '/login') {
+          // Après connexion depuis la page login, toujours rediriger vers /home
+          router.push('/home');
+        } else if (isPWA && currentPath === '/landing') {
+          // En PWA uniquement : rediriger depuis landing vers home
           router.push('/home');
         } else {
           router.refresh();
@@ -78,9 +87,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       } else if (event === 'SIGNED_OUT') {
         console.log('❌ Utilisateur déconnecté');
         setIsChecking(false);
-        router.push('/login');
+        const currentPath = window.location.pathname;
+        // Rediriger vers login seulement si on est sur une page protégée
+        const protectedPaths = ['/home', '/dashboard', '/sites', '/planning', '/reports', '/qr', '/team', '/analytics'];
+        if (protectedPaths.some(path => currentPath.startsWith(path))) {
+          router.push('/login');
+        }
       } else if (event === 'TOKEN_REFRESHED' && session) {
-        console.log('🔄 Token rafraîchi pour PWA');
+        console.log('🔄 Token rafraîchi');
         // Rafraîchir silencieusement pour mettre à jour les cookies serveur
         router.refresh();
       }
