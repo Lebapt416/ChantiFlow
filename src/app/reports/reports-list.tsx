@@ -83,17 +83,23 @@ export function ReportsList({
                     {siteName}
                   </p>
                 </div>
-                <div className="flex items-center gap-3">
-                  <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                <div className="flex items-center gap-3 flex-shrink-0">
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400 whitespace-nowrap">
                     {new Date(report.created_at ?? '').toLocaleString('fr-FR')}
                   </p>
                   <button
-                    onClick={() => handleReportClick(report)}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      console.log('🔍 Bouton Vérifier cliqué pour rapport:', report.id);
+                      handleReportClick(report);
+                    }}
                     type="button"
-                    className="flex items-center gap-2 rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-emerald-700 active:scale-95"
+                    className="flex items-center justify-center gap-1.5 rounded-lg bg-emerald-600 px-4 py-2 text-xs font-semibold text-white transition-all hover:bg-emerald-700 active:scale-95 shadow-sm hover:shadow-md whitespace-nowrap min-w-[90px]"
+                    style={{ zIndex: 10 }}
                   >
-                    <Eye className="h-3.5 w-3.5" />
-                    Vérifier
+                    <Eye className="h-4 w-4 flex-shrink-0" />
+                    <span>Vérifier</span>
                   </button>
                 </div>
               </div>
