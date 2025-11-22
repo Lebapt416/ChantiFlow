@@ -130,7 +130,7 @@ export function AppShell({
             })}
           </nav>
         </aside>
-        <div className="min-h-screen flex-1 transition-all duration-300 lg:ml-16">
+        <div className={`min-h-screen flex-1 transition-all duration-300 lg:ml-16 ${mobileMenuOpen ? 'ml-16' : ''}`}>
           <header className="sticky top-0 z-10 border-b border-zinc-200 bg-white/80 px-4 py-4 backdrop-blur dark:border-zinc-800 dark:bg-zinc-950/80">
             <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
               <div className="flex items-center gap-3">
@@ -164,11 +164,6 @@ export function AppShell({
             {/* Menu mobile - Drawer */}
             {mobileMenuOpen && (
               <>
-                {/* Overlay */}
-                <div
-                  className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm lg:hidden"
-                  onClick={() => setMobileMenuOpen(false)}
-                />
                 {/* Drawer */}
                 <aside className="fixed inset-y-0 left-0 z-50 w-16 flex-col items-center border-r border-zinc-800 bg-black/80 px-0 py-8 shadow-xl backdrop-blur dark:border-zinc-700 dark:bg-black/80 lg:hidden flex">
                   <button
