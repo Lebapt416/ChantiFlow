@@ -41,23 +41,54 @@ export function InstallPwaButton() {
   }, []);
 
   const handleInstallClick = async () => {
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+      alert('✅ L\'application est déjà installée !');
+      return;
+    }
+
     if (!deferredPrompt) {
-      // Si le prompt n'est pas disponible, donner des instructions
-      if (window.matchMedia('(display-mode: standalone)').matches) {
-        alert('L\'application est déjà installée !');
+      // Instructions pour différents navigateurs
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+      const isSafari = /Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent);
+      const isAndroid = /Android/.test(navigator.userAgent);
+      const isChrome = /Chrome/.test(navigator.userAgent) && !/Edg/.test(navigator.userAgent);
+      const isEdge = /Edg/.test(navigator.userAgent);
+      
+      let message = '📱 Pour installer l\'application :\n\n';
+      
+      if (isIOS || (isSafari && isIOS)) {
+        message += 'Sur iOS (Safari) :\n';
+        message += '1. Appuyez sur le bouton Partager (📤)\n';
+        message += '2. Faites défiler et sélectionnez "Sur l\'écran d\'accueil"\n';
+        message += '3. Appuyez sur "Ajouter"\n\n';
+        message += 'L\'icône ChantiFlow apparaîtra sur votre écran d\'accueil !';
+      } else if (isAndroid) {
+        message += 'Sur Android :\n';
+        message += '1. Ouvrez le menu du navigateur (⋮ en haut à droite)\n';
+        message += '2. Sélectionnez "Installer l\'application" ou "Ajouter à l\'écran d\'accueil"\n';
+        message += '3. Confirmez l\'installation\n\n';
+        message += 'L\'application sera installée sur votre appareil !';
+      } else if (isChrome) {
+        message += 'Sur Chrome (PC/Mac) :\n';
+        message += '1. Cherchez l\'icône d\'installation (➕) dans la barre d\'adresse\n';
+        message += '2. Cliquez dessus et sélectionnez "Installer"\n';
+        message += 'OU utilisez le menu (⋮) > "Installer ChantiFlow"\n\n';
+        message += 'L\'application s\'ouvrira comme une application native !';
+      } else if (isEdge) {
+        message += 'Sur Edge (PC/Mac) :\n';
+        message += '1. Cherchez l\'icône d\'installation (➕) dans la barre d\'adresse\n';
+        message += '2. Cliquez dessus et sélectionnez "Installer"\n';
+        message += 'OU utilisez le menu (⋯) > "Applications" > "Installer ce site en tant qu\'application"\n\n';
+        message += 'L\'application s\'ouvrira comme une application native !';
       } else {
-        // Instructions pour différents navigateurs
-        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-        const isAndroid = /Android/.test(navigator.userAgent);
-        
-        if (isIOS) {
-          alert('Pour installer sur iOS :\n1. Appuyez sur le bouton Partager\n2. Sélectionnez "Sur l\'écran d\'accueil"');
-        } else if (isAndroid) {
-          alert('Pour installer sur Android :\n1. Utilisez le menu du navigateur (⋮)\n2. Sélectionnez "Installer l\'application" ou "Ajouter à l\'écran d\'accueil"');
-        } else {
-          alert('Pour installer sur PC :\n1. Utilisez le menu du navigateur\n2. Cherchez "Installer ChantiFlow" ou l\'icône d\'installation dans la barre d\'adresse');
-        }
+        message += 'Pour installer l\'application :\n';
+        message += '1. Utilisez le menu de votre navigateur\n';
+        message += '2. Cherchez "Installer" ou "Ajouter à l\'écran d\'accueil"\n';
+        message += '3. Suivez les instructions de votre navigateur\n\n';
+        message += 'L\'application fonctionnera hors ligne une fois installée !';
       }
+      
+      alert(message);
       return;
     }
 
