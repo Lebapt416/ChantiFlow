@@ -89,8 +89,9 @@ export default function JoinTeamPage() {
       // Envoyer un email de confirmation si l'email est fourni
       if (email.trim()) {
         try {
+          console.log('📧 Tentative d\'envoi email de confirmation à:', email.trim());
           // Appel à l'API pour envoyer l'email (car c'est une fonction serveur)
-          await fetch('/api/team/join-confirmation', {
+          const emailResponse = await fetch('/api/team/join-confirmation', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -99,10 +100,21 @@ export default function JoinTeamPage() {
               userId,
             }),
           });
+
+          const emailResult = await emailResponse.json();
+          
+          if (!emailResponse.ok || !emailResult.success) {
+            console.error('❌ Erreur envoi email confirmation:', emailResult.error || 'Erreur inconnue');
+            // Ne pas bloquer l'ajout, mais logger l'erreur
+          } else {
+            console.log('✅ Email de confirmation envoyé avec succès');
+          }
         } catch (emailError) {
-          console.error('Erreur envoi email confirmation:', emailError);
+          console.error('❌ Exception lors de l\'envoi email confirmation:', emailError);
           // Ne pas bloquer l'ajout si l'email échoue
         }
+      } else {
+        console.warn('⚠️ Pas d\'email fourni, email de confirmation non envoyé');
       }
 
       setSuccess(true);
