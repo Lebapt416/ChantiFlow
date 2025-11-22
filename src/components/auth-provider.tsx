@@ -10,6 +10,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isChecking, setIsChecking] = useState(true);
 
   useEffect(() => {
+    // S'assurer que nous sommes côté client
+    if (typeof window === 'undefined') {
+      setIsChecking(false);
+      return;
+    }
+
     // Restaurer la session au chargement de l'app (important pour PWA)
     const supabase = createSupabaseBrowserClient();
 
@@ -21,7 +27,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         console.log('✅ Session restaurée automatiquement pour PWA:', session.user.email);
         
         // Rediriger automatiquement si on est sur login ou landing
-        if (pathname === '/login' || pathname === '/landing') {
+        const currentPath = window.location.pathname;
+        if (currentPath === '/login' || currentPath === '/landing') {
           // Vérifier si c'est le compte analytics
           const authorizedUserId = 'e78e437e-a817-4da2-a091-a7f4e5e02583';
           if (session.user.id === authorizedUserId || session.user.email === 'bcb83@icloud.com') {
@@ -34,16 +41,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         console.log('❌ Aucune session trouvée');
         
         // Si pas de session et qu'on est sur une page protégée, rediriger vers login
+        const currentPath = window.location.pathname;
         const protectedPaths = ['/home', '/dashboard', '/sites', '/planning', '/reports', '/qr', '/team', '/analytics'];
-        const isProtectedPath = protectedPaths.some(path => pathname?.startsWith(path));
+        const isProtectedPath = protectedPaths.some(path => currentPath.startsWith(path));
         
         if (isProtectedPath) {
           router.push('/login');
-        } else if (pathname === '/') {
+        } else if (currentPath === '/') {
           // Si on est sur la racine sans session, aller à landing
           router.push('/landing');
         }
       }
+    }).catch((error) => {
+      console.error('Erreur lors de la vérification de session:', error);
+      setIsChecking(false);
     });
 
     // Écouter les changements d'authentification pour la PWA
@@ -55,10 +66,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setIsChecking(false);
         
         // Rediriger automatiquement après connexion
+        const currentPath = window.location.pathname;
         const authorizedUserId = 'e78e437e-a817-4da2-a091-a7f4e5e02583';
         if (session.user.id === authorizedUserId || session.user.email === 'bcb83@icloud.com') {
           router.push('/analytics');
-        } else if (pathname === '/login' || pathname === '/landing') {
+        } else if (currentPath === '/login' || currentPath === '/landing') {
           router.push('/home');
         } else {
           router.refresh();
@@ -77,18 +89,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => {
       subscription.unsubscribe();
     };
-  }, [router, pathname]);
+  }, [router]);
 
   // Afficher un loader pendant la vérification de session
-  if (isChecking && (pathname === '/login' || pathname === '/landing' || pathname === '/')) {
-    return (
-      <div className="fixed inset-0 flex items-center justify-center bg-white dark:bg-zinc-950">
-        <div className="text-center">
-          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-black border-r-transparent dark:border-white dark:border-r-transparent"></div>
-          <p className="mt-4 text-zinc-600 dark:text-zinc-400">Chargement...</p>
+  if (isChecking && typeof window !== 'undefined') {
+    const currentPath = window.location.pathname;
+    if (currentPath === '/login' || currentPath === '/landing' || currentPath === '/') {
+      return (
+        <div className="fixed inset-0 flex items-center justify-center bg-white dark:bg-zinc-950">
+          <div className="text-center">
+            <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-black border-r-transparent dark:border-white dark:border-r-transparent"></div>
+            <p className="mt-4 text-zinc-600 dark:text-zinc-400">Chargement...</p>
+          </div>
         </div>
-      </div>
-    );
+      );
+    }
   }
 
   return <>{children}</>;
