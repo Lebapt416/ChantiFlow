@@ -95,15 +95,15 @@ export function AppShell({
       {/* Menu mobile - Drawer - En dehors du flux pour rester fixe */}
       {mobileMenuOpen && (
         <aside className="fixed inset-y-0 left-0 z-50 w-16 flex-col items-center border-r border-zinc-800 bg-black/80 px-0 py-8 shadow-xl backdrop-blur dark:border-zinc-700 dark:bg-black/80 lg:hidden flex">
-          <div className="flex flex-col items-center gap-2 w-full pt-2">
+          <div className="flex flex-col items-center gap-2 w-full pt-4">
             <button
               onClick={() => setMobileMenuOpen(false)}
-              className="group/item relative flex items-center justify-center w-14 h-14 rounded-xl bg-white/20 text-white hover:bg-white/30 hover:text-white transition-all shadow-lg mb-2"
+              className="group/item relative flex items-center justify-center w-14 h-14 rounded-xl transition-all duration-200 text-white hover:text-white mb-1"
               aria-label="Fermer le menu"
             >
-              <span className="absolute rounded-xl transition-all duration-200 top-0 bottom-0 left-2 right-0 bg-black/50 group-hover/item:bg-black/70 group-hover/item:left-3"></span>
+              <span className="absolute rounded-xl transition-all duration-200 top-0 bottom-0 left-2 right-0 bg-black/50 group-hover/item:bg-white/20 group-hover/item:left-3"></span>
               <span className="relative z-10">
-                <X size={22} strokeWidth={2.5} />
+                <X size={24} strokeWidth={3} className="group-hover/item:scale-110 transition-transform duration-200" />
               </span>
             </button>
           </div>
