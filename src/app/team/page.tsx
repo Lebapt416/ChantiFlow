@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { AppShell } from '@/components/app-shell';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { AddWorkerForm } from './add-worker-form';
+import { AddWorkerToSiteForm } from './add-worker-to-site-form';
 import { DeleteWorkerButton } from '@/components/delete-worker-button';
 import { TeamQrSection } from './team-qr-section';
 
@@ -83,8 +84,9 @@ export default async function TeamPage() {
   // Récupérer aussi les workers liés aux chantiers pour affichage
   const { data: sites } = await supabase
     .from('sites')
-    .select('id, name')
-    .eq('created_by', user.id);
+    .select('id, name, completed_at')
+    .eq('created_by', user.id)
+    .order('created_at', { ascending: false });
 
   const siteMap =
     sites?.reduce<Record<string, string>>((acc, site) => {
@@ -115,6 +117,15 @@ export default async function TeamPage() {
   const highlightedRoles = Object.entries(groupedByRole)
     .sort((a, b) => b[1] - a[1])
     .slice(0, 4);
+
+  // Filtrer les workers en attente et approuvés
+  const pendingWorkers = (accountWorkers || []).filter((w: any) => w.status === 'pending');
+  const approvedWorkers = (accountWorkers || []).filter((w: any) => 
+    w.status === 'approved' || w.status === null || w.status === undefined
+  );
+
+  // Filtrer uniquement les chantiers actifs (non terminés)
+  const activeSites = sites?.filter((site) => !site.completed_at) ?? [];
 
   return (
     <AppShell
@@ -206,6 +217,27 @@ export default async function TeamPage() {
       </div>
     </section>
 
+    {activeSites.length > 0 && (
+      <section className="mt-8 rounded-3xl border border-zinc-100 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="mb-4 flex items-center justify-between">
+          <div>
+            <h2 className="text-lg font-semibold text-zinc-900 dark:text-white">
+              Ajouter un membre à un chantier
+            </h2>
+            <p className="text-sm text-zinc-500 dark:text-zinc-400">
+              Sélectionnez un chantier et ajoutez un membre de votre équipe ou créez un nouveau membre directement pour ce chantier.
+            </p>
+          </div>
+        </div>
+        <div className="mb-8">
+          <AddWorkerToSiteForm 
+            sites={activeSites} 
+            availableWorkers={approvedWorkers} 
+          />
+        </div>
+      </section>
+    )}
+
     <section className="mt-8 rounded-3xl border border-zinc-100 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
       <div className="mb-4 flex items-center justify-between">
         <div>
@@ -219,14 +251,6 @@ export default async function TeamPage() {
       </div>
       {/* Séparer les workers en attente et approuvés */}
       {(() => {
-        // Filtrer les workers en attente (status === 'pending')
-        const pendingWorkers = (accountWorkers || []).filter((w: any) => w.status === 'pending');
-        // Seuls les workers avec status === 'approved' ou status === null (anciens workers créés manuellement) sont approuvés
-        // Les workers avec status === 'pending' ne doivent PAS apparaître ici
-        const approvedWorkers = (accountWorkers || []).filter((w: any) => 
-          w.status === 'approved' || w.status === null || w.status === undefined
-        );
-        
         return (
           <>
             {pendingWorkers.length > 0 && (
