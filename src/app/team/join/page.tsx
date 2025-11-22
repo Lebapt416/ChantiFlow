@@ -3,7 +3,6 @@
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { createSupabaseBrowserClient } from '@/lib/supabase/client';
-import { sendTeamJoinConfirmationEmail } from '@/lib/email';
 
 export default function JoinTeamPage() {
   const [name, setName] = useState('');
@@ -79,10 +78,15 @@ export default function JoinTeamPage() {
       // Envoyer un email de confirmation si l'email est fourni
       if (email.trim()) {
         try {
-          await sendTeamJoinConfirmationEmail({
-            workerEmail: email.trim(),
-            workerName: name.trim(),
-            managerName: manager?.email || undefined,
+          // Appel à l'API pour envoyer l'email (car c'est une fonction serveur)
+          await fetch('/api/team/join-confirmation', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              workerEmail: email.trim(),
+              workerName: name.trim(),
+              userId,
+            }),
           });
         } catch (emailError) {
           console.error('Erreur envoi email confirmation:', emailError);
