@@ -553,6 +553,18 @@ export async function sendTeamJoinConfirmationEmail({
         name: error.name,
         to: workerEmail,
       });
+      
+      // Vérifier si l'erreur est due à une restriction Resend (email non autorisé en mode dev)
+      if (error.message?.includes('not authorized') || 
+          error.message?.includes('domain') || 
+          error.message?.includes('verified') ||
+          error.message?.includes('not allowed')) {
+        return { 
+          success: false, 
+          error: 'Envoi d\'email restreint. En mode développement, Resend ne peut envoyer des emails qu\'à l\'adresse email vérifiée de votre compte. Pour envoyer à d\'autres adresses, vous devez vérifier un domaine dans Resend.' 
+        };
+      }
+      
       return { success: false, error: error.message };
     }
 
