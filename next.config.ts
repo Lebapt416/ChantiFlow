@@ -11,6 +11,13 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  // Forcer la revalidation pour éviter les problèmes de cache
+  experimental: {
+    staleTimes: {
+      dynamic: 0,
+      static: 0,
+    },
+  },
 };
 
 export default nextConfig;
