@@ -110,23 +110,47 @@ export async function submitReportAction(
   let photoUrl: string | null = null;
 
   if (file && file.size > 0) {
-    const fileExt = file.name?.split('.').pop() ?? 'jpg';
-    const filename = `site-${siteId}/${crypto.randomUUID()}.${fileExt}`;
-    const { error: uploadError } = await admin.storage
-      .from(REPORT_BUCKET)
-      .upload(filename, file, {
-        contentType: file.type || 'image/jpeg',
-        upsert: false,
-      });
+    try {
+      const fileExt = file.name?.split('.').pop() ?? 'jpg';
+      const filename = `site-${siteId}/${crypto.randomUUID()}.${fileExt}`;
+      
+      // Vérifier si le bucket existe, sinon continuer sans photo
+      const { data: buckets, error: listError } = await admin.storage.listBuckets();
+      
+      if (listError) {
+        console.warn('⚠️ Erreur lors de la vérification des buckets:', listError);
+      } else {
+        const bucketExists = buckets?.some((b) => b.name === REPORT_BUCKET);
+        
+        if (!bucketExists) {
+          console.warn(`⚠️ Le bucket "${REPORT_BUCKET}" n'existe pas. Le rapport sera envoyé sans photo.`);
+          console.warn('💡 Pour créer le bucket, allez dans Supabase Dashboard > Storage > New bucket > Nom: "reports"');
+        } else {
+          const { error: uploadError } = await admin.storage
+            .from(REPORT_BUCKET)
+            .upload(filename, file, {
+              contentType: file.type || 'image/jpeg',
+              upsert: false,
+            });
 
-    if (uploadError) {
-      return { error: uploadError.message };
+          if (uploadError) {
+            console.error('❌ Erreur upload photo:', uploadError);
+            // Ne pas bloquer l'envoi du rapport si l'upload échoue
+            console.warn('⚠️ Le rapport sera envoyé sans photo.');
+          } else {
+            const {
+              data: { publicUrl },
+            } = admin.storage.from(REPORT_BUCKET).getPublicUrl(filename);
+            photoUrl = publicUrl;
+            console.log('✅ Photo uploadée avec succès:', photoUrl);
+          }
+        }
+      }
+    } catch (error) {
+      console.error('❌ Exception lors de l\'upload de la photo:', error);
+      // Ne pas bloquer l'envoi du rapport si l'upload échoue
+      console.warn('⚠️ Le rapport sera envoyé sans photo.');
     }
-
-    const {
-      data: { publicUrl },
-    } = admin.storage.from(REPORT_BUCKET).getPublicUrl(filename);
-    photoUrl = publicUrl;
   }
 
   const { error: reportError } = await admin.from('reports').insert({
@@ -159,28 +183,58 @@ export async function submitReportAction(
 
   if (siteInfo && task) {
     // Récupérer l'email du manager
-    const { data: manager } = await admin.auth.admin.getUserById(siteInfo.created_by);
+    console.log('📧 Récupération du manager pour le chantier:', siteInfo.id, 'created_by:', siteInfo.created_by);
     
-    if (manager?.user?.email) {
-      const workerName = name || email;
-      const appUrl = process.env.NEXT_PUBLIC_APP_BASE_URL ?? '';
-      const reportUrl = `${appUrl}/reports`;
+    try {
+      const { data: manager, error: managerError } = await admin.auth.admin.getUserById(siteInfo.created_by);
+      
+      if (managerError) {
+        console.error('❌ Erreur récupération manager:', managerError);
+      }
+      
+      if (manager?.user?.email) {
+        const workerName = name || email;
+        const appUrl = process.env.NEXT_PUBLIC_APP_BASE_URL ?? '';
+        const reportUrl = `${appUrl}/report/${siteId}`;
 
-      try {
-        await sendReportNotificationEmail({
+        console.log('📧 Envoi email notification au manager:', {
           managerEmail: manager.user.email,
-          managerName: manager.user.user_metadata?.full_name || undefined,
           workerName,
-          workerEmail: email || undefined,
           taskTitle: task.title,
           siteName: siteInfo.name,
-          reportUrl,
         });
-      } catch (error) {
-        // Ne pas bloquer l'envoi du rapport si l'email échoue
-        console.error('Erreur envoi email notification:', error);
+
+        try {
+          const emailResult = await sendReportNotificationEmail({
+            managerEmail: manager.user.email,
+            managerName: manager.user.user_metadata?.full_name || undefined,
+            workerName,
+            workerEmail: email || undefined,
+            taskTitle: task.title,
+            siteName: siteInfo.name,
+            reportUrl,
+          });
+
+          if (emailResult.success) {
+            console.log('✅ Email notification envoyé avec succès au manager:', manager.user.email);
+          } else {
+            console.error('❌ Échec envoi email notification:', emailResult.error);
+          }
+        } catch (error) {
+          // Ne pas bloquer l'envoi du rapport si l'email échoue
+          console.error('❌ Exception lors de l\'envoi email notification:', error);
+        }
+      } else {
+        console.warn('⚠️ Manager non trouvé ou email manquant:', {
+          manager: manager ? 'trouvé' : 'non trouvé',
+          email: manager?.user?.email || 'manquant',
+        });
       }
+    } catch (error) {
+      console.error('❌ Erreur lors de la récupération du manager:', error);
     }
+  } else {
+    console.warn('⚠️ SiteInfo ou task manquant:', { siteInfo: !!siteInfo, task: !!task });
   }
 
   revalidatePath(`/qr/${siteId}`);
