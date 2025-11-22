@@ -42,11 +42,21 @@ export function InstallPwaButton() {
 
   const handleInstallClick = async () => {
     if (!deferredPrompt) {
-      // Si le prompt n'est pas disponible, essayer d'ouvrir les instructions
+      // Si le prompt n'est pas disponible, donner des instructions
       if (window.matchMedia('(display-mode: standalone)').matches) {
         alert('L\'application est déjà installée !');
       } else {
-        alert('L\'installation n\'est pas encore disponible. Veuillez utiliser le menu de votre navigateur pour installer l\'application.');
+        // Instructions pour différents navigateurs
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+        const isAndroid = /Android/.test(navigator.userAgent);
+        
+        if (isIOS) {
+          alert('Pour installer sur iOS :\n1. Appuyez sur le bouton Partager\n2. Sélectionnez "Sur l\'écran d\'accueil"');
+        } else if (isAndroid) {
+          alert('Pour installer sur Android :\n1. Utilisez le menu du navigateur (⋮)\n2. Sélectionnez "Installer l\'application" ou "Ajouter à l\'écran d\'accueil"');
+        } else {
+          alert('Pour installer sur PC :\n1. Utilisez le menu du navigateur\n2. Cherchez "Installer ChantiFlow" ou l\'icône d\'installation dans la barre d\'adresse');
+        }
       }
       return;
     }
@@ -61,6 +71,7 @@ export function InstallPwaButton() {
       if (outcome === 'accepted') {
         console.log('Installation acceptée');
         setIsInstalled(true);
+        alert('Installation réussie ! L\'application va s\'ouvrir.');
       } else {
         console.log('Installation refusée');
       }
@@ -69,6 +80,7 @@ export function InstallPwaButton() {
       setDeferredPrompt(null);
     } catch (error) {
       console.error('Erreur lors de l\'installation:', error);
+      alert('Erreur lors de l\'installation. Veuillez réessayer.');
     }
   };
 
