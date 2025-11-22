@@ -104,15 +104,22 @@ export function AppShell({
                   className={`group/item relative flex items-center justify-center w-14 h-14 rounded-xl transition-all duration-200 ${
                     active
                       ? 'bg-white text-black shadow-lg shadow-white/20'
-                      : 'bg-black/40 text-white hover:bg-black/60 hover:text-white'
+                      : 'text-white hover:text-white'
                   }`}
                   title={item.label}
                 >
-                  <item.icon 
-                    size={26} 
-                    strokeWidth={active ? 3.5 : 3}
-                    className={active ? '' : 'group-hover/item:scale-110 transition-transform duration-200'}
-                  />
+                  <span className={`absolute inset-0 rounded-xl transition-all duration-200 ${
+                    active
+                      ? 'bg-white'
+                      : 'bg-black/40 translate-x-1 group-hover/item:bg-black/60 group-hover/item:translate-x-1.5'
+                  }`}></span>
+                  <span className="relative z-10">
+                    <item.icon 
+                      size={26} 
+                      strokeWidth={active ? 3.5 : 3}
+                      className={active ? '' : 'group-hover/item:scale-110 transition-transform duration-200'}
+                    />
+                  </span>
                   {/* Tooltip pour affichage au survol */}
                   <span className="pointer-events-none absolute left-full ml-3 z-50 whitespace-nowrap rounded-lg bg-zinc-900 px-3 py-1.5 text-xs font-medium text-white opacity-0 shadow-xl transition-all duration-200 group-hover/item:opacity-100 group-hover/item:translate-x-0 -translate-x-1 dark:bg-zinc-100 dark:text-zinc-900">
                     {item.label}
@@ -182,15 +189,22 @@ export function AppShell({
                           className={`group/item relative flex items-center justify-center w-14 h-14 rounded-xl transition-all duration-200 ${
                             active
                               ? 'bg-white text-black shadow-lg shadow-white/20'
-                              : 'bg-black/40 text-white hover:bg-black/60 hover:text-white'
+                              : 'text-white hover:text-white'
                           }`}
                           title={item.label}
                         >
-                          <item.icon 
-                            size={26} 
-                            strokeWidth={active ? 3.5 : 3}
-                            className={active ? '' : 'group-hover/item:scale-110 transition-transform duration-200'}
-                          />
+                          <span className={`absolute inset-0 rounded-xl transition-all duration-200 ${
+                            active
+                              ? 'bg-white'
+                              : 'bg-black/40 translate-x-1 group-hover/item:bg-black/60 group-hover/item:translate-x-1.5'
+                          }`}></span>
+                          <span className="relative z-10">
+                            <item.icon 
+                              size={26} 
+                              strokeWidth={active ? 3.5 : 3}
+                              className={active ? '' : 'group-hover/item:scale-110 transition-transform duration-200'}
+                            />
+                          </span>
                           {/* Tooltip pour affichage au survol */}
                           <span className="pointer-events-none absolute left-full ml-3 z-50 whitespace-nowrap rounded-lg bg-zinc-900 px-3 py-1.5 text-xs font-medium text-white opacity-0 shadow-xl transition-all duration-200 group-hover/item:opacity-100 group-hover/item:translate-x-0 -translate-x-1 dark:bg-zinc-100 dark:text-zinc-900">
                             {item.label}
