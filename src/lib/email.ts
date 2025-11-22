@@ -468,3 +468,100 @@ export async function sendSiteCompletedEmail({
   }
 }
 
+export async function sendTeamJoinConfirmationEmail({
+  workerEmail,
+  workerName,
+  managerName,
+}: {
+  workerEmail?: string;
+  workerName: string;
+  managerName?: string;
+}) {
+  // Si Resend n'est pas configuré, on retourne silencieusement
+  if (!process.env.RESEND_API_KEY) {
+    console.warn('RESEND_API_KEY non configuré, email non envoyé');
+    return { success: false, error: 'Service email non configuré' };
+  }
+
+  // Vérifier que Resend est initialisé
+  if (!resend) {
+    console.warn('Resend non initialisé');
+    return { success: false, error: 'Service email non initialisé' };
+  }
+
+  // Si pas d'email, on ne peut pas envoyer
+  if (!workerEmail) {
+    console.warn('Pas d\'email fourni pour l\'envoi de confirmation');
+    return { success: false, error: 'Email non fourni' };
+  }
+
+  try {
+    const { data, error } = await resend.emails.send({
+      from: process.env.RESEND_FROM_EMAIL || 'ChantiFlow <onboarding@resend.dev>',
+      to: workerEmail,
+      subject: 'Demande d\'ajout à l\'équipe - En attente de validation',
+      html: `
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Demande d'ajout à l'équipe</title>
+          </head>
+          <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+            <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
+              <h1 style="color: white; margin: 0; font-size: 28px;">Demande reçue !</h1>
+            </div>
+            
+            <div style="background: #ffffff; padding: 30px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 10px 10px;">
+              <p style="font-size: 16px; margin-bottom: 20px;">
+                Bonjour ${workerName},
+              </p>
+              
+              <p style="font-size: 16px; margin-bottom: 20px;">
+                Votre demande d'ajout à l'équipe a bien été reçue. Nous vous remercions de votre intérêt !
+              </p>
+              
+              <div style="background: #fef3c7; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #f59e0b;">
+                <p style="margin: 0; font-size: 16px; font-weight: 600; color: #92400e;">
+                  ⏳ En attente de validation
+                </p>
+                <p style="margin: 10px 0 0 0; font-size: 14px; color: #78350f;">
+                  Votre demande est actuellement en attente de validation par le chef de chantier${managerName ? ` ${managerName}` : ''}. Vous recevrez un email de confirmation une fois votre demande approuvée.
+                </p>
+              </div>
+              
+              <p style="font-size: 14px; color: #6b7280; margin-top: 30px; border-top: 1px solid #e5e7eb; padding-top: 20px;">
+                En attendant, vous pouvez préparer vos informations et documents nécessaires pour votre intégration à l'équipe.
+              </p>
+            </div>
+            
+            <div style="text-align: center; margin-top: 20px; color: #9ca3af; font-size: 12px;">
+              <p>ChantiFlow - Gestion de chantier simplifiée</p>
+            </div>
+          </body>
+        </html>
+      `,
+    });
+
+    if (error) {
+      console.error('❌ Erreur Resend lors de l\'envoi confirmation:', {
+        message: error.message,
+        name: error.name,
+        to: workerEmail,
+      });
+      return { success: false, error: error.message };
+    }
+
+    console.log('✅ Email de confirmation envoyé avec succès à:', workerEmail);
+    return { success: true, data };
+  } catch (error) {
+    console.error('❌ Exception lors de l\'envoi confirmation:', {
+      error: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+      to: workerEmail,
+    });
+    return { success: false, error: error instanceof Error ? error.message : 'Erreur inconnue' };
+  }
+}
+

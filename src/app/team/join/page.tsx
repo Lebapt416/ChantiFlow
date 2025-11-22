@@ -3,6 +3,7 @@
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { createSupabaseBrowserClient } from '@/lib/supabase/client';
+import { sendTeamJoinConfirmationEmail } from '@/lib/email';
 
 export default function JoinTeamPage() {
   const [name, setName] = useState('');
@@ -51,7 +52,10 @@ export default function JoinTeamPage() {
         }
       }
 
-      // Créer un worker au niveau du compte (sans site_id)
+      // Récupérer les infos du manager pour l'email (via une action serveur)
+      // Pour l'instant, on passe undefined pour managerName
+
+      // Créer un worker au niveau du compte (sans site_id) avec status 'pending'
       const { error: insertError } = await supabase
         .from('workers')
         .insert({
@@ -60,6 +64,7 @@ export default function JoinTeamPage() {
           email: email.trim() || null,
           role: role.trim() || null,
           site_id: null, // Worker au niveau du compte
+          status: 'pending', // En attente de validation
         });
 
       if (insertError) {
@@ -71,10 +76,24 @@ export default function JoinTeamPage() {
         return;
       }
 
+      // Envoyer un email de confirmation si l'email est fourni
+      if (email.trim()) {
+        try {
+          await sendTeamJoinConfirmationEmail({
+            workerEmail: email.trim(),
+            workerName: name.trim(),
+            managerName: manager?.email || undefined,
+          });
+        } catch (emailError) {
+          console.error('Erreur envoi email confirmation:', emailError);
+          // Ne pas bloquer l'ajout si l'email échoue
+        }
+      }
+
       setSuccess(true);
       setTimeout(() => {
-        router.push('/team');
-      }, 2000);
+        router.push('/team/join/success');
+      }, 1500);
     });
   }
 

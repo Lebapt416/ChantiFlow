@@ -49,7 +49,7 @@ export default async function TeamPage() {
       // Si pas d'erreur, récupérer tous les workers
       const { data: allAccountWorkers } = await supabase
         .from('workers')
-        .select('id, name, email, role, created_at')
+        .select('id, name, email, role, created_at, status')
         .eq('created_by', user.id)
         .is('site_id', null)
         .order('created_at', { ascending: true });
@@ -163,7 +163,12 @@ export default async function TeamPage() {
         </div>
       </div>
       <div className="mb-8">
-        <TeamQrSection qrUrl={`${process.env.NEXT_PUBLIC_APP_BASE_URL ?? 'http://localhost:3000'}/team/join?userId=${user.id}`} />
+        <Link
+          href="/team/qr"
+          className="flex items-center justify-center gap-2 rounded-lg bg-emerald-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-emerald-700 active:scale-95"
+        >
+          <span>Voir le QR code d'inscription</span>
+        </Link>
       </div>
     </section>
 
@@ -194,39 +199,104 @@ export default async function TeamPage() {
           </p>
         </div>
       </div>
-      {accountWorkers && accountWorkers.length > 0 ? (
-        <div className="space-y-3">
-          <h3 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 mb-2">
-            Membres de votre équipe (disponibles pour tous les chantiers)
-          </h3>
-          {accountWorkers.map((worker) => (
-            <div
-              key={worker.id}
-              className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 dark:border-emerald-800 dark:bg-emerald-900/20"
-            >
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <div className="flex-1">
-                  <p className="text-sm font-semibold text-zinc-900 dark:text-white">
-                    {worker.name}
-                  </p>
-                  <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                    {worker.role ?? 'Rôle non défini'}
-                  </p>
-                  <p className="text-xs text-zinc-400 dark:text-zinc-500">
-                    {worker.email ?? 'Email non communiqué'}
-                  </p>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">
-                    Disponible
-                  </span>
-                  <DeleteWorkerButton workerId={worker.id} workerName={worker.name} />
-                </div>
+      {/* Séparer les workers en attente et approuvés */}
+      {(() => {
+        const pendingWorkers = accountWorkers.filter((w: any) => w.status === 'pending');
+        const approvedWorkers = accountWorkers.filter((w: any) => !w.status || w.status === 'approved');
+        
+        return (
+          <>
+            {pendingWorkers.length > 0 && (
+              <div className="space-y-3 mb-6">
+                <h3 className="text-sm font-semibold text-amber-700 dark:text-amber-300 mb-2">
+                  ⏳ Demandes en attente de validation ({pendingWorkers.length})
+                </h3>
+                {pendingWorkers.map((worker: any) => (
+                  <div
+                    key={worker.id}
+                    className="rounded-2xl border border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-900/20"
+                  >
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <div className="flex-1">
+                        <p className="text-sm font-semibold text-zinc-900 dark:text-white">
+                          {worker.name}
+                        </p>
+                        <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                          {worker.role ?? 'Rôle non défini'}
+                        </p>
+                        <p className="text-xs text-zinc-400 dark:text-zinc-500">
+                          {worker.email ?? 'Email non communiqué'}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <form action="/team/actions" method="post" className="inline">
+                          <input type="hidden" name="action" value="approve" />
+                          <input type="hidden" name="workerId" value={worker.id} />
+                          <button
+                            type="submit"
+                            className="rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-emerald-700"
+                          >
+                            Valider
+                          </button>
+                        </form>
+                        <form action="/team/actions" method="post" className="inline">
+                          <input type="hidden" name="action" value="reject" />
+                          <input type="hidden" name="workerId" value={worker.id} />
+                          <button
+                            type="submit"
+                            className="rounded-lg bg-rose-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-rose-700"
+                          >
+                            Refuser
+                          </button>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
-            </div>
-          ))}
-        </div>
-      ) : null}
+            )}
+            
+            {approvedWorkers.length > 0 && (
+              <div className="space-y-3">
+                <h3 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 mb-2">
+                  Membres de votre équipe (disponibles pour tous les chantiers)
+                </h3>
+                {approvedWorkers.map((worker: any) => (
+                  <div
+                    key={worker.id}
+                    className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 dark:border-emerald-800 dark:bg-emerald-900/20"
+                  >
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <div className="flex-1">
+                        <p className="text-sm font-semibold text-zinc-900 dark:text-white">
+                          {worker.name}
+                        </p>
+                        <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                          {worker.role ?? 'Rôle non défini'}
+                        </p>
+                        <p className="text-xs text-zinc-400 dark:text-zinc-500">
+                          {worker.email ?? 'Email non communiqué'}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                          Disponible
+                        </span>
+                        <DeleteWorkerButton workerId={worker.id} workerName={worker.name} />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+            {pendingWorkers.length === 0 && approvedWorkers.length === 0 && (
+              <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                Aucune ressource pour l'instant. Ajoutez des membres à votre équipe ci-dessus.
+              </p>
+            )}
+          </>
+        );
+      })()}
       {siteWorkers && siteWorkers.length > 0 ? (
         <div className="space-y-3 mt-6">
           <h3 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 mb-2">
