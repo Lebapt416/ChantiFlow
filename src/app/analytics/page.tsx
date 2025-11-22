@@ -81,6 +81,13 @@ export default async function AnalyticsPage() {
   const approvedWorkers = allWorkers.filter((w) => w.status === 'approved' || !w.status).length;
   const pendingWorkers = allWorkers.filter((w) => w.status === 'pending').length;
 
+  // Statistiques par date (30 derniers jours)
+  const last30Days = Array.from({ length: 30 }, (_, i) => {
+    const date = new Date();
+    date.setDate(date.getDate() - (29 - i));
+    return date.toISOString().split('T')[0];
+  });
+
   // Calculer le MRR (Monthly Recurring Revenue)
   const plusUsers = allUsers.filter((user) => user.user_metadata?.plan === 'plus').length;
   const proUsers = allUsers.filter((user) => user.user_metadata?.plan === 'pro').length;
@@ -103,13 +110,6 @@ export default async function AnalyticsPage() {
     const dayMrr = (plusCount * 29) + (proCount * 79);
 
     return { date: day, mrr: dayMrr, plus: plusCount, pro: proCount };
-  });
-
-  // Statistiques par date (30 derniers jours)
-  const last30Days = Array.from({ length: 30 }, (_, i) => {
-    const date = new Date();
-    date.setDate(date.getDate() - (29 - i));
-    return date.toISOString().split('T')[0];
   });
 
   // Sites créés par jour
