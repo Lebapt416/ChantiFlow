@@ -1,14 +1,15 @@
 import { redirect } from 'next/navigation';
+import Link from 'next/link';
 import { AppShell } from '@/components/app-shell';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
-import { PendingReportsList } from './pending-reports-list';
-import { ValidatedReportsList } from './validated-reports-list';
+import { ValidatedReportsList } from '../validated-reports-list';
+import { ArrowLeft } from 'lucide-react';
 
 export const metadata = {
-  title: 'Rapports | ChantiFlow',
+  title: 'Rapports validés | ChantiFlow',
 };
 
-export default async function ReportsHubPage() {
+export default async function ValidatedReportsPage() {
   const supabase = await createSupabaseServerClient();
   const {
     data: { user },
@@ -88,7 +89,7 @@ export default async function ReportsHubPage() {
       {},
     ) ?? {};
 
-  // Séparer les rapports en attente et validés
+  // Filtrer uniquement les rapports validés
   type ReportType = {
     id: string;
     task_id: string | null;
@@ -98,72 +99,51 @@ export default async function ReportsHubPage() {
     created_at: string;
   };
 
-  const pendingReports: ReportType[] = [];
   const validatedReports: ReportType[] = [];
 
   allReports?.forEach((report) => {
     const taskStatus = taskStatusMap[report.task_id ?? ''];
     if (taskStatus === 'done') {
       validatedReports.push(report);
-    } else {
-      pendingReports.push(report);
     }
   });
 
-  // Prendre les 10 derniers de chaque catégorie
-  const last10Pending = pendingReports.slice(0, 10);
-  const last10Validated = validatedReports.slice(0, 10);
-
   return (
     <AppShell
-      heading="Rapports terrain"
-      subheading="Toutes les remontées photo/texte envoyées via les QR codes."
+      heading="Rapports validés"
+      subheading="Tous les rapports validés et leurs tâches terminées."
       userEmail={user.email}
       primarySite={sites?.[0] ?? null}
     >
-      <div className="grid gap-6 lg:grid-cols-2">
-        {/* Colonne Rapports en attente */}
-        <section className="rounded-3xl border border-zinc-100 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-          <div className="mb-4">
-            <h2 className="text-lg font-semibold text-zinc-900 dark:text-white">
-              Rapports en attente
-            </h2>
-            <p className="text-sm text-zinc-500 dark:text-zinc-400">
-              {pendingReports.length > 0
-                ? `${pendingReports.length} rapport${pendingReports.length > 1 ? 's' : ''} en attente de validation`
-                : 'Aucun rapport en attente'}
-            </p>
-          </div>
-          <PendingReportsList
-            reports={last10Pending}
-            taskMap={taskMap}
-            workerMap={workerMap}
-            siteMap={siteMap}
-            totalCount={pendingReports.length}
-          />
-        </section>
-
-        {/* Colonne Rapports validés */}
-        <section className="rounded-3xl border border-zinc-100 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-          <div className="mb-4">
-            <h2 className="text-lg font-semibold text-zinc-900 dark:text-white">
-              Rapports validés
-            </h2>
-            <p className="text-sm text-zinc-500 dark:text-zinc-400">
-              {validatedReports.length > 0
-                ? `${validatedReports.length} rapport${validatedReports.length > 1 ? 's' : ''} validé${validatedReports.length > 1 ? 's' : ''}`
-                : 'Aucun rapport validé'}
-            </p>
-          </div>
-          <ValidatedReportsList
-            reports={last10Validated}
-            taskMap={taskMap}
-            workerMap={workerMap}
-            siteMap={siteMap}
-            totalCount={validatedReports.length}
-          />
-        </section>
+      <div className="mb-6">
+        <Link
+          href="/reports"
+          className="inline-flex items-center gap-2 text-sm font-medium text-zinc-600 transition hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Retour aux rapports
+        </Link>
       </div>
+
+      <section className="rounded-3xl border border-zinc-100 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="mb-4">
+          <h2 className="text-lg font-semibold text-zinc-900 dark:text-white">
+            Tous les rapports validés
+          </h2>
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">
+            {validatedReports.length > 0
+              ? `${validatedReports.length} rapport${validatedReports.length > 1 ? 's' : ''} validé${validatedReports.length > 1 ? 's' : ''}`
+              : 'Aucun rapport validé'}
+          </p>
+        </div>
+        <ValidatedReportsList
+          reports={validatedReports}
+          taskMap={taskMap}
+          workerMap={workerMap}
+          siteMap={siteMap}
+          totalCount={validatedReports.length}
+        />
+      </section>
     </AppShell>
   );
 }
