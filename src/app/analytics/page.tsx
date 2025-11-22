@@ -224,7 +224,7 @@ export default async function AnalyticsPage() {
   }, {} as Record<string, number>);
 
   const tasksByRoleData = Object.entries(tasksByRole)
-    .map(([name, value]) => ({ name, value }))
+    .map(([name, value]) => ({ name, value: value as number }))
     .sort((a, b) => b.value - a.value);
 
   // Taux de croissance (comparaison avec la semaine précédente)
