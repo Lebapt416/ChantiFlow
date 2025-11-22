@@ -28,8 +28,9 @@ export async function signInAction(
     return { error: error.message };
   }
 
-  // Rediriger vers /analytics si c'est le compte admin analytics
-  if (data.user?.email === 'bcb83@icloud.com') {
+  // Rediriger vers /analytics si c'est le compte admin analytics (par ID ou email)
+  const authorizedUserId = 'e78e437e-a817-4da2-a091-a7f4e5e02583';
+  if (data.user?.id === authorizedUserId || data.user?.email === 'bcb83@icloud.com') {
     redirect('/analytics');
   }
 

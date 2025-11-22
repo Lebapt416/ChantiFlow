@@ -22,8 +22,9 @@ export default async function AnalyticsPage() {
     redirect('/login?redirect=/analytics');
   }
 
-  // Vérifier que l'utilisateur est le compte autorisé
-  if (user.email !== 'bcb83@icloud.com') {
+  // Vérifier que l'utilisateur est le compte autorisé (par ID ou email)
+  const authorizedUserId = 'e78e437e-a817-4da2-a091-a7f4e5e02583';
+  if (user.id !== authorizedUserId && user.email !== 'bcb83@icloud.com') {
     redirect('/login?error=unauthorized');
   }
 
