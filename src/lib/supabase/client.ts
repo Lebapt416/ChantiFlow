@@ -8,6 +8,8 @@ export function createSupabaseBrowserClient() {
     throw new Error('Supabase est mal configuré côté client.');
   }
 
+  // createBrowserClient gère automatiquement la persistance via localStorage
+  // Ce qui est parfait pour les PWA
   return createBrowserClient(url, anonKey);
 }
 

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { PwaRegister } from "@/components/pwa-register";
+import { AuthProvider } from "@/components/auth-provider";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -36,9 +37,11 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[var(--background)] text-[var(--foreground)]`}
       >
-        {children}
-        <PwaRegister />
-        <SpeedInsights />
+        <AuthProvider>
+          {children}
+          <PwaRegister />
+          <SpeedInsights />
+        </AuthProvider>
       </body>
     </html>
   );

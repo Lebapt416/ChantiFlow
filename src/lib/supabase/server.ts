@@ -27,7 +27,16 @@ export async function createSupabaseServerClient(options?: Options) {
           return;
         }
         try {
-          cookieStore.set({ name, value, ...opts });
+          // S'assurer que les cookies sont persistants pour la PWA
+          cookieStore.set({ 
+            name, 
+            value, 
+            ...opts,
+            maxAge: opts?.maxAge || 60 * 60 * 24 * 365, // 1 an par défaut
+            sameSite: 'lax' as const,
+            secure: process.env.NODE_ENV === 'production',
+            httpOnly: false, // Permettre l'accès depuis JavaScript pour la PWA
+          });
         } catch {
           // ignore when Next bloque la mutation hors Server Action
         }
