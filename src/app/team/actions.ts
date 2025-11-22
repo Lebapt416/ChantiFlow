@@ -56,7 +56,8 @@ export async function addWorkerAction(
   }
 
   // Créer un worker au niveau du compte (sans site_id)
-  const insertData = {
+  // Les workers créés manuellement sont automatiquement approuvés
+  const insertData: any = {
     created_by: user.id,
     name,
     email: email || null,
@@ -64,11 +65,31 @@ export async function addWorkerAction(
     site_id: null, // Worker au niveau du compte
   };
 
-  const { error, data: insertedWorker } = await supabase
+  // Essayer d'ajouter avec status 'approved' (workers créés manuellement sont approuvés)
+  insertData.status = 'approved';
+  let { error, data: insertedWorker } = await supabase
     .from('workers')
     .insert(insertData)
     .select('id')
     .single();
+
+  // Si l'erreur est liée à la colonne status, réessayer sans
+  if (error && (error.message.includes('status') || error.message.includes('column'))) {
+    console.warn('Colonne status non trouvée, création sans status (sera considéré comme approuvé)');
+    delete insertData.status;
+    const { error: retryError, data: retryWorker } = await supabase
+      .from('workers')
+      .insert(insertData)
+      .select('id')
+      .single();
+    
+    if (retryError) {
+      error = retryError;
+    } else {
+      error = null;
+      insertedWorker = retryWorker;
+    }
+  }
 
   if (error) {
     // Vérifier le type d'erreur

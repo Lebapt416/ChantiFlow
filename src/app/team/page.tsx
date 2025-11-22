@@ -221,8 +221,11 @@ export default async function TeamPage() {
       {(() => {
         // Filtrer les workers en attente (status === 'pending')
         const pendingWorkers = (accountWorkers || []).filter((w: any) => w.status === 'pending');
-        // Tous les autres workers sont considérés comme approuvés (status null, undefined, 'approved', ou inexistant)
-        const approvedWorkers = (accountWorkers || []).filter((w: any) => w.status !== 'pending');
+        // Seuls les workers avec status === 'approved' ou status === null (anciens workers créés manuellement) sont approuvés
+        // Les workers avec status === 'pending' ne doivent PAS apparaître ici
+        const approvedWorkers = (accountWorkers || []).filter((w: any) => 
+          w.status === 'approved' || w.status === null || w.status === undefined
+        );
         
         return (
           <>

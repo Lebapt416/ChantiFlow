@@ -70,19 +70,11 @@ export default function JoinTeamPage() {
         .from('workers')
         .insert(insertData);
 
-      // Si l'erreur est liée à la colonne status, réessayer sans
+      // Si l'erreur est liée à la colonne status, on ne peut pas créer le worker correctement
+      // Il faut que la migration SQL soit exécutée
       if (insertError && (insertError.message.includes('status') || insertError.message.includes('column'))) {
-        console.warn('Colonne status non trouvée, création sans status');
-        delete insertData.status;
-        const { error: retryError } = await supabase
-          .from('workers')
-          .insert(insertData);
-        
-        if (retryError) {
-          insertError = retryError;
-        } else {
-          insertError = null;
-        }
+        setError('La colonne status n\'existe pas dans la base de données. Veuillez exécuter la migration SQL migration-worker-status.sql dans Supabase pour activer le système de validation.');
+        return;
       }
 
       if (insertError) {
