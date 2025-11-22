@@ -25,6 +25,9 @@ export default async function SitesPage() {
     .eq('created_by', user.id)
     .order('created_at', { ascending: false });
 
+  // Séparer les chantiers actifs et terminés
+  const activeSites = sites?.filter((site) => !site.completed_at) ?? [];
+
   // Récupérer les stats pour chaque chantier
   const siteIds = sites?.map((site) => site.id) ?? [];
   const siteStats: Record<string, { tasks: number; done: number; workers: number }> = {};
@@ -63,7 +66,8 @@ export default async function SitesPage() {
   const plan = await getUserPlan(user);
   const limits = getPlanLimits(plan);
   const { allowed: canCreate, reason: limitReason } = await canCreateSite(user.id);
-  const currentCount = sites?.length ?? 0;
+  // Compter uniquement les chantiers actifs (non terminés)
+  const currentCount = activeSites.length;
 
   return (
     <AppShell

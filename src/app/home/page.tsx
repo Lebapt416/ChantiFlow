@@ -60,14 +60,16 @@ export default async function HomePage() {
     });
   }
 
+  // Séparer les chantiers actifs et terminés
+  const activeSites = sites?.filter((site) => !site.completed_at) ?? [];
+  const completedSites = sites?.filter((site) => site.completed_at) ?? [];
+
   // Vérifier les limites du plan
   const plan = await getUserPlan(user);
   const limits = getPlanLimits(plan);
   const { allowed: canCreate, reason: limitReason } = await canCreateSite(user.id);
-  const currentCount = sites?.length ?? 0;
-
-  const activeSites = sites?.filter((site) => !site.completed_at) ?? [];
-  const completedSites = sites?.filter((site) => site.completed_at) ?? [];
+  // Compter uniquement les chantiers actifs (non terminés)
+  const currentCount = activeSites.length;
 
   return (
     <AppShell

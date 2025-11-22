@@ -63,12 +63,15 @@ export async function canCreateSite(userId: string): Promise<{ allowed: boolean;
     return { allowed: true };
   }
 
+  // Compter uniquement les chantiers actifs (non terminés)
   const { data: sites } = await supabase
     .from('sites')
-    .select('id')
+    .select('id, completed_at')
     .eq('created_by', userId);
 
-  const siteCount = sites?.length ?? 0;
+  // Filtrer les chantiers terminés
+  const activeSites = sites?.filter((site) => !site.completed_at) ?? [];
+  const siteCount = activeSites.length;
 
   if (siteCount >= limits.maxSites) {
     return {
