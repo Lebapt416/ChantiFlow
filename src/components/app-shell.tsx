@@ -90,12 +90,12 @@ export function AppShell({
   return (
     <div className="group/sidebar min-h-screen bg-zinc-50 text-zinc-900 dark:bg-zinc-950 dark:text-white">
       <div className="lg:flex">
-        <aside className="group/sidebar fixed inset-y-0 left-0 z-20 hidden w-16 flex-col border-r border-zinc-200 bg-white/80 px-3 py-8 shadow-lg shadow-black/5 backdrop-blur transition-all duration-300 hover:w-64 dark:border-zinc-800 dark:bg-zinc-900/80 lg:flex">
+        <aside className="group/sidebar fixed inset-y-0 left-0 z-20 hidden w-16 flex-col border-r border-zinc-200 bg-white/80 px-3 py-8 shadow-lg shadow-black/5 backdrop-blur transition-all duration-300 ease-in-out hover:w-64 dark:border-zinc-800 dark:bg-zinc-900/80 lg:flex">
           <div className="mb-10 overflow-hidden">
-            <p className="whitespace-nowrap text-xs uppercase tracking-[0.4em] text-zinc-500 opacity-0 transition-opacity duration-300 group-hover/sidebar:opacity-100 dark:text-zinc-400">
+            <p className="whitespace-nowrap text-xs uppercase tracking-[0.4em] text-zinc-500 opacity-0 transition-all duration-300 delay-75 group-hover/sidebar:opacity-100 dark:text-zinc-400">
               ChantiFlow
             </p>
-            <p className="mt-2 whitespace-nowrap text-2xl font-semibold opacity-0 transition-opacity duration-300 group-hover/sidebar:opacity-100">Pilotage</p>
+            <p className="mt-2 whitespace-nowrap text-2xl font-semibold opacity-0 transition-all duration-300 delay-100 group-hover/sidebar:opacity-100">Pilotage</p>
           </div>
           <nav className="flex flex-1 flex-col gap-2">
             {navItems.map((item) => {
@@ -104,7 +104,7 @@ export function AppShell({
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`group/item relative inline-flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition ${
+                  className={`group/item relative inline-flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition-all duration-200 ${
                     active
                       ? 'bg-zinc-900 text-white shadow-lg shadow-black/20 dark:bg-white dark:text-black'
                       : 'text-zinc-600 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800'
@@ -112,26 +112,27 @@ export function AppShell({
                   title={item.label}
                 >
                   <span
-                    className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${
+                    className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl transition-all duration-200 ${
                       active
                         ? 'bg-white/20 text-white dark:bg-black/10 dark:text-black'
-                        : 'bg-zinc-900/5 text-zinc-500 dark:bg-white/5 dark:text-zinc-200'
+                        : 'bg-zinc-900/5 text-zinc-500 dark:bg-white/5 dark:text-zinc-200 group-hover/item:bg-zinc-900/10 dark:group-hover/item:bg-white/10'
                     }`}
                   >
                     <item.icon size={18} strokeWidth={2.2} />
                   </span>
-                  <span className="whitespace-nowrap opacity-0 transition-opacity duration-300 group-hover/sidebar:opacity-100">
+                  <span className="whitespace-nowrap opacity-0 transition-all duration-300 delay-75 group-hover/sidebar:opacity-100 group-hover/sidebar:translate-x-0 -translate-x-2">
                     {item.label}
                   </span>
-                  {/* Tooltip pour affichage au survol de l'item individuel */}
-                  <span className="pointer-events-none absolute left-full ml-2 rounded-lg bg-zinc-900 px-2 py-1 text-xs text-white opacity-0 shadow-lg transition-opacity duration-200 group-hover/item:opacity-100 dark:bg-zinc-100 dark:text-zinc-900">
+                  {/* Tooltip pour affichage au survol de l'item individuel - visible même si sidebar pas survolée */}
+                  <span className="pointer-events-none absolute left-full ml-3 z-50 whitespace-nowrap rounded-lg bg-zinc-900 px-3 py-1.5 text-xs font-medium text-white opacity-0 shadow-xl transition-all duration-200 group-hover/item:opacity-100 group-hover/item:translate-x-0 -translate-x-1 dark:bg-zinc-100 dark:text-zinc-900 group-hover/sidebar:hidden">
                     {item.label}
+                    <span className="absolute right-full top-1/2 -mr-1 h-2 w-2 -translate-y-1/2 rotate-45 bg-zinc-900 dark:bg-zinc-100"></span>
                   </span>
                 </Link>
               );
             })}
           </nav>
-          <div className="mt-8 overflow-hidden rounded-2xl border border-zinc-200 p-4 text-xs text-zinc-500 opacity-0 transition-opacity duration-300 group-hover/sidebar:opacity-100 dark:border-zinc-800 dark:text-zinc-400">
+          <div className="mt-8 overflow-hidden rounded-2xl border border-zinc-200 p-4 text-xs text-zinc-500 opacity-0 transition-all duration-300 delay-100 group-hover/sidebar:opacity-100 dark:border-zinc-800 dark:text-zinc-400">
             {primarySite ? (
               <>
                 <p className="text-sm font-semibold text-zinc-900 dark:text-white">
