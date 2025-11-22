@@ -54,12 +54,41 @@ export default async function ReportsHubPage() {
         .in('site_id', siteIds)
     : { data: [] };
 
-  const { data: workers } = siteIds.length
+  // Récupérer les workers de deux façons :
+  // 1. Workers actuellement sur les chantiers
+  // 2. Workers historiques via les rapports (pour les chantiers terminés)
+  const { data: workersFromSites } = siteIds.length
     ? await supabase
         .from('workers')
         .select('id, name, role')
         .in('site_id', siteIds)
     : { data: [] };
+
+  // Récupérer les worker_ids depuis les rapports pour les workers historiques
+  const workerIdsFromReports = [
+    ...new Set(
+      allReports
+        ?.map((r) => r.worker_id)
+        .filter((id): id is string => id !== null) ?? [],
+    ),
+  ];
+
+  const { data: workersFromReports } =
+    workerIdsFromReports.length > 0
+      ? await supabase
+          .from('workers')
+          .select('id, name, role')
+          .in('id', workerIdsFromReports)
+      : { data: [] };
+
+  // Fusionner les deux listes de workers (en évitant les doublons)
+  const allWorkers = [
+    ...(workersFromSites ?? []),
+    ...(workersFromReports ?? []),
+  ];
+  const uniqueWorkers = Array.from(
+    new Map(allWorkers.map((w) => [w.id, w])).values(),
+  );
 
   const taskMap =
     tasks?.reduce<Record<string, { title: string; site_id: string }>>(
@@ -79,14 +108,13 @@ export default async function ReportsHubPage() {
       {},
     ) ?? {};
 
-  const workerMap =
-    workers?.reduce<Record<string, { name: string; role: string | null }>>(
-      (acc, worker) => {
-        acc[worker.id] = { name: worker.name, role: worker.role };
-        return acc;
-      },
-      {},
-    ) ?? {};
+  const workerMap = uniqueWorkers.reduce<Record<string, { name: string; role: string | null }>>(
+    (acc, worker) => {
+      acc[worker.id] = { name: worker.name, role: worker.role };
+      return acc;
+    },
+    {},
+  );
 
   // Séparer les rapports en attente et validés
   type ReportType = {
