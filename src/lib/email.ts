@@ -565,3 +565,197 @@ export async function sendTeamJoinConfirmationEmail({
   }
 }
 
+export async function sendTeamApprovalEmail({
+  workerEmail,
+  workerName,
+  managerName,
+}: {
+  workerEmail?: string;
+  workerName: string;
+  managerName?: string;
+}) {
+  // Si Resend n'est pas configuré, on retourne silencieusement
+  if (!process.env.RESEND_API_KEY) {
+    console.warn('RESEND_API_KEY non configuré, email non envoyé');
+    return { success: false, error: 'Service email non configuré' };
+  }
+
+  // Vérifier que Resend est initialisé
+  if (!resend) {
+    console.warn('Resend non initialisé');
+    return { success: false, error: 'Service email non initialisé' };
+  }
+
+  // Si pas d'email, on ne peut pas envoyer
+  if (!workerEmail) {
+    console.warn('Pas d\'email fourni pour l\'envoi d\'approbation');
+    return { success: false, error: 'Email non fourni' };
+  }
+
+  try {
+    const { data, error } = await resend.emails.send({
+      from: process.env.RESEND_FROM_EMAIL || 'ChantiFlow <onboarding@resend.dev>',
+      to: workerEmail,
+      subject: 'Demande d\'ajout à l\'équipe - Approuvée',
+      html: `
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Demande approuvée</title>
+          </head>
+          <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+            <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
+              <h1 style="color: white; margin: 0; font-size: 28px;">Demande approuvée !</h1>
+            </div>
+            
+            <div style="background: #ffffff; padding: 30px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 10px 10px;">
+              <p style="font-size: 16px; margin-bottom: 20px;">
+                Bonjour ${workerName},
+              </p>
+              
+              <p style="font-size: 16px; margin-bottom: 20px;">
+                Excellente nouvelle ! Votre demande d'ajout à l'équipe a été approuvée${managerName ? ` par ${managerName}` : ''}.
+              </p>
+              
+              <div style="background: #f0fdf4; border: 2px solid #10b981; padding: 20px; border-radius: 8px; margin: 20px 0; text-align: center;">
+                <p style="margin: 0; font-size: 16px; font-weight: 600; color: #065f46;">
+                  ✅ Vous faites maintenant partie de l'équipe !
+                </p>
+                <p style="margin: 10px 0 0 0; font-size: 14px; color: #047857;">
+                  Vous pouvez maintenant être assigné à des chantiers et commencer à travailler.
+                </p>
+              </div>
+              
+              <p style="font-size: 14px; color: #6b7280; margin-top: 30px; border-top: 1px solid #e5e7eb; padding-top: 20px;">
+                Vous recevrez un email avec votre code d'accès unique lorsque vous serez assigné à un chantier spécifique.
+              </p>
+            </div>
+            
+            <div style="text-align: center; margin-top: 20px; color: #9ca3af; font-size: 12px;">
+              <p>ChantiFlow - Gestion de chantier simplifiée</p>
+            </div>
+          </body>
+        </html>
+      `,
+    });
+
+    if (error) {
+      console.error('❌ Erreur Resend lors de l\'envoi approbation:', {
+        message: error.message,
+        name: error.name,
+        to: workerEmail,
+      });
+      return { success: false, error: error.message };
+    }
+
+    console.log('✅ Email d\'approbation envoyé avec succès à:', workerEmail);
+    return { success: true, data };
+  } catch (error) {
+    console.error('❌ Exception lors de l\'envoi approbation:', {
+      error: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+      to: workerEmail,
+    });
+    return { success: false, error: error instanceof Error ? error.message : 'Erreur inconnue' };
+  }
+}
+
+export async function sendTeamRejectionEmail({
+  workerEmail,
+  workerName,
+  managerName,
+}: {
+  workerEmail?: string;
+  workerName: string;
+  managerName?: string;
+}) {
+  // Si Resend n'est pas configuré, on retourne silencieusement
+  if (!process.env.RESEND_API_KEY) {
+    console.warn('RESEND_API_KEY non configuré, email non envoyé');
+    return { success: false, error: 'Service email non configuré' };
+  }
+
+  // Vérifier que Resend est initialisé
+  if (!resend) {
+    console.warn('Resend non initialisé');
+    return { success: false, error: 'Service email non initialisé' };
+  }
+
+  // Si pas d'email, on ne peut pas envoyer
+  if (!workerEmail) {
+    console.warn('Pas d\'email fourni pour l\'envoi de refus');
+    return { success: false, error: 'Email non fourni' };
+  }
+
+  try {
+    const { data, error } = await resend.emails.send({
+      from: process.env.RESEND_FROM_EMAIL || 'ChantiFlow <onboarding@resend.dev>',
+      to: workerEmail,
+      subject: 'Demande d\'ajout à l\'équipe - Refusée',
+      html: `
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Demande refusée</title>
+          </head>
+          <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+            <div style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
+              <h1 style="color: white; margin: 0; font-size: 28px;">Demande refusée</h1>
+            </div>
+            
+            <div style="background: #ffffff; padding: 30px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 10px 10px;">
+              <p style="font-size: 16px; margin-bottom: 20px;">
+                Bonjour ${workerName},
+              </p>
+              
+              <p style="font-size: 16px; margin-bottom: 20px;">
+                Nous vous informons que votre demande d'ajout à l'équipe a été refusée${managerName ? ` par ${managerName}` : ''}.
+              </p>
+              
+              <div style="background: #fef2f2; border: 2px solid #ef4444; padding: 20px; border-radius: 8px; margin: 20px 0; text-align: center;">
+                <p style="margin: 0; font-size: 16px; font-weight: 600; color: #991b1b;">
+                  ❌ Votre demande n'a pas été retenue
+                </p>
+                <p style="margin: 10px 0 0 0; font-size: 14px; color: #b91c1c;">
+                  Si vous avez des questions, n'hésitez pas à contacter directement le chef de chantier.
+                </p>
+              </div>
+              
+              <p style="font-size: 14px; color: #6b7280; margin-top: 30px; border-top: 1px solid #e5e7eb; padding-top: 20px;">
+                Nous vous remercions de votre intérêt pour rejoindre l'équipe.
+              </p>
+            </div>
+            
+            <div style="text-align: center; margin-top: 20px; color: #9ca3af; font-size: 12px;">
+              <p>ChantiFlow - Gestion de chantier simplifiée</p>
+            </div>
+          </body>
+        </html>
+      `,
+    });
+
+    if (error) {
+      console.error('❌ Erreur Resend lors de l\'envoi refus:', {
+        message: error.message,
+        name: error.name,
+        to: workerEmail,
+      });
+      return { success: false, error: error.message };
+    }
+
+    console.log('✅ Email de refus envoyé avec succès à:', workerEmail);
+    return { success: true, data };
+  } catch (error) {
+    console.error('❌ Exception lors de l\'envoi refus:', {
+      error: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+      to: workerEmail,
+    });
+    return { success: false, error: error instanceof Error ? error.message : 'Erreur inconnue' };
+  }
+}
+
