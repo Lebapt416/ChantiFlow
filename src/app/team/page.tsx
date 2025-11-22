@@ -99,8 +99,8 @@ export default async function TeamPage() {
 
   return (
     <AppShell
-      heading="Équipe"
-      subheading="Centralise les intervenants présents sur tes chantiers."
+      heading="Équipe générale"
+      subheading="Gérez votre catalogue d'équipe et ajoutez rapidement des personnes."
       userEmail={user.email}
       primarySite={sites?.[0] ?? null}
     >

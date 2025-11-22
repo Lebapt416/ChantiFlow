@@ -81,6 +81,8 @@ export function AppShell({
     return [
       { href: '/home', label: 'Accueil', icon: Home },
       { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+      { href: '/qr', label: 'QR codes', icon: QrCode },
+      { href: '/team', label: 'Équipe générale', icon: UsersRound },
       { href: '/account', label: 'Mon compte', icon: User },
     ];
   }, [pathname]);

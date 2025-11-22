@@ -26,8 +26,8 @@ export default async function QrHubPage() {
 
   return (
     <AppShell
-      heading="QR codes"
-      subheading="Gérez les QR codes d'accès pour vos chantiers."
+      heading="QR codes générale"
+      subheading="Tous les QR codes de tous vos chantiers en un seul endroit."
       userEmail={user.email}
       primarySite={sites?.[0] ?? null}
     >
