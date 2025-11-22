@@ -68,12 +68,12 @@ export function ReportsTab({ siteId, workerId }: Props) {
   }
 
   return (
-    <div className="p-4">
-      <h2 className="text-lg font-semibold text-zinc-900 dark:text-white mb-4">
+    <div className="p-3 sm:p-4 md:p-6">
+      <h2 className="text-base sm:text-lg font-semibold text-zinc-900 dark:text-white mb-3 sm:mb-4">
         Envoyer un rapport
       </h2>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
         <div>
           <label htmlFor="taskId" className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
             Tâche
@@ -83,7 +83,7 @@ export function ReportsTab({ siteId, workerId }: Props) {
             name="taskId"
             value={taskId}
             onChange={(e) => setTaskId(e.target.value)}
-            className="w-full rounded-lg border border-zinc-300 bg-white px-4 py-2 text-zinc-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:border-zinc-600 dark:bg-zinc-800 dark:text-white"
+            className="w-full rounded-lg border border-zinc-300 bg-white px-3 sm:px-4 py-2 text-sm sm:text-base text-zinc-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:border-zinc-600 dark:bg-zinc-800 dark:text-white"
             required
           >
             <option value="">Sélectionner une tâche</option>
@@ -105,7 +105,7 @@ export function ReportsTab({ siteId, workerId }: Props) {
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             rows={4}
-            className="w-full rounded-lg border border-zinc-300 bg-white px-4 py-2 text-zinc-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:border-zinc-600 dark:bg-zinc-800 dark:text-white"
+            className="w-full rounded-lg border border-zinc-300 bg-white px-3 sm:px-4 py-2 text-sm sm:text-base text-zinc-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:border-zinc-600 dark:bg-zinc-800 dark:text-white"
             placeholder="Décrivez l'avancement, les incidents, le matériel utilisé..."
           />
         </div>
@@ -155,9 +155,9 @@ export function ReportsTab({ siteId, workerId }: Props) {
         <button
           type="submit"
           disabled={isPending || !taskId}
-          className="w-full rounded-lg bg-emerald-600 px-6 py-3 text-base font-semibold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-70 flex items-center justify-center gap-2"
+          className="w-full rounded-lg bg-emerald-600 px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base font-semibold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-70 flex items-center justify-center gap-2 active:scale-95"
         >
-          <Upload className="h-5 w-5" />
+          <Upload className="h-4 w-4 sm:h-5 sm:w-5" />
           {isPending ? 'Envoi...' : 'Envoyer le rapport'}
         </button>
       </form>
