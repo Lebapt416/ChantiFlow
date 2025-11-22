@@ -55,16 +55,35 @@ export default function JoinTeamPage() {
       // Pour l'instant, on passe undefined pour managerName
 
       // Créer un worker au niveau du compte (sans site_id) avec status 'pending'
-      const { error: insertError } = await supabase
+      // Essayer d'abord avec status, puis sans si la colonne n'existe pas
+      let insertData: any = {
+        created_by: userId,
+        name: name.trim(),
+        email: email.trim() || null,
+        role: role.trim() || null,
+        site_id: null, // Worker au niveau du compte
+      };
+
+      // Essayer d'ajouter avec status 'pending'
+      insertData.status = 'pending';
+      let { error: insertError } = await supabase
         .from('workers')
-        .insert({
-          created_by: userId,
-          name: name.trim(),
-          email: email.trim() || null,
-          role: role.trim() || null,
-          site_id: null, // Worker au niveau du compte
-          status: 'pending', // En attente de validation
-        });
+        .insert(insertData);
+
+      // Si l'erreur est liée à la colonne status, réessayer sans
+      if (insertError && (insertError.message.includes('status') || insertError.message.includes('column'))) {
+        console.warn('Colonne status non trouvée, création sans status');
+        delete insertData.status;
+        const { error: retryError } = await supabase
+          .from('workers')
+          .insert(insertData);
+        
+        if (retryError) {
+          insertError = retryError;
+        } else {
+          insertError = null;
+        }
+      }
 
       if (insertError) {
         if (insertError.message.includes('unique') || insertError.message.includes('duplicate')) {
