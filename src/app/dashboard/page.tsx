@@ -97,8 +97,8 @@ export default async function DashboardPage() {
 
   return (
     <AppShell
-      heading="Mes chantiers"
-      subheading="Crée, supervise et partage l’avancement de tes sites."
+      heading="Dashboard général"
+      subheading="Vue d'ensemble de tous vos chantiers avec graphiques dynamiques"
       userEmail={user.email}
       primarySite={sites?.[0] ?? null}
       actions={
