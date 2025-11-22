@@ -95,14 +95,19 @@ export function AppShell({
       {/* Menu mobile - Drawer - En dehors du flux pour rester fixe */}
       {mobileMenuOpen && (
         <aside className="fixed inset-y-0 left-0 z-50 w-16 flex-col items-center border-r border-zinc-800 bg-black/80 px-0 py-8 shadow-xl backdrop-blur dark:border-zinc-700 dark:bg-black/80 lg:hidden flex">
-          <button
-            onClick={() => setMobileMenuOpen(false)}
-            className="absolute top-4 right-2 flex items-center justify-center w-10 h-10 rounded-lg bg-white/20 text-white hover:bg-white/30 hover:text-white transition-all shadow-lg z-50"
-            aria-label="Fermer le menu"
-          >
-            <X size={22} strokeWidth={2.5} />
-          </button>
-          <nav className="flex flex-1 flex-col items-center gap-2 w-full">
+          <div className="flex flex-col items-center gap-2 w-full pt-2">
+            <button
+              onClick={() => setMobileMenuOpen(false)}
+              className="group/item relative flex items-center justify-center w-14 h-14 rounded-xl bg-white/20 text-white hover:bg-white/30 hover:text-white transition-all shadow-lg mb-2"
+              aria-label="Fermer le menu"
+            >
+              <span className="absolute rounded-xl transition-all duration-200 top-0 bottom-0 left-2 right-0 bg-black/50 group-hover/item:bg-black/70 group-hover/item:left-3"></span>
+              <span className="relative z-10">
+                <X size={22} strokeWidth={2.5} />
+              </span>
+            </button>
+          </div>
+          <nav className="flex flex-1 flex-col items-center gap-2 w-full pt-4">
             {navItems.map((item) => {
               const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
               return (
