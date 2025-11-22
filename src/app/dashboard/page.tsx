@@ -52,6 +52,31 @@ export default async function DashboardPage() {
     .sort((a, b) => (a.deadline ?? '').localeCompare(b.deadline ?? ''))
     .slice(0, 4);
 
+  // Récupérer les workers en attente de validation
+  let pendingWorkers: any[] = [];
+  try {
+    const { data: testData, error: testError } = await supabase
+      .from('workers')
+      .select('id, name, email, role, created_at, status')
+      .eq('created_by', user.id)
+      .is('site_id', null)
+      .limit(1);
+    
+    if (!testError) {
+      const { data: allAccountWorkers } = await supabase
+        .from('workers')
+        .select('id, name, email, role, created_at, status')
+        .eq('created_by', user.id)
+        .is('site_id', null)
+        .order('created_at', { ascending: false });
+      
+      pendingWorkers = (allAccountWorkers ?? []).filter((w: any) => w.status === 'pending');
+    }
+  } catch (error) {
+    // Ignorer les erreurs si la colonne n'existe pas
+    console.warn('Erreur récupération workers en attente:', error);
+  }
+
   // Récupérer les plannings de tous les chantiers (limité à 6 pour performance)
   const sitesWithPlanning = await Promise.all(
     (activeSites ?? []).slice(0, 6).map(async (site) => {
@@ -140,6 +165,85 @@ export default async function DashboardPage() {
           </div>
         </div>
       </section>
+
+      {/* Section Demandes en attente de validation */}
+      {pendingWorkers.length > 0 && (
+        <section className="mt-8 rounded-3xl border border-amber-200 bg-amber-50 p-6 shadow-sm dark:border-amber-800 dark:bg-amber-900/20">
+          <div className="mb-4 flex items-center justify-between">
+            <div>
+              <h2 className="text-lg font-semibold text-amber-900 dark:text-amber-300">
+                ⏳ Demandes en attente de validation
+              </h2>
+              <p className="text-sm text-amber-700 dark:text-amber-400">
+                {pendingWorkers.length} nouvelle{pendingWorkers.length > 1 ? 's' : ''} personne{pendingWorkers.length > 1 ? 's' : ''} souhaitant rejoindre votre équipe
+              </p>
+            </div>
+            <Link
+              href="/team"
+              className="text-xs font-semibold text-amber-700 hover:text-amber-900 dark:text-amber-400 dark:hover:text-amber-300"
+            >
+              Voir tout →
+            </Link>
+          </div>
+          <div className="space-y-3">
+            {pendingWorkers.slice(0, 5).map((worker: any) => (
+              <div
+                key={worker.id}
+                className="rounded-2xl border border-amber-300 bg-white p-4 dark:border-amber-700 dark:bg-zinc-900"
+              >
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div className="flex-1">
+                    <p className="text-sm font-semibold text-zinc-900 dark:text-white">
+                      {worker.name}
+                    </p>
+                    <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                      {worker.role ?? 'Rôle non défini'}
+                    </p>
+                    <p className="text-xs text-zinc-400 dark:text-zinc-500">
+                      {worker.email ?? 'Email non communiqué'}
+                    </p>
+                    <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">
+                      Demandé le {new Date(worker.created_at).toLocaleDateString('fr-FR')}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <form action="/team/actions" method="post" className="inline">
+                      <input type="hidden" name="action" value="approve" />
+                      <input type="hidden" name="workerId" value={worker.id} />
+                      <button
+                        type="submit"
+                        className="rounded-lg bg-emerald-600 px-4 py-2 text-xs font-semibold text-white transition hover:bg-emerald-700 active:scale-95"
+                      >
+                        Approuver
+                      </button>
+                    </form>
+                    <form action="/team/actions" method="post" className="inline">
+                      <input type="hidden" name="action" value="reject" />
+                      <input type="hidden" name="workerId" value={worker.id} />
+                      <button
+                        type="submit"
+                        className="rounded-lg bg-rose-600 px-4 py-2 text-xs font-semibold text-white transition hover:bg-rose-700 active:scale-95"
+                      >
+                        Refuser
+                      </button>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            ))}
+            {pendingWorkers.length > 5 && (
+              <div className="text-center pt-2">
+                <Link
+                  href="/team"
+                  className="text-sm font-semibold text-amber-700 hover:text-amber-900 dark:text-amber-400 dark:hover:text-amber-300"
+                >
+                  Voir les {pendingWorkers.length - 5} autre{pendingWorkers.length - 5 > 1 ? 's' : ''} demande{pendingWorkers.length - 5 > 1 ? 's' : ''} →
+                </Link>
+              </div>
+            )}
+          </div>
+        </section>
+      )}
 
       <section className="mt-8 grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
         <div className="space-y-6">
