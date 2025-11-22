@@ -81,6 +81,15 @@ export default async function AnalyticsPage() {
   const approvedWorkers = allWorkers.filter((w) => w.status === 'approved' || !w.status).length;
   const pendingWorkers = allWorkers.filter((w) => w.status === 'pending').length;
 
+  // Calculer le MRR (Monthly Recurring Revenue)
+  const plusUsers = allUsers.filter((user) => user.user_metadata?.plan === 'plus').length;
+  const proUsers = allUsers.filter((user) => user.user_metadata?.plan === 'pro').length;
+  const basicUsers = allUsers.filter((user) => {
+    const plan = user.user_metadata?.plan;
+    return !plan || plan === 'basic';
+  }).length;
+  const mrr = (plusUsers * 29) + (proUsers * 79);
+
   // Statistiques par date (30 derniers jours)
   const last30Days = Array.from({ length: 30 }, (_, i) => {
     const date = new Date();
@@ -273,6 +282,10 @@ export default async function AnalyticsPage() {
       tasksByRoleData={tasksByRoleData}
       sitesGrowth={sitesGrowth}
       tasksGrowth={tasksGrowth}
+      mrr={mrr}
+      plusUsers={plusUsers}
+      proUsers={proUsers}
+      basicUsers={basicUsers}
     />
   );
 }

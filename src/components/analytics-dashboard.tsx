@@ -51,6 +51,10 @@ type AnalyticsDashboardProps = {
   tasksByRoleData: Array<{ name: string; value: number }>;
   sitesGrowth: number;
   tasksGrowth: number;
+  mrr: number;
+  plusUsers: number;
+  proUsers: number;
+  basicUsers: number;
 };
 
 const COLORS = ['#10b981', '#f59e0b', '#3b82f6', '#ef4444', '#8b5cf6', '#ec4899'];
@@ -87,6 +91,10 @@ export function AnalyticsDashboard({
   tasksByRoleData,
   sitesGrowth,
   tasksGrowth,
+  mrr,
+  plusUsers,
+  proUsers,
+  basicUsers,
 }: AnalyticsDashboardProps) {
   const [lastUpdate, setLastUpdate] = useState(new Date());
 
@@ -216,6 +224,35 @@ export function AnalyticsDashboard({
             <p className="text-xs text-zinc-500 mt-1">
               {reportsWithPhotos} avec photos
             </p>
+          </div>
+        </div>
+
+        {/* MRR Card - Prominent */}
+        <div className="rounded-2xl border-2 border-emerald-500/50 bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 p-6 backdrop-blur mb-8">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-emerald-400 mb-2 font-semibold">MRR (Monthly Recurring Revenue)</p>
+              <p className="text-5xl font-bold text-white">{mrr}€</p>
+              <p className="text-sm text-zinc-400 mt-2">
+                {plusUsers} Plus (29€) + {proUsers} Pro (79€) = {mrr}€/mois
+              </p>
+            </div>
+            <div className="text-right">
+              <div className="space-y-2">
+                <div className="rounded-lg bg-zinc-800/50 px-4 py-2">
+                  <p className="text-xs text-zinc-400">Basic</p>
+                  <p className="text-xl font-bold text-white">{basicUsers}</p>
+                </div>
+                <div className="rounded-lg bg-blue-500/20 px-4 py-2 border border-blue-500/30">
+                  <p className="text-xs text-blue-400">Plus</p>
+                  <p className="text-xl font-bold text-white">{plusUsers}</p>
+                </div>
+                <div className="rounded-lg bg-purple-500/20 px-4 py-2 border border-purple-500/30">
+                  <p className="text-xs text-purple-400">Pro</p>
+                  <p className="text-xl font-bold text-white">{proUsers}</p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
