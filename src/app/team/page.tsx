@@ -4,6 +4,7 @@ import { AppShell } from '@/components/app-shell';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { AddWorkerForm } from './add-worker-form';
 import { DeleteWorkerButton } from '@/components/delete-worker-button';
+import { TeamQrSection } from './team-qr-section';
 
 export const metadata = {
   title: 'Équipe | ChantiFlow',
@@ -148,6 +149,22 @@ export default async function TeamPage() {
           Aucun employé renseigné.
         </p>
       )}
+    </section>
+
+    <section className="mt-8 rounded-3xl border border-zinc-100 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+      <div className="mb-4 flex items-center justify-between">
+        <div>
+          <h2 className="text-lg font-semibold text-zinc-900 dark:text-white">
+            QR code d'inscription à l'équipe
+          </h2>
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">
+            Partagez ce QR code pour permettre aux personnes de s'ajouter à votre équipe en le scannant.
+          </p>
+        </div>
+      </div>
+      <div className="mb-8">
+        <TeamQrSection qrUrl={`${process.env.NEXT_PUBLIC_APP_BASE_URL ?? 'http://localhost:3000'}/team/join?userId=${user.id}`} />
+      </div>
     </section>
 
     <section className="mt-8 rounded-3xl border border-zinc-100 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
