@@ -16,9 +16,9 @@ type Props = {
 export function AddOnsSection({ user, currentAddOns, plan }: Props) {
   const [isLoading, setIsLoading] = useState<string | null>(null);
 
-  // Les liens Stripe seront fournis par l'utilisateur
-  const STRIPE_ADDON_EXTRA_WORKERS = process.env.NEXT_PUBLIC_STRIPE_ADDON_EXTRA_WORKERS || '#';
-  const STRIPE_ADDON_EXTRA_SITES = process.env.NEXT_PUBLIC_STRIPE_ADDON_EXTRA_SITES || '#';
+  // Liens Stripe pour les add-ons
+  const STRIPE_ADDON_EXTRA_WORKERS = 'https://buy.stripe.com/5kQcN5dxZ7qabmD6hF2VG02'; // +5 employés (10€/mois)
+  const STRIPE_ADDON_EXTRA_SITES = 'https://buy.stripe.com/6oU6oHfG739U3UbdK72VG03'; // +2 chantiers (5€/mois)
 
   const handlePurchaseAddOn = async (addOnType: 'extra_workers' | 'extra_sites') => {
     setIsLoading(addOnType);
@@ -27,12 +27,6 @@ export function AddOnsSection({ user, currentAddOns, plan }: Props) {
       const url = addOnType === 'extra_workers' 
         ? STRIPE_ADDON_EXTRA_WORKERS 
         : STRIPE_ADDON_EXTRA_SITES;
-      
-      if (url === '#') {
-        alert('Les liens Stripe pour les add-ons ne sont pas encore configurés. Veuillez contacter le support.');
-        setIsLoading(null);
-        return;
-      }
 
       // Rediriger vers Stripe Checkout
       window.location.href = url;
