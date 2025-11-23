@@ -17,51 +17,80 @@ export async function workerLoginAction(
   _prevState: WorkerLoginState,
   formData: FormData,
 ): Promise<WorkerLoginState> {
-  const email = String(formData.get('email') ?? '').trim().toLowerCase();
   const accessCode = String(formData.get('access_code') ?? '').trim().toUpperCase();
   const siteIdFromUrl = String(formData.get('siteId') ?? '').trim();
 
-  if (!email || !accessCode) {
-    return { error: 'Email et code d\'accès requis.' };
+  if (!accessCode) {
+    return { error: 'Code d\'accès requis.' };
+  }
+
+  // Vérifier le format du code (4 chiffres + 4 lettres)
+  if (!/^[0-9]{4}[A-Z]{4}$/.test(accessCode)) {
+    return { error: 'Format de code invalide. Format attendu: 4 chiffres + 4 lettres (ex: 1234ABCD).' };
   }
 
   const supabase = await createSupabaseServerClient();
 
-  // Rechercher le worker par email et code d'accès
+  // Rechercher le worker uniquement par code d'accès
   const { data: worker, error: workerError } = await supabase
     .from('workers')
     .select('id, name, email, site_id, access_code')
-    .eq('email', email)
     .eq('access_code', accessCode)
     .single();
 
   if (workerError || !worker) {
-    return { error: 'Code d\'accès ou email incorrect.' };
+    return { error: 'Code d\'accès incorrect.' };
   }
 
-  // Si un siteId est fourni dans l'URL, vérifier que le worker est assigné à ce chantier
-  let finalSiteId = worker.site_id;
+  // Déterminer le siteId final
+  let finalSiteId: string | null = null;
+
+  // Si un siteId est fourni dans l'URL, vérifier que le worker peut accéder à ce chantier
   if (siteIdFromUrl) {
-    // Vérifier que le worker est bien assigné à ce chantier
-    if (worker.site_id !== siteIdFromUrl) {
-      // Peut-être que le worker est au niveau du compte, vérifier s'il peut accéder à ce chantier
-      const { data: siteWorker } = await supabase
-        .from('workers')
-        .select('id, site_id')
-        .eq('id', worker.id)
+    // Vérifier si le worker est assigné à ce chantier directement
+    if (worker.site_id === siteIdFromUrl) {
+      finalSiteId = siteIdFromUrl;
+    } else {
+      // Vérifier si le worker est assigné à une tâche de ce chantier
+      const { data: task } = await supabase
+        .from('tasks')
+        .select('site_id')
         .eq('site_id', siteIdFromUrl)
-        .single();
-      
-      if (!siteWorker) {
+        .eq('assigned_worker_id', worker.id)
+        .limit(1)
+        .maybeSingle();
+
+      if (task) {
+        // Le worker est assigné à une tâche de ce chantier
+        finalSiteId = siteIdFromUrl;
+      } else {
         return { error: 'Vous n\'êtes pas assigné à ce chantier.' };
       }
-      finalSiteId = siteIdFromUrl;
     }
   } else {
-    // Si pas de siteId dans l'URL, vérifier que le worker a un site_id
-    if (!worker.site_id) {
-      return { error: 'Aucun chantier assigné. Contactez votre responsable.' };
+    // Si pas de siteId dans l'URL, chercher un chantier où le worker a une tâche assignée
+    // Priorité: site_id du worker, puis tâche assignée
+    if (worker.site_id) {
+      finalSiteId = worker.site_id;
+    } else {
+      // Worker au niveau du compte, chercher une tâche assignée
+      const { data: task } = await supabase
+        .from('tasks')
+        .select('site_id')
+        .eq('assigned_worker_id', worker.id)
+        .limit(1)
+        .maybeSingle();
+
+      if (task) {
+        finalSiteId = task.site_id;
+      } else {
+        return { error: 'Aucune tâche assignée. Contactez votre responsable.' };
+      }
     }
+  }
+
+  if (!finalSiteId) {
+    return { error: 'Aucun chantier trouvé. Contactez votre responsable.' };
   }
 
   // Créer un cookie de session pour le worker

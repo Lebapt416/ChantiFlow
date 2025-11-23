@@ -269,7 +269,7 @@ export async function assignTaskAction(
                   <div style="background: #1f2937; color: white; padding: 20px; text-align: center; border-radius: 8px; margin: 30px 0;">
                     <p style="margin: 0; font-size: 14px; color: #9ca3af; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px;">Code d'accès</p>
                     <p style="margin: 0; font-size: 32px; font-weight: bold; letter-spacing: 4px; font-family: 'Courier New', monospace; text-transform: uppercase;">
-                      ${String(accessCode).toUpperCase().replace(/[^0-9A-Z]/g, '').replace(/(\d{4})([A-Z]{4})/, '$1$2')}
+                      ${String(accessCode).toUpperCase().replace(/[^0-9A-Z]/g, '')}
                     </p>
                     <p style="margin: 10px 0 0 0; font-size: 12px; color: #9ca3af;">
                       Format: 4 chiffres + 4 lettres (ex: 1234ABCD)

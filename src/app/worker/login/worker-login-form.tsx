@@ -3,7 +3,7 @@
 import { useState, useTransition, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useFormStatus } from 'react-dom';
-import { LogIn, Loader2, Mail } from 'lucide-react';
+import { LogIn, Loader2 } from 'lucide-react';
 import { workerLoginAction } from './actions';
 
 type LoginState = {
@@ -60,55 +60,36 @@ export function WorkerLoginForm() {
     <form action={handleSubmit} className="space-y-4">
       <div className="space-y-2">
         <label
-          htmlFor="email"
-          className="block text-sm font-medium text-zinc-700 dark:text-zinc-300"
-        >
-          Email
-        </label>
-        <div className="relative">
-          <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
-          <input
-            id="email"
-            name="email"
-            type="email"
-            placeholder="votre@email.com"
-            required
-            className="w-full rounded-md border border-zinc-300 bg-white pl-10 pr-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:border-zinc-600 dark:bg-zinc-800 dark:text-white"
-          />
-        </div>
-      </div>
-
-      <div className="space-y-2">
-        <label
           htmlFor="access_code"
           className="block text-sm font-medium text-zinc-700 dark:text-zinc-300"
         >
           Code d'accès
         </label>
-          <input
-            id="access_code"
-            name="access_code"
-            type="text"
-            placeholder="1234ABCD"
-            required
-            maxLength={8}
-            pattern="[0-9]{4}[A-Z]{4}"
-            className="w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-center text-lg font-mono font-bold tracking-widest shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:border-zinc-600 dark:bg-zinc-800 dark:text-white uppercase"
-            style={{ letterSpacing: '0.3em' }}
-            onChange={(e) => {
-              // Forcer le format: 4 chiffres + 4 lettres
-              let value = e.target.value.toUpperCase().replace(/[^0-9A-Z]/g, '');
-              // Séparer les chiffres et les lettres
-              const digits = value.match(/[0-9]/g)?.join('') || '';
-              const letters = value.match(/[A-Z]/g)?.join('') || '';
-              // Limiter à 4 chiffres puis 4 lettres
-              const formatted = (digits.slice(0, 4) + letters.slice(0, 4)).slice(0, 8);
-              e.target.value = formatted;
-            }}
-          />
-          <p className="text-xs text-zinc-500 dark:text-zinc-400">
-            Format: 4 chiffres + 4 lettres (ex: 1234ABCD). Le code vous a été envoyé par email lors de l'assignation de votre tâche.
-          </p>
+        <input
+          id="access_code"
+          name="access_code"
+          type="text"
+          placeholder="1234ABCD"
+          required
+          maxLength={8}
+          pattern="[0-9]{4}[A-Z]{4}"
+          className="w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-center text-lg font-mono font-bold tracking-widest shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:border-zinc-600 dark:bg-zinc-800 dark:text-white uppercase"
+          style={{ letterSpacing: '0.3em' }}
+          autoFocus
+          onChange={(e) => {
+            // Forcer le format: 4 chiffres + 4 lettres
+            let value = e.target.value.toUpperCase().replace(/[^0-9A-Z]/g, '');
+            // Séparer les chiffres et les lettres
+            const digits = value.match(/[0-9]/g)?.join('') || '';
+            const letters = value.match(/[A-Z]/g)?.join('') || '';
+            // Limiter à 4 chiffres puis 4 lettres
+            const formatted = (digits.slice(0, 4) + letters.slice(0, 4)).slice(0, 8);
+            e.target.value = formatted;
+          }}
+        />
+        <p className="text-xs text-zinc-500 dark:text-zinc-400">
+          Format: 4 chiffres + 4 lettres (ex: 1234ABCD). Le code vous a été envoyé par email lors de l'assignation de votre tâche.
+        </p>
       </div>
 
       {state?.error && (
