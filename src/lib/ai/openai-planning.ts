@@ -21,9 +21,11 @@ type PlanningResult = {
     order: number;
     startDate: string;
     endDate: string;
-    assignedWorkerId: string | null;
+    assignedWorkerId?: string | null; // Ancien format (compatibilité)
+    assignedWorkerIds?: string[]; // Nouveau format (collaboration)
     dependencies: string[];
     priority: 'high' | 'medium' | 'low';
+    estimatedHours?: number;
   }>;
   newDeadline?: string;
   warnings: string[];
@@ -73,7 +75,7 @@ export async function generateAIPlanning(
         ? workers.map((w) => `- ${w.name} (${w.role || 'Rôle non défini'})`).join('\n')
         : 'Aucun employé assigné';
 
-    const prompt = `Tu es un expert en gestion de chantiers de construction. Analyse ce chantier et génère un planning optimisé.
+    const prompt = `Tu es un expert en gestion de chantiers de construction en France. Analyse ce chantier et génère un planning optimisé en respectant STRICTEMENT les lois du travail françaises.
 
 Chantier: ${siteName}
 Deadline: ${deadline ? new Date(deadline).toLocaleDateString('fr-FR') : 'Non définie'}
@@ -84,12 +86,35 @@ ${tasksDescription}
 Équipe disponible:
 ${workersDescription}
 
+LOIS DU TRAVAIL FRANÇAISES À RESPECTER:
+- Maximum 10h/jour (avec dérogation) ou 8h/jour (standard)
+- Pause obligatoire de 20 minutes après 6h de travail
+- Repos minimum de 11h entre deux journées
+- Repos hebdomadaire de 24h consécutives (généralement dimanche)
+- Jours fériés exclus du planning
+
+RÈGLES DE COLLABORATION:
+- Les workers du même métier peuvent collaborer sur une même tâche
+- Si une tâche dure plus de 8h, assigne plusieurs workers du même métier si disponibles
+- Prends en compte le temps estimé (duration_hours) de chaque tâche
+
+RECONNAISSANCE DES MÉTIERS:
+- Maçon: fondation, structure, mur, cloison, parpaing, brique, ciment
+- Électricien: électricité, câblage, tableau, prise, éclairage
+- Plombier: plomberie, sanitaire, eau, chauffage
+- Peintre: peinture, finition, enduit, revêtement
+- Carreleur: carrelage, faïence, sol
+- Charpentier: charpente, bois, toiture, ossature
+- Couvreur: couverture, toiture, tuile, ardoise
+- Menuisier: menuiserie, fenêtre, porte, parquet
+
 Génère un planning JSON avec:
 1. Ordre logique des tâches (dépendances, séquence optimale)
-2. Dates de début/fin réalistes
-3. Assignation des workers selon les rôles
+2. Dates de début/fin réalistes en respectant les lois du travail
+3. Assignation des workers (peut être un tableau pour collaboration)
 4. Priorités (high/medium/low)
-5. Une explication de ton raisonnement
+5. Temps estimé de chaque tâche
+6. Une explication détaillée de ton raisonnement
 
 Réponds UNIQUEMENT avec un JSON valide dans ce format:
 {
@@ -99,13 +124,14 @@ Réponds UNIQUEMENT avec un JSON valide dans ce format:
       "order": 1,
       "startDate": "YYYY-MM-DD",
       "endDate": "YYYY-MM-DD",
-      "assignedWorkerId": "id du worker ou null",
+      "assignedWorkerIds": ["id1", "id2"] ou ["id1"] ou [],
       "dependencies": ["id1", "id2"],
-      "priority": "high|medium|low"
+      "priority": "high|medium|low",
+      "estimatedHours": nombre d'heures
     }
   ],
   "warnings": ["avertissement 1", "avertissement 2"],
-  "reasoning": "Explication de ton analyse et de tes choix"
+  "reasoning": "Explication détaillée de ton analyse, des lois respectées, et des choix de collaboration"
 }`;
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -120,7 +146,7 @@ Réponds UNIQUEMENT avec un JSON valide dans ce format:
           {
             role: 'system',
             content:
-              'Tu es un expert en gestion de projets de construction. Tu génères des plannings optimisés en JSON. Réponds UNIQUEMENT en JSON valide.',
+              'Tu es un expert en gestion de projets de construction en France. Tu génères des plannings optimisés en JSON en respectant STRICTEMENT les lois du travail françaises (Code du travail). Tu reconnais les métiers et permets la collaboration entre workers du même métier. Tu prends en compte le temps estimé (duration_hours) de chaque tâche. Réponds UNIQUEMENT en JSON valide.',
           },
           {
             role: 'user',
@@ -170,23 +196,35 @@ Réponds UNIQUEMENT avec un JSON valide dans ce format:
       throw new Error('Erreur lors du parsing de la réponse OpenAI');
     }
 
-    // Valider et compléter les dates
+    // Valider et compléter les dates en respectant les lois du travail
     const startDate = new Date();
     planning.orderedTasks = planning.orderedTasks.map((task, index) => {
       const taskObj = tasks.find((t) => t.id === task.taskId);
-      const duration = taskObj?.duration_hours || 8;
-      const daysNeeded = Math.ceil(duration / 8);
+      const duration = taskObj?.duration_hours || task.estimatedHours || 8;
+      
+      // Utiliser la durée estimée de la tâche
+      const estimatedHours = task.estimatedHours || duration;
+      
+      // Calculer les jours en respectant les lois (8h/jour max, pauses, repos)
+      const workingHoursPerDay = 8;
+      const daysNeeded = Math.ceil(estimatedHours / workingHoursPerDay);
 
       const taskStartDate = new Date(startDate);
       taskStartDate.setDate(taskStartDate.getDate() + index);
 
       const taskEndDate = new Date(taskStartDate);
       taskEndDate.setDate(taskEndDate.getDate() + daysNeeded);
+      
+      // Normaliser les assignedWorkerIds si on a l'ancien format
+      const assignedWorkerIds = task.assignedWorkerIds || 
+                                (task.assignedWorkerId ? [task.assignedWorkerId] : []);
 
       return {
         ...task,
         startDate: taskStartDate.toISOString().split('T')[0],
         endDate: taskEndDate.toISOString().split('T')[0],
+        assignedWorkerIds,
+        estimatedHours,
       };
     });
 
@@ -198,10 +236,24 @@ Réponds UNIQUEMENT avec un JSON valide dans ce format:
 
     console.log('[AI Planning] Planning généré avec succès:', planning.orderedTasks.length, 'tâches');
     
-    // Enregistrer pour l'entraînement
+    // Enregistrer pour l'entraînement continu
     if (siteId) {
-      const { savePlanningResult } = await import('./training');
-      await savePlanningResult(siteId, tasks, workers, planning, siteName, deadline);
+      try {
+        const { savePlanningForTraining } = await import('./improved-planning');
+        // Adapter le format pour la compatibilité
+        const adaptedPlanning = {
+          ...planning,
+          orderedTasks: planning.orderedTasks.map(task => ({
+            ...task,
+            assignedWorkerIds: task.assignedWorkerIds || (task.assignedWorkerId ? [task.assignedWorkerId] : []),
+            estimatedHours: task.estimatedHours || 8,
+          })),
+        };
+        await savePlanningForTraining(siteId, tasks, workers, adaptedPlanning as any, siteName, deadline);
+      } catch (error) {
+        console.error('[AI Training] Error saving planning for training:', error);
+        // Ne pas bloquer si l'enregistrement échoue
+      }
     }
     
     return planning;

@@ -11,8 +11,11 @@ export type GenerateAIPlanningState = {
       order: number;
       startDate: string;
       endDate: string;
-      assignedWorkerId: string | null;
+      assignedWorkerId?: string | null; // Ancien format (compatibilité)
+      assignedWorkerIds?: string[]; // Nouveau format (collaboration)
+      dependencies?: string[];
       priority: 'high' | 'medium' | 'low';
+      estimatedHours?: number;
       taskTitle: string;
     }>;
     warnings: string[];
@@ -67,6 +70,10 @@ export async function generateAIPlanningAction(
         orderedTasks: planning.orderedTasks.map((task) => ({
           ...task,
           taskTitle: pendingTasks.find((t) => t.id === task.taskId)?.title || 'Tâche inconnue',
+          // Assurer la compatibilité avec l'ancien format
+          assignedWorkerId: task.assignedWorkerIds?.[0] || task.assignedWorkerId || null,
+          assignedWorkerIds: task.assignedWorkerIds || (task.assignedWorkerId ? [task.assignedWorkerId] : []),
+          estimatedHours: task.estimatedHours || pendingTasks.find((t) => t.id === task.taskId)?.duration_hours || 8,
         })),
         warnings: planning.warnings,
         reasoning: planning.reasoning,

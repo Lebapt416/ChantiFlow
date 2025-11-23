@@ -21,8 +21,11 @@ type PlanningResult = {
     order: number;
     startDate: string;
     endDate: string;
-    assignedWorkerId: string | null;
+    assignedWorkerId?: string | null; // Ancien format (compatibilité)
+    assignedWorkerIds?: string[]; // Nouveau format (collaboration)
+    dependencies?: string[];
     priority: 'high' | 'medium' | 'low';
+    estimatedHours?: number;
     taskTitle: string;
   }>;
   warnings: string[];

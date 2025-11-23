@@ -9,9 +9,11 @@ type PlanningTask = {
   order: number;
   startDate: string;
   endDate: string;
-  assignedWorkerId: string | null;
+  assignedWorkerId?: string | null; // Ancien format (compatibilité)
+  assignedWorkerIds?: string[]; // Nouveau format (collaboration)
   priority: 'high' | 'medium' | 'low';
   hours?: number;
+  estimatedHours?: number;
 };
 
 type Worker = {
@@ -105,28 +107,54 @@ export function InteractiveCalendar({
         dayDate.setHours(0, 0, 0, 0);
 
         if (dayDate >= taskStart && dayDate < taskEnd) {
-          const workerId = task.assignedWorkerId || 'unassigned';
-          if (!grouped[dayKey][workerId]) {
-            grouped[dayKey][workerId] = [];
+          // Utiliser assignedWorkerIds si disponible, sinon assignedWorkerId
+          const workerIds = task.assignedWorkerIds || (task.assignedWorkerId ? [task.assignedWorkerId] : []);
+          if (workerIds.length === 0) {
+            const workerId = 'unassigned';
+            if (!grouped[dayKey][workerId]) {
+              grouped[dayKey][workerId] = [];
+            }
+            grouped[dayKey][workerId].push({
+              ...task,
+              hours: task.hours || task.estimatedHours || 8,
+            });
+          } else {
+            // Assigner la tâche à tous les workers assignés
+            workerIds.forEach(workerId => {
+              if (!grouped[dayKey][workerId]) {
+                grouped[dayKey][workerId] = [];
+              }
+              grouped[dayKey][workerId].push({
+                ...task,
+                hours: task.hours || task.estimatedHours || 8,
+              });
+            });
           }
-
-          const hours = task.hours || 8;
-          grouped[dayKey][workerId].push({ ...task, hours });
         }
       });
     });
-
+    
     return grouped;
   }, [planning, weekDays]);
+  
+  // Fonction pour obtenir le workerId principal (pour compatibilité)
+  const getMainWorkerId = (task: PlanningTask): string => {
+    if (task.assignedWorkerIds && task.assignedWorkerIds.length > 0) {
+      return task.assignedWorkerIds[0];
+    }
+    return task.assignedWorkerId || 'unassigned';
+  };
 
   const allWorkers = useMemo(() => {
     const workerMap = new Map<string, Worker>();
     workers.forEach((w) => workerMap.set(w.id, w));
     planning.forEach((task) => {
-      if (task.assignedWorkerId) {
-        const worker = workers.find((w) => w.id === task.assignedWorkerId);
+      // Gérer les deux formats (ancien et nouveau)
+      const workerIds = task.assignedWorkerIds || (task.assignedWorkerId ? [task.assignedWorkerId] : []);
+      workerIds.forEach(workerId => {
+        const worker = workers.find((w) => w.id === workerId);
         if (worker) workerMap.set(worker.id, worker);
-      }
+      });
     });
     return Array.from(workerMap.values());
   }, [workers, planning]);
