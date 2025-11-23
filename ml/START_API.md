@@ -55,8 +55,10 @@ Depuis le dossier `ml` :
 
 ```bash
 cd ml
-uvicorn api:app --reload --host 0.0.0.0 --port 8000
+python3 -m uvicorn api:app --reload --host 0.0.0.0 --port 8000
 ```
+
+**Note :** Utilisez `python3 -m uvicorn` au lieu de `uvicorn` directement pour éviter les erreurs de PATH.
 
 L'option `--reload` permet de recharger automatiquement l'API lors des modifications.
 

@@ -37,8 +37,11 @@ python ml/api.py
 
 Ou avec uvicorn directement :
 ```bash
-uvicorn ml.api:app --reload --port 8000
+cd ml
+python3 -m uvicorn api:app --reload --host 0.0.0.0 --port 8000
 ```
+
+**Note :** Utilisez `python3 -m uvicorn` au lieu de `uvicorn` directement pour éviter les erreurs de PATH.
 
 L'API sera disponible sur `http://localhost:8000`
 

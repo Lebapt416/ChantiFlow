@@ -43,5 +43,5 @@ echo ✅ Démarrage de l'API sur http://localhost:8000
 echo    Appuyez sur CTRL+C pour arrêter
 echo.
 
-uvicorn api:app --reload --host 0.0.0.0 --port 8000
+python -m uvicorn api:app --reload --host 0.0.0.0 --port 8000
 
