@@ -3,6 +3,44 @@ import { Resend } from 'resend';
 // Initialiser Resend seulement si la clé API est disponible
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
+/**
+ * Fonction générique pour envoyer un email
+ */
+export async function sendEmail({
+  to,
+  subject,
+  html,
+}: {
+  to: string;
+  subject: string;
+  html: string;
+}) {
+  if (!process.env.RESEND_API_KEY || !resend) {
+    console.warn('RESEND_API_KEY non configuré, email non envoyé');
+    return { success: false, error: 'Service email non configuré' };
+  }
+
+  try {
+    const { data, error } = await resend.emails.send({
+      from: process.env.RESEND_FROM_EMAIL || 'ChantiFlow <onboarding@resend.dev>',
+      to,
+      subject,
+      html,
+    });
+
+    if (error) {
+      console.error('❌ Erreur Resend:', error);
+      return { success: false, error: error.message };
+    }
+
+    console.log('✅ Email envoyé avec succès à:', to);
+    return { success: true, data };
+  } catch (error) {
+    console.error('❌ Exception lors de l\'envoi email:', error);
+    return { success: false, error: error instanceof Error ? error.message : 'Erreur inconnue' };
+  }
+}
+
 export async function sendWorkerWelcomeEmail({
   workerEmail,
   workerName,
