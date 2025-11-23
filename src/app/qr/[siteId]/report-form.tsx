@@ -2,7 +2,6 @@
 
 import { startTransition, useActionState, useEffect, useMemo, useState } from "react";
 import { useFormStatus } from "react-dom";
-import { Eye, Loader2 } from "lucide-react";
 import { submitReportAction, type ReportState } from './actions';
 
 const initialState: ReportState = {};
@@ -42,8 +41,6 @@ export function ReportForm({ siteId, tasks, workers }: Props) {
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
   const [role, setRole] = useState('');
-  const [selectedPhoto, setSelectedPhoto] = useState<File | null>(null);
-  const [isAnalyzingPhoto, setIsAnalyzingPhoto] = useState(false);
 
   const matchedWorker = useMemo(
     () =>
@@ -63,39 +60,9 @@ export function ReportForm({ siteId, tasks, workers }: Props) {
         setEmail('');
         setName('');
         setRole('');
-        setSelectedPhoto(null);
       });
     }
   }, [state?.success]);
-
-  // Fonction pour analyser la photo (simulation pour l'instant)
-  const handleAnalyzePhoto = async () => {
-    if (!selectedPhoto) return;
-
-    setIsAnalyzingPhoto(true);
-
-    try {
-      // Simulation d'une analyse de photo
-      // En production, cela appellerait une vraie API de Vision par Ordinateur
-      await new Promise((resolve) => setTimeout(resolve, 1500)); // Simuler un délai
-
-      // Résultats simulés
-      const nonConformites = [
-        'EPI manquant',
-        'Outil mal rangé',
-        'Zone de sécurité non respectée',
-      ];
-
-      alert(
-        `Analyse en cours...\n\nDétection de ${nonConformites.length} non-conformité(s):\n${nonConformites.map((nc, i) => `${i + 1}. ${nc}`).join('\n')}\n\n⚠️ Cette fonctionnalité sera bientôt connectée à une API de Vision par Ordinateur.`
-      );
-    } catch (error) {
-      console.error('Erreur lors de l\'analyse de la photo:', error);
-      alert('Erreur lors de l\'analyse de la photo. Veuillez réessayer.');
-    } finally {
-      setIsAnalyzingPhoto(false);
-    }
-  };
 
   return (
     <form
@@ -236,39 +203,13 @@ export function ReportForm({ siteId, tasks, workers }: Props) {
         >
           Photo (optionnel)
         </label>
-        <div className="flex gap-2">
-          <input
-            id="photo"
-            name="photo"
-            type="file"
-            accept="image/*"
-            onChange={(e) => {
-              const file = e.target.files?.[0] || null;
-              setSelectedPhoto(file);
-            }}
-            className="flex-1 rounded-md border border-dashed border-zinc-300 px-3 py-2 text-sm text-zinc-500 dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-200"
-          />
-          {selectedPhoto && (
-            <button
-              type="button"
-              onClick={handleAnalyzePhoto}
-              disabled={isAnalyzingPhoto}
-              className="rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50 flex items-center gap-2"
-            >
-              {isAnalyzingPhoto ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  Analyse...
-                </>
-              ) : (
-                <>
-                  <Eye className="h-4 w-4" />
-                  Analyser
-                </>
-              )}
-            </button>
-          )}
-        </div>
+        <input
+          id="photo"
+          name="photo"
+          type="file"
+          accept="image/*"
+          className="w-full rounded-md border border-dashed border-zinc-300 px-3 py-2 text-sm text-zinc-500 dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-200"
+        />
         <p className="text-xs text-zinc-500 dark:text-zinc-300">
           Formats acceptés: JPG, PNG. Taille max définie par Supabase Storage.
         </p>
