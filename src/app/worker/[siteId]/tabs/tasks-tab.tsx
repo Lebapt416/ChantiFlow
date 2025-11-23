@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { createSupabaseBrowserClient } from '@/lib/supabase/client';
 import { Clock, CheckCircle2 } from 'lucide-react';
+import { TaskDetailModal } from './task-detail-modal';
 
 type Task = {
   id: string;
@@ -20,6 +21,7 @@ export function TasksTab({ siteId, workerId }: Props) {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [siteName, setSiteName] = useState('');
+  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
 
   useEffect(() => {
     async function loadData() {
@@ -82,9 +84,10 @@ export function TasksTab({ siteId, workerId }: Props) {
           </h3>
           <div className="space-y-2 sm:space-y-3">
             {pendingTasks.map((task) => (
-              <div
+              <button
                 key={task.id}
-                className="rounded-lg border border-zinc-200 bg-white p-3 sm:p-4 dark:border-zinc-800 dark:bg-zinc-900"
+                onClick={() => setSelectedTaskId(task.id)}
+                className="w-full text-left rounded-lg border border-zinc-200 bg-white p-3 sm:p-4 transition hover:bg-zinc-50 hover:border-zinc-300 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:bg-zinc-800 dark:hover:border-zinc-700"
               >
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex-1 min-w-0">
@@ -99,7 +102,7 @@ export function TasksTab({ siteId, workerId }: Props) {
                   </div>
                   <Clock className="h-4 w-4 sm:h-5 sm:w-5 text-amber-500 flex-shrink-0" />
                 </div>
-              </div>
+              </button>
             ))}
           </div>
         </div>
@@ -112,9 +115,10 @@ export function TasksTab({ siteId, workerId }: Props) {
           </h3>
           <div className="space-y-2">
             {completedTasks.map((task) => (
-              <div
+              <button
                 key={task.id}
-                className="rounded-lg border border-zinc-200 bg-white p-4 opacity-75 dark:border-zinc-800 dark:bg-zinc-900"
+                onClick={() => setSelectedTaskId(task.id)}
+                className="w-full text-left rounded-lg border border-zinc-200 bg-white p-4 opacity-75 transition hover:opacity-100 hover:bg-zinc-50 hover:border-zinc-300 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:bg-zinc-800 dark:hover:border-zinc-700"
               >
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
@@ -129,7 +133,7 @@ export function TasksTab({ siteId, workerId }: Props) {
                   </div>
                   <CheckCircle2 className="h-5 w-5 text-emerald-500 flex-shrink-0 ml-2" />
                 </div>
-              </div>
+              </button>
             ))}
           </div>
         </div>
@@ -141,6 +145,16 @@ export function TasksTab({ siteId, workerId }: Props) {
             Aucune tâche disponible pour le moment.
           </p>
         </div>
+      )}
+
+      {/* Modal de détails */}
+      {selectedTaskId && (
+        <TaskDetailModal
+          taskId={selectedTaskId}
+          siteId={siteId}
+          isOpen={!!selectedTaskId}
+          onClose={() => setSelectedTaskId(null)}
+        />
       )}
     </div>
   );

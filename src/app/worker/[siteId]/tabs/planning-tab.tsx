@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react';
 import { createSupabaseBrowserClient } from '@/lib/supabase/client';
 import { getWorkerPlanning } from '../actions';
-import { CheckCircle2, XCircle, Calendar, Clock, AlertCircle } from 'lucide-react';
+import { CheckCircle2, XCircle, Calendar, Clock, AlertCircle, Eye } from 'lucide-react';
+import { PlanningDetailModal } from './planning-detail-modal';
 
 type PlanningTask = {
   taskId: string;
@@ -12,7 +13,9 @@ type PlanningTask = {
   startDate: string;
   endDate: string;
   assignedWorkerId: string | null;
+  assignedWorkerIds?: string[];
   priority: 'high' | 'medium' | 'low';
+  estimatedHours?: number;
   validated?: boolean;
 };
 
@@ -26,6 +29,7 @@ export function PlanningTab({ siteId, workerId }: Props) {
   const [isLoading, setIsLoading] = useState(true);
   const [siteName, setSiteName] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [showDetailModal, setShowDetailModal] = useState(false);
 
   useEffect(() => {
     async function loadPlanning() {
@@ -133,13 +137,24 @@ export function PlanningTab({ siteId, workerId }: Props) {
 
   return (
     <div className="p-3 sm:p-4 md:p-6 space-y-4 sm:space-y-6">
-      <div>
-        <h2 className="text-base sm:text-lg font-semibold text-zinc-900 dark:text-white mb-1">
-          Mon emploi du temps
-        </h2>
-        <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400">
-          {siteName || 'Chantier'} • {planning.length} tâche{planning.length > 1 ? 's' : ''} planifiée{planning.length > 1 ? 's' : ''}
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-base sm:text-lg font-semibold text-zinc-900 dark:text-white mb-1">
+            Mon emploi du temps
+          </h2>
+          <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400">
+            {siteName || 'Chantier'} • {planning.length} tâche{planning.length > 1 ? 's' : ''} planifiée{planning.length > 1 ? 's' : ''}
+          </p>
+        </div>
+        {planning.length > 0 && (
+          <button
+            onClick={() => setShowDetailModal(true)}
+            className="flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-xs font-medium text-zinc-700 transition hover:bg-zinc-50 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
+          >
+            <Eye className="h-4 w-4" />
+            <span className="hidden sm:inline">Voir en détail</span>
+          </button>
+        )}
       </div>
 
       {planning.length === 0 ? (
@@ -214,6 +229,16 @@ export function PlanningTab({ siteId, workerId }: Props) {
             </div>
           ))}
         </div>
+      )}
+
+      {/* Modal de détails du planning */}
+      {showDetailModal && (
+        <PlanningDetailModal
+          planning={planning}
+          siteName={siteName || 'Chantier'}
+          isOpen={showDetailModal}
+          onClose={() => setShowDetailModal(false)}
+        />
       )}
     </div>
   );

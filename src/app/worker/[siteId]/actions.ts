@@ -11,7 +11,9 @@ export type WorkerPlanningResult = {
     startDate: string;
     endDate: string;
     assignedWorkerId: string | null;
+    assignedWorkerIds?: string[];
     priority: 'high' | 'medium' | 'low';
+    estimatedHours?: number;
   }>;
   error?: string;
 };
@@ -78,14 +80,29 @@ export async function getWorkerPlanning(
     // Mapper les tâches avec leurs titres
     const allPlanning = planningResult.orderedTasks.map((p) => {
       const task = tasks.find((t) => t.id === p.taskId);
+      // Gérer les deux formats: assignedWorkerIds (nouveau) ou assignedWorkerId (ancien)
+      const assignedWorkerIds = 'assignedWorkerIds' in p && Array.isArray(p.assignedWorkerIds)
+        ? p.assignedWorkerIds
+        : p.assignedWorkerId
+        ? [p.assignedWorkerId]
+        : [];
+      const assignedWorkerId = assignedWorkerIds.length > 0 ? assignedWorkerIds[0] : null;
+      
+      // Gérer estimatedHours (peut être présent ou non selon la version de generatePlanning)
+      const estimatedHours = 'estimatedHours' in p && typeof p.estimatedHours === 'number'
+        ? p.estimatedHours
+        : undefined;
+      
       return {
         taskId: p.taskId,
         taskTitle: task?.title || 'Tâche inconnue',
         order: p.order,
         startDate: p.startDate,
         endDate: p.endDate,
-        assignedWorkerId: p.assignedWorkerId,
+        assignedWorkerId,
+        assignedWorkerIds,
         priority: p.priority,
+        estimatedHours,
       };
     });
 
