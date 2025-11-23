@@ -15,6 +15,6 @@ BEGIN
     CREATE INDEX IF NOT EXISTS idx_workers_access_code ON workers(access_code);
     
     -- Commentaire pour la documentation
-    COMMENT ON COLUMN workers.access_code IS 'Code unique d''accès pour l''espace employé (8 caractères alphanumériques)';
+    COMMENT ON COLUMN workers.access_code IS 'Code unique d''accès pour l''espace employé (format: 4 chiffres + 4 lettres, ex: 1234ABCD)';
   END IF;
 END $$;
