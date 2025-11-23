@@ -2,6 +2,8 @@ import { redirect } from 'next/navigation';
 import { AppShell } from '@/components/app-shell';
 import { WorkerLoginForm } from './worker-login-form';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata = {
   title: 'Connexion Employé | ChantiFlow',
 };

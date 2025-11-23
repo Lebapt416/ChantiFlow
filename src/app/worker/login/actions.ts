@@ -19,6 +19,7 @@ export async function workerLoginAction(
 ): Promise<WorkerLoginState> {
   const email = String(formData.get('email') ?? '').trim().toLowerCase();
   const accessCode = String(formData.get('access_code') ?? '').trim().toUpperCase();
+  const siteIdFromUrl = String(formData.get('siteId') ?? '').trim();
 
   if (!email || !accessCode) {
     return { error: 'Email et code d\'accès requis.' };
@@ -38,16 +39,36 @@ export async function workerLoginAction(
     return { error: 'Code d\'accès ou email incorrect.' };
   }
 
-  // Vérifier que le worker a un site_id (assigné à un chantier)
-  if (!worker.site_id) {
-    return { error: 'Aucun chantier assigné. Contactez votre responsable.' };
+  // Si un siteId est fourni dans l'URL, vérifier que le worker est assigné à ce chantier
+  let finalSiteId = worker.site_id;
+  if (siteIdFromUrl) {
+    // Vérifier que le worker est bien assigné à ce chantier
+    if (worker.site_id !== siteIdFromUrl) {
+      // Peut-être que le worker est au niveau du compte, vérifier s'il peut accéder à ce chantier
+      const { data: siteWorker } = await supabase
+        .from('workers')
+        .select('id, site_id')
+        .eq('id', worker.id)
+        .eq('site_id', siteIdFromUrl)
+        .single();
+      
+      if (!siteWorker) {
+        return { error: 'Vous n\'êtes pas assigné à ce chantier.' };
+      }
+      finalSiteId = siteIdFromUrl;
+    }
+  } else {
+    // Si pas de siteId dans l'URL, vérifier que le worker a un site_id
+    if (!worker.site_id) {
+      return { error: 'Aucun chantier assigné. Contactez votre responsable.' };
+    }
   }
 
   // Créer un cookie de session pour le worker
   const cookieStore = await cookies();
   cookieStore.set('worker_session', JSON.stringify({
     workerId: worker.id,
-    siteId: worker.site_id,
+    siteId: finalSiteId,
     email: worker.email,
     name: worker.name,
   }), {
@@ -61,7 +82,7 @@ export async function workerLoginAction(
   return {
     success: true,
     workerId: worker.id,
-    siteId: worker.site_id,
+    siteId: finalSiteId,
   };
 }
 

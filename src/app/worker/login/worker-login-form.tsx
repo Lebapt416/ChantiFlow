@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useTransition } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useTransition, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useFormStatus } from 'react-dom';
 import { LogIn, Loader2, Mail } from 'lucide-react';
 import { workerLoginAction } from './actions';
@@ -37,8 +37,15 @@ export function WorkerLoginForm() {
   const [isPending, startTransition] = useTransition();
   const [state, setState] = useState<LoginState | null>(null);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const siteIdFromUrl = searchParams.get('siteId');
 
   async function handleSubmit(formData: FormData) {
+    // Ajouter le siteId depuis l'URL si présent
+    if (siteIdFromUrl) {
+      formData.append('siteId', siteIdFromUrl);
+    }
+
     startTransition(async () => {
       const result = await workerLoginAction({}, formData);
       setState(result);
@@ -78,19 +85,30 @@ export function WorkerLoginForm() {
         >
           Code d'accès
         </label>
-        <input
-          id="access_code"
-          name="access_code"
-          type="text"
-          placeholder="XXXXXXXX"
-          required
-          maxLength={8}
-          className="w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-center text-lg font-mono font-bold tracking-widest shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:border-zinc-600 dark:bg-zinc-800 dark:text-white"
-          style={{ letterSpacing: '0.5em' }}
-        />
-        <p className="text-xs text-zinc-500 dark:text-zinc-400">
-          Le code vous a été envoyé par email lors de l'assignation de votre tâche.
-        </p>
+          <input
+            id="access_code"
+            name="access_code"
+            type="text"
+            placeholder="1234ABCD"
+            required
+            maxLength={8}
+            pattern="[0-9]{4}[A-Z]{4}"
+            className="w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-center text-lg font-mono font-bold tracking-widest shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:border-zinc-600 dark:bg-zinc-800 dark:text-white uppercase"
+            style={{ letterSpacing: '0.3em' }}
+            onChange={(e) => {
+              // Forcer le format: 4 chiffres + 4 lettres
+              let value = e.target.value.toUpperCase().replace(/[^0-9A-Z]/g, '');
+              // Séparer les chiffres et les lettres
+              const digits = value.match(/[0-9]/g)?.join('') || '';
+              const letters = value.match(/[A-Z]/g)?.join('') || '';
+              // Limiter à 4 chiffres puis 4 lettres
+              const formatted = (digits.slice(0, 4) + letters.slice(0, 4)).slice(0, 8);
+              e.target.value = formatted;
+            }}
+          />
+          <p className="text-xs text-zinc-500 dark:text-zinc-400">
+            Format: 4 chiffres + 4 lettres (ex: 1234ABCD). Le code vous a été envoyé par email lors de l'assignation de votre tâche.
+          </p>
       </div>
 
       {state?.error && (

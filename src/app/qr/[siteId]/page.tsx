@@ -1,4 +1,4 @@
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { ReportForm } from './report-form';
 
@@ -77,40 +77,7 @@ export default async function QrAccessPage({ params }: Params) {
 
   const workers = Array.from(workerMap.values());
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-zinc-100 via-white to-zinc-50 p-6 text-zinc-900 dark:from-zinc-900 dark:via-zinc-800 dark:to-black dark:text-white">
-      <div className="mx-auto max-w-4xl space-y-8">
-        <header className="rounded-3xl border border-zinc-200 bg-white/80 p-8 backdrop-blur dark:border-white/10 dark:bg-white/5">
-          <p className="text-xs uppercase tracking-[0.5em] text-zinc-500 dark:text-white/70">
-            Accès chantier
-          </p>
-          <h1 className="mt-3 text-4xl font-semibold dark:text-white">
-            {site.name}
-          </h1>
-          <p className="text-sm text-zinc-600 dark:text-white/70">
-            Deadline{' '}
-            {site.deadline
-              ? new Date(site.deadline).toLocaleDateString('fr-FR')
-              : 'Non communiquée'}
-          </p>
-        </header>
-
-        <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-6 dark:border-emerald-800 dark:bg-emerald-900/20">
-          <h2 className="text-xl font-semibold text-zinc-900 dark:text-white mb-2">
-            Accès sécurisé
-          </h2>
-          <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-4">
-            Pour accéder à vos informations et envoyer des rapports, vous devez d'abord entrer votre code d'accès unique.
-          </p>
-          <a
-            href={`/qr/${site.id}/verify`}
-            className="inline-block rounded-lg bg-emerald-600 px-6 py-3 text-base font-semibold text-white transition hover:bg-emerald-700"
-          >
-            Entrer mon code d'accès
-          </a>
-        </div>
-      </div>
-    </div>
-  );
+  // Rediriger automatiquement vers la page de connexion worker
+  redirect(`/worker/login?siteId=${site.id}`);
 }
 

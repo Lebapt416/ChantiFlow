@@ -11,14 +11,23 @@ export function generateWorkerAccessCode(): string {
 }
 
 /**
- * Génère un code unique alphanumérique de 8 caractères
+ * Génère un code unique au format 4 chiffres + 4 lettres (ex: 1234ABCD)
  */
 export function generateWorkerAccessCodeAlphanumeric(): string {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // Exclut les caractères ambigus (0, O, I, 1)
-  let code = '';
-  for (let i = 0; i < 8; i++) {
-    code += chars.charAt(Math.floor(Math.random() * chars.length));
+  // 4 chiffres (0-9)
+  const digits = '0123456789';
+  let digitPart = '';
+  for (let i = 0; i < 4; i++) {
+    digitPart += digits.charAt(Math.floor(Math.random() * digits.length));
   }
-  return code;
+  
+  // 4 lettres (exclut les caractères ambigus: O, I, 0, 1)
+  const letters = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+  let letterPart = '';
+  for (let i = 0; i < 4; i++) {
+    letterPart += letters.charAt(Math.floor(Math.random() * letters.length));
+  }
+  
+  return digitPart + letterPart; // Format: 1234ABCD
 }
 
