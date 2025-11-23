@@ -22,19 +22,33 @@ export default function WorkerMobilePage() {
   useEffect(() => {
     if (!siteId) return;
 
-    // Récupérer l'ID du worker depuis le localStorage
-    const storedWorkerId = localStorage.getItem(`worker_${siteId}`);
-    const storedWorkerName = localStorage.getItem(`worker_name_${siteId}`);
+    // Vérifier la session worker via les cookies (gérés côté serveur)
+    // Si pas de session, rediriger vers la page de connexion
+    async function checkSession() {
+      try {
+        const response = await fetch('/api/worker/session', {
+          method: 'GET',
+          credentials: 'include',
+        });
 
-    if (!storedWorkerId) {
-      // Rediriger vers la page de vérification si pas de worker ID
-      window.location.href = `/qr/${siteId}/verify`;
-      return;
+        if (response.ok) {
+          const data = await response.json();
+          if (data.workerId && data.siteId === siteId) {
+            setWorkerId(data.workerId);
+            setWorkerName(data.name || '');
+            setIsLoading(false);
+            return;
+          }
+        }
+      } catch (error) {
+        console.error('Erreur vérification session:', error);
+      }
+
+      // Pas de session valide, rediriger vers la connexion
+      window.location.href = `/worker/login?siteId=${siteId}`;
     }
 
-    setWorkerId(storedWorkerId);
-    setWorkerName(storedWorkerName || '');
-    setIsLoading(false);
+    checkSession();
   }, [siteId]);
 
   if (isLoading || !workerId || !siteId) {
