@@ -108,18 +108,22 @@ export async function generateAIPlanningAction(
       const dbTask = pendingTasks.find((t) => t.id === task.taskId);
       const assignedWorkerIdFromDb = dbTask?.assigned_worker_id;
       
-      // Si la tâche a un worker assigné en DB mais pas dans le planning IA, l'utiliser
-      let finalAssignedWorkerIds = task.assignedWorkerIds || (task.assignedWorkerId ? [task.assignedWorkerId] : []);
-      if (assignedWorkerIdFromDb && !finalAssignedWorkerIds.includes(assignedWorkerIdFromDb)) {
-        finalAssignedWorkerIds = [assignedWorkerIdFromDb, ...finalAssignedWorkerIds];
+      // Prioriser l'assignation de la base de données si elle existe
+      let finalAssignedWorkerIds: string[] = [];
+      if (assignedWorkerIdFromDb) {
+        // Si la tâche a un worker assigné en DB, l'utiliser en priorité
+        finalAssignedWorkerIds = [assignedWorkerIdFromDb];
+      } else {
+        // Sinon utiliser l'assignation de l'IA
+        finalAssignedWorkerIds = task.assignedWorkerIds || (task.assignedWorkerId ? [task.assignedWorkerId] : []);
       }
       
       return {
         ...task,
         taskTitle: dbTask?.title || 'Tâche inconnue',
         // Utiliser l'assignation de la DB si disponible, sinon celle de l'IA
-        assignedWorkerId: assignedWorkerIdFromDb || task.assignedWorkerIds?.[0] || task.assignedWorkerId || null,
-        assignedWorkerIds: finalAssignedWorkerIds.length > 0 ? finalAssignedWorkerIds : (assignedWorkerIdFromDb ? [assignedWorkerIdFromDb] : []),
+        assignedWorkerId: finalAssignedWorkerIds[0] || null,
+        assignedWorkerIds: finalAssignedWorkerIds,
         estimatedHours: task.estimatedHours || dbTask?.duration_hours || 8,
       };
     });
