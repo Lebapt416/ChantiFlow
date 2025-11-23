@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from 'react';
 import { useFormStatus } from 'react-dom';
+import Link from 'next/link';
 import { UserPlus, X, Loader2, User } from 'lucide-react';
 import { assignTaskAction, type AssignTaskState } from './actions';
 
@@ -106,38 +107,64 @@ export function AssignTaskButton({ taskId, siteId, currentWorkerId, availableWor
             </button>
           </div>
 
-          <form action={handleSubmit}>
-            <input type="hidden" name="taskId" value={taskId} />
-            
+          {availableWorkers.length === 0 ? (
             <div className="space-y-2">
-              <select
-                name="workerId"
-                className="w-full rounded-md border border-zinc-200 bg-white px-2 py-1.5 text-xs shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:border-zinc-600 dark:bg-zinc-900 dark:text-white"
-                defaultValue={currentWorkerId || ''}
+              <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                Aucun membre d'équipe disponible. Ajoutez des membres dans la page "Équipe".
+              </p>
+              <Link
+                href="/team"
+                className="block rounded-md bg-emerald-600 px-3 py-1.5 text-center text-xs font-medium text-white transition hover:bg-emerald-700"
               >
-                <option value="">Aucun (désassigner)</option>
-                {availableWorkers.map((worker) => (
-                  <option key={worker.id} value={worker.id}>
-                    {worker.name} {worker.role ? `(${worker.role})` : ''}
-                  </option>
-                ))}
-              </select>
+                Aller à l'équipe →
+              </Link>
+            </div>
+          ) : (
+            <form action={handleSubmit}>
+              <input type="hidden" name="taskId" value={taskId} />
+              
+              <div className="space-y-2">
+                <select
+                  name="workerId"
+                  className="w-full rounded-md border border-zinc-200 bg-white px-2 py-1.5 text-xs shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:border-zinc-600 dark:bg-zinc-900 dark:text-white"
+                  defaultValue={currentWorkerId || ''}
+                >
+                  <option value="">Aucun (désassigner)</option>
+                  {availableWorkers.map((worker) => (
+                    <option key={worker.id} value={worker.id}>
+                      {worker.name} {worker.role ? `(${worker.role})` : ''}
+                    </option>
+                  ))}
+                </select>
 
-              <div className="flex items-center justify-between gap-2">
-                <div className="text-xs text-zinc-500 dark:text-zinc-400">
+                <div className="flex flex-col gap-2">
                   {state?.error && (
-                    <span className="text-rose-600 dark:text-rose-400">{state.error}</span>
+                    <div className="rounded-md bg-rose-50 p-2 text-xs text-rose-700 dark:bg-rose-900/30 dark:text-rose-300">
+                      {state.error}
+                      {state.error.includes('assigned_worker_id') && (
+                        <div className="mt-1">
+                          <Link
+                            href="/team"
+                            className="underline"
+                          >
+                            Exécutez la migration SQL: migration-task-assigned-worker.sql
+                          </Link>
+                        </div>
+                      )}
+                    </div>
                   )}
                   {state?.success && (
-                    <span className="text-emerald-600 dark:text-emerald-400">
-                      Assignation mise à jour
-                    </span>
+                    <div className="rounded-md bg-emerald-50 p-2 text-xs text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300">
+                      ✅ Assignation mise à jour avec succès
+                    </div>
                   )}
+                  <div className="flex items-center justify-end">
+                    <SubmitButton isPending={isPending} />
+                  </div>
                 </div>
-                <SubmitButton isPending={isPending} />
               </div>
-            </div>
-          </form>
+            </form>
+          )}
         </div>
       )}
     </div>

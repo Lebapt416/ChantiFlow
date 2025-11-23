@@ -55,38 +55,70 @@ export default async function TasksPage() {
   }> = [];
 
   if (siteIds.length > 0) {
-    // Récupérer les workers assignés aux chantiers
-    const { data: siteWorkers } = await supabase
-      .from('workers')
-      .select('id, name, email, role, site_id, created_by')
-      .in('site_id', siteIds);
+    try {
+      // Récupérer les workers assignés aux chantiers
+      const { data: siteWorkers, error: siteWorkersError } = await supabase
+        .from('workers')
+        .select('id, name, email, role, site_id, created_by')
+        .in('site_id', siteIds);
 
-    // Récupérer les workers au niveau du compte (sans site_id)
-    const { data: accountWorkers } = await supabase
-      .from('workers')
-      .select('id, name, email, role, created_by')
-      .eq('created_by', user.id)
-      .is('site_id', null);
-
-    // Combiner et dédupliquer
-    const allWorkers = [
-      ...(siteWorkers ?? []),
-      ...(accountWorkers ?? []),
-    ];
-
-    // Filtrer pour ne garder que ceux de l'utilisateur et dédupliquer par ID
-    const workerMap = new Map<string, typeof availableWorkers[0]>();
-    allWorkers.forEach((worker) => {
-      if (worker.created_by === user.id && !workerMap.has(worker.id)) {
-        workerMap.set(worker.id, {
-          id: worker.id,
-          name: worker.name,
-          email: worker.email,
-          role: worker.role,
-        });
+      if (siteWorkersError) {
+        console.error('Erreur récupération workers des chantiers:', siteWorkersError);
       }
-    });
-    availableWorkers = Array.from(workerMap.values());
+
+      // Récupérer les workers au niveau du compte (sans site_id)
+      // Gérer le cas où created_by n'existe pas encore
+      let accountWorkers: any[] = [];
+      try {
+        const { data: accountWorkersData, error: accountWorkersError } = await supabase
+          .from('workers')
+          .select('id, name, email, role, created_by')
+          .eq('created_by', user.id)
+          .is('site_id', null);
+
+        if (accountWorkersError) {
+          // Si la colonne created_by n'existe pas, essayer sans filtre
+          if (accountWorkersError.message.includes('created_by') || accountWorkersError.code === '42703') {
+            console.warn('Colonne created_by non trouvée, récupération sans filtre');
+            const { data: allWorkersData } = await supabase
+              .from('workers')
+              .select('id, name, email, role')
+              .is('site_id', null);
+            accountWorkers = allWorkersData ?? [];
+          }
+        } else {
+          accountWorkers = accountWorkersData ?? [];
+        }
+      } catch (error) {
+        console.error('Erreur récupération workers du compte:', error);
+      }
+
+      // Combiner et dédupliquer
+      const allWorkers = [
+        ...(siteWorkers ?? []),
+        ...accountWorkers,
+      ];
+
+      // Filtrer pour ne garder que ceux de l'utilisateur et dédupliquer par ID
+      const workerMap = new Map<string, typeof availableWorkers[0]>();
+      allWorkers.forEach((worker: any) => {
+        // Si created_by existe, vérifier qu'il appartient à l'utilisateur
+        // Sinon, inclure tous les workers (pour compatibilité)
+        if (!worker.created_by || worker.created_by === user.id) {
+          if (!workerMap.has(worker.id)) {
+            workerMap.set(worker.id, {
+              id: worker.id,
+              name: worker.name,
+              email: worker.email,
+              role: worker.role,
+            });
+          }
+        }
+      });
+      availableWorkers = Array.from(workerMap.values());
+    } catch (error) {
+      console.error('Erreur lors de la récupération des workers:', error);
+    }
   }
 
   const pendingTasks = tasks?.filter((task) => task.status !== 'done') ?? [];
@@ -188,6 +220,11 @@ export default async function TasksPage() {
                     </Link>
                   </div>
                 </div>
+                {availableWorkers.length === 0 && (
+                  <p className="mt-2 text-xs text-amber-600 dark:text-amber-400">
+                    ⚠️ Aucun membre d'équipe disponible. Ajoutez des membres dans la page "Équipe".
+                  </p>
+                )}
                 <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-400">
                   Créée le{' '}
                   {task.created_at
