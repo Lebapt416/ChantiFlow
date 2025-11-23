@@ -4,12 +4,19 @@
 
 echo "🚀 Démarrage de l'API FastAPI ChantiFlow..."
 
+# Obtenir le répertoire du script
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+cd "$SCRIPT_DIR"
+
 # Vérifier que nous sommes dans le bon dossier
 if [ ! -f "api.py" ]; then
-    echo "❌ Erreur: Ce script doit être exécuté depuis le dossier 'ml'"
-    echo "   Exécutez: cd ml && ./start.sh"
+    echo "❌ Erreur: Le fichier api.py est introuvable"
+    echo "   Répertoire actuel: $(pwd)"
+    echo "   Exécutez ce script depuis le dossier 'ml'"
     exit 1
 fi
+
+echo "📁 Répertoire de travail: $(pwd)"
 
 # Vérifier que Python est installé
 if ! command -v python3 &> /dev/null; then
@@ -39,6 +46,7 @@ fi
 
 # Démarrer l'API
 echo "✅ Démarrage de l'API sur http://localhost:8000"
+echo "   Répertoire: $(pwd)"
 echo "   Appuyez sur CTRL+C pour arrêter"
 echo ""
 
