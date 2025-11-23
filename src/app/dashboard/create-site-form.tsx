@@ -3,9 +3,11 @@
 import { useActionState, useEffect, useState } from "react";
 import { useFormStatus } from "react-dom";
 import { useRouter } from "next/navigation";
-import { Sparkles, Loader2, Calendar } from "lucide-react";
+import { Sparkles, Loader2, Calendar, AlertTriangle, Users } from "lucide-react";
 import { createSiteAction, type CreateSiteState } from './actions';
 import { getPrediction } from '@/lib/ai/prediction';
+import { analyserRisqueRetard } from '@/lib/ai/risk-analysis';
+import { recommanderEquipe } from '@/lib/ai/team-recommendation';
 
 const initialState: CreateSiteState = {};
 
@@ -35,6 +37,17 @@ export function CreateSiteForm({ onSuccess }: Props) {
   const [predictedDuree, setPredictedDuree] = useState<number | null>(null);
   const [isPredicting, setIsPredicting] = useState(false);
   const [predictionError, setPredictionError] = useState<string | null>(null);
+  
+  // État pour l'analyse de risque
+  const [risqueRetard, setRisqueRetard] = useState<{ pourcentage: number; justification: string } | null>(null);
+  const [isAnalyzingRisk, setIsAnalyzingRisk] = useState(false);
+  const [riskError, setRiskError] = useState<string | null>(null);
+  
+  // État pour la recommandation d'équipe
+  const [typeTache, setTypeTache] = useState<string>('');
+  const [recommandationEquipe, setRecommandationEquipe] = useState<{ equipe: string; performance: number } | null>(null);
+  const [isRecommending, setIsRecommending] = useState(false);
+  const [recommendationError, setRecommendationError] = useState<string | null>(null);
 
   useEffect(() => {
     if (state?.success) {
@@ -90,6 +103,79 @@ export function CreateSiteForm({ onSuccess }: Props) {
       setPredictedDuree(null);
     } finally {
       setIsPredicting(false);
+    }
+  };
+
+  // Fonction pour analyser le risque de retard
+  const handleAnalyzeRisk = async () => {
+    const comp = parseFloat(complexite);
+    const taches = parseInt(nombreTaches);
+
+    if (!comp || comp < 1 || comp > 10) {
+      setRiskError('La complexité doit être entre 1.0 et 10.0');
+      return;
+    }
+
+    setIsAnalyzingRisk(true);
+    setRiskError(null);
+
+    try {
+      // Simuler un historique basé sur le nombre de tâches et la complexité
+      // En production, cela viendrait de la base de données
+      const historiqueSimule = Array.from({ length: Math.min(10, Math.max(3, Math.floor(taches / 5))) }, () => {
+        const base = taches * 0.5;
+        const variation = (comp / 10) * base * 0.3;
+        return Math.max(1, Math.round(base + (Math.random() - 0.5) * variation));
+      });
+
+      const result = await analyserRisqueRetard(historiqueSimule, Math.round(comp));
+      setRisqueRetard({
+        pourcentage: result.risque_pourcentage,
+        justification: result.justification,
+      });
+    } catch (error) {
+      setRiskError(
+        error instanceof Error
+          ? error.message
+          : 'Erreur lors de l\'analyse de risque. Vérifiez que l\'API est démarrée.'
+      );
+      setRisqueRetard(null);
+    } finally {
+      setIsAnalyzingRisk(false);
+    }
+  };
+
+  // Fonction pour recommander une équipe
+  const handleRecommendTeam = async () => {
+    if (!typeTache || typeTache.trim() === '') {
+      setRecommendationError('Veuillez entrer un type de tâche');
+      return;
+    }
+
+    const comp = parseFloat(complexite);
+    if (!comp || comp < 1 || comp > 10) {
+      setRecommendationError('La complexité doit être entre 1.0 et 10.0');
+      return;
+    }
+
+    setIsRecommending(true);
+    setRecommendationError(null);
+
+    try {
+      const result = await recommanderEquipe(typeTache, Math.round(comp));
+      setRecommandationEquipe({
+        equipe: result.equipe_recommandee,
+        performance: result.performance_attendue,
+      });
+    } catch (error) {
+      setRecommendationError(
+        error instanceof Error
+          ? error.message
+          : 'Erreur lors de la recommandation d\'équipe. Vérifiez que l\'API est démarrée.'
+      );
+      setRecommandationEquipe(null);
+    } finally {
+      setIsRecommending(false);
     }
   };
 
@@ -199,6 +285,134 @@ export function CreateSiteForm({ onSuccess }: Props) {
         {predictionError && (
           <div className="mt-3 rounded-md bg-rose-100 p-2 text-xs text-rose-700 dark:bg-rose-900/30 dark:text-rose-300">
             {predictionError}
+          </div>
+        )}
+      </div>
+
+      {/* Section Analyse de risque */}
+      <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-900/20">
+        <div className="mb-3 flex items-center gap-2">
+          <AlertTriangle className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+          <h3 className="text-sm font-semibold text-amber-900 dark:text-amber-100">
+            Analyse de risque de retard
+          </h3>
+        </div>
+        
+        <button
+          type="button"
+          onClick={handleAnalyzeRisk}
+          disabled={isAnalyzingRisk || !complexite}
+          className="w-full rounded-md bg-amber-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-amber-700 disabled:cursor-not-allowed disabled:opacity-50 flex items-center justify-center gap-2"
+        >
+          {isAnalyzingRisk ? (
+            <>
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Analyse en cours...
+            </>
+          ) : (
+            <>
+              <AlertTriangle className="h-4 w-4" />
+              Vérifier le risque de retard
+            </>
+          )}
+        </button>
+
+        {/* Résultat de l'analyse de risque */}
+        {risqueRetard && (
+          <div className="mt-3 rounded-md bg-white p-3 dark:bg-zinc-800">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs font-medium text-amber-800 dark:text-amber-200">
+                Risque de retard
+              </span>
+              <span
+                className={`text-lg font-bold ${
+                  risqueRetard.pourcentage >= 70
+                    ? 'text-rose-600 dark:text-rose-400'
+                    : risqueRetard.pourcentage >= 40
+                    ? 'text-amber-600 dark:text-amber-400'
+                    : 'text-emerald-600 dark:text-emerald-400'
+                }`}
+              >
+                {risqueRetard.pourcentage}%
+              </span>
+            </div>
+            <p className="text-xs text-amber-700 dark:text-amber-300 mt-1">
+              {risqueRetard.justification}
+            </p>
+          </div>
+        )}
+
+        {/* Erreur d'analyse de risque */}
+        {riskError && (
+          <div className="mt-3 rounded-md bg-rose-100 p-2 text-xs text-rose-700 dark:bg-rose-900/30 dark:text-rose-300">
+            {riskError}
+          </div>
+        )}
+      </div>
+
+      {/* Section Recommandation d'équipe */}
+      <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-900/20">
+        <div className="mb-3 flex items-center gap-2">
+          <Users className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+          <h3 className="text-sm font-semibold text-blue-900 dark:text-blue-100">
+            Recommandation d'équipe
+          </h3>
+        </div>
+        
+        <div className="space-y-2">
+          <input
+            type="text"
+            value={typeTache}
+            onChange={(e) => setTypeTache(e.target.value)}
+            placeholder="Ex: maçonnerie, plomberie, électricité..."
+            className="w-full rounded-md border border-blue-200 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-blue-700 dark:bg-zinc-950 dark:text-white"
+          />
+          <button
+            type="button"
+            onClick={handleRecommendTeam}
+            disabled={isRecommending || !typeTache || !complexite}
+            className="w-full rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50 flex items-center justify-center gap-2"
+          >
+            {isRecommending ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Recherche...
+              </>
+            ) : (
+              <>
+                <Users className="h-4 w-4" />
+                Recommander une équipe
+              </>
+            )}
+          </button>
+        </div>
+
+        {/* Résultat de la recommandation */}
+        {recommandationEquipe && (
+          <div className="mt-3 rounded-md bg-white p-3 dark:bg-zinc-800">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs font-medium text-blue-800 dark:text-blue-200">
+                Équipe recommandée
+              </span>
+              <span className="text-sm font-bold text-blue-900 dark:text-blue-100">
+                {recommandationEquipe.equipe}
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-blue-700 dark:text-blue-300">
+                Performance attendue:
+              </span>
+              <span className="text-sm font-semibold text-blue-900 dark:text-blue-100">
+                {recommandationEquipe.performance.toFixed(1)}/10
+              </span>
+            </div>
+          </div>
+        )}
+
+        {/* Erreur de recommandation */}
+        {recommendationError && (
+          <div className="mt-3 rounded-md bg-rose-100 p-2 text-xs text-rose-700 dark:bg-rose-900/30 dark:text-rose-300">
+            {recommendationError}
           </div>
         )}
       </div>
