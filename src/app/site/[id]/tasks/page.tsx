@@ -4,6 +4,7 @@ import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { AppShell } from '@/components/app-shell';
 import { AddTaskForm } from '@/app/site/[id]/add-task-form';
 import { CompleteTaskButton } from '@/app/site/[id]/complete-task-button';
+import { AssignTaskButton } from '@/app/tasks/assign-task-button';
 
 type Params = {
   params: Promise<{
@@ -41,12 +42,44 @@ export default async function SiteTasksPage({ params }: Params) {
     notFound();
   }
 
-  // Récupérer les tâches du chantier
+  // Récupérer les tâches du chantier avec les workers assignés
   const { data: tasks } = await supabase
     .from('tasks')
-    .select('id, title, status, required_role, duration_hours, created_at')
+    .select('id, title, status, required_role, duration_hours, created_at, assigned_worker_id')
     .eq('site_id', site.id)
     .order('created_at', { ascending: true });
+
+  // Récupérer les workers du chantier et du compte
+  const [{ data: siteWorkers }, { data: accountWorkers }] = await Promise.all([
+    supabase
+      .from('workers')
+      .select('id, name, email, role, created_by')
+      .eq('site_id', site.id),
+    supabase
+      .from('workers')
+      .select('id, name, email, role, created_by')
+      .eq('created_by', user.id)
+      .is('site_id', null),
+  ]);
+
+  // Combiner et dédupliquer les workers
+  const allWorkers = [
+    ...(siteWorkers ?? []),
+    ...(accountWorkers ?? []),
+  ];
+
+  const workerMap = new Map<string, { id: string; name: string; email: string | null; role: string | null }>();
+  allWorkers.forEach((worker: any) => {
+    if ((!worker.created_by || worker.created_by === user.id) && !workerMap.has(worker.id)) {
+      workerMap.set(worker.id, {
+        id: worker.id,
+        name: worker.name,
+        email: worker.email,
+        role: worker.role,
+      });
+    }
+  });
+  const availableWorkers = Array.from(workerMap.values());
 
   const pendingTasks = tasks?.filter((task) => task.status !== 'done') ?? [];
   const doneTasks = tasks?.filter((task) => task.status === 'done') ?? [];
@@ -117,7 +150,7 @@ export default async function SiteTasksPage({ params }: Params) {
                   className="rounded-2xl border border-zinc-200 p-4 dark:border-zinc-700"
                 >
                   <div className="flex flex-wrap items-center justify-between gap-2">
-                    <div>
+                    <div className="flex-1 min-w-0">
                       <p className="text-sm font-semibold text-zinc-900 dark:text-white">
                         {task.title}
                       </p>
@@ -128,7 +161,15 @@ export default async function SiteTasksPage({ params }: Params) {
                           : ''}
                       </p>
                     </div>
-                    <CompleteTaskButton siteId={site.id} taskId={task.id} />
+                    <div className="flex items-center gap-3 flex-shrink-0">
+                      <AssignTaskButton
+                        taskId={task.id}
+                        siteId={site.id}
+                        currentWorkerId={(task as any).assigned_worker_id || null}
+                        availableWorkers={availableWorkers}
+                      />
+                      <CompleteTaskButton siteId={site.id} taskId={task.id} />
+                    </div>
                   </div>
                 </div>
               ))}

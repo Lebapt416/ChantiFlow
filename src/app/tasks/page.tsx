@@ -190,55 +190,58 @@ export default async function TasksPage() {
         </div>
         {pendingTasks.length ? (
           <div className="space-y-3">
-            {pendingTasks.map((task) => (
-              <div
-                key={task.id}
-                className="rounded-2xl border border-zinc-200 p-4 dark:border-zinc-700"
-              >
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <div className="flex-1">
-                    <p className="text-sm font-semibold text-zinc-900 dark:text-white">
-                      {task.title}
-                    </p>
-                    <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                      {siteMap[task.site_id]?.name ?? 'Site inconnu'} •{' '}
-                      {task.required_role || 'Rôle libre'}
-                    </p>
+            {pendingTasks.map((task) => {
+              const assignedWorkerId = (task as any).assigned_worker_id || null;
+              return (
+                <div
+                  key={task.id}
+                  className="rounded-2xl border border-zinc-200 p-4 dark:border-zinc-700"
+                >
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-zinc-900 dark:text-white">
+                        {task.title}
+                      </p>
+                      <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                        {siteMap[task.site_id]?.name ?? 'Site inconnu'} •{' '}
+                        {task.required_role || 'Rôle libre'}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-3 flex-shrink-0">
+                      <AssignTaskButton
+                        taskId={task.id}
+                        siteId={task.site_id}
+                        currentWorkerId={assignedWorkerId}
+                        availableWorkers={availableWorkers}
+                      />
+                      <Link
+                        href={`/site/${task.site_id}`}
+                        className="text-xs font-semibold text-black hover:underline dark:text-white whitespace-nowrap"
+                      >
+                        Voir le chantier →
+                      </Link>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <AssignTaskButton
-                      taskId={task.id}
-                      siteId={task.site_id}
-                      currentWorkerId={(task as any).assigned_worker_id || null}
-                      availableWorkers={availableWorkers}
-                    />
-                    <Link
-                      href={`/site/${task.site_id}`}
-                      className="text-xs font-semibold text-black hover:underline dark:text-white"
-                    >
-                      Voir le chantier →
-                    </Link>
-                  </div>
-                </div>
-                {availableWorkers.length === 0 && (
-                  <p className="mt-2 text-xs text-amber-600 dark:text-amber-400">
-                    ⚠️ Aucun membre d'équipe disponible. Ajoutez des membres dans la page "Équipe".
+                  {availableWorkers.length === 0 && (
+                    <p className="mt-2 text-xs text-amber-600 dark:text-amber-400">
+                      ⚠️ Aucun membre d'équipe disponible. Ajoutez des membres dans la page "Équipe".
+                    </p>
+                  )}
+                  <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-400">
+                    Créée le{' '}
+                    {task.created_at
+                      ? new Date(task.created_at).toLocaleDateString('fr-FR', {
+                          day: '2-digit',
+                          month: 'short',
+                        })
+                      : '---'}
+                    {task.duration_hours
+                      ? ` • Durée estimée ${task.duration_hours}h`
+                      : ''}
                   </p>
-                )}
-                <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-400">
-                  Créée le{' '}
-                  {task.created_at
-                    ? new Date(task.created_at).toLocaleDateString('fr-FR', {
-                        day: '2-digit',
-                        month: 'short',
-                      })
-                    : '---'}
-                  {task.duration_hours
-                    ? ` • Durée estimée ${task.duration_hours}h`
-                    : ''}
-                </p>
-              </div>
-            ))}
+                </div>
+              );
+            })}
           </div>
         ) : (
           <p className="rounded-2xl border border-dashed border-zinc-200 p-6 text-center text-sm text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">

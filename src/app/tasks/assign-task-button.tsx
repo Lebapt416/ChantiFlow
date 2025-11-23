@@ -57,8 +57,19 @@ export function AssignTaskButton({ taskId, siteId, currentWorkerId, availableWor
     });
   }
 
+  // Toujours afficher le bouton, même s'il n'y a pas de workers
+  // Debug: afficher les infos en console
+  if (typeof window !== 'undefined') {
+    console.log('[AssignTaskButton]', {
+      taskId,
+      currentWorkerId,
+      availableWorkersCount: availableWorkers.length,
+      hasCurrentWorker: !!currentWorker,
+    });
+  }
+
   return (
-    <div className="relative">
+    <div className="relative inline-block z-10">
       {currentWorker ? (
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-1.5 rounded-md bg-emerald-100 px-2 py-1 text-xs text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">
@@ -73,19 +84,21 @@ export function AssignTaskButton({ taskId, siteId, currentWorkerId, availableWor
           <button
             type="button"
             onClick={() => setIsOpen(!isOpen)}
-            className="rounded-md p-1 text-xs text-zinc-500 transition hover:bg-zinc-100 hover:text-zinc-700 dark:hover:bg-zinc-800 dark:hover:text-zinc-300"
+            className="rounded-md p-1.5 text-xs text-zinc-500 transition hover:bg-zinc-100 hover:text-zinc-700 dark:hover:bg-zinc-800 dark:hover:text-zinc-300"
+            title="Modifier l'assignation"
           >
-            <UserPlus className="h-3 w-3" />
+            <UserPlus className="h-4 w-4" />
           </button>
         </div>
       ) : (
         <button
           type="button"
           onClick={() => setIsOpen(!isOpen)}
-          className="flex items-center gap-1.5 rounded-md border border-zinc-300 bg-white px-2 py-1 text-xs font-medium text-zinc-700 transition hover:bg-zinc-50 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
+          className="flex items-center gap-1.5 rounded-md border border-zinc-300 bg-white px-3 py-1.5 text-xs font-medium text-zinc-700 transition hover:bg-zinc-50 hover:border-zinc-400 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700 dark:hover:border-zinc-500"
+          title="Assigner cette tâche à un membre de l'équipe"
         >
-          <UserPlus className="h-3 w-3" />
-          Assigner
+          <UserPlus className="h-4 w-4" />
+          <span>Assigner</span>
         </button>
       )}
 
