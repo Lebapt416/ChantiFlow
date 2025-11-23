@@ -174,14 +174,60 @@ export async function assignTaskAction(
     // Générer ou récupérer le code d'accès
     let accessCode = worker.access_code;
     if (!accessCode) {
+      // Générer un nouveau code au format 4 chiffres + 4 lettres
       accessCode = generateWorkerAccessCodeAlphanumeric();
       
+      // Vérifier que le code respecte le format (4 chiffres + 4 lettres)
+      if (!/^[0-9]{4}[A-Z]{4}$/.test(accessCode)) {
+        console.error('Code généré invalide, régénération:', accessCode);
+        accessCode = generateWorkerAccessCodeAlphanumeric();
+      }
+      
+      // Vérifier que le code n'existe pas déjà (éviter les doublons)
+      let attempts = 0;
+      while (attempts < 10) {
+        const { data: existingWorker } = await admin
+          .from('workers')
+          .select('id')
+          .eq('access_code', accessCode)
+          .maybeSingle();
+        
+        if (!existingWorker) {
+          break; // Code unique trouvé
+        }
+        
+        // Régénérer un nouveau code
+        accessCode = generateWorkerAccessCodeAlphanumeric();
+        attempts++;
+      }
+      
       // Mettre à jour le worker avec le code d'accès
+      const { error: updateError } = await admin
+        .from('workers')
+        .update({ access_code: accessCode })
+        .eq('id', workerId);
+      
+      if (updateError) {
+        console.error('Erreur lors de la mise à jour du code d\'accès:', updateError);
+      }
+    }
+    
+    // S'assurer que le code est en majuscules et respecte le format
+    accessCode = String(accessCode || '').toUpperCase().trim();
+    
+    // Vérifier le format final avant l'envoi (4 chiffres + 4 lettres)
+    if (!/^[0-9]{4}[A-Z]{4}$/.test(accessCode)) {
+      console.error('Code d\'accès invalide avant envoi email:', accessCode, 'Régénération...');
+      // Régénérer si nécessaire
+      accessCode = generateWorkerAccessCodeAlphanumeric();
       await admin
         .from('workers')
         .update({ access_code: accessCode })
         .eq('id', workerId);
     }
+    
+    // S'assurer que le code est en majuscules
+    accessCode = accessCode.toUpperCase();
 
     // Envoyer l'email avec le code d'accès
     if (worker.email) {
@@ -222,8 +268,11 @@ export async function assignTaskAction(
                   
                   <div style="background: #1f2937; color: white; padding: 20px; text-align: center; border-radius: 8px; margin: 30px 0;">
                     <p style="margin: 0; font-size: 14px; color: #9ca3af; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px;">Code d'accès</p>
-                    <p style="margin: 0; font-size: 32px; font-weight: bold; letter-spacing: 4px; font-family: 'Courier New', monospace;">
-                      ${accessCode}
+                    <p style="margin: 0; font-size: 32px; font-weight: bold; letter-spacing: 4px; font-family: 'Courier New', monospace; text-transform: uppercase;">
+                      ${String(accessCode).toUpperCase().replace(/(\d{4})([A-Z]{4})/, '$1 $2')}
+                    </p>
+                    <p style="margin: 10px 0 0 0; font-size: 12px; color: #9ca3af;">
+                      Format: 4 chiffres + 4 lettres (ex: 1234 ABCD)
                     </p>
                   </div>
                   
