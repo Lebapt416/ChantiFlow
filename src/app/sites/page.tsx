@@ -3,7 +3,7 @@ import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { AppShell } from '@/components/app-shell';
 import { CreateSiteCard } from './create-site-card';
 import { SiteCard } from './site-card';
-import { getUserPlan, getPlanLimits, canCreateSite } from '@/lib/plans';
+import { getUserPlan, getPlanLimits, canCreateSite, getUserAddOns } from '@/lib/plans';
 
 export const metadata = {
   title: 'Chantiers | ChantiFlow',
@@ -64,7 +64,8 @@ export default async function SitesPage() {
 
   // Vérifier les limites du plan
   const plan = await getUserPlan(user);
-  const limits = getPlanLimits(plan);
+  const addOns = getUserAddOns(user);
+  const limits = getPlanLimits(plan, addOns);
   const { allowed: canCreate, reason: limitReason } = await canCreateSite(user.id);
   // Compter uniquement les chantiers actifs (non terminés)
   const currentCount = activeSites.length;

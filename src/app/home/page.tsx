@@ -3,7 +3,7 @@ import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { AppShell } from '@/components/app-shell';
 import { SiteCard } from '@/app/sites/site-card';
 import { CreateSiteCard } from '@/app/sites/create-site-card';
-import { getUserPlan, getPlanLimits, canCreateSite } from '@/lib/plans';
+import { getUserPlan, getPlanLimits, canCreateSite, getUserAddOns } from '@/lib/plans';
 import { CheckCircle2 } from 'lucide-react';
 
 export const metadata = {
@@ -66,7 +66,8 @@ export default async function HomePage() {
 
   // Vérifier les limites du plan
   const plan = await getUserPlan(user);
-  const limits = getPlanLimits(plan);
+  const addOns = getUserAddOns(user);
+  const limits = getPlanLimits(plan, addOns);
   const { allowed: canCreate, reason: limitReason } = await canCreateSite(user.id);
   // Compter uniquement les chantiers actifs (non terminés)
   const currentCount = activeSites.length;

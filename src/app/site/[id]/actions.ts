@@ -5,6 +5,7 @@ import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 import { sendWorkerWelcomeEmail, sendSiteCompletedEmail } from '@/lib/email';
 import { generateAccessCode } from '@/lib/access-code';
+import { canAddWorker } from '@/lib/plans';
 
 export type ActionState = {
   error?: string;
@@ -75,6 +76,12 @@ export async function addWorkerAction(
 
   if (!site) {
     return { error: 'Chantier non trouvé ou accès refusé.' };
+  }
+
+  // Vérifier les limites du plan pour les workers
+  const { allowed: canAdd, reason: limitReason } = await canAddWorker(user.id);
+  if (!canAdd) {
+    return { error: limitReason || 'Limite d\'employés atteinte pour votre plan.' };
   }
 
   // Si un worker existant est sélectionné, le lier au chantier

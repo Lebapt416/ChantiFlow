@@ -4,7 +4,8 @@ import { AppShell } from '@/components/app-shell';
 import { signOutAction } from '../actions';
 import { SignOutButton } from './sign-out-button';
 import { ChangePlanButton } from './change-plan-button';
-import { getUserPlan, type Plan } from '@/lib/plans';
+import { getUserPlan, getUserAddOns, getPlanLimits, type Plan } from '@/lib/plans';
+import { AddOnsSection } from './add-ons-section';
 
 export const metadata = {
   title: 'Mon compte | ChantiFlow',
@@ -21,6 +22,8 @@ export default async function AccountPage() {
   }
 
   const plan = await getUserPlan(user);
+  const addOns = getUserAddOns(user);
+  const limits = getPlanLimits(plan, addOns);
 
   const planNames: Record<Plan, string> = {
     basic: 'Basic',
@@ -29,9 +32,9 @@ export default async function AccountPage() {
   };
 
   const planFeatures: Record<Plan, string[]> = {
-    basic: ['1 chantier actif', 'Planification IA basique', 'QR codes', 'Support par email'],
-    plus: ['Jusqu\'à 5 chantiers actifs', 'Planification IA avancée', 'Analytics', 'Support prioritaire'],
-    pro: ['Chantiers illimités', 'Multi-utilisateurs', 'API personnalisée', 'Support 24/7'],
+    basic: ['1 chantier actif', '3 employés max', 'Planification IA basique', 'QR codes', 'Support par email'],
+    plus: ['Jusqu\'à 5 chantiers actifs', '7 employés max', 'Planification IA avancée', 'Analytics', 'Support prioritaire'],
+    pro: ['Chantiers illimités', 'Employés illimités', 'Multi-utilisateurs', 'API personnalisée', 'Support 24/7'],
   };
 
   const planPrices: Record<Plan, string> = {
@@ -86,16 +89,24 @@ export default async function AccountPage() {
                 </p>
               </div>
               <div className="text-right">
-                <p className="text-xs text-zinc-500 dark:text-zinc-400">Fonctionnalités :</p>
+                <p className="text-xs text-zinc-500 dark:text-zinc-400">Limites actuelles :</p>
                 <ul className="mt-1 space-y-1 text-xs text-zinc-600 dark:text-zinc-300">
-                  {planFeatures[plan].slice(0, 2).map((feature, index) => (
-                    <li key={index}>• {feature}</li>
-                  ))}
+                  <li>
+                    • {limits.maxSites === Infinity ? 'Chantiers illimités' : `${limits.maxSites} chantier${limits.maxSites > 1 ? 's' : ''} max`}
+                    {addOns.extra_sites ? ` (+${addOns.extra_sites * 2} via add-ons)` : ''}
+                  </li>
+                  <li>
+                    • {limits.maxWorkers === Infinity ? 'Employés illimités' : `${limits.maxWorkers} employé${limits.maxWorkers > 1 ? 's' : ''} max`}
+                    {addOns.extra_workers ? ` (+${addOns.extra_workers * 5} via add-ons)` : ''}
+                  </li>
                 </ul>
               </div>
             </div>
           </div>
         </section>
+
+        {/* Add-ons */}
+        <AddOnsSection user={user} currentAddOns={addOns} plan={plan} />
 
         {/* Changer de plan */}
         <section className="rounded-2xl border border-zinc-100 bg-white p-6 shadow-lg shadow-black/5 dark:border-zinc-800 dark:bg-zinc-900">
@@ -104,31 +115,34 @@ export default async function AccountPage() {
             Mettez à niveau votre abonnement pour accéder à plus de fonctionnalités.
           </p>
           <div className="mt-4 grid gap-4 md:grid-cols-3">
-            {(['basic', 'plus', 'pro'] as Plan[]).map((p) => (
-              <div
-                key={p}
-                className={`rounded-xl border p-4 ${
-                  p === plan
-                    ? 'border-emerald-500 bg-emerald-50 dark:border-emerald-400 dark:bg-emerald-900/20'
-                    : 'border-zinc-200 dark:border-zinc-700'
-                }`}
-              >
-                <div className="mb-3">
-                  <p className="text-sm font-semibold text-zinc-900 dark:text-white">
-                    {planNames[p]}
-                  </p>
-                  <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
-                    {planPrices[p]}
-                  </p>
+            {(['basic', 'plus', 'pro'] as Plan[]).map((p) => {
+              const planLimits = getPlanLimits(p);
+              return (
+                <div
+                  key={p}
+                  className={`rounded-xl border p-4 ${
+                    p === plan
+                      ? 'border-emerald-500 bg-emerald-50 dark:border-emerald-400 dark:bg-emerald-900/20'
+                      : 'border-zinc-200 dark:border-zinc-700'
+                  }`}
+                >
+                  <div className="mb-3">
+                    <p className="text-sm font-semibold text-zinc-900 dark:text-white">
+                      {planNames[p]}
+                    </p>
+                    <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+                      {planPrices[p]}
+                    </p>
+                  </div>
+                  <ul className="mb-4 space-y-1 text-xs text-zinc-600 dark:text-zinc-300">
+                    <li>• {planLimits.maxSites === Infinity ? 'Chantiers illimités' : `${planLimits.maxSites} chantier${planLimits.maxSites > 1 ? 's' : ''} max`}</li>
+                    <li>• {planLimits.maxWorkers === Infinity ? 'Employés illimités' : `${planLimits.maxWorkers} employé${planLimits.maxWorkers > 1 ? 's' : ''} max`}</li>
+                    <li>• {planFeatures[p][2]}</li>
+                  </ul>
+                  <ChangePlanButton plan={p} currentPlan={plan} userEmail={user.email} />
                 </div>
-                <ul className="mb-4 space-y-1 text-xs text-zinc-600 dark:text-zinc-300">
-                  {planFeatures[p].slice(0, 3).map((feature, index) => (
-                    <li key={index}>• {feature}</li>
-                  ))}
-                </ul>
-                <ChangePlanButton plan={p} currentPlan={plan} userEmail={user.email} />
-              </div>
-            ))}
+              );
+            })}
           </div>
         </section>
 

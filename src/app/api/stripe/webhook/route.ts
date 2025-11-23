@@ -184,7 +184,45 @@ export async function POST(request: Request) {
         }
       }
 
-      if (plan) {
+      // Vérifier si c'est un add-on ou un plan
+      const isAddOn = amountTotal === 1000 || amountTotal === 500; // 10€ ou 5€
+      
+      if (isAddOn) {
+        // C'est un add-on
+        const currentMetadata = user.user_metadata || {};
+        const currentAddOns = currentMetadata.addOns || { extra_workers: 0, extra_sites: 0 };
+        
+        let updatedAddOns = { ...currentAddOns };
+        
+        if (amountTotal === 1000) {
+          // Add-on +5 employés (10€)
+          updatedAddOns.extra_workers = (updatedAddOns.extra_workers || 0) + 1;
+          console.log(`Add-on +5 employés acheté pour ${customerEmail}`);
+        } else if (amountTotal === 500) {
+          // Add-on +2 chantiers (5€)
+          updatedAddOns.extra_sites = (updatedAddOns.extra_sites || 0) + 1;
+          console.log(`Add-on +2 chantiers acheté pour ${customerEmail}`);
+        }
+        
+        // Mettre à jour les add-ons de l'utilisateur
+        const { error } = await admin.auth.admin.updateUserById(user.id, {
+          user_metadata: {
+            ...currentMetadata,
+            addOns: updatedAddOns,
+            addOns_updated_at: new Date().toISOString(),
+            stripe_customer_id: session.customer,
+            stripe_subscription_id: session.subscription,
+            stripe_checkout_session_id: session.id,
+          },
+        });
+
+        if (error) {
+          console.error('Erreur mise à jour add-ons:', error);
+        } else {
+          console.log(`Add-ons mis à jour pour ${customerEmail}:`, updatedAddOns);
+        }
+      } else if (plan) {
+        // C'est un plan
         // Mettre à jour le plan de l'utilisateur
         const { error } = await admin.auth.admin.updateUserById(user.id, {
           user_metadata: {
@@ -203,7 +241,7 @@ export async function POST(request: Request) {
           console.log(`Plan ${plan} activé pour ${customerEmail}`);
         }
       } else {
-        console.warn(`Impossible de déterminer le plan pour la session ${session.id}`);
+        console.warn(`Impossible de déterminer le plan ou add-on pour la session ${session.id}`);
       }
       break;
     }
