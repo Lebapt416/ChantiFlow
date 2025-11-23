@@ -95,11 +95,19 @@ export function CreateSiteForm({ onSuccess }: Props) {
         deadlineInput.value = today.toISOString().split('T')[0];
       }
     } catch (error) {
-      setPredictionError(
-        error instanceof Error 
-          ? error.message 
-          : 'Erreur lors de la prédiction. Vérifiez que l\'API est démarrée.'
-      );
+      const errorMessage = error instanceof Error 
+        ? error.message 
+        : 'Erreur lors de la prédiction.';
+      
+      // Message plus clair si l'API n'est pas accessible
+      if (errorMessage.includes('Impossible de se connecter') || errorMessage.includes('fetch')) {
+        setPredictionError(
+          'API non accessible. Assurez-vous que le serveur FastAPI est démarré (port 8000). ' +
+          'Exécutez: cd ml && python api.py'
+        );
+      } else {
+        setPredictionError(errorMessage);
+      }
       setPredictedDuree(null);
     } finally {
       setIsPredicting(false);
@@ -134,11 +142,19 @@ export function CreateSiteForm({ onSuccess }: Props) {
         justification: result.justification,
       });
     } catch (error) {
-      setRiskError(
-        error instanceof Error
-          ? error.message
-          : 'Erreur lors de l\'analyse de risque. Vérifiez que l\'API est démarrée.'
-      );
+      const errorMessage = error instanceof Error
+        ? error.message
+        : 'Erreur lors de l\'analyse de risque.';
+      
+      // Message plus clair si l'API n'est pas accessible
+      if (errorMessage.includes('Impossible de se connecter') || errorMessage.includes('fetch')) {
+        setRiskError(
+          'API non accessible. Assurez-vous que le serveur FastAPI est démarré (port 8000). ' +
+          'Exécutez: cd ml && python api.py'
+        );
+      } else {
+        setRiskError(errorMessage);
+      }
       setRisqueRetard(null);
     } finally {
       setIsAnalyzingRisk(false);
@@ -168,11 +184,19 @@ export function CreateSiteForm({ onSuccess }: Props) {
         performance: result.performance_attendue,
       });
     } catch (error) {
-      setRecommendationError(
-        error instanceof Error
-          ? error.message
-          : 'Erreur lors de la recommandation d\'équipe. Vérifiez que l\'API est démarrée.'
-      );
+      const errorMessage = error instanceof Error
+        ? error.message
+        : 'Erreur lors de la recommandation d\'équipe.';
+      
+      // Message plus clair si l'API n'est pas accessible
+      if (errorMessage.includes('Impossible de se connecter') || errorMessage.includes('fetch')) {
+        setRecommendationError(
+          'API non accessible. Assurez-vous que le serveur FastAPI est démarré (port 8000). ' +
+          'Exécutez: cd ml && python api.py'
+        );
+      } else {
+        setRecommendationError(errorMessage);
+      }
       setRecommandationEquipe(null);
     } finally {
       setIsRecommending(false);

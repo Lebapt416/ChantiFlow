@@ -60,7 +60,22 @@ export async function recommanderEquipe(
     return data;
   } catch (error) {
     console.error('Erreur lors de la recommandation d\'équipe:', error);
-    throw error;
+    
+    // Gérer les erreurs de réseau spécifiquement
+    if (error instanceof TypeError && (error.message.includes('fetch') || error.message.includes('Failed to fetch'))) {
+      throw new Error(
+        'Impossible de se connecter à l\'API de recommandation d\'équipe. ' +
+        'Vérifiez que le serveur FastAPI est démarré (port 8000) et que l\'URL est correcte.'
+      );
+    }
+    
+    // Si c'est déjà une Error avec un message, la relancer
+    if (error instanceof Error) {
+      throw error;
+    }
+    
+    // Sinon, créer une nouvelle erreur
+    throw new Error('Erreur inconnue lors de la recommandation d\'équipe.');
   }
 }
 
