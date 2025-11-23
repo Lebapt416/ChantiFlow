@@ -1,5 +1,39 @@
 # ChantiFlow
 
+## 🚀 Démarrage rapide de l'API IA
+
+Pour utiliser les fonctionnalités IA (prédiction de durée, analyse de risque, recommandation d'équipe), vous devez démarrer le serveur FastAPI :
+
+### Installation et démarrage
+
+**Option 1 : Script automatique (macOS/Linux)**
+```bash
+cd ml
+./start.sh
+```
+
+**Option 2 : Script automatique (Windows)**
+```bash
+cd ml
+start.bat
+```
+
+**Option 3 : Manuel**
+```bash
+cd ml
+pip3 install -r requirements.txt
+python3 train_model.py  # Si predictor.pt n'existe pas
+python3 api.py
+```
+
+L'API sera accessible sur `http://localhost:8000`
+
+Pour plus de détails, consultez [ml/START_API.md](ml/START_API.md)
+
+---
+
+# ChantiFlow
+
 Application web de gestion de chantiers avec planification IA et accès QR codes pour les employés.
 
 ## 🚀 Technologies
