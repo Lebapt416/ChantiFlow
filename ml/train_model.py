@@ -9,9 +9,6 @@ import torch.optim as optim
 import numpy as np
 from pathlib import Path
 
-# Créer le dossier ml s'il n'existe pas
-Path("ml").mkdir(exist_ok=True)
-
 
 class ChantierPredictor(nn.Module):
     """
@@ -106,8 +103,8 @@ def train_model():
         if (epoch + 1) % 20 == 0:
             print(f"Epoch [{epoch+1}/{n_epochs}], Loss: {loss.item():.4f}")
     
-    # Sauvegarder le modèle
-    model_path = Path("ml/predictor.pt")
+    # Sauvegarder le modèle dans le répertoire courant
+    model_path = Path(__file__).parent / "predictor.pt"
     torch.save({
         'model_state_dict': model.state_dict(),
         'model_architecture': 'ChantierPredictor',

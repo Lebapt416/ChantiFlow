@@ -91,7 +91,8 @@ async def load_model():
     """
     global model, mean_values, std_values
     
-    model_path = Path("ml/predictor.pt")
+    # Le chemin doit être relatif au répertoire où se trouve api.py
+    model_path = Path(__file__).parent / "predictor.pt"
     
     if not model_path.exists():
         raise FileNotFoundError(
