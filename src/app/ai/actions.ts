@@ -30,21 +30,59 @@ export async function generateAIPlanningAction(
     const supabase = await createSupabaseServerClient();
 
     // Récupérer les tâches et workers
-    const [{ data: tasks }, { data: workers }, { data: site }] = await Promise.all([
+    const [{ data: tasks }, { data: site }] = await Promise.all([
       supabase
         .from('tasks')
-        .select('id, title, required_role, duration_hours, status')
-        .eq('site_id', siteId),
-      supabase
-        .from('workers')
-        .select('id, name, email, role')
+        .select('id, title, required_role, duration_hours, status, assigned_worker_id')
         .eq('site_id', siteId),
       supabase
         .from('sites')
-        .select('deadline, name')
+        .select('deadline, name, created_by')
         .eq('id', siteId)
         .single(),
     ]);
+
+    // Récupérer les workers du chantier
+    const { data: siteWorkers } = await supabase
+      .from('workers')
+      .select('id, name, email, role')
+      .eq('site_id', siteId);
+
+    // Récupérer les workers réutilisables (sans site_id) qui sont assignés à des tâches de ce chantier
+    const assignedWorkerIds = tasks
+      ?.filter((task) => task.assigned_worker_id)
+      .map((task) => task.assigned_worker_id)
+      .filter((id): id is string => id !== null) || [];
+
+    let accountWorkers: Array<{ id: string; name: string; email: string; role: string | null }> = [];
+    
+    if (site?.created_by && assignedWorkerIds.length > 0) {
+      const { data: reusableWorkers } = await supabase
+        .from('workers')
+        .select('id, name, email, role')
+        .eq('created_by', site.created_by)
+        .is('site_id', null)
+        .in('id', assignedWorkerIds);
+      
+      if (reusableWorkers) {
+        accountWorkers = reusableWorkers;
+      }
+    }
+
+    // Combiner les workers du chantier et les workers réutilisables assignés
+    const allWorkers = [
+      ...(siteWorkers || []),
+      ...accountWorkers,
+    ];
+
+    // Dédupliquer par ID
+    const workersMap = new Map<string, { id: string; name: string; email: string; role: string | null }>();
+    allWorkers.forEach((worker) => {
+      if (!workersMap.has(worker.id)) {
+        workersMap.set(worker.id, worker);
+      }
+    });
+    const workers = Array.from(workersMap.values());
 
     if (!tasks || !site) {
       return { error: 'Impossible de charger les données du chantier.' };
@@ -59,26 +97,40 @@ export async function generateAIPlanningAction(
     // Générer le planning avec l'IA OpenAI
     const planning = await generateAIPlanning(
       pendingTasks,
-      workers || [],
+      workers,
       site.deadline,
       site.name,
       siteId,
     );
 
+    // Mapper les tâches avec les workers assignés depuis la base de données
+    const orderedTasksWithAssignments = planning.orderedTasks.map((task) => {
+      const dbTask = pendingTasks.find((t) => t.id === task.taskId);
+      const assignedWorkerIdFromDb = dbTask?.assigned_worker_id;
+      
+      // Si la tâche a un worker assigné en DB mais pas dans le planning IA, l'utiliser
+      let finalAssignedWorkerIds = task.assignedWorkerIds || (task.assignedWorkerId ? [task.assignedWorkerId] : []);
+      if (assignedWorkerIdFromDb && !finalAssignedWorkerIds.includes(assignedWorkerIdFromDb)) {
+        finalAssignedWorkerIds = [assignedWorkerIdFromDb, ...finalAssignedWorkerIds];
+      }
+      
+      return {
+        ...task,
+        taskTitle: dbTask?.title || 'Tâche inconnue',
+        // Utiliser l'assignation de la DB si disponible, sinon celle de l'IA
+        assignedWorkerId: assignedWorkerIdFromDb || task.assignedWorkerIds?.[0] || task.assignedWorkerId || null,
+        assignedWorkerIds: finalAssignedWorkerIds.length > 0 ? finalAssignedWorkerIds : (assignedWorkerIdFromDb ? [assignedWorkerIdFromDb] : []),
+        estimatedHours: task.estimatedHours || dbTask?.duration_hours || 8,
+      };
+    });
+
     return {
       planning: {
-        orderedTasks: planning.orderedTasks.map((task) => ({
-          ...task,
-          taskTitle: pendingTasks.find((t) => t.id === task.taskId)?.title || 'Tâche inconnue',
-          // Assurer la compatibilité avec l'ancien format
-          assignedWorkerId: task.assignedWorkerIds?.[0] || task.assignedWorkerId || null,
-          assignedWorkerIds: task.assignedWorkerIds || (task.assignedWorkerId ? [task.assignedWorkerId] : []),
-          estimatedHours: task.estimatedHours || pendingTasks.find((t) => t.id === task.taskId)?.duration_hours || 8,
-        })),
+        orderedTasks: orderedTasksWithAssignments,
         warnings: planning.warnings,
         reasoning: planning.reasoning,
       },
-      workers: workers || [],
+      workers: workers,
     };
   } catch (error) {
     return {
