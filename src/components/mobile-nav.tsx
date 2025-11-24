@@ -2,7 +2,17 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, HardHat, Calendar, Users, User } from 'lucide-react';
+import { useMemo } from 'react';
+import {
+  Home,
+  LayoutDashboard,
+  ListChecks,
+  UsersRound,
+  QrCode,
+  FileText,
+  User,
+  Calendar,
+} from 'lucide-react';
 
 type NavItem = {
   href: string;
@@ -10,20 +20,41 @@ type NavItem = {
   icon: React.ComponentType<{ size?: number; strokeWidth?: number; className?: string }>;
 };
 
-const navItems: NavItem[] = [
-  { href: '/dashboard', label: 'Accueil', icon: Home },
-  { href: '/sites', label: 'Chantiers', icon: HardHat },
-  { href: '/planning', label: 'Planning', icon: Calendar },
-  { href: '/team', label: 'Équipe', icon: Users },
-  { href: '/account', label: 'Compte', icon: User },
-];
-
 export function MobileNav() {
   const pathname = usePathname();
 
+  const navItems = useMemo(() => {
+    // Détecter si on est sur une page de chantier (/site/[id]/...)
+    const siteMatch = pathname.match(/^\/site\/([^/]+)/);
+    const siteId = siteMatch ? siteMatch[1] : null;
+
+    if (siteId) {
+      // Navigation contextuelle au chantier sélectionné
+      return [
+        { href: `/site/${siteId}/dashboard`, label: 'Dashboard', icon: LayoutDashboard },
+        { href: '/home', label: 'Accueil', icon: Home },
+        { href: `/site/${siteId}/planning`, label: 'Planning IA', icon: Calendar },
+        { href: `/site/${siteId}/tasks`, label: 'Tâches', icon: ListChecks },
+        { href: `/site/${siteId}/team`, label: 'Équipe', icon: UsersRound },
+        { href: `/site/${siteId}/reports`, label: 'Rapports', icon: FileText },
+        { href: `/site/${siteId}/qr`, label: 'QR code', icon: QrCode },
+        { href: '/account', label: 'Mon compte', icon: User },
+      ];
+    }
+
+    // Navigation limitée quand aucun chantier n'est sélectionné
+    return [
+      { href: '/home', label: 'Accueil', icon: Home },
+      { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+      { href: '/qr', label: 'QR codes', icon: QrCode },
+      { href: '/team', label: 'Équipe générale', icon: UsersRound },
+      { href: '/account', label: 'Mon compte', icon: User },
+    ];
+  }, [pathname]);
+
   return (
     <nav className="fixed bottom-4 left-4 right-4 z-50 md:hidden">
-      <div className="flex items-center justify-around bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl border border-white/20 dark:border-zinc-800 rounded-full shadow-2xl shadow-black/5 px-2 py-3">
+      <div className="flex items-center justify-around bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl border border-white/20 dark:border-zinc-800 rounded-full shadow-2xl shadow-black/5 px-2 py-3 overflow-x-auto scrollbar-hide">
         {navItems.map((item) => {
           const isActive =
             pathname === item.href || pathname.startsWith(`${item.href}/`);
@@ -32,7 +63,7 @@ export function MobileNav() {
             <Link
               key={item.href}
               href={item.href}
-              className={`relative flex flex-col items-center justify-center gap-1 px-3 py-2 rounded-full transition-all duration-300 ${
+              className={`relative flex flex-col items-center justify-center gap-1 px-2 py-2 rounded-full transition-all duration-300 flex-shrink-0 ${
                 isActive
                   ? 'text-emerald-600 dark:text-emerald-500'
                   : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'

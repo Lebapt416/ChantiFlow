@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ReactNode, useMemo, useState } from 'react';
+import { ReactNode, useMemo } from 'react';
 import { InstallPwaButton } from './install-pwa-button';
 import { MobileNav } from './mobile-nav';
 import {
@@ -16,8 +16,6 @@ import {
   Sparkles,
   User,
   Calendar,
-  Menu,
-  X,
 } from 'lucide-react';
 
 type NavItem = {
@@ -61,7 +59,6 @@ export function AppShell({
   actions,
 }: AppShellProps) {
   const pathname = usePathname();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navItems = useMemo(() => {
     // Détecter si on est sur une page de chantier (/site/[id]/...)
@@ -94,63 +91,6 @@ export function AppShell({
 
   return (
     <div className="min-h-screen bg-zinc-50 text-zinc-900 dark:bg-zinc-950 dark:text-white">
-      {/* Menu mobile - Drawer - En dehors du flux pour rester fixe */}
-      {mobileMenuOpen && (
-        <aside className="fixed inset-y-0 left-0 z-50 w-16 flex-col items-center border-r border-zinc-800 bg-black/80 px-0 py-8 shadow-xl backdrop-blur dark:border-zinc-700 dark:bg-black/80 lg:hidden flex">
-          <div className="flex flex-col items-center gap-2 w-full pt-4">
-            <button
-              onClick={() => setMobileMenuOpen(false)}
-              className="group/item relative flex items-center justify-center w-14 h-14 rounded-xl transition-all duration-200 text-white hover:text-white mb-1"
-              aria-label="Fermer le menu"
-            >
-              <span className="absolute rounded-xl transition-all duration-200 top-0 bottom-0 left-2 right-0 bg-black/50 group-hover/item:bg-white/20 group-hover/item:left-3"></span>
-              <span className="relative z-10">
-                <X size={24} strokeWidth={3} className="group-hover/item:scale-110 transition-transform duration-200" />
-              </span>
-            </button>
-          </div>
-          <nav className="flex flex-1 flex-col items-center gap-2 w-full pt-4">
-            {navItems.map((item) => {
-              const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`group/item relative flex items-center justify-center w-14 h-14 rounded-xl transition-all duration-200 ${
-                    active
-                      ? 'bg-white text-black shadow-lg shadow-white/20'
-                      : 'text-white hover:text-white'
-                  }`}
-                  title={item.label}
-                >
-                  <span className={`absolute rounded-xl transition-all duration-200 ${
-                    active
-                      ? 'inset-0 bg-white'
-                      : 'top-0 bottom-0 left-2 right-0 bg-black/50 group-hover/item:bg-black/70 group-hover/item:left-3'
-                  }`}></span>
-                  <span className="relative z-10">
-                    <item.icon 
-                      size={26} 
-                      strokeWidth={active ? 3.5 : 3}
-                      className={active ? '' : 'group-hover/item:scale-110 transition-transform duration-200'}
-                    />
-                  </span>
-                  {/* Tooltip pour affichage au survol */}
-                  <span className="pointer-events-none absolute left-full ml-3 z-50 whitespace-nowrap rounded-lg bg-zinc-900 px-3 py-1.5 text-xs font-medium text-white opacity-0 shadow-xl transition-all duration-200 group-hover/item:opacity-100 group-hover/item:translate-x-0 -translate-x-1 dark:bg-zinc-100 dark:text-zinc-900">
-                    {item.label}
-                    <span className="absolute right-full top-1/2 -mr-1 h-2 w-2 -translate-y-1/2 rotate-45 bg-zinc-900 dark:bg-zinc-100"></span>
-                  </span>
-                </Link>
-              );
-            })}
-            {/* Bouton d'installation PWA mobile */}
-            <div className="mt-auto pt-4">
-              <InstallPwaButton />
-            </div>
-          </nav>
-        </aside>
-      )}
       <div className="lg:flex">
         <aside className="fixed inset-y-0 left-0 z-20 hidden w-16 flex-col items-center border-r border-zinc-800 bg-black/80 px-0 py-8 shadow-xl backdrop-blur dark:border-zinc-700 dark:bg-black/80 lg:flex">
           <nav className="flex flex-1 flex-col items-center gap-2 w-full">
@@ -193,17 +133,10 @@ export function AppShell({
             </div>
           </nav>
         </aside>
-        <div className={`min-h-screen flex-1 transition-all duration-300 ease-in-out lg:ml-16 ${mobileMenuOpen ? 'ml-16' : ''}`}>
+        <div className="min-h-screen flex-1 transition-all duration-300 ease-in-out lg:ml-16">
           <header className="sticky top-0 z-10 border-b border-zinc-200 bg-white/80 px-4 py-4 backdrop-blur dark:border-zinc-800 dark:bg-zinc-950/80">
             <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
               <div className="flex items-center gap-3">
-                <button
-                  onClick={() => setMobileMenuOpen(true)}
-                  className="lg:hidden flex items-center justify-center w-10 h-10 rounded-lg border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 transition-colors"
-                  aria-label="Ouvrir le menu"
-                >
-                  <Menu size={20} />
-                </button>
                 <div>
                   <p className="text-xs uppercase tracking-[0.4em] text-zinc-500 dark:text-zinc-400">
                     ChantiFlow
