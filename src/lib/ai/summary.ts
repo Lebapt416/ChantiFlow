@@ -1,75 +1,71 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_PREDICTION_API_URL || 'http://localhost:8000';
+'use server';
 
-export type SummaryStatus = 'good' | 'warning' | 'critical';
+const API_URL = process.env.NEXT_PUBLIC_PREDICTION_API_URL || 'http://localhost:8000';
 
-export type SummaryResponse = {
-  summary: string;
-  status: SummaryStatus;
-};
-
-export type GlobalSummarySite = {
-  name: string;
-  tasks_total: number;
-  tasks_done: number;
-  complexity: number;
-  days_elapsed: number;
-};
-
-export type SiteSummaryPayload = {
-  site_name: string;
-  tasks_total: number;
-  tasks_pending: number;
-  complexity: number;
-  days_elapsed: number;
-  planned_duration: number;
-};
-
-async function postSummary<TInput>(
-  endpoint: string,
-  body: TInput,
-  fallback: SummaryResponse,
-): Promise<SummaryResponse> {
+export async function generateGlobalSummary(sites: any[]) {
+  if (!API_URL) return null;
+  
   try {
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    // Transformer les données pour l'API Python
+    const payload = {
+      sites: sites.map(s => ({
+        name: s.name,
+        tasks_total: s.tasks?.length || 0,
+        tasks_done: s.tasks?.filter((t: any) => t.status === 'done').length || 0,
+        complexity: 5.0, // Valeur par défaut ou calculée
+        days_elapsed: Math.ceil((new Date().getTime() - new Date(s.created_at).getTime()) / (1000 * 3600 * 24))
+      }))
+    };
+
+    const res = await fetch(`${API_URL}/summary/global`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-      },
-      body: JSON.stringify(body),
-      cache: 'no-store',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      next: { revalidate: 60 } // Cache 1 minute
     });
-
-    if (!response.ok) {
-      const detail = await response.text();
-      console.warn('Résumé IA indisponible:', detail);
-      return fallback;
-    }
-
-    return (await response.json()) as SummaryResponse;
-  } catch (error) {
-    console.error('Erreur appel résumé IA:', error);
-    return fallback;
+    
+    if (!res.ok) return null;
+    return await res.json();
+    
+  } catch (e) {
+    console.error("Erreur résumé global:", e);
+    return null;
   }
 }
 
-export async function generateGlobalSummary(
-  sites: GlobalSummarySite[],
-): Promise<SummaryResponse> {
-  return postSummary('/summary/global', { sites }, {
-    summary: sites.length
-      ? 'Analyse IA indisponible. Surveillance manuelle recommandée.'
-      : 'Aucun chantier actif pour le moment.',
-    status: sites.length ? 'warning' : 'good',
-  });
-}
+export async function generateSiteSummary(site: any, tasks: any[]) {
+  if (!API_URL) return null;
 
-export async function generateSiteSummary(
-  payload: SiteSummaryPayload,
-): Promise<SummaryResponse> {
-  return postSummary('/summary/site', payload, {
-    summary: 'Analyse IA indisponible. Vérifiez manuellement l’avancement.',
-    status: 'warning',
-  });
-}
+  try {
+    const totalTasks = tasks.length;
+    const pendingTasks = tasks.filter(t => t.status === 'pending').length;
+    
+    // Estimation deadline théorique (simplifiée)
+    const plannedDays = site.deadline 
+      ? Math.ceil((new Date(site.deadline).getTime() - new Date(site.created_at).getTime()) / (1000 * 3600 * 24))
+      : 30;
 
+    const payload = {
+      site_name: site.name,
+      tasks_total: totalTasks,
+      tasks_pending: pendingTasks,
+      complexity: 5.5, // On pourrait affiner ce calcul
+      days_elapsed: Math.ceil((new Date().getTime() - new Date(site.created_at).getTime()) / (1000 * 3600 * 24)),
+      planned_duration: plannedDays
+    };
+
+    const res = await fetch(`${API_URL}/summary/site`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      next: { revalidate: 60 }
+    });
+
+    if (!res.ok) return null;
+    return await res.json();
+
+  } catch (e) {
+    console.error("Erreur résumé chantier:", e);
+    return null;
+  }
+}
