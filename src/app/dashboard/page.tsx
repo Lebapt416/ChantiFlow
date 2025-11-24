@@ -7,6 +7,7 @@ import { AppShell } from '@/components/app-shell';
 import { DashboardCharts } from './dashboard-charts';
 import { SitePlanningMini } from '@/components/site-planning-mini';
 import { generatePlanning } from '@/lib/ai/planning';
+import { AIStatusBadge } from '@/components/ai-status-badge';
 
 export const metadata = {
   title: 'Dashboard | ChantiFlow',
@@ -127,14 +128,17 @@ export default async function DashboardPage() {
       userEmail={user.email}
       primarySite={sites?.[0] ?? null}
       actions={
-        <form action={signOutAction}>
-          <button
-            type="submit"
-            className="rounded-full border border-zinc-200 px-4 py-2 text-sm font-medium text-zinc-700 transition hover:border-zinc-900 hover:text-zinc-900 dark:border-zinc-700 dark:text-zinc-200 dark:hover:border-white dark:hover:text-white"
-          >
-            Se déconnecter
-          </button>
-        </form>
+        <div className="flex items-center gap-3">
+          <AIStatusBadge />
+          <form action={signOutAction}>
+            <button
+              type="submit"
+              className="rounded-full border border-zinc-200 px-4 py-2 text-sm font-medium text-zinc-700 transition hover:border-zinc-900 hover:text-zinc-900 dark:border-zinc-700 dark:text-zinc-200 dark:hover:border-white dark:hover:text-white"
+            >
+              Se déconnecter
+            </button>
+          </form>
+        </div>
       }
     >
       <section className="grid gap-4 md:grid-cols-3">
