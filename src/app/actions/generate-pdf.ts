@@ -1,6 +1,7 @@
 'use server';
 
 import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { generateSiteSummary } from '@/lib/ai/summary';
 
 export async function generatePDFAction(siteId: string) {
   const supabase = await createSupabaseServerClient();
@@ -36,6 +37,21 @@ export async function generatePDFAction(siteId: string) {
     return { error: 'Chantier non trouvé ou accès refusé' };
   }
 
+  // Générer le résumé IA
+  let aiSummary: { summary: string; status: string } | null = null;
+  if (tasks && tasks.length > 0) {
+    try {
+      aiSummary = await generateSiteSummary(site, tasks);
+    } catch (error) {
+      console.error('Erreur génération résumé IA pour PDF:', error);
+    }
+  }
+
+  // Créer un map des workers pour faciliter l'accès
+  const workerMap = new Map(
+    workers?.map((w) => [w.id, { name: w.name, email: w.email, role: w.role }]) || [],
+  );
+
   // Préparer les données pour le PDF
   const totalTasks = tasks?.length || 0;
   const doneTasks = tasks?.filter((t) => t.status === 'done').length || 0;
@@ -58,25 +74,28 @@ export async function generatePDFAction(siteId: string) {
         workersCount: workers?.length || 0,
         reportsCount: reports?.length || 0,
       },
-      tasks: tasks?.map((t) => ({
-        title: t.title,
-        status: t.status,
-        role: t.required_role,
-        duration: t.duration_hours,
-        startDate: (t as any).planned_start,
-        endDate: (t as any).planned_end,
-      })) || [],
+      tasks:
+        tasks?.map((t) => {
+          const assignedWorker = (t as any).planned_worker_id
+            ? workerMap.get((t as any).planned_worker_id)
+            : null;
+          return {
+            title: t.title,
+            status: t.status,
+            role: t.required_role,
+            duration_hours: t.duration_hours,
+            startDate: (t as any).planned_start,
+            endDate: (t as any).planned_end,
+            assignedWorkerName: assignedWorker?.name || null,
+          };
+        }) || [],
       workers:
         workers?.map((w) => ({
           name: w.name,
           email: w.email,
           role: w.role,
         })) || [],
-      reports:
-        reports?.slice(0, 20).map((r) => ({
-          description: r.description,
-          created_at: r.created_at,
-        })) || [],
+      aiSummary,
     },
   };
 }
