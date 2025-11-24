@@ -52,9 +52,38 @@ export async function generatePlanningAction(
     // Générer le planning avec l'IA
     const planning = await generatePlanning(tasks, workers || [], site?.deadline || null);
 
-    // Mettre à jour l'ordre des tâches dans la base de données
-    // On pourrait créer une table "planning" ou ajouter un champ "order" aux tâches
-    // Pour l'instant, on retourne juste le planning généré
+    // Mettre à jour la planification sauvegardée (dernière génération uniquement)
+    const plannedTaskIds = planning.orderedTasks.map((task) => task.taskId);
+
+    // Réinitialiser les tâches non planifiées
+    const unplannedIds = tasks
+      .map((task) => task.id)
+      .filter((taskId) => !plannedTaskIds.includes(taskId));
+
+    if (unplannedIds.length > 0) {
+      await supabase
+        .from('tasks')
+        .update({
+          planned_start: null,
+          planned_end: null,
+          planned_order: null,
+          planned_worker_id: null,
+        })
+        .in('id', unplannedIds);
+    }
+
+    // Appliquer les nouvelles dates
+    for (const task of planning.orderedTasks) {
+      await supabase
+        .from('tasks')
+        .update({
+          planned_start: task.startDate,
+          planned_end: task.endDate,
+          planned_order: task.order,
+          planned_worker_id: task.assignedWorkerId,
+        })
+        .eq('id', task.taskId);
+    }
 
     revalidatePath(`/site/${siteId}`);
 

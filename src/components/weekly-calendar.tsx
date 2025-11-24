@@ -90,8 +90,14 @@ export function WeeklyCalendar({ planning, workers }: Props) {
             grouped[dayKey][workerId] = [];
           }
 
-          // Calculer les heures pour ce jour (simplifié : 8h par jour)
-          const hours = 8;
+          const hours = Math.max(
+            1,
+            Math.round(
+              (Math.min(taskEnd.getTime(), dayDate.getTime() + 24 * 60 * 60 * 1000) -
+                Math.max(taskStart.getTime(), dayDate.getTime())) /
+                36e5,
+            ),
+          );
           grouped[dayKey][workerId].push({ ...task, hours });
         }
       });

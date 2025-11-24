@@ -3,7 +3,6 @@ import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { AppShell } from '@/components/app-shell';
 import { WeeklyCalendar } from '@/components/weekly-calendar';
 import { GeneratePlanningButton } from '@/app/site/[id]/generate-planning-button';
-import { generatePlanning } from '@/lib/ai/planning';
 import Link from 'next/link';
 import { SiteSelector } from '@/components/site-selector';
 
@@ -66,7 +65,9 @@ export default async function PlanningPage({ searchParams }: SearchParams) {
   const [{ data: tasks }, { data: workers }] = await Promise.all([
     supabase
       .from('tasks')
-      .select('id, title, required_role, duration_hours, status')
+      .select(
+        'id, title, required_role, duration_hours, status, planned_start, planned_end, planned_worker_id, planned_order',
+      )
       .eq('site_id', currentSite.id),
     supabase
       .from('workers')
@@ -74,29 +75,23 @@ export default async function PlanningPage({ searchParams }: SearchParams) {
       .eq('site_id', currentSite.id),
   ]);
 
-  // Générer le planning
-  let planning = null;
-  if (tasks && tasks.length > 0) {
-    try {
-      const planningResult = await generatePlanning(
-        tasks || [],
-        workers || [],
-        currentSite.deadline,
-      );
-      
-      planning = planningResult.orderedTasks.map((task) => ({
-        taskId: task.taskId,
-        taskTitle: tasks.find((t) => t.id === task.taskId)?.title || 'Tâche',
-        order: task.order,
-        startDate: task.startDate,
-        endDate: task.endDate,
-        assignedWorkerId: task.assignedWorkerId,
-        priority: task.priority,
-      }));
-    } catch (error) {
-      console.error('Erreur génération planning:', error);
-    }
-  }
+  const planning =
+    tasks
+      ?.filter((task) => task.planned_start && task.planned_end)
+      .map((task) => ({
+        taskId: task.id,
+        taskTitle: task.title,
+        order: task.planned_order ?? 0,
+        startDate: task.planned_start as string,
+        endDate: task.planned_end as string,
+        assignedWorkerId: task.planned_worker_id,
+      }))
+      .sort((a, b) => a.order - b.order)
+      .map((task, index, arr) => ({
+        ...task,
+        priority:
+          index === 0 ? ('high' as const) : index >= arr.length - 2 ? ('low' as const) : ('medium' as const),
+      })) ?? null;
 
   return (
     <AppShell

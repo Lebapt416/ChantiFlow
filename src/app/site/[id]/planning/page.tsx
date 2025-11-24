@@ -1,9 +1,8 @@
 import { notFound, redirect } from 'next/navigation';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { AppShell } from '@/components/app-shell';
-import { WeeklyCalendar } from '@/components/weekly-calendar';
 import { GeneratePlanningButton } from '@/app/site/[id]/generate-planning-button';
-import { generatePlanning } from '@/lib/ai/planning';
+import { EditablePlanningBoard } from '@/components/editable-planning-board';
 
 type Params = {
   params: Promise<{
@@ -45,7 +44,9 @@ export default async function SitePlanningPage({ params }: Params) {
   const [{ data: tasks }, { data: workers }] = await Promise.all([
     supabase
       .from('tasks')
-      .select('id, title, required_role, duration_hours, status')
+      .select(
+        'id, title, required_role, duration_hours, status, planned_start, planned_end, planned_worker_id, planned_order',
+      )
       .eq('site_id', site.id),
     supabase
       .from('workers')
@@ -53,29 +54,24 @@ export default async function SitePlanningPage({ params }: Params) {
       .eq('site_id', site.id),
   ]);
 
-  // Générer le planning
-  let planning = null;
-  if (tasks && tasks.length > 0) {
-    try {
-      const planningResult = await generatePlanning(
-        tasks || [],
-        workers || [],
-        site.deadline,
-      );
-
-      planning = planningResult.orderedTasks.map((task) => ({
-        taskId: task.taskId,
-        taskTitle: tasks.find((t) => t.id === task.taskId)?.title || 'Tâche',
-        order: task.order,
-        startDate: task.startDate,
-        endDate: task.endDate,
-        assignedWorkerId: task.assignedWorkerId,
-        priority: task.priority,
-      }));
-    } catch (error) {
-      console.error('Erreur génération planning:', error);
-    }
-  }
+  const persistedPlanning =
+    tasks
+      ?.filter((task) => task.planned_start && task.planned_end)
+      .map((task) => ({
+        taskId: task.id,
+        taskTitle: task.title,
+        order: task.planned_order ?? 0,
+        startDate: task.planned_start as string,
+        endDate: task.planned_end as string,
+        durationHours: task.duration_hours || 8,
+        assignedWorkerId: task.planned_worker_id ?? null,
+      }))
+      .sort((a, b) => a.order - b.order)
+      .map((task, index, arr) => ({
+        ...task,
+        priority:
+          index === 0 ? ('high' as const) : index >= arr.length - 2 ? ('low' as const) : ('medium' as const),
+      })) ?? [];
 
   return (
     <AppShell
@@ -99,15 +95,17 @@ export default async function SitePlanningPage({ params }: Params) {
           <GeneratePlanningButton siteId={site.id} />
         </div>
 
-        {planning && planning.length > 0 ? (
-          <WeeklyCalendar
-            planning={planning}
-            workers={workers?.map((w) => ({
-              id: w.id,
-              name: w.name,
-              email: w.email || '',
-              role: w.role,
-            })) || []}
+        {persistedPlanning.length > 0 ? (
+          <EditablePlanningBoard
+            siteId={site.id}
+            initialPlanning={persistedPlanning}
+            workers={
+              workers?.map((w) => ({
+                id: w.id,
+                name: w.name,
+                role: w.role,
+              })) || []
+            }
           />
         ) : (
           <div className="rounded-2xl border border-zinc-200 bg-white p-8 text-center dark:border-zinc-800 dark:bg-zinc-900">

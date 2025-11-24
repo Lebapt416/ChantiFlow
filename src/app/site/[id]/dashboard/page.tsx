@@ -3,7 +3,6 @@ import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { AppShell } from '@/components/app-shell';
 import { DashboardCharts } from '@/app/dashboard/dashboard-charts';
 import { SitePlanningMini } from '@/components/site-planning-mini';
-import { generatePlanning } from '@/lib/ai/planning';
 
 type Params = {
   params: Promise<{
@@ -45,7 +44,9 @@ export default async function SiteDashboardPage({ params }: Params) {
   const [{ data: tasks }, { data: workers }] = await Promise.all([
     supabase
       .from('tasks')
-      .select('id, title, required_role, duration_hours, status')
+      .select(
+        'id, title, required_role, duration_hours, status, planned_start, planned_end, planned_worker_id, planned_order',
+      )
       .eq('site_id', site.id),
     supabase
       .from('workers')
@@ -58,26 +59,27 @@ export default async function SiteDashboardPage({ params }: Params) {
   const pendingTasks = totalTasks - doneTasks;
   const progress = totalTasks > 0 ? Math.round((doneTasks / totalTasks) * 100) : 0;
 
-  // Générer le planning pour ce chantier
-  let planning: any[] = [];
-  if (tasks && tasks.length > 0) {
-    try {
-      const planningResult = await generatePlanning(
-        tasks || [],
-        workers || [],
-        site.deadline,
-      );
-      planning = planningResult.orderedTasks.map((p: any) => ({
-        taskId: p.taskId,
-        taskTitle: tasks.find((t) => t.id === p.taskId)?.title || 'Tâche',
-        startDate: p.startDate,
-        endDate: p.endDate,
-        assignedWorkerId: p.assignedWorkerId,
-      }));
-    } catch (error) {
-      console.error(`Erreur génération planning pour ${site.name}:`, error);
-    }
-  }
+  const persistedPlanning =
+    tasks
+      ?.filter((task) => task.planned_start && task.planned_end)
+      .map((task) => ({
+        taskId: task.id,
+        taskTitle: task.title,
+        startDate: task.planned_start as string,
+        endDate: task.planned_end as string,
+        assignedWorkerId: task.planned_worker_id,
+        durationHours: task.duration_hours || 8,
+        order: task.planned_order ?? 0,
+      }))
+      .sort((a, b) => a.order - b.order) ?? [];
+
+  const todayKey = new Date().toISOString().split('T')[0];
+  const workerMap = new Map(workers?.map((w) => [w.id, w]) ?? []);
+  const todaysTasks = persistedPlanning
+    .filter((task) => new Date(task.startDate).toISOString().split('T')[0] === todayKey)
+    .sort(
+      (a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime(),
+    );
 
   return (
     <AppShell
@@ -121,10 +123,74 @@ export default async function SiteDashboardPage({ params }: Params) {
           </div>
         </section>
 
+        {/* Planning du jour */}
+        <section className="rounded-2xl border border-zinc-100 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900">
+          <div className="mb-4 flex items-center justify-between">
+            <div>
+              <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">
+                Planning du jour
+              </h3>
+              <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                {new Date().toLocaleDateString('fr-FR', {
+                  weekday: 'long',
+                  day: 'numeric',
+                  month: 'long',
+                })}
+              </p>
+            </div>
+          </div>
+
+          {todaysTasks.length > 0 ? (
+            <div className="space-y-3">
+              {todaysTasks.map((task) => {
+                const worker = task.assignedWorkerId
+                  ? workerMap.get(task.assignedWorkerId)
+                  : null;
+                return (
+                  <div
+                    key={task.taskId}
+                    className="rounded-xl border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-700 dark:bg-zinc-800"
+                  >
+                    <div className="flex items-center justify-between text-sm">
+                      <div>
+                        <p className="font-semibold text-zinc-900 dark:text-white">
+                          {task.taskTitle}
+                        </p>
+                        <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                          {new Date(task.startDate).toLocaleTimeString('fr-FR', {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })}{' '}
+                          -{' '}
+                          {new Date(task.endDate).toLocaleTimeString('fr-FR', {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })}
+                        </p>
+                      </div>
+                      <span className="rounded-full bg-zinc-900 px-3 py-1 text-[11px] font-semibold text-white dark:bg-zinc-100 dark:text-zinc-900">
+                        {task.durationHours}h
+                      </span>
+                    </div>
+                    <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-400">
+                      {worker ? `${worker.name} • ${worker.role ?? 'Rôle non défini'}` : 'Non assigné'}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <p className="text-sm text-zinc-500 dark:text-zinc-400">
+              Aucune tâche planifiée pour aujourd'hui. Glissez-déposez une tâche sur la journée
+              souhaitée dans l'onglet Planning pour la programmer.
+            </p>
+          )}
+        </section>
+
         {/* Planning du chantier */}
         <SitePlanningMini
           site={site}
-          planning={planning}
+          planning={persistedPlanning}
           workerCount={workers?.length || 0}
           taskCount={tasks?.length || 0}
         />
