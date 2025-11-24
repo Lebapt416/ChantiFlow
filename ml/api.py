@@ -125,6 +125,16 @@ async def load_model():
     model.eval()
 
 
+@app.get("/health")
+async def health_check():
+    """Route de santé pour vérifier l'état de l'API"""
+    return {
+        "status": "healthy",
+        "model_loaded": model is not None,
+        "learning_enabled": True,
+    }
+
+
 @app.post("/predict", response_model=ChantierPrediction)
 async def predict(input_data: ChantierInput):
     if model is None:
