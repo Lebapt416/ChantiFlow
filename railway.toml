@@ -3,7 +3,7 @@ builder = "nixpacks"
 watchPatterns = ["ml/**"]
 
 [service]
-rootDirectory = "/ml"
+rootDirectory = "ml"
 
 [deploy]
 startCommand = "uvicorn api:app --host 0.0.0.0 --port $PORT"
