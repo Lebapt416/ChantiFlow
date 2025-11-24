@@ -1,5 +1,7 @@
 'use server';
 
+import { getPrediction } from '@/lib/ai/prediction';
+
 type Task = {
   id: string;
   title: string;
@@ -28,6 +30,26 @@ type PlanningResult = {
   newDeadline?: string;
   warnings: string[];
 };
+
+const BASE_WORKING_HOURS = 8;
+
+function computeComplexity(tasks: Task[]): number {
+  if (tasks.length === 0) return 1;
+
+  const uniqueRoles = new Set(
+    tasks
+      .map((task) => task.required_role?.toLowerCase().trim())
+      .filter((role): role is string => Boolean(role)),
+  ).size;
+
+  const totalDuration = tasks.reduce((sum, task) => sum + (task.duration_hours || 8), 0);
+  const avgDuration = totalDuration / tasks.length;
+
+  const diversityScore = Math.min(uniqueRoles + tasks.length / 5, 10);
+  const durationScore = Math.min(avgDuration / 4, 10);
+
+  return Math.max(1, Math.min(10, Number(((diversityScore + durationScore) / 2).toFixed(2))));
+}
 
 /**
  * Génère un planning intelligent pour un chantier
@@ -59,8 +81,8 @@ export async function generatePlanning(
     0,
   );
 
-  // Calculer la date de fin estimée
-  const workingHoursPerDay = 8;
+  // Calculer la date de fin estimée (théorique)
+  const workingHoursPerDay = BASE_WORKING_HOURS;
   const daysNeeded = Math.ceil(totalHours / workingHoursPerDay);
   const estimatedEndDate = new Date(startDate);
   estimatedEndDate.setDate(estimatedEndDate.getDate() + daysNeeded);
@@ -73,6 +95,26 @@ export async function generatePlanning(
     );
   }
 
+  const complexity = computeComplexity(classifiedTasks);
+  let realityFactor = 1;
+  try {
+    const predictionDays = await getPrediction(classifiedTasks.length, complexity);
+    if (predictionDays > 0) {
+      const theoreticalDays = Math.max(daysNeeded, 1);
+      realityFactor = Math.max(1, Number((predictionDays / theoreticalDays).toFixed(2)));
+
+      if (predictionDays > theoreticalDays * 1.1) {
+        warnings.push(
+          `⚠️ L'IA prévoit ${predictionDays} jours (basé sur l'historique). Ajustement du planning appliqué.`,
+        );
+      }
+    }
+  } catch (error) {
+    console.warn('Impossible de récupérer la prédiction IA:', error);
+  }
+
+  const adjustedDailyHours = BASE_WORKING_HOURS / realityFactor;
+
   // Générer le planning avec dates et assignations
   const orderedTasks = classifiedTasks.map((task, index) => {
     const taskStartDate = new Date(startDate);
@@ -81,12 +123,12 @@ export async function generatePlanning(
       .slice(0, index)
       .reduce((sum, t) => sum + (t.duration_hours || 8), 0);
     taskStartDate.setDate(
-      taskStartDate.getDate() + Math.floor(previousTasksHours / workingHoursPerDay),
+      taskStartDate.getDate() + Math.floor(previousTasksHours / adjustedDailyHours),
     );
 
     const taskEndDate = new Date(taskStartDate);
     taskEndDate.setDate(
-      taskEndDate.getDate() + Math.ceil((task.duration_hours || 8) / workingHoursPerDay),
+      taskEndDate.getDate() + Math.ceil((task.duration_hours || 8) / adjustedDailyHours),
     );
 
     // Trouver un worker approprié
@@ -111,9 +153,11 @@ export async function generatePlanning(
     };
   });
 
+  const lastTaskEnd = new Date(orderedTasks[orderedTasks.length - 1].endDate);
+
   return {
     orderedTasks,
-    newDeadline: estimatedEndDate.toISOString().split('T')[0],
+    newDeadline: lastTaskEnd.toISOString().split('T')[0],
     warnings,
   };
 }
