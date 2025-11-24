@@ -35,7 +35,7 @@ export const metadata: Metadata = {
     "rapport chantier",
   ],
   alternates: {
-    canonical: "/landing",
+    canonical: "/",
   },
   openGraph: {
     type: "website",
