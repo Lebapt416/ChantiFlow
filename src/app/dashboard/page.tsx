@@ -8,6 +8,7 @@ import { DashboardCharts } from './dashboard-charts';
 import { SitePlanningMini } from '@/components/site-planning-mini';
 import { generatePlanning } from '@/lib/ai/planning';
 import { AIStatusBadge } from '@/components/ai-status-badge';
+import { generateGlobalSummary } from '@/lib/ai/summary';
 
 export const metadata = {
   title: 'Dashboard | ChantiFlow',
@@ -121,6 +122,51 @@ export default async function DashboardPage() {
     }),
   );
 
+  // Générer le résumé IA global
+  let aiSummary: { summary: string; status: string } | null = null;
+  if (activeSites.length > 0) {
+    try {
+      // Récupérer toutes les tâches pour calculer la complexité
+      const { data: allTasks } = await supabase
+        .from('tasks')
+        .select('id, status, required_role, duration_hours, site_id')
+        .in('site_id', activeSites.map((s) => s.id));
+
+      // Préparer les données pour l'API
+      const sitesData = activeSites.map((site) => {
+        const siteTasks = allTasks?.filter((t) => t.site_id === site.id) || [];
+        const doneTasks = siteTasks.filter((t) => t.status === 'done');
+        
+        // Calcul de la complexité
+        const roleDiversity = new Set(
+          siteTasks.map((t) => t.required_role).filter(Boolean),
+        ).size;
+        const avgDuration =
+          siteTasks.reduce((sum, t) => sum + (t.duration_hours || 8), 0) /
+          Math.max(1, siteTasks.length);
+        const complexity = Math.min(10, Math.max(1, avgDuration / 4 + roleDiversity / 2));
+
+        const daysElapsed = Math.ceil(
+          (new Date().getTime() - new Date(site.created_at).getTime()) /
+            (1000 * 3600 * 24),
+        );
+
+        return {
+          ...site,
+          tasks: siteTasks,
+          tasks_total: siteTasks.length,
+          tasks_done: doneTasks.length,
+          complexity: Number(complexity.toFixed(2)),
+          days_elapsed: daysElapsed,
+        };
+      });
+
+      aiSummary = await generateGlobalSummary(sitesData);
+    } catch (error) {
+      console.error('Erreur génération résumé IA:', error);
+    }
+  }
+
   return (
     <AppShell
       heading="Dashboard général"
@@ -141,6 +187,53 @@ export default async function DashboardPage() {
         </div>
       }
     >
+      {/* Résumé IA Global */}
+      {aiSummary && (
+        <section
+          className={`rounded-3xl border p-6 shadow-sm ${
+            aiSummary.status === 'critical'
+              ? 'border-rose-200 bg-rose-50 dark:border-rose-800 dark:bg-rose-900/20'
+              : aiSummary.status === 'warning'
+                ? 'border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-900/20'
+                : 'border-emerald-200 bg-emerald-50 dark:border-emerald-800 dark:bg-emerald-900/20'
+          }`}
+        >
+          <div className="flex items-start gap-4">
+            <div className="flex-shrink-0">
+              {aiSummary.status === 'critical' ? (
+                <div className="rounded-full bg-rose-100 p-2 dark:bg-rose-900/30">
+                  <span className="text-2xl">⚠️</span>
+                </div>
+              ) : aiSummary.status === 'warning' ? (
+                <div className="rounded-full bg-amber-100 p-2 dark:bg-amber-900/30">
+                  <span className="text-2xl">🟠</span>
+                </div>
+              ) : (
+                <div className="rounded-full bg-emerald-100 p-2 dark:bg-emerald-900/30">
+                  <span className="text-2xl">✨</span>
+                </div>
+              )}
+            </div>
+            <div className="flex-1">
+              <h2 className="mb-1 text-lg font-semibold text-zinc-900 dark:text-white">
+                Analyse IA des chantiers
+              </h2>
+              <p
+                className={`text-sm ${
+                  aiSummary.status === 'critical'
+                    ? 'text-rose-900 dark:text-rose-200'
+                    : aiSummary.status === 'warning'
+                      ? 'text-amber-900 dark:text-amber-200'
+                      : 'text-emerald-900 dark:text-emerald-200'
+                }`}
+              >
+                {aiSummary.summary}
+              </p>
+            </div>
+          </div>
+        </section>
+      )}
+
       <section className="grid gap-4 md:grid-cols-3">
         <div className="rounded-2xl border border-zinc-100 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
           <p className="text-xs uppercase tracking-[0.3em] text-zinc-500">Chantiers</p>
