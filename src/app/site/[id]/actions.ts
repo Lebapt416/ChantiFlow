@@ -13,6 +13,43 @@ export type ActionState = {
   message?: string;
 };
 
+type FeedbackPayload = {
+  nombre_taches: number;
+  complexite: number;
+  duree_reelle: number;
+};
+
+export async function sendFeedbackToAI(payload: FeedbackPayload) {
+  const baseUrl =
+    process.env.NEXT_PUBLIC_PREDICTION_API_URL ||
+    process.env.ML_API_URL ||
+    '';
+
+  if (!baseUrl) {
+    console.warn('⚠️ Aucun endpoint ML configuré, feedback ignoré.');
+    return;
+  }
+
+  const endpoint = `${baseUrl.replace(/\/$/, '')}/feedback`;
+
+  try {
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      // Ne pas mettre en cache : on veut enregistrer chaque feedback
+      cache: 'no-store',
+    });
+
+    if (!response.ok) {
+      const detail = await response.text();
+      console.warn('⚠️ Feedback AI rejeté:', response.status, detail);
+    }
+  } catch (error) {
+    console.error('❌ Impossible d’envoyer le feedback IA:', error);
+  }
+}
+
 export async function addTaskAction(
   _prevState: ActionState,
   formData: FormData,
@@ -365,7 +402,7 @@ export async function completeSiteAction(
   // Vérifier que le chantier appartient à l'utilisateur
   const { data: site } = await supabase
     .from('sites')
-    .select('id, name, created_by')
+    .select('id, name, created_by, created_at')
     .eq('id', siteId)
     .eq('created_by', user.id)
     .single();
@@ -374,17 +411,35 @@ export async function completeSiteAction(
     return { error: 'Chantier non trouvé ou accès refusé.' };
   }
 
+  const { data: siteTasks } = await supabase
+    .from('tasks')
+    .select('id, duration_hours')
+    .eq('site_id', siteId);
+
+  const taskCount = siteTasks?.length ?? 0;
+  const totalEstimatedHours = siteTasks?.reduce(
+    (sum, task) => sum + (task.duration_hours ?? 8),
+    0,
+  ) ?? 0;
+  const avgDurationHours = taskCount > 0 ? totalEstimatedHours / taskCount : 8;
+  const derivedComplexity = Number(
+    Math.min(10, Math.max(1, avgDurationHours / 4 + taskCount / 10)).toFixed(2),
+  );
+
   // Récupérer tous les workers du chantier avant de les retirer
   const { data: workers } = await supabase
     .from('workers')
     .select('id, name, email, site_id')
     .eq('site_id', siteId);
 
+  const completionDate = new Date();
+  const completionISO = completionDate.toISOString();
+
   // Marquer le chantier comme terminé (ajouter un champ completed_at)
   const { error: siteError } = await supabase
     .from('sites')
     .update({
-      completed_at: new Date().toISOString(),
+      completed_at: completionISO,
     })
     .eq('id', siteId);
 
@@ -521,6 +576,20 @@ export async function completeSiteAction(
     }
   } catch (error) {
     console.warn('⚠️ Impossible de mettre à jour le metadata completedSites:', error);
+  }
+
+  const siteCreatedAtDate = site.created_at ? new Date(site.created_at) : null;
+  const realDurationDays =
+    siteCreatedAtDate && Number.isFinite(siteCreatedAtDate.getTime())
+      ? (completionDate.getTime() - siteCreatedAtDate.getTime()) / (1000 * 60 * 60 * 24)
+      : null;
+
+  if (realDurationDays && Number.isFinite(realDurationDays)) {
+    await sendFeedbackToAI({
+      nombre_taches: Math.max(1, taskCount),
+      complexite: derivedComplexity,
+      duree_reelle: Number(Math.max(realDurationDays, 1).toFixed(2)),
+    });
   }
 
   revalidatePath(`/site/${siteId}`);
