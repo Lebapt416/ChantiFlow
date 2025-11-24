@@ -3,11 +3,29 @@ import { AppShell } from '@/components/app-shell';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { AddWorkerForm } from '../add-worker-form';
 import { DeleteWorkerButton } from '@/components/delete-worker-button';
+import { CopyButton } from '@/components/copy-button';
 
 type Params = {
   params: Promise<{
     id: string;
   }>;
+};
+
+type TeamMember = {
+  id: string;
+  name: string | null;
+  email: string | null;
+  role: string | null;
+  status?: 'approved' | 'pending' | 'rejected' | null;
+  access_code?: string | null;
+  created_at?: string | null;
+};
+
+type SelectableWorker = {
+  id: string;
+  name: string;
+  email: string | null;
+  role: string | null;
 };
 
 function isValidUuid(value: string | undefined) {
@@ -43,34 +61,40 @@ export default async function SiteTeamPage({ params }: Params) {
   }
 
   // Récupérer les workers assignés à ce chantier
-  const { data: siteWorkers } = await supabase
+  const { data: siteWorkersData } = await supabase
     .from('workers')
-    .select('id, name, email, role, created_at, access_code')
+    .select('id, name, email, role, created_at, access_code, status')
     .eq('site_id', id)
     .order('created_at', { ascending: false });
+  const siteWorkers: TeamMember[] = (siteWorkersData ?? []).map((worker) => ({
+    ...worker,
+  }));
 
   // Récupérer les workers disponibles au niveau du compte (pour le formulaire)
-  let availableWorkers: any[] = [];
+  let availableWorkers: SelectableWorker[] = [];
   try {
-    const { data: accountWorkers } = await supabase
+    const { data: accountWorkersData } = await supabase
       .from('workers')
       .select('id, name, email, role, created_at, status')
       .eq('created_by', user.id)
       .is('site_id', null)
+      .in('status', ['approved'])
       .order('created_at', { ascending: false });
 
-    // Filtrer uniquement les workers approuvés
-    availableWorkers = (accountWorkers ?? []).filter((w: any) => 
-      w.status === 'approved' || w.status === null || w.status === undefined
-    );
+    availableWorkers = (accountWorkersData ?? []).map((worker) => ({
+      id: worker.id,
+      name: worker.name ?? 'Membre sans nom',
+      email: worker.email,
+      role: worker.role,
+    }));
   } catch (error) {
     console.warn('Erreur récupération workers compte:', error);
   }
 
   // Calculer les stats
-  const totalWorkers = siteWorkers?.length ?? 0;
-  const workersWithEmail = siteWorkers?.filter((w) => w.email).length ?? 0;
-  const groupedByRole = (siteWorkers ?? []).reduce<Record<string, number>>((acc, worker) => {
+  const totalWorkers = siteWorkers.length;
+  const workersWithEmail = siteWorkers.filter((w) => w.email).length;
+  const groupedByRole = siteWorkers.reduce<Record<string, number>>((acc, worker) => {
     const key = worker.role?.toLowerCase() || 'Non défini';
     acc[key] = (acc[key] ?? 0) + 1;
     return acc;
@@ -163,7 +187,7 @@ export default async function SiteTeamPage({ params }: Params) {
           </div>
         </div>
 
-        {siteWorkers && siteWorkers.length > 0 ? (
+        {siteWorkers.length > 0 ? (
           <div className="space-y-3">
             {siteWorkers.map((worker) => (
               <div
@@ -184,9 +208,13 @@ export default async function SiteTeamPage({ params }: Params) {
                       </p>
                     )}
                     {worker.access_code && (
-                      <p className="text-xs text-emerald-600 dark:text-emerald-400 mt-1 font-mono">
-                        Code d'accès: {worker.access_code}
-                      </p>
+                      <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-emerald-600 dark:text-emerald-400">
+                        <span>Code d'accès :</span>
+                        <span className="font-mono blur-sm hover:blur-none cursor-pointer transition">
+                          {worker.access_code}
+                        </span>
+                        <CopyButton value={worker.access_code} />
+                      </div>
                     )}
                   </div>
                   {!isCompleted && (
