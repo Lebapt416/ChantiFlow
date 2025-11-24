@@ -18,9 +18,9 @@ const geistMono = Geist_Mono({
 const appBaseUrl = process.env.NEXT_PUBLIC_APP_BASE_URL ?? "https://www.chantiflow.com";
 
 export const metadata: Metadata = {
-  metadataBase: new URL(appBaseUrl),
+  metadataBase: new URL("https://chantiflow.com"),
   title: {
-    default: "ChantiFlow",
+    default: "ChantiFlow - Logiciel de Gestion de Chantier & Planning IA",
     template: "%s | ChantiFlow",
   },
   description: "Logiciel SaaS pour planifier, suivre et automatiser la gestion de vos chantiers BTP.",
