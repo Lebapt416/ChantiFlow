@@ -1,0 +1,25 @@
+# Ignore everything by default
+**
+
+# Allow Dockerfile and dockerignore
+!Dockerfile
+!.dockerignore
+
+# Allow ml source folder
+!ml/**
+
+# Keep package metadata if needed
+!package.json
+!pnpm-lock.yaml
+!package-lock.json
+!yarn.lock
+
+# Explicitly ignore heavy directories
+node_modules
+.next
+dist
+build
+out
+.tmp
+coverage
+.git
