@@ -13,11 +13,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Copier les requirements du dossier ml et installer une version CPU compacte de torch
+# Copier les requirements du dossier ml et installer toutes les dépendances
 COPY ml/requirements.txt ./requirements.txt
 RUN pip install --no-cache-dir --extra-index-url https://download.pytorch.org/whl/cpu \
-    torch==2.1.0+cpu \
-    && pip install --no-cache-dir -r requirements.txt --no-deps
+    -r requirements.txt
 
 # Copier le code de l'API
 COPY ml/ ./
