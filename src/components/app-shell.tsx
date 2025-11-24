@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ReactNode, useMemo, useState } from 'react';
 import { InstallPwaButton } from './install-pwa-button';
+import { MobileNav } from './mobile-nav';
 import {
   Home,
   LayoutDashboard,
@@ -223,9 +224,10 @@ export function AppShell({
               </div>
             </div>
           </header>
-          <main className="px-4 py-8 lg:px-10">{children}</main>
+          <main className="px-4 py-8 lg:px-10 pb-24 md:pb-8">{children}</main>
         </div>
       </div>
+      <MobileNav />
     </div>
   );
 }
