@@ -221,8 +221,11 @@ export default async function LandingPage() {
       {/* Hero Section */}
       <section className="mx-auto max-w-7xl px-6 py-20">
         <div className="mx-auto max-w-3xl text-center">
+          <h2 className="text-sm font-semibold uppercase tracking-[0.4em] text-emerald-600 dark:text-emerald-400">
+            Logiciel de gestion BTP
+          </h2>
           <h1 className="text-5xl font-bold tracking-tight text-zinc-900 dark:text-white sm:text-6xl">
-            Logiciel de gestion de chantier BTP&nbsp;: gérez vos chantiers{' '}
+            Logiciel de Suivi de Chantier&nbsp;: gérez vos chantiers{' '}
             <span className="text-emerald-600 dark:text-emerald-400">30% plus vite</span>{' '}
             grâce à l'IA
           </h1>

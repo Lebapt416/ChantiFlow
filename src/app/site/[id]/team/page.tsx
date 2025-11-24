@@ -14,8 +14,6 @@ function isValidUuid(value: string | undefined) {
   return Boolean(value && /^[0-9a-fA-F-]{36}$/.test(value));
 }
 
-export const dynamic = 'force-dynamic';
-
 export default async function SiteTeamPage({ params }: Params) {
   const { id } = await params;
 
