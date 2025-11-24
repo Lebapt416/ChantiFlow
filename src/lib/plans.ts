@@ -2,6 +2,45 @@ import { createSupabaseServerClient } from '@/lib/supabase/server';
 
 export type Plan = 'basic' | 'plus' | 'pro';
 
+export const PLANS = {
+  basic: {
+    name: 'Basic',
+    features: [
+      '1 chantier actif',
+      'Planification IA basique',
+      'QR codes pour les employés',
+      'Upload de photos et rapports',
+      'Support par email',
+    ],
+  },
+  plus: {
+    name: 'Plus',
+    features: [
+      'Jusqu\'à 5 chantiers actifs',
+      'Planification IA avancée',
+      'Classement intelligent des tâches',
+      'Analytics détaillés',
+      'Support prioritaire',
+      'Export de rapports',
+      'Météo de chantier en temps réel',
+    ],
+  },
+  pro: {
+    name: 'Pro',
+    features: [
+      'Tout de Plus',
+      'Multi-utilisateurs',
+      'API personnalisée',
+      'Intégrations avancées',
+      'Support dédié 24/7',
+      'Formation personnalisée',
+      'Gestion des permissions',
+      'Exports rapports PDF professionnels',
+      'Assistant IA de chantier',
+    ],
+  },
+} as const;
+
 export type AddOn = {
   type: 'extra_workers' | 'extra_sites';
   quantity: number; // Nombre d'add-ons achetés
@@ -168,5 +207,19 @@ export async function canAddWorker(userId: string): Promise<{ allowed: boolean; 
   }
 
   return { allowed: true };
+}
+
+/**
+ * Vérifie si l'utilisateur a accès à la fonctionnalité météo (plan PLUS ou supérieur)
+ */
+export function canAccessWeather(planId: Plan): boolean {
+  return planId === 'plus' || planId === 'pro';
+}
+
+/**
+ * Vérifie si l'utilisateur a accès aux fonctionnalités PRO
+ */
+export function canAccessProFeatures(planId: Plan): boolean {
+  return planId === 'pro';
 }
 

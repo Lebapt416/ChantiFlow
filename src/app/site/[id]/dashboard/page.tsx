@@ -4,6 +4,9 @@ import { AppShell } from '@/components/app-shell';
 import { DashboardCharts } from '@/app/dashboard/dashboard-charts';
 import { SitePlanningMini } from '@/components/site-planning-mini';
 import { generateSiteSummary } from '@/lib/ai/summary';
+import { WeatherWidget } from '@/components/weather-widget';
+import { getUserPlan, canAccessWeather, canAccessProFeatures } from '@/lib/plans';
+import { PDFButton } from '@/components/pdf-button';
 
 type Params = {
   params: Promise<{
@@ -91,6 +94,11 @@ export default async function SiteDashboardPage({ params }: Params) {
       console.error('Erreur génération résumé IA:', error);
     }
   }
+
+  // Récupérer le plan de l'utilisateur pour vérifier les accès
+  const userPlan = await getUserPlan(user);
+  const hasWeatherAccess = canAccessWeather(userPlan);
+  const hasProAccess = canAccessProFeatures(userPlan);
 
   return (
     <AppShell
@@ -243,6 +251,22 @@ export default async function SiteDashboardPage({ params }: Params) {
               souhaitée dans l'onglet Planning pour la programmer.
             </p>
           )}
+        </section>
+
+        {/* Widget Météo */}
+        <WeatherWidget location={site.address || undefined} isLocked={!hasWeatherAccess} />
+
+        {/* Section Rapports avec bouton PDF */}
+        <section className="rounded-2xl border border-zinc-100 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900">
+          <div className="mb-4 flex items-center justify-between">
+            <div>
+              <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">Rapports</h3>
+              <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                Exportez vos données de chantier
+              </p>
+            </div>
+            <PDFButton siteId={site.id} isPro={hasProAccess} />
+          </div>
         </section>
 
         {/* Planning du chantier */}
