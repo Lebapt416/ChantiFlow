@@ -3,6 +3,7 @@ import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { AppShell } from '@/components/app-shell';
 import { DashboardCharts } from '@/app/dashboard/dashboard-charts';
 import { SitePlanningMini } from '@/components/site-planning-mini';
+import { generateSiteSummary } from '@/lib/ai/summary';
 
 type Params = {
   params: Promise<{
@@ -81,6 +82,16 @@ export default async function SiteDashboardPage({ params }: Params) {
       (a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime(),
     );
 
+  // Générer le résumé IA du chantier
+  let aiSummary: { summary: string; status: string } | null = null;
+  if (tasks && tasks.length > 0) {
+    try {
+      aiSummary = await generateSiteSummary(site, tasks);
+    } catch (error) {
+      console.error('Erreur génération résumé IA:', error);
+    }
+  }
+
   return (
     <AppShell
       heading={`Dashboard - ${site.name}`}
@@ -89,6 +100,53 @@ export default async function SiteDashboardPage({ params }: Params) {
       primarySite={{ id: site.id, name: site.name }}
     >
       <div className="space-y-6">
+        {/* Résumé IA du chantier */}
+        {aiSummary && (
+          <section
+            className={`rounded-3xl border p-6 shadow-sm ${
+              aiSummary.status === 'critical'
+                ? 'border-rose-200 bg-rose-50 dark:border-rose-800 dark:bg-rose-900/20'
+                : aiSummary.status === 'warning'
+                  ? 'border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-900/20'
+                  : 'border-emerald-200 bg-emerald-50 dark:border-emerald-800 dark:bg-emerald-900/20'
+            }`}
+          >
+            <div className="flex items-start gap-4">
+              <div className="flex-shrink-0">
+                {aiSummary.status === 'critical' ? (
+                  <div className="rounded-full bg-rose-100 p-2 dark:bg-rose-900/30">
+                    <span className="text-2xl">⚠️</span>
+                  </div>
+                ) : aiSummary.status === 'warning' ? (
+                  <div className="rounded-full bg-amber-100 p-2 dark:bg-amber-900/30">
+                    <span className="text-2xl">🟠</span>
+                  </div>
+                ) : (
+                  <div className="rounded-full bg-emerald-100 p-2 dark:bg-emerald-900/30">
+                    <span className="text-2xl">✨</span>
+                  </div>
+                )}
+              </div>
+              <div className="flex-1">
+                <h2 className="mb-1 text-lg font-semibold text-zinc-900 dark:text-white">
+                  Analyse IA du chantier
+                </h2>
+                <p
+                  className={`text-sm ${
+                    aiSummary.status === 'critical'
+                      ? 'text-rose-900 dark:text-rose-200'
+                      : aiSummary.status === 'warning'
+                        ? 'text-amber-900 dark:text-amber-200'
+                        : 'text-emerald-900 dark:text-emerald-200'
+                  }`}
+                >
+                  {aiSummary.summary}
+                </p>
+              </div>
+            </div>
+          </section>
+        )}
+
         {/* Stats du chantier */}
         <section className="grid gap-4 md:grid-cols-4">
           <div className="rounded-2xl border border-zinc-100 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">

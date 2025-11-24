@@ -197,7 +197,10 @@ async def generate_global_summary(data: GlobalSummaryInput):
         text = f"🟠 Vigilance : {sites_at_risk} chantier(s) montrent des signes de ralentissement d'après l'analyse."
         status = "warning"
     else:
-        text = f"✨ Tout va bien. Les {total_sites} chantiers avancent conformément aux estimations de l'IA."
+        if total_sites == 1:
+            text = "✨ Tout va bien. Le chantier avance conformément aux estimations de l'IA."
+        else:
+            text = f"✨ Tout va bien. Les {total_sites} chantiers avancent conformément aux estimations de l'IA."
         status = "good"
 
     return SummaryResponse(summary=text, status=status)
