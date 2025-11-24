@@ -37,7 +37,7 @@ export async function getWorkerPlanning(
         .eq('site_id', siteId),
       supabase
         .from('sites')
-        .select('deadline')
+        .select('deadline, address')
         .eq('id', siteId)
         .single(),
     ]);
@@ -70,6 +70,7 @@ export async function getWorkerPlanning(
       pendingTasks,
       workers || [],
       site?.deadline || null,
+      (site as any)?.address || undefined,
     );
 
     console.log('📅 Planning généré:', {

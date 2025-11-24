@@ -1,6 +1,7 @@
 'use server';
 
 import { getPrediction } from '@/lib/ai/prediction';
+import { getWorkRule, getEffectiveWorkingHours } from '@/lib/ai/work-rules';
 
 type Task = {
   id: string;
@@ -59,6 +60,7 @@ export async function generatePlanning(
   tasks: Task[],
   workers: Worker[],
   deadline: string | null,
+  location?: string, // Localisation du chantier pour la météo
 ): Promise<PlanningResult> {
   // Filtrer uniquement les tâches en attente
   const pendingTasks = tasks.filter((task) => task.status === 'pending');
@@ -115,20 +117,31 @@ export async function generatePlanning(
 
   const adjustedDailyHours = BASE_WORKING_HOURS / realityFactor;
 
-  // Générer le planning avec dates et assignations
-  const orderedTasks = classifiedTasks.map((task, index) => {
+  // Générer le planning initial avec dates et assignations
+  let orderedTasks = classifiedTasks.map((task, index) => {
     const taskStartDate = new Date(startDate);
+    
+    // Utiliser les heures effectives selon les règles de métier
+    const workRule = getWorkRule(task.required_role);
+    const effectiveHours = getEffectiveWorkingHours(workRule);
+    const taskHours = task.duration_hours || effectiveHours;
+    
     // Calculer la date de début en fonction de l'ordre et des dépendances
     const previousTasksHours = classifiedTasks
       .slice(0, index)
-      .reduce((sum, t) => sum + (t.duration_hours || 8), 0);
+      .reduce((sum, t) => {
+        const tRule = getWorkRule(t.required_role);
+        const tEffectiveHours = getEffectiveWorkingHours(tRule);
+        return sum + (t.duration_hours || tEffectiveHours);
+      }, 0);
+    
     taskStartDate.setDate(
       taskStartDate.getDate() + Math.floor(previousTasksHours / adjustedDailyHours),
     );
 
     const taskEndDate = new Date(taskStartDate);
     taskEndDate.setDate(
-      taskEndDate.getDate() + Math.ceil((task.duration_hours || 8) / adjustedDailyHours),
+      taskEndDate.getDate() + Math.ceil(taskHours / adjustedDailyHours),
     );
 
     // Trouver un worker approprié
@@ -152,6 +165,65 @@ export async function generatePlanning(
       priority,
     };
   });
+
+  // Optimiser avec la météo si la localisation est fournie
+  if (location) {
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_PREDICTION_API_URL || process.env.ML_API_URL || '';
+      if (apiUrl) {
+        const weatherOptimization = await fetch(`${apiUrl.replace(/\/$/, '')}/planning/optimize-weather`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            tasks: orderedTasks.map((ot) => {
+              const task = classifiedTasks.find((t) => t.id === ot.taskId);
+              return {
+                task_role: task?.required_role || null,
+                task_title: task?.title || '',
+                planned_date: ot.startDate,
+              };
+            }),
+            location,
+            start_date: startDate.toISOString().split('T')[0],
+          }),
+          cache: 'no-store',
+        });
+
+        if (weatherOptimization.ok) {
+          const weatherData = await weatherOptimization.json();
+          
+          // Appliquer les recommandations météo
+          weatherData.recommendations?.forEach((rec: any, idx: number) => {
+            if (!rec.favorable && weatherData.best_dates && weatherData.best_dates[idx]) {
+              const bestDate = new Date(weatherData.best_dates[idx]);
+              const currentTask = orderedTasks[idx];
+              if (currentTask) {
+                const daysDiff = Math.ceil(
+                  (bestDate.getTime() - new Date(currentTask.startDate).getTime()) /
+                    (1000 * 60 * 60 * 24),
+                );
+                currentTask.startDate = bestDate.toISOString().split('T')[0];
+                const endDate = new Date(bestDate);
+                endDate.setDate(endDate.getDate() + Math.ceil((classifiedTasks[idx]?.duration_hours || 8) / adjustedDailyHours));
+                currentTask.endDate = endDate.toISOString().split('T')[0];
+                
+                warnings.push(
+                  `🌤️ ${rec.recommendation || `Tâche "${classifiedTasks[idx]?.title}" décalée de ${daysDiff} jour(s) pour conditions météo optimales`}`,
+                );
+              }
+            }
+          });
+
+          // Ajouter les warnings de l'API
+          if (weatherData.warnings) {
+            warnings.push(...weatherData.warnings);
+          }
+        }
+      }
+    } catch (error) {
+      console.warn('Impossible d\'optimiser avec la météo:', error);
+    }
+  }
 
   const lastTaskEnd = new Date(orderedTasks[orderedTasks.length - 1].endDate);
 

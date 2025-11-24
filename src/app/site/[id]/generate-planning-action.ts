@@ -42,15 +42,20 @@ export async function generatePlanningAction(
       return { error: 'Impossible de charger les données du chantier.' };
     }
 
-    // Récupérer la deadline du chantier
+    // Récupérer la deadline et l'adresse du chantier
     const { data: site } = await supabase
       .from('sites')
-      .select('deadline')
+      .select('deadline, address')
       .eq('id', siteId)
       .single();
 
-    // Générer le planning avec l'IA
-    const planning = await generatePlanning(tasks, workers || [], site?.deadline || null);
+    // Générer le planning avec l'IA (incluant optimisation météo)
+    const planning = await generatePlanning(
+      tasks,
+      workers || [],
+      site?.deadline || null,
+      (site as any)?.address || undefined,
+    );
 
     // Mettre à jour la planification sauvegardée (dernière génération uniquement)
     const plannedTaskIds = planning.orderedTasks.map((task) => task.taskId);

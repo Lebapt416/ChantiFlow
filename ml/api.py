@@ -8,7 +8,9 @@ from pathlib import Path
 import numpy as np
 import csv
 import os
-from typing import List
+from typing import List, Optional
+import requests
+from datetime import datetime, timedelta
 
 # --- CONFIGURATION ---
 # Utilisation de /data pour le volume persistant si dispo, sinon dossier local
@@ -68,6 +70,41 @@ class SummaryResponse(BaseModel):
     status: str
 
 
+class WeatherData(BaseModel):
+    temperature: float
+    precipitation: float
+    weather_code: int
+    date: str
+
+
+class TaskWeatherInput(BaseModel):
+    task_role: Optional[str] = None
+    task_title: str
+    planned_date: str
+    location: Optional[str] = None  # Ville ou coordonnées
+
+
+class WeatherOptimizationInput(BaseModel):
+    tasks: List[TaskWeatherInput]
+    location: Optional[str] = None
+    start_date: str
+
+
+class WeatherRecommendation(BaseModel):
+    date: str
+    temperature: float
+    precipitation: float
+    favorable: bool
+    reason: str
+    recommendation: str
+
+
+class OptimizedPlanningResponse(BaseModel):
+    recommendations: List[WeatherRecommendation]
+    best_dates: List[str]
+    warnings: List[str]
+
+
 app = FastAPI(title="ChantiFlow Self-Learning AI")
 
 app.add_middleware(
@@ -83,6 +120,106 @@ new_samples_counter = 0
 
 def get_norm_params():
     return torch.tensor([25.0, 5.5]), torch.tensor([12.0, 2.5])
+
+
+def geocode_location(location: str) -> Optional[tuple[float, float]]:
+    """Géocode une ville en coordonnées lat/lon"""
+    try:
+        response = requests.get(
+            f"https://nominatim.openstreetmap.org/search?format=json&q={location}&limit=1",
+            headers={"User-Agent": "ChantiFlow AI"},
+            timeout=5
+        )
+        if response.ok:
+            data = response.json()
+            if data and len(data) > 0:
+                return (float(data[0]["lat"]), float(data[0]["lon"]))
+    except Exception as e:
+        print(f"Erreur géocodage: {e}")
+    return None
+
+
+def get_weather_forecast(lat: float, lon: float, days: int = 7) -> List[WeatherData]:
+    """Récupère les prévisions météo depuis OpenMeteo"""
+    try:
+        response = requests.get(
+            f"https://api.open-meteo.com/v1/forecast",
+            params={
+                "latitude": lat,
+                "longitude": lon,
+                "daily": "temperature_2m_max,precipitation_sum,weathercode",
+                "timezone": "Europe/Paris",
+                "forecast_days": days
+            },
+            timeout=5
+        )
+        if response.ok:
+            data = response.json()
+            daily = data.get("daily", {})
+            dates = daily.get("time", [])
+            temps = daily.get("temperature_2m_max", [])
+            precip = daily.get("precipitation_sum", [])
+            codes = daily.get("weathercode", [])
+            
+            return [
+                WeatherData(
+                    temperature=temps[i],
+                    precipitation=precip[i],
+                    weather_code=codes[i],
+                    date=dates[i]
+                )
+                for i in range(min(len(dates), days))
+            ]
+    except Exception as e:
+        print(f"Erreur météo: {e}")
+    return []
+
+
+def check_weather_for_role(role: Optional[str], weather: WeatherData) -> dict:
+    """Vérifie si les conditions météo sont favorables pour un métier"""
+    # Règles simplifiées (version backend, règles complètes dans work-rules.ts)
+    rules = {
+        "maçon": {"avoid_rain": True, "min_temp": 5},
+        "carreleur": {"avoid_rain": True, "min_temp": 5},
+        "charpentier": {"avoid_rain": True, "min_temp": 0},
+        "peintre": {"avoid_rain": True, "min_temp": 10, "max_temp": 30},
+        "terrassier": {"avoid_rain": True, "min_temp": 0},
+        "couvreur": {"avoid_rain": True, "min_temp": 5, "max_temp": 30},
+    }
+    
+    if not role:
+        return {"favorable": True, "reason": "Pas de contrainte météo spécifique"}
+    
+    role_lower = role.lower()
+    rule = None
+    for key, r in rules.items():
+        if key in role_lower:
+            rule = r
+            break
+    
+    if not rule:
+        return {"favorable": True, "reason": "Métier sans contrainte météo spécifique"}
+    
+    reasons = []
+    if rule.get("avoid_rain") and weather.precipitation > 0.5:
+        reasons.append(f"Pluie prévue ({weather.precipitation:.1f}mm)")
+    if rule.get("min_temp") and weather.temperature < rule["min_temp"]:
+        reasons.append(f"Température trop basse ({weather.temperature:.1f}°C)")
+    if rule.get("max_temp") and weather.temperature > rule["max_temp"]:
+        reasons.append(f"Température trop élevée ({weather.temperature:.1f}°C)")
+    
+    if reasons:
+        return {
+            "favorable": False,
+            "reason": " | ".join(reasons),
+            "recommendation": f"Reporter cette tâche à une date plus favorable"
+        }
+    
+    return {
+        "favorable": True,
+        "reason": "Conditions météo favorables",
+        "recommendation": "Date idéale pour cette tâche"
+    }
 
 
 def train_on_new_data():
@@ -208,7 +345,7 @@ async def generate_global_summary(data: GlobalSummaryInput):
 
 @app.post("/summary/site", response_model=SummaryResponse)
 async def generate_site_summary(data: SiteSummaryInput):
-    """Génère un résumé pour un chantier spécifique"""
+    """Génère un résumé pour un chantier spécifique avec recommandations météo"""
     if model is not None:
         mean_v, std_v = get_norm_params()
         with torch.no_grad():
@@ -221,20 +358,99 @@ async def generate_site_summary(data: SiteSummaryInput):
     retard_estime = predicted_total_days - data.planned_duration
     progression = 1 - (data.tasks_pending / max(1, data.tasks_total))
 
+    base_text = ""
     if retard_estime > 5:
         status = "critical"
-        text = f"⚠️ Risque élevé : L'IA prévoit {int(predicted_total_days)} jours de travail (vs {data.planned_duration} prévus). Un retard de {int(retard_estime)} jours est probable."
+        base_text = f"⚠️ Risque élevé : L'IA prévoit {int(predicted_total_days)} jours de travail (vs {data.planned_duration} prévus). Un retard de {int(retard_estime)} jours est probable."
     elif retard_estime > 2:
         status = "warning"
-        text = f"🟠 Attention : Le rythme actuel suggère un léger dépassement ({int(retard_estime)} jours) par rapport au planning."
+        base_text = f"🟠 Attention : Le rythme actuel suggère un léger dépassement ({int(retard_estime)} jours) par rapport au planning."
     elif progression > 0.9:
         status = "good"
-        text = "✅ Chantier en phase de finition. Les objectifs sont atteints."
+        base_text = "✅ Chantier en phase de finition. Les objectifs sont atteints."
     else:
         status = "good"
-        text = f"✨ Le chantier avance normalement. L'estimation IA ({int(predicted_total_days)}j) est alignée avec votre planning."
+        base_text = f"✨ Le chantier avance normalement. L'estimation IA ({int(predicted_total_days)}j) est alignée avec votre planning."
+
+    # Ajouter recommandation météo si applicable
+    weather_note = " 🌤️ Consultez la météo pour optimiser les tâches extérieures."
+    text = base_text + weather_note
 
     return SummaryResponse(summary=text, status=status)
+
+
+@app.post("/planning/optimize-weather", response_model=OptimizedPlanningResponse)
+async def optimize_planning_with_weather(data: WeatherOptimizationInput):
+    """Optimise le planning en tenant compte de la météo et des règles de métier"""
+    location = data.location or "Paris"
+    coords = geocode_location(location)
+    
+    if not coords:
+        return OptimizedPlanningResponse(
+            recommendations=[],
+            best_dates=[],
+            warnings=["Impossible de géolocaliser le chantier. Utilisation de Paris par défaut."]
+        )
+    
+    lat, lon = coords
+    forecast = get_weather_forecast(lat, lon, days=14)
+    
+    if not forecast:
+        return OptimizedPlanningResponse(
+            recommendations=[],
+            best_dates=[],
+            warnings=["Impossible de récupérer les prévisions météo."]
+        )
+    
+    recommendations = []
+    best_dates = []
+    warnings = []
+    
+    # Analyser chaque tâche avec les prévisions
+    for task in data.tasks:
+        task_date = datetime.fromisoformat(task.planned_date.replace('Z', '+00:00'))
+        
+        # Trouver la prévision la plus proche
+        closest_weather = None
+        min_diff = float('inf')
+        for weather in forecast:
+            weather_date = datetime.fromisoformat(weather.date)
+            diff = abs((task_date - weather_date).days)
+            if diff < min_diff:
+                min_diff = diff
+                closest_weather = weather
+        
+        if closest_weather:
+            check = check_weather_for_role(task.task_role, closest_weather)
+            recommendations.append(WeatherRecommendation(
+                date=task.planned_date,
+                temperature=closest_weather.temperature,
+                precipitation=closest_weather.precipitation,
+                favorable=check["favorable"],
+                reason=check.get("reason", ""),
+                recommendation=check.get("recommendation", "")
+            ))
+            
+            if check["favorable"]:
+                best_dates.append(task.planned_date)
+            else:
+                # Chercher une meilleure date dans les 14 prochains jours
+                for weather in forecast:
+                    future_date = datetime.fromisoformat(weather.date)
+                    if future_date > task_date:
+                        future_check = check_weather_for_role(task.task_role, weather)
+                        if future_check["favorable"]:
+                            best_dates.append(weather.date)
+                            warnings.append(
+                                f"Tâche '{task.task_title}' : meilleure date le {weather.date} (au lieu de {task.planned_date})"
+                            )
+                            break
+    
+    return OptimizedPlanningResponse(
+        recommendations=recommendations,
+        best_dates=best_dates,
+        warnings=warnings
+    )
 
 
 @app.post("/predict", response_model=ChantierPrediction)

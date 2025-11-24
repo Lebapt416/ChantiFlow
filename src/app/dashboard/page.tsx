@@ -100,6 +100,7 @@ export default async function DashboardPage() {
             tasks || [],
             workers || [],
             site.deadline,
+            (site as any).address || undefined,
           );
           planning = planningResult.orderedTasks.map((p: any) => ({
             taskId: p.taskId,
