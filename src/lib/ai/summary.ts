@@ -50,7 +50,7 @@ export async function generateGlobalSummary(sites: any[]) {
   }
 }
 
-export async function generateSiteSummary(site: any, tasks: any[]) {
+export async function generateSiteSummary(site: any, tasks: any[], hasWeatherAccess: boolean = false) {
   if (!API_URL) {
     console.warn('⚠️ URL API non configurée pour les résumés');
     return null;
@@ -76,7 +76,9 @@ export async function generateSiteSummary(site: any, tasks: any[]) {
       tasks_pending: pendingTasks,
       complexity: Number(complexity.toFixed(2)),
       days_elapsed: Math.ceil((new Date().getTime() - new Date(site.created_at).getTime()) / (1000 * 3600 * 24)),
-      planned_duration: plannedDays
+      planned_duration: plannedDays,
+      // Inclure la localisation seulement si l'utilisateur a accès à la météo
+      location: (hasWeatherAccess && site.address) ? site.address.trim() : null
     };
 
     const res = await fetch(`${API_URL}/summary/site`, {

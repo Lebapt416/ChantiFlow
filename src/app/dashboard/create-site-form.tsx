@@ -82,23 +82,23 @@ export function CreateSiteForm({ onSuccess }: Props) {
         />
       </div>
 
-      {/* Adresse du chantier */}
+      {/* Ville du chantier */}
       <div className="space-y-2">
         <label
           htmlFor="address"
           className="text-sm font-medium text-zinc-600 dark:text-zinc-300"
         >
-          Localisation du chantier
+          Ville du chantier
         </label>
         <input
           id="address"
           name="address"
           type="text"
-          placeholder="Ex: 123 Rue de la République, 75001 Paris"
+          placeholder="Ex: Paris, Lyon, Marseille, Toulouse..."
           className="w-full rounded-md border border-zinc-200 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-black/60 dark:border-zinc-700 dark:bg-zinc-950 dark:text-white"
         />
         <p className="text-xs text-zinc-500 dark:text-zinc-400">
-          🌤️ L'adresse permet à l'IA d'optimiser le planning selon la météo locale
+          🌤️ La ville permet à l'IA d'optimiser le planning selon la météo locale (toutes les villes de France sont supportées)
         </p>
       </div>
 

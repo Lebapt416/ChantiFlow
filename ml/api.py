@@ -63,6 +63,7 @@ class SiteSummaryInput(BaseModel):
     complexity: float
     days_elapsed: int
     planned_duration: int
+    location: Optional[str] = None  # Ville du chantier pour la météo
 
 
 class SummaryResponse(BaseModel):
@@ -123,11 +124,27 @@ def get_norm_params():
 
 
 def geocode_location(location: str) -> Optional[tuple[float, float]]:
-    """Géocode une ville en coordonnées lat/lon"""
+    """Géocode une ville en coordonnées lat/lon - Optimisé pour les villes françaises"""
+    if not location or not location.strip():
+        return None
+    
+    location_clean = location.strip()
+    
+    # Si la ville ne contient pas "France", l'ajouter pour améliorer la précision
+    if "france" not in location_clean.lower():
+        location_clean = f"{location_clean}, France"
+    
     try:
         response = requests.get(
-            f"https://nominatim.openstreetmap.org/search?format=json&q={location}&limit=1",
-            headers={"User-Agent": "ChantiFlow AI"},
+            f"https://nominatim.openstreetmap.org/search",
+            params={
+                "q": location_clean,
+                "format": "json",
+                "limit": 1,
+                "countrycodes": "fr",  # Restreindre à la France
+                "addressdetails": 1
+            },
+            headers={"User-Agent": "ChantiFlowApp/1.0 (contact@chantiflow.com)"},
             timeout=5
         )
         if response.ok:
@@ -135,7 +152,7 @@ def geocode_location(location: str) -> Optional[tuple[float, float]]:
             if data and len(data) > 0:
                 return (float(data[0]["lat"]), float(data[0]["lon"]))
     except Exception as e:
-        print(f"Erreur géocodage: {e}")
+        print(f"Erreur géocodage pour '{location}': {e}")
     return None
 
 
@@ -372,8 +389,54 @@ async def generate_site_summary(data: SiteSummaryInput):
         status = "good"
         base_text = f"✨ Le chantier avance normalement. L'estimation IA ({int(predicted_total_days)}j) est alignée avec votre planning."
 
-    # Ajouter recommandation météo si applicable
-    weather_note = " 🌤️ Consultez la météo pour optimiser les tâches extérieures."
+    # Ajouter recommandations météo si la localisation est fournie
+    weather_note = ""
+    if data.location and data.location.strip():
+        try:
+            coords = geocode_location(data.location)
+            if coords:
+                lat, lon = coords
+                forecast = get_weather_forecast(lat, lon, days=3)  # Prévisions sur 3 jours
+                
+                if forecast and len(forecast) > 0:
+                    # Analyser les conditions météo pour les prochains jours
+                    today = forecast[0] if len(forecast) > 0 else None
+                    tomorrow = forecast[1] if len(forecast) > 1 else None
+                    
+                    weather_advice = []
+                    
+                    if today:
+                        if today.precipitation > 2:
+                            weather_advice.append(f"Pluie prévue aujourd'hui ({today.precipitation:.1f}mm)")
+                        elif today.precipitation > 0.5:
+                            weather_advice.append(f"Risque de pluie aujourd'hui ({today.precipitation:.1f}mm)")
+                        elif today.temperature < 5:
+                            weather_advice.append(f"Température froide aujourd'hui ({today.temperature:.1f}°C)")
+                        elif today.temperature > 30:
+                            weather_advice.append(f"Température élevée aujourd'hui ({today.temperature:.1f}°C)")
+                        else:
+                            weather_advice.append(f"Conditions favorables aujourd'hui ({today.temperature:.1f}°C)")
+                    
+                    if tomorrow:
+                        if tomorrow.precipitation > 2:
+                            weather_advice.append(f"Pluie prévue demain ({tomorrow.precipitation:.1f}mm)")
+                        elif tomorrow.precipitation > 0.5:
+                            weather_advice.append(f"Risque de pluie demain ({tomorrow.precipitation:.1f}mm)")
+                    
+                    if weather_advice:
+                        weather_note = f" 🌤️ Météo {data.location}: {' | '.join(weather_advice)}. Planifiez les tâches extérieures en conséquence."
+                    else:
+                        weather_note = f" 🌤️ Météo {data.location}: Conditions favorables pour les prochains jours. Idéal pour les travaux extérieurs."
+                else:
+                    weather_note = f" 🌤️ Consultez la météo de {data.location} pour optimiser les tâches extérieures."
+            else:
+                weather_note = f" 🌤️ Consultez la météo de {data.location} pour optimiser les tâches extérieures."
+        except Exception as e:
+            print(f"Erreur récupération météo pour résumé: {e}")
+            weather_note = f" 🌤️ Consultez la météo de {data.location} pour optimiser les tâches extérieures."
+    else:
+        weather_note = " 🌤️ Consultez la météo pour optimiser les tâches extérieures."
+
     text = base_text + weather_note
 
     return SummaryResponse(summary=text, status=status)

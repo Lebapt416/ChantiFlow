@@ -85,15 +85,15 @@ export default async function SiteDashboardPage({ params }: Params) {
       (a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime(),
     );
 
-  // Générer le résumé IA du chantier
-  let aiSummary: { summary: string; status: string } | null = null;
-  if (tasks && tasks.length > 0) {
-    try {
-      aiSummary = await generateSiteSummary(site, tasks);
-    } catch (error) {
-      console.error('Erreur génération résumé IA:', error);
-    }
-  }
+        // Générer le résumé IA du chantier (avec météo si accès Plus/Pro)
+        let aiSummary: { summary: string; status: string } | null = null;
+        if (tasks && tasks.length > 0) {
+          try {
+            aiSummary = await generateSiteSummary(site, tasks, hasWeatherAccess);
+          } catch (error) {
+            console.error('Erreur génération résumé IA:', error);
+          }
+        }
 
   // Récupérer le plan de l'utilisateur pour vérifier les accès
   const userPlan = await getUserPlan(user);
