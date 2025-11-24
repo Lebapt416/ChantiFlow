@@ -1,19 +1,31 @@
 'use server';
 
-const API_URL = process.env.NEXT_PUBLIC_PREDICTION_API_URL || 'http://localhost:8000';
+function normalizeUrl(rawUrl: string | undefined): string | null {
+  if (!rawUrl) return null;
+  const trimmed = rawUrl.trim().replace(/\/$/, '');
+  if (!trimmed.startsWith('http://') && !trimmed.startsWith('https://')) {
+    return `https://${trimmed}`;
+  }
+  return trimmed;
+}
+
+const API_URL = normalizeUrl(process.env.NEXT_PUBLIC_PREDICTION_API_URL || process.env.ML_API_URL);
 
 export async function generateGlobalSummary(sites: any[]) {
-  if (!API_URL) return null;
+  if (!API_URL) {
+    console.warn('⚠️ URL API non configurée pour les résumés');
+    return null;
+  }
   
   try {
     // Transformer les données pour l'API Python
     const payload = {
       sites: sites.map(s => ({
         name: s.name,
-        tasks_total: s.tasks?.length || 0,
-        tasks_done: s.tasks?.filter((t: any) => t.status === 'done').length || 0,
-        complexity: 5.0, // Valeur par défaut ou calculée
-        days_elapsed: Math.ceil((new Date().getTime() - new Date(s.created_at).getTime()) / (1000 * 3600 * 24))
+        tasks_total: s.tasks_total || s.tasks?.length || 0,
+        tasks_done: s.tasks_done || s.tasks?.filter((t: any) => t.status === 'done').length || 0,
+        complexity: s.complexity || 5.0, // Utiliser la complexité fournie ou valeur par défaut
+        days_elapsed: s.days_elapsed || Math.ceil((new Date().getTime() - new Date(s.created_at).getTime()) / (1000 * 3600 * 24))
       }))
     };
 
@@ -21,26 +33,39 @@ export async function generateGlobalSummary(sites: any[]) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
-      next: { revalidate: 60 } // Cache 1 minute
+      cache: 'no-store',
     });
     
-    if (!res.ok) return null;
+    if (!res.ok) {
+      const errorText = await res.text();
+      console.error(`❌ Erreur API résumé global: ${res.status} - ${errorText}`);
+      return null;
+    }
+    
     return await res.json();
     
   } catch (e) {
-    console.error("Erreur résumé global:", e);
+    console.error("❌ Erreur résumé global:", e);
     return null;
   }
 }
 
 export async function generateSiteSummary(site: any, tasks: any[]) {
-  if (!API_URL) return null;
+  if (!API_URL) {
+    console.warn('⚠️ URL API non configurée pour les résumés');
+    return null;
+  }
 
   try {
     const totalTasks = tasks.length;
     const pendingTasks = tasks.filter(t => t.status === 'pending').length;
     
-    // Estimation deadline théorique (simplifiée)
+    // Calcul de la complexité basé sur la diversité des rôles et la durée moyenne
+    const roleDiversity = new Set(tasks.map((t: any) => t.required_role).filter(Boolean)).size;
+    const avgDuration = tasks.reduce((sum: number, t: any) => sum + (t.duration_hours || 8), 0) / Math.max(1, totalTasks);
+    const complexity = Math.min(10, Math.max(1, avgDuration / 4 + roleDiversity / 2));
+    
+    // Estimation deadline théorique
     const plannedDays = site.deadline 
       ? Math.ceil((new Date(site.deadline).getTime() - new Date(site.created_at).getTime()) / (1000 * 3600 * 24))
       : 30;
@@ -49,7 +74,7 @@ export async function generateSiteSummary(site: any, tasks: any[]) {
       site_name: site.name,
       tasks_total: totalTasks,
       tasks_pending: pendingTasks,
-      complexity: 5.5, // On pourrait affiner ce calcul
+      complexity: Number(complexity.toFixed(2)),
       days_elapsed: Math.ceil((new Date().getTime() - new Date(site.created_at).getTime()) / (1000 * 3600 * 24)),
       planned_duration: plannedDays
     };
@@ -58,14 +83,19 @@ export async function generateSiteSummary(site: any, tasks: any[]) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
-      next: { revalidate: 60 }
+      cache: 'no-store',
     });
 
-    if (!res.ok) return null;
+    if (!res.ok) {
+      const errorText = await res.text();
+      console.error(`❌ Erreur API résumé site: ${res.status} - ${errorText}`);
+      return null;
+    }
+    
     return await res.json();
 
   } catch (e) {
-    console.error("Erreur résumé chantier:", e);
+    console.error("❌ Erreur résumé chantier:", e);
     return null;
   }
 }
