@@ -219,7 +219,10 @@ export default async function SiteTeamPage({ params }: Params) {
                   </div>
                   {!isCompleted && (
                     <div className="flex items-center gap-2">
-                      <DeleteWorkerButton workerId={worker.id} workerName={worker.name} />
+                      <DeleteWorkerButton
+                        workerId={worker.id}
+                        workerName={worker.name ?? 'Membre sans nom'}
+                      />
                     </div>
                   )}
                 </div>
