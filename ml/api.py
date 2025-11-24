@@ -8,6 +8,7 @@ from pathlib import Path
 import numpy as np
 import csv
 import os
+from typing import List
 
 # --- CONFIGURATION ---
 # Utilisation de /data pour le volume persistant si dispo, sinon dossier local
@@ -39,6 +40,32 @@ class FeedbackInput(BaseModel):
     nombre_taches: int
     complexite: float
     duree_reelle: float
+
+
+class SiteData(BaseModel):
+    name: str
+    tasks_total: int
+    tasks_done: int
+    complexity: float
+    days_elapsed: int
+
+
+class GlobalSummaryInput(BaseModel):
+    sites: List[SiteData]
+
+
+class SiteSummaryInput(BaseModel):
+    site_name: str
+    tasks_total: int
+    tasks_pending: int
+    complexity: float
+    days_elapsed: int
+    planned_duration: int
+
+
+class SummaryResponse(BaseModel):
+    summary: str
+    status: str
 
 
 app = FastAPI(title="ChantiFlow Self-Learning AI")
@@ -133,6 +160,78 @@ async def health_check():
         "model_loaded": model is not None,
         "learning_enabled": True,
     }
+
+
+@app.post("/summary/global", response_model=SummaryResponse)
+async def generate_global_summary(data: GlobalSummaryInput):
+    """Génère un résumé de l'état de santé de tous les chantiers"""
+    if not data.sites:
+        return SummaryResponse(summary="Aucun chantier actif pour le moment.", status="good")
+
+    total_sites = len(data.sites)
+    sites_at_risk = 0
+    sites_critical = 0
+    mean_v, std_v = get_norm_params()
+
+    for site in data.sites:
+        if model is not None:
+            with torch.no_grad():
+                inp = torch.FloatTensor([[site.tasks_total, site.complexity]])
+                inp_norm = (inp - mean_v) / (std_v + 1e-8)
+                predicted_duration = model(inp_norm).item()
+        else:
+            predicted_duration = site.tasks_total * 0.5
+
+        progress_ratio = site.tasks_done / max(1, site.tasks_total)
+        time_ratio = site.days_elapsed / max(1, predicted_duration)
+
+        if time_ratio > 0.8 and progress_ratio < 0.5:
+            sites_critical += 1
+        elif time_ratio > 0.6 and progress_ratio < 0.4:
+            sites_at_risk += 1
+
+    if sites_critical > 0:
+        text = f"⚠️ Attention requise : {sites_critical} chantier(s) en situation critique par rapport aux prédictions IA."
+        status = "critical"
+    elif sites_at_risk > 0:
+        text = f"🟠 Vigilance : {sites_at_risk} chantier(s) montrent des signes de ralentissement d'après l'analyse."
+        status = "warning"
+    else:
+        text = f"✨ Tout va bien. Les {total_sites} chantiers avancent conformément aux estimations de l'IA."
+        status = "good"
+
+    return SummaryResponse(summary=text, status=status)
+
+
+@app.post("/summary/site", response_model=SummaryResponse)
+async def generate_site_summary(data: SiteSummaryInput):
+    """Génère un résumé pour un chantier spécifique"""
+    if model is not None:
+        mean_v, std_v = get_norm_params()
+        with torch.no_grad():
+            inp = torch.FloatTensor([[data.tasks_total, data.complexity]])
+            inp_norm = (inp - mean_v) / (std_v + 1e-8)
+            predicted_total_days = max(1, model(inp_norm).item())
+    else:
+        predicted_total_days = data.tasks_total * 0.8
+
+    retard_estime = predicted_total_days - data.planned_duration
+    progression = 1 - (data.tasks_pending / max(1, data.tasks_total))
+
+    if retard_estime > 5:
+        status = "critical"
+        text = f"⚠️ Risque élevé : L'IA prévoit {int(predicted_total_days)} jours de travail (vs {data.planned_duration} prévus). Un retard de {int(retard_estime)} jours est probable."
+    elif retard_estime > 2:
+        status = "warning"
+        text = f"🟠 Attention : Le rythme actuel suggère un léger dépassement ({int(retard_estime)} jours) par rapport au planning."
+    elif progression > 0.9:
+        status = "good"
+        text = "✅ Chantier en phase de finition. Les objectifs sont atteints."
+    else:
+        status = "good"
+        text = f"✨ Le chantier avance normalement. L'estimation IA ({int(predicted_total_days)}j) est alignée avec votre planning."
+
+    return SummaryResponse(summary=text, status=status)
 
 
 @app.post("/predict", response_model=ChantierPrediction)
