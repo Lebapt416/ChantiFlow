@@ -408,13 +408,20 @@ async def optimize_planning_with_weather(data: WeatherOptimizationInput):
     
     # Analyser chaque tâche avec les prévisions
     for task in data.tasks:
-        task_date = datetime.fromisoformat(task.planned_date.replace('Z', '+00:00'))
+        # Parser la date de la tâche (format YYYY-MM-DD)
+        try:
+            task_date = datetime.strptime(task.planned_date.split('T')[0], '%Y-%m-%d')
+        except:
+            task_date = datetime.now()
         
         # Trouver la prévision la plus proche
         closest_weather = None
         min_diff = float('inf')
         for weather in forecast:
-            weather_date = datetime.fromisoformat(weather.date)
+            try:
+                weather_date = datetime.strptime(weather.date, '%Y-%m-%d')
+            except:
+                continue
             diff = abs((task_date - weather_date).days)
             if diff < min_diff:
                 min_diff = diff
@@ -436,7 +443,10 @@ async def optimize_planning_with_weather(data: WeatherOptimizationInput):
             else:
                 # Chercher une meilleure date dans les 14 prochains jours
                 for weather in forecast:
-                    future_date = datetime.fromisoformat(weather.date)
+                    try:
+                        future_date = datetime.strptime(weather.date, '%Y-%m-%d')
+                    except:
+                        continue
                     if future_date > task_date:
                         future_check = check_weather_for_role(task.task_role, weather)
                         if future_check["favorable"]:
@@ -445,6 +455,9 @@ async def optimize_planning_with_weather(data: WeatherOptimizationInput):
                                 f"Tâche '{task.task_title}' : meilleure date le {weather.date} (au lieu de {task.planned_date})"
                             )
                             break
+                # Si pas de meilleure date trouvée, garder la date originale
+                if not any(d == task.planned_date.split('T')[0] for d in best_dates):
+                    best_dates.append(task.planned_date.split('T')[0])
     
     return OptimizedPlanningResponse(
         recommendations=recommendations,

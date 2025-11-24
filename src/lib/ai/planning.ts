@@ -167,10 +167,11 @@ export async function generatePlanning(
   });
 
   // Optimiser avec la météo si la localisation est fournie
-  if (location) {
+  if (location && location.trim()) {
     try {
       const apiUrl = process.env.NEXT_PUBLIC_PREDICTION_API_URL || process.env.ML_API_URL || '';
       if (apiUrl) {
+        console.log('🌤️ Optimisation météo pour:', location);
         const weatherOptimization = await fetch(`${apiUrl.replace(/\/$/, '')}/planning/optimize-weather`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -183,7 +184,7 @@ export async function generatePlanning(
                 planned_date: ot.startDate,
               };
             }),
-            location,
+            location: location.trim(),
             start_date: startDate.toISOString().split('T')[0],
           }),
           cache: 'no-store',
@@ -191,38 +192,66 @@ export async function generatePlanning(
 
         if (weatherOptimization.ok) {
           const weatherData = await weatherOptimization.json();
+          console.log('✅ Données météo reçues:', weatherData);
           
           // Appliquer les recommandations météo
-          weatherData.recommendations?.forEach((rec: any, idx: number) => {
-            if (!rec.favorable && weatherData.best_dates && weatherData.best_dates[idx]) {
-              const bestDate = new Date(weatherData.best_dates[idx]);
-              const currentTask = orderedTasks[idx];
-              if (currentTask) {
-                const daysDiff = Math.ceil(
-                  (bestDate.getTime() - new Date(currentTask.startDate).getTime()) /
-                    (1000 * 60 * 60 * 24),
-                );
-                currentTask.startDate = bestDate.toISOString().split('T')[0];
-                const endDate = new Date(bestDate);
-                endDate.setDate(endDate.getDate() + Math.ceil((classifiedTasks[idx]?.duration_hours || 8) / adjustedDailyHours));
-                currentTask.endDate = endDate.toISOString().split('T')[0];
+          if (weatherData.recommendations && Array.isArray(weatherData.recommendations)) {
+            weatherData.recommendations.forEach((rec: any, idx: number) => {
+              if (!rec.favorable) {
+                const currentTask = orderedTasks[idx];
+                const task = classifiedTasks[idx];
                 
-                warnings.push(
-                  `🌤️ ${rec.recommendation || `Tâche "${classifiedTasks[idx]?.title}" décalée de ${daysDiff} jour(s) pour conditions météo optimales`}`,
-                );
+                if (currentTask && task) {
+                  // Chercher une meilleure date dans best_dates
+                  if (weatherData.best_dates && weatherData.best_dates.length > idx) {
+                    const bestDate = new Date(weatherData.best_dates[idx]);
+                    const daysDiff = Math.ceil(
+                      (bestDate.getTime() - new Date(currentTask.startDate).getTime()) /
+                        (1000 * 60 * 60 * 24),
+                    );
+                    
+                    if (daysDiff !== 0) {
+                      currentTask.startDate = bestDate.toISOString().split('T')[0];
+                      const endDate = new Date(bestDate);
+                      endDate.setDate(endDate.getDate() + Math.ceil((task.duration_hours || 8) / adjustedDailyHours));
+                      currentTask.endDate = endDate.toISOString().split('T')[0];
+                      
+                      warnings.push(
+                        `🌤️ ${rec.recommendation || `Tâche "${task.title}" décalée de ${Math.abs(daysDiff)} jour(s) pour conditions météo optimales (${rec.reason || 'pluie prévue'})`}`,
+                      );
+                    } else {
+                      warnings.push(
+                        `🌤️ Attention: ${rec.reason || 'Conditions météo défavorables'} pour "${task.title}" le ${currentTask.startDate}`,
+                      );
+                    }
+                  } else {
+                    warnings.push(
+                      `🌤️ Conditions météo défavorables pour "${task.title}" le ${currentTask.startDate}: ${rec.reason || 'pluie prévue'}`,
+                    );
+                  }
+                }
               }
-            }
-          });
+            });
+          }
 
           // Ajouter les warnings de l'API
-          if (weatherData.warnings) {
+          if (weatherData.warnings && Array.isArray(weatherData.warnings)) {
             warnings.push(...weatherData.warnings);
           }
+        } else {
+          const errorText = await weatherOptimization.text();
+          console.warn('⚠️ Erreur API météo:', weatherOptimization.status, errorText);
+          warnings.push('⚠️ Impossible de récupérer les prévisions météo pour optimiser le planning.');
         }
+      } else {
+        console.warn('⚠️ URL API non configurée pour la météo');
       }
     } catch (error) {
-      console.warn('Impossible d\'optimiser avec la météo:', error);
+      console.error('❌ Erreur optimisation météo:', error);
+      warnings.push('⚠️ Erreur lors de l\'optimisation météo. Planning généré sans optimisation.');
     }
+  } else {
+    console.log('ℹ️ Pas de localisation fournie, optimisation météo ignorée');
   }
 
   const lastTaskEnd = new Date(orderedTasks[orderedTasks.length - 1].endDate);
