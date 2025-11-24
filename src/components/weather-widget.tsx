@@ -45,18 +45,37 @@ export function WeatherWidget({ location, isLocked = false }: WeatherWidgetProps
   const [city, setCity] = useState<string>(location || 'Paris');
   const [showCityInput, setShowCityInput] = useState(!location);
 
-  // Géocodage de la ville en coordonnées
+  // Géocodage de la ville en coordonnées - Optimisé pour les villes françaises
   const geocodeCity = async (cityName: string): Promise<{ lat: number; lon: number } | null> => {
+    if (!cityName || !cityName.trim()) {
+      return null;
+    }
+
     try {
-      // Utiliser l'API de géocodage gratuite Nominatim
-      const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(cityName)}&limit=1`,
-        {
-          headers: {
-            'User-Agent': 'ChantiFlow Weather Widget',
-          },
+      // Préparer la requête avec "France" si pas déjà présent
+      let query = cityName.trim();
+      if (!query.toLowerCase().includes('france')) {
+        query = `${query}, France`;
+      }
+
+      // Utiliser l'API de géocodage gratuite Nominatim avec restriction à la France
+      const url = new URL('https://nominatim.openstreetmap.org/search');
+      url.searchParams.set('q', query);
+      url.searchParams.set('format', 'json');
+      url.searchParams.set('limit', '1');
+      url.searchParams.set('countrycodes', 'fr'); // Restreindre à la France
+      url.searchParams.set('addressdetails', '1');
+
+      const response = await fetch(url.toString(), {
+        headers: {
+          'User-Agent': 'ChantiFlowApp/1.0 (contact@chantiflow.com)',
         },
-      );
+      });
+
+      if (!response.ok) {
+        return null;
+      }
+
       const data = await response.json();
       if (data && data.length > 0) {
         return {
