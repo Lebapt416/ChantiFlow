@@ -25,4 +25,4 @@ COPY ml/ ./
 # Par défaut Railway injecte $PORT
 ENV PORT=8000
 
-CMD ["sh", "-c", "uvicorn api:app --host 0.0.0.0 --port ${PORT}"]
+CMD ["python", "start.py"]
