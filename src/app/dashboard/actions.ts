@@ -15,6 +15,7 @@ export async function createSiteAction(
 ): Promise<CreateSiteState> {
   const name = String(formData.get('name') ?? '').trim();
   const deadline = String(formData.get('deadline') ?? '');
+  const address = String(formData.get('address') ?? '').trim();
 
   if (!name || !deadline) {
     return { error: 'Nom et deadline sont requis.' };
@@ -39,6 +40,7 @@ export async function createSiteAction(
   const { error } = await supabase.from('sites').insert({
     name,
     deadline,
+    address: address || null,
     created_by: user.id,
   });
 

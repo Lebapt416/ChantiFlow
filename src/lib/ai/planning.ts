@@ -172,6 +172,7 @@ export async function generatePlanning(
       const apiUrl = process.env.NEXT_PUBLIC_PREDICTION_API_URL || process.env.ML_API_URL || '';
       if (apiUrl) {
         console.log('🌤️ Optimisation météo pour:', location);
+        warnings.push(`🌤️ Optimisation météo activée pour ${location}`);
         const weatherOptimization = await fetch(`${apiUrl.replace(/\/$/, '')}/planning/optimize-weather`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
