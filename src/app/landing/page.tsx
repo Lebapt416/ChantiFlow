@@ -1,11 +1,148 @@
+import type { LucideIcon } from 'lucide-react';
 import Link from 'next/link';
-import { Check, Zap, Users, QrCode, Brain, Calendar, Clock, AlertTriangle, MessageSquare, FileText, Camera, TrendingUp, Shield } from 'lucide-react';
+import {
+  Check,
+  Zap,
+  Users,
+  QrCode,
+  Brain,
+  Calendar,
+  Clock,
+  AlertTriangle,
+  MessageSquare,
+  FileText,
+  Camera,
+  TrendingUp,
+  Shield,
+  HardHat,
+  Hammer,
+  Building2,
+  Ruler,
+  LineChart,
+} from 'lucide-react';
 import { PricingSection } from '@/components/pricing-section';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 
 export const metadata = {
   title: 'ChantiFlow - Gestion de chantiers simplifiée avec IA',
   description: 'Gérez vos chantiers efficacement avec planification IA, QR codes pour les employés, et suivi en temps réel.',
+  keywords: [
+    'logiciel gestion chantier',
+    'solution BTP',
+    'planification chantier ia',
+    'application suivi chantier',
+  ],
+  alternates: {
+    canonical: '/landing',
+  },
+};
+
+type SectorHighlight = {
+  title: string;
+  description: string;
+  icon: LucideIcon;
+};
+
+const sectorHighlights: SectorHighlight[] = [
+  {
+    title: 'Entreprises générales du BTP',
+    description:
+      'Pilotez simultanément les lots maçonnerie, gros œuvre et second œuvre avec un même tableau de bord.',
+    icon: Building2,
+  },
+  {
+    title: 'Artisans & PME du bâtiment',
+    description:
+      'Centralisez les interventions plomberie, électricité, peinture ou rénovation sans multiplier les outils.',
+    icon: Hammer,
+  },
+  {
+    title: 'Conducteurs de travaux',
+    description:
+      'Suivez budgets, retards et ressources en temps réel pour chaque chantier, même en mobilité.',
+    icon: HardHat,
+  },
+  {
+    title: 'Bureaux d’études / MOE',
+    description:
+      'Disposez d’une traçabilité complète (rapports, photos, réserves) pour garantir la conformité de vos livrables.',
+    icon: Ruler,
+  },
+];
+
+const faqEntries = [
+  {
+    question: 'ChantiFlow convient-il aux petites équipes ?',
+    answer:
+      'Oui, le logiciel est utilisé par des artisans, PME et ETI. L’interface reste simple même avec seulement quelques chantiers en cours.',
+  },
+  {
+    question: 'Comment se fait la mise en route ?',
+    answer:
+      'Nous importons vos équipes et tâches existantes via un fichier Excel ou un onboarding guidé. Vous êtes opérationnel sous 48h.',
+  },
+  {
+    question: 'Puis-je donner un accès aux sous-traitants ?',
+    answer:
+      'Chaque intervenant reçoit un code sécurisé via email ou QR code. Vous contrôlez les chantiers visibles et les permissions.',
+  },
+  {
+    question: 'L’IA respecte-t-elle les données clients ?',
+    answer:
+      'Oui, toutes les données sont hébergées dans l’Union Européenne (Supabase). Les modèles IA n’utilisent jamais vos informations pour entraîner des services externes.',
+  },
+];
+
+const baseUrl = process.env.NEXT_PUBLIC_APP_BASE_URL ?? 'https://www.chantiflow.com';
+
+const proofMetrics = [
+  { value: '30%', label: 'productivité gagnée', description: 'Gràce au planning IA et aux alertes.' },
+  { value: '2h', label: 'temps économisé par chef de chantier', description: 'Rapports et relances automatisés.' },
+  { value: '100%', label: 'traçabilité des rapports', description: 'Photos, réserves et documents centralisés.' },
+];
+
+const softwareSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: 'ChantiFlow',
+  applicationCategory: 'BusinessApplication',
+  operatingSystem: 'Web',
+  url: `${baseUrl}/landing`,
+  offers: {
+    '@type': 'Offer',
+    price: '0',
+    priceCurrency: 'EUR',
+    availability: 'https://schema.org/InStock',
+  },
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: '4.9',
+    reviewCount: '26',
+  },
+  featureList: [
+    'Planning intelligent',
+    'QR codes équipe',
+    'Rapports photo illimités',
+    'Alertes retards',
+  ],
+  creator: {
+    '@type': 'Organization',
+    name: 'ChantiFlow SAS',
+    url: baseUrl,
+  },
+};
+
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqEntries.map((entry) => ({
+    '@type': 'Question',
+    name: entry.question,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: entry.answer,
+    },
+  })),
 };
 
 export default async function LandingPage() {
@@ -22,6 +159,16 @@ export default async function LandingPage() {
   }
   return (
     <div className="min-h-screen bg-white dark:bg-zinc-950">
+      <script
+        type="application/ld+json"
+        suppressHydrationWarning
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        suppressHydrationWarning
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
       {/* Header */}
       <header className="border-b border-zinc-200 dark:border-zinc-800">
         <div className="mx-auto max-w-7xl px-6 py-4">
@@ -186,6 +333,34 @@ export default async function LandingPage() {
         </div>
       </section>
 
+      {/* Secteurs & métiers ciblés */}
+      <section className="mx-auto max-w-7xl px-6 py-20">
+        <div className="mx-auto max-w-2xl text-center">
+          <p className="text-sm font-semibold uppercase tracking-widest text-emerald-600 dark:text-emerald-400">
+            Compatible avec tous les métiers du BTP
+          </p>
+          <h2 className="mt-4 text-3xl font-bold tracking-tight text-zinc-900 dark:text-white sm:text-4xl">
+            Le logiciel pensé pour votre réalité terrain
+          </h2>
+          <p className="mt-4 text-lg text-zinc-600 dark:text-zinc-400">
+            ChantiFlow couvre la planification, le suivi sécurité et la traçabilité documentaire pour les chantiers
+            de construction, rénovation, voirie ou maintenance industrielle.
+          </p>
+        </div>
+        <div className="mx-auto mt-16 grid max-w-4xl grid-cols-1 gap-6 sm:grid-cols-2">
+          {sectorHighlights.map((sector) => (
+            <div
+              key={sector.title}
+              className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:border-emerald-300 dark:border-zinc-800 dark:bg-zinc-900"
+            >
+              <sector.icon className="h-8 w-8 text-emerald-600 dark:text-emerald-400" />
+              <h3 className="mt-4 text-xl font-semibold text-zinc-900 dark:text-white">{sector.title}</h3>
+              <p className="mt-2 text-sm leading-6 text-zinc-600 dark:text-zinc-400">{sector.description}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* Features Section */}
       <section id="features" className="mx-auto max-w-7xl px-6 py-20">
         <div className="mx-auto max-w-2xl text-center">
@@ -302,6 +477,29 @@ export default async function LandingPage() {
         </div>
       </section>
 
+      {/* Résultats constatés */}
+      <section className="mx-auto max-w-7xl px-6 py-20">
+        <div className="mx-auto max-w-2xl text-center">
+          <h2 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-white sm:text-4xl">
+            Des gains mesurables sur vos chantiers
+          </h2>
+          <p className="mt-4 text-lg text-zinc-600 dark:text-zinc-400">
+            Les entreprises utilisant ChantiFlow améliorent leur visibilité chantier et leur marge grâce à des
+            données temps réel.
+          </p>
+        </div>
+        <div className="mx-auto mt-12 grid max-w-4xl grid-cols-1 gap-6 sm:grid-cols-3">
+          {proofMetrics.map((metric) => (
+            <div key={metric.label} className="rounded-2xl border border-zinc-200 bg-white p-6 text-center dark:border-zinc-800 dark:bg-zinc-900">
+              <LineChart className="mx-auto h-8 w-8 text-emerald-600 dark:text-emerald-400" />
+              <p className="mt-4 text-4xl font-black text-zinc-900 dark:text-white">{metric.value}</p>
+              <p className="mt-2 text-sm font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">{metric.label}</p>
+              <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">{metric.description}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* Pricing Section */}
       <PricingSection isAuthenticated={isAuthenticated} userEmail={null} />
 
@@ -342,6 +540,29 @@ export default async function LandingPage() {
               Commencer gratuitement
             </Link>
           </div>
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section className="mx-auto max-w-7xl px-6 py-20">
+        <div className="mx-auto max-w-3xl text-center">
+          <p className="text-sm font-semibold uppercase tracking-widest text-emerald-600 dark:text-emerald-400">
+            FAQ ChantiFlow
+          </p>
+          <h2 className="mt-4 text-3xl font-bold tracking-tight text-zinc-900 dark:text-white sm:text-4xl">
+            Tout ce qu’il faut savoir avant de déployer ChantiFlow
+          </h2>
+          <p className="mt-4 text-lg text-zinc-600 dark:text-zinc-400">
+            Nous accompagnons chaque client avec un plan de mise en œuvre adapté à la taille de l’entreprise.
+          </p>
+        </div>
+        <div className="mx-auto mt-12 max-w-4xl space-y-4">
+          {faqEntries.map((entry) => (
+            <div key={entry.question} className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+              <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">{entry.question}</h3>
+              <p className="mt-2 text-sm leading-6 text-zinc-600 dark:text-zinc-400">{entry.answer}</p>
+            </div>
+          ))}
         </div>
       </section>
 

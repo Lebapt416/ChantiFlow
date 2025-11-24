@@ -15,15 +15,62 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const appBaseUrl = process.env.NEXT_PUBLIC_APP_BASE_URL ?? "https://www.chantiflow.com";
+
 export const metadata: Metadata = {
-  title: "ChantiFlow",
-  description: "Planifie et pilote tes chantiers simplement",
+  metadataBase: new URL(appBaseUrl),
+  title: {
+    default: "ChantiFlow",
+    template: "%s | ChantiFlow",
+  },
+  description: "Logiciel SaaS pour planifier, suivre et automatiser la gestion de vos chantiers BTP.",
+  keywords: [
+    "chantier",
+    "logiciel btp",
+    "gestion de chantier",
+    "planning chantier",
+    "suivi chantier",
+    "QR code chantier",
+    "application btp",
+    "rapport chantier",
+  ],
+  alternates: {
+    canonical: "/landing",
+  },
+  openGraph: {
+    type: "website",
+    url: appBaseUrl,
+    siteName: "ChantiFlow",
+    title: "ChantiFlow - Logiciel de gestion de chantiers BTP",
+    description:
+      "Automatisez votre planning, vos équipes et vos rapports de chantier grâce à l'IA. Solution SaaS dédiée aux entreprises du BTP.",
+    images: [
+      {
+        url: `${appBaseUrl}/og-image.png`,
+        width: 1200,
+        height: 630,
+        alt: "Interface ChantiFlow",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    site: "@chantiflow",
+    title: "ChantiFlow - Gestion de chantiers",
+    description:
+      "Planificateur BTP avec IA, QR codes équipes et rapports automatiques pour vos chantiers.",
+    images: [`${appBaseUrl}/og-image.png`],
+  },
+  category: "technology",
   icons: {
     icon: [
       { url: "/favicon.svg", rel: "icon", type: "image/svg+xml" },
       { url: "/icon.png", sizes: "512x512", rel: "icon" },
     ],
     apple: [{ url: "/apple-touch-icon.png", sizes: "180x180" }],
+  },
+  other: {
+    "format-detection": "telephone=no",
   },
 };
 
