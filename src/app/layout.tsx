@@ -18,6 +18,13 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "ChantiFlow",
   description: "Planifie et pilote tes chantiers simplement",
+  icons: {
+    icon: [
+      { url: "/favicon.svg", rel: "icon", type: "image/svg+xml" },
+      { url: "/icon.png", sizes: "512x512", rel: "icon" },
+    ],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180" }],
+  },
 };
 
 export default function RootLayout({
