@@ -267,3 +267,50 @@ export function getEffectiveWorkingHours(rule: WorkRule): number {
   return totalMinutes / 60;
 }
 
+/**
+ * Constantes pour les limites de travail
+ */
+export const MAX_WORKING_HOURS_PER_DAY = 8; // Maximum 8h de travail effectif par jour
+export const LUNCH_BREAK_DURATION_HOURS = 1; // 1h de pause déjeuner obligatoire
+
+/**
+ * Distribue les heures de travail sur plusieurs jours en respectant les limites
+ * Retourne un tableau avec les heures par jour
+ * 
+ * @param totalHours - Nombre total d'heures à distribuer
+ * @param maxHoursPerDay - Maximum d'heures par jour (défaut: 8h)
+ * @returns Tableau des heures par jour
+ */
+export function distributeWorkingHours(
+  totalHours: number,
+  maxHoursPerDay: number = MAX_WORKING_HOURS_PER_DAY,
+): number[] {
+  if (totalHours <= 0) return [];
+  
+  const days: number[] = [];
+  let remainingHours = totalHours;
+  
+  while (remainingHours > 0) {
+    const hoursForDay = Math.min(remainingHours, maxHoursPerDay);
+    days.push(hoursForDay);
+    remainingHours -= hoursForDay;
+  }
+  
+  return days;
+}
+
+/**
+ * Calcule le nombre de jours nécessaires pour une tâche en respectant les limites
+ * 
+ * @param totalHours - Nombre total d'heures de la tâche
+ * @param maxHoursPerDay - Maximum d'heures par jour (défaut: 8h)
+ * @returns Nombre de jours nécessaires
+ */
+export function calculateDaysNeeded(
+  totalHours: number,
+  maxHoursPerDay: number = MAX_WORKING_HOURS_PER_DAY,
+): number {
+  if (totalHours <= 0) return 1;
+  return Math.ceil(totalHours / maxHoursPerDay);
+}
+

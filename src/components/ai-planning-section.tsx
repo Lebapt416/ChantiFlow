@@ -275,7 +275,8 @@ export function AIPlanningSection({ sites }: Props) {
               planning={result.orderedTasks.map((task) => ({
                 ...task,
                 taskTitle: task.taskTitle,
-                hours: 8, // Par défaut 8h
+                // Utiliser les heures estimées de la tâche, limitées à 8h/jour
+                hours: Math.min(task.estimatedHours || 8, 8),
               }))}
               workers={workers}
               taskDetails={{}}
@@ -315,6 +316,10 @@ export function AIPlanningSection({ sites }: Props) {
           💡 <strong>Astuce :</strong> L'IA analyse vos tâches, identifie les dépendances, et
           génère un planning optimisé avec dates de début/fin et priorités. Les tâches sont
           classées par ordre logique d'exécution.
+        </p>
+        <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-500">
+          ⚖️ <strong>Règles de travail appliquées :</strong> Maximum 8h de travail effectif par jour avec pause déjeuner obligatoire de 1h. 
+          Les tâches dépassant 8h sont automatiquement réparties sur plusieurs jours.
         </p>
       </section>
     </div>

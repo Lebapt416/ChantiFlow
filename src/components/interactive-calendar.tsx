@@ -1,7 +1,11 @@
 'use client';
 
 import { useState, useMemo, useCallback } from 'react';
-import { ChevronLeft, ChevronRight, Clock, X } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Clock, X, AlertCircle } from 'lucide-react';
+
+// Constantes pour les limites de travail
+const MAX_WORKING_HOURS_PER_DAY = 8; // Maximum 8h de travail effectif par jour
+const LUNCH_BREAK_DURATION_HOURS = 1; // 1h de pause déjeuner obligatoire
 
 type PlanningTask = {
   taskId: string;
@@ -293,7 +297,13 @@ export function InteractiveCalendar({
                       const dayKey = day.toISOString().split('T')[0];
                       const dayTasks =
                         tasksByDayAndWorker[dayKey]?.[worker.id] || [];
-                      const totalHours = dayTasks.reduce((sum, task) => sum + task.hours, 0);
+                      // Limiter les heures affichées à 8h max par jour
+                      const totalHours = Math.min(
+                        dayTasks.reduce((sum, task) => sum + Math.min(task.hours, MAX_WORKING_HOURS_PER_DAY), 0),
+                        MAX_WORKING_HOURS_PER_DAY
+                      );
+                      const rawTotalHours = dayTasks.reduce((sum, task) => sum + task.hours, 0);
+                      const exceedsLimit = rawTotalHours > MAX_WORKING_HOURS_PER_DAY;
                       const isToday = day.toDateString() === new Date().toDateString();
                       const isDragOver =
                         dragOverCell?.workerId === worker.id && dragOverCell?.day === dayKey;
@@ -305,33 +315,55 @@ export function InteractiveCalendar({
                           onDrop={(e) => handleDrop(e, worker.id, dayKey)}
                           className={`min-w-[120px] border-r border-zinc-200 bg-white p-2 align-top last:border-r-0 dark:border-zinc-700 dark:bg-zinc-900 ${
                             isToday ? 'bg-emerald-50/50 dark:bg-emerald-900/10' : ''
-                          } ${isDragOver ? 'bg-blue-100 dark:bg-blue-900/30' : ''}`}
+                          } ${isDragOver ? 'bg-blue-100 dark:bg-blue-900/30' : ''} ${
+                            exceedsLimit ? 'bg-rose-50/50 dark:bg-rose-900/10' : ''
+                          }`}
                         >
                           {dayTasks.length > 0 ? (
                             <div className="space-y-1">
-                              {dayTasks.map((task) => (
-                                <div
-                                  key={task.taskId}
-                                  draggable={!!onUpdate}
-                                  onDragStart={() => handleDragStart(task)}
-                                  className={`cursor-move rounded-lg border px-2 py-1.5 text-xs ${
-                                    task.priority === 'high'
-                                      ? 'border-rose-200 bg-rose-50 text-rose-900 dark:border-rose-900/60 dark:bg-rose-900/20 dark:text-rose-200'
-                                      : task.priority === 'medium'
-                                        ? 'border-amber-200 bg-amber-50 text-amber-900 dark:border-amber-900/60 dark:bg-amber-900/20 dark:text-amber-200'
-                                        : 'border-zinc-200 bg-zinc-50 text-zinc-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300'
-                                  }`}
-                                >
-                                  <div className="font-semibold">{task.taskTitle}</div>
-                                  <div className="mt-0.5 flex items-center gap-1 text-[10px] opacity-75">
-                                    <Clock className="h-3 w-3" />
-                                    {task.hours}h
+                              {dayTasks.map((task) => {
+                                // Limiter l'affichage à 8h max par tâche par jour
+                                const displayHours = Math.min(task.hours, MAX_WORKING_HOURS_PER_DAY);
+                                const taskExceedsLimit = task.hours > MAX_WORKING_HOURS_PER_DAY;
+                                
+                                return (
+                                  <div
+                                    key={task.taskId}
+                                    draggable={!!onUpdate}
+                                    onDragStart={() => handleDragStart(task)}
+                                    className={`cursor-move rounded-lg border px-2 py-1.5 text-xs ${
+                                      task.priority === 'high'
+                                        ? 'border-rose-200 bg-rose-50 text-rose-900 dark:border-rose-900/60 dark:bg-rose-900/20 dark:text-rose-200'
+                                        : task.priority === 'medium'
+                                          ? 'border-amber-200 bg-amber-50 text-amber-900 dark:border-amber-900/60 dark:bg-amber-900/20 dark:text-amber-200'
+                                          : 'border-zinc-200 bg-zinc-50 text-zinc-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300'
+                                    } ${taskExceedsLimit ? 'border-rose-300 dark:border-rose-800' : ''}`}
+                                  >
+                                    <div className="font-semibold">{task.taskTitle}</div>
+                                    <div className="mt-0.5 flex items-center gap-1 text-[10px] opacity-75">
+                                      <Clock className="h-3 w-3" />
+                                      {displayHours}h
+                                      {taskExceedsLimit && (
+                                        <span className="text-rose-600 dark:text-rose-400" title={`Cette tâche de ${task.hours}h sera répartie sur plusieurs jours`}>
+                                          ⚠️
+                                        </span>
+                                      )}
+                                    </div>
                                   </div>
-                                </div>
-                              ))}
+                                );
+                              })}
                               {totalHours > 0 && (
-                                <div className="mt-1 text-[10px] font-semibold text-zinc-500 dark:text-zinc-400">
+                                <div className={`mt-1 text-[10px] font-semibold ${
+                                  exceedsLimit 
+                                    ? 'text-rose-600 dark:text-rose-400' 
+                                    : 'text-zinc-500 dark:text-zinc-400'
+                                }`}>
                                   Total: {totalHours}h
+                                  {exceedsLimit && (
+                                    <span className="ml-1 flex items-center gap-0.5" title={`Limite de ${MAX_WORKING_HOURS_PER_DAY}h/jour dépassée. Les heures supplémentaires seront réparties sur d'autres jours.`}>
+                                      <AlertCircle className="h-3 w-3" />
+                                    </span>
+                                  )}
                                 </div>
                               )}
                             </div>

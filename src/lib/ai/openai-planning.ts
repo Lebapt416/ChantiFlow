@@ -1,5 +1,7 @@
 'use server';
 
+import { calculateDaysNeeded, MAX_WORKING_HOURS_PER_DAY, LUNCH_BREAK_DURATION_HOURS } from './work-rules';
+
 type Task = {
   id: string;
   title: string;
@@ -86,12 +88,17 @@ ${tasksDescription}
 Équipe disponible:
 ${workersDescription}
 
-LOIS DU TRAVAIL FRANÇAISES À RESPECTER:
-- Maximum 10h/jour (avec dérogation) ou 8h/jour (standard)
-- Pause obligatoire de 20 minutes après 6h de travail
+LOIS DU TRAVAIL FRANÇAISES À RESPECTER STRICTEMENT:
+- Maximum 8h de travail EFFECTIF par jour (hors pause déjeuner)
+- Pause déjeuner OBLIGATOIRE de 1h (12h-13h généralement)
+- Personne ne travaille 12h par jour - c'est ILLÉGAL et irréaliste
+- Si une tâche dépasse 8h, elle DOIT être répartie sur plusieurs jours
+- Pause obligatoire de 20 minutes après 6h de travail (incluse dans la pause déjeuner si > 6h)
 - Repos minimum de 11h entre deux journées
 - Repos hebdomadaire de 24h consécutives (généralement dimanche)
 - Jours fériés exclus du planning
+
+EXEMPLE: Une tâche de 12h doit être répartie sur 2 jours (8h le jour 1, 4h le jour 2)
 
 RÈGLES DE COLLABORATION:
 - Les workers du même métier peuvent collaborer sur une même tâche
@@ -198,6 +205,8 @@ Réponds UNIQUEMENT avec un JSON valide dans ce format:
 
     // Valider et compléter les dates en respectant les lois du travail
     const startDate = new Date();
+    let currentDate = new Date(startDate);
+    
     planning.orderedTasks = planning.orderedTasks.map((task, index) => {
       const taskObj = tasks.find((t) => t.id === task.taskId);
       const duration = taskObj?.duration_hours || task.estimatedHours || 8;
@@ -205,15 +214,20 @@ Réponds UNIQUEMENT avec un JSON valide dans ce format:
       // Utiliser la durée estimée de la tâche
       const estimatedHours = task.estimatedHours || duration;
       
-      // Calculer les jours en respectant les lois (8h/jour max, pauses, repos)
-      const workingHoursPerDay = 8;
-      const daysNeeded = Math.ceil(estimatedHours / workingHoursPerDay);
+      // Calculer les jours en respectant les lois (8h/jour max avec pause déjeuner)
+      // Si une tâche dépasse 8h, elle doit être répartie sur plusieurs jours
+      const daysNeeded = calculateDaysNeeded(estimatedHours, MAX_WORKING_HOURS_PER_DAY);
 
-      const taskStartDate = new Date(startDate);
-      taskStartDate.setDate(taskStartDate.getDate() + index);
-
+      // La date de début est la date actuelle (ou la date de fin de la tâche précédente)
+      const taskStartDate = new Date(currentDate);
+      
+      // La date de fin est calculée en fonction du nombre de jours nécessaires
       const taskEndDate = new Date(taskStartDate);
-      taskEndDate.setDate(taskEndDate.getDate() + daysNeeded);
+      taskEndDate.setDate(taskEndDate.getDate() + daysNeeded - 1); // -1 car le premier jour compte
+      
+      // Avancer la date courante pour la prochaine tâche
+      currentDate = new Date(taskEndDate);
+      currentDate.setDate(currentDate.getDate() + 1); // Commencer le jour suivant
       
       // Normaliser les assignedWorkerIds si on a l'ancien format
       const assignedWorkerIds = task.assignedWorkerIds || 
@@ -224,7 +238,7 @@ Réponds UNIQUEMENT avec un JSON valide dans ce format:
         startDate: taskStartDate.toISOString().split('T')[0],
         endDate: taskEndDate.toISOString().split('T')[0],
         assignedWorkerIds,
-        estimatedHours,
+        estimatedHours, // Garder la valeur réelle pour la distribution sur plusieurs jours
       };
     });
 

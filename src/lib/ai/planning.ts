@@ -1,7 +1,7 @@
 'use server';
 
 import { getPrediction } from '@/lib/ai/prediction';
-import { getWorkRule, getEffectiveWorkingHours } from '@/lib/ai/work-rules';
+import { getWorkRule, getEffectiveWorkingHours, calculateDaysNeeded, MAX_WORKING_HOURS_PER_DAY, LUNCH_BREAK_DURATION_HOURS } from '@/lib/ai/work-rules';
 
 type Task = {
   id: string;
@@ -32,7 +32,8 @@ type PlanningResult = {
   warnings: string[];
 };
 
-const BASE_WORKING_HOURS = 8;
+// Utiliser la constante depuis work-rules pour la cohérence
+const BASE_WORKING_HOURS = MAX_WORKING_HOURS_PER_DAY;
 
 function computeComplexity(tasks: Task[]): number {
   if (tasks.length === 0) return 1;
@@ -91,6 +92,18 @@ export async function generatePlanning(
 
   // Vérifier si la deadline est réaliste
   const warnings: string[] = [];
+  
+  // Vérifier les tâches qui dépassent 8h
+  classifiedTasks.forEach((task) => {
+    const taskHours = task.duration_hours || 8;
+    if (taskHours > MAX_WORKING_HOURS_PER_DAY) {
+      const daysNeeded = calculateDaysNeeded(taskHours, MAX_WORKING_HOURS_PER_DAY);
+      warnings.push(
+        `⚠️ La tâche "${task.title}" (${taskHours}h) sera répartie sur ${daysNeeded} jour(s) pour respecter la limite de ${MAX_WORKING_HOURS_PER_DAY}h/jour avec pause déjeuner de ${LUNCH_BREAK_DURATION_HOURS}h.`,
+      );
+    }
+  });
+  
   if (deadlineDate && estimatedEndDate > deadlineDate) {
     warnings.push(
       `La deadline du ${deadlineDate.toLocaleDateString('fr-FR')} semble irréaliste. Estimation: ${estimatedEndDate.toLocaleDateString('fr-FR')}`,
@@ -126,22 +139,29 @@ export async function generatePlanning(
     const effectiveHours = getEffectiveWorkingHours(workRule);
     const taskHours = task.duration_hours || effectiveHours;
     
+    // Respecter la limite de 8h/jour avec pause déjeuner
+    // Si une tâche dépasse 8h, elle doit être répartie sur plusieurs jours
+    const daysNeeded = calculateDaysNeeded(taskHours, MAX_WORKING_HOURS_PER_DAY);
+    
     // Calculer la date de début en fonction de l'ordre et des dépendances
     const previousTasksHours = classifiedTasks
       .slice(0, index)
       .reduce((sum, t) => {
         const tRule = getWorkRule(t.required_role);
         const tEffectiveHours = getEffectiveWorkingHours(tRule);
-        return sum + (t.duration_hours || tEffectiveHours);
+        const tHours = t.duration_hours || tEffectiveHours;
+        // Calculer les jours nécessaires pour chaque tâche précédente
+        const tDays = calculateDaysNeeded(tHours, MAX_WORKING_HOURS_PER_DAY);
+        return sum + tDays;
       }, 0);
     
     taskStartDate.setDate(
-      taskStartDate.getDate() + Math.floor(previousTasksHours / adjustedDailyHours),
+      taskStartDate.getDate() + previousTasksHours,
     );
 
     const taskEndDate = new Date(taskStartDate);
     taskEndDate.setDate(
-      taskEndDate.getDate() + Math.ceil(taskHours / adjustedDailyHours),
+      taskEndDate.getDate() + daysNeeded - 1, // -1 car le premier jour compte
     );
 
     // Trouver un worker approprié

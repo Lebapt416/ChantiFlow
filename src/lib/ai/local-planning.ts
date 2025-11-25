@@ -1,5 +1,7 @@
 'use server';
 
+import { calculateDaysNeeded, MAX_WORKING_HOURS_PER_DAY, LUNCH_BREAK_DURATION_HOURS } from './work-rules';
+
 type Task = {
   id: string;
   title: string;
@@ -63,7 +65,6 @@ export async function generateLocalAIPlanning(
   // Phase 5 : Calculer les dates en fonction de l'ordre et des durées
   const startDate = new Date();
   const deadlineDate = deadline ? new Date(deadline) : null;
-  const workingHoursPerDay = 8;
 
   let currentDate = new Date(startDate);
   const taskSchedule: Array<{
@@ -83,7 +84,16 @@ export async function generateLocalAIPlanning(
     if (!task) return;
 
     const duration = task.duration_hours || 8;
-    const daysNeeded = Math.ceil(duration / workingHoursPerDay);
+    // Respecter la limite de 8h/jour avec pause déjeuner
+    // Si une tâche dépasse 8h, elle doit être répartie sur plusieurs jours
+    const daysNeeded = calculateDaysNeeded(duration, MAX_WORKING_HOURS_PER_DAY);
+    
+    // Avertir si une tâche dépasse 8h
+    if (duration > MAX_WORKING_HOURS_PER_DAY) {
+      warnings.push(
+        `⚠️ La tâche "${task.title}" (${duration}h) sera répartie sur ${daysNeeded} jour(s) pour respecter la limite de ${MAX_WORKING_HOURS_PER_DAY}h/jour avec pause déjeuner.`,
+      );
+    }
 
     // Calculer la date de début en fonction des dépendances
     const dependencies = taskDependencies[taskId] || [];
