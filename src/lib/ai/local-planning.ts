@@ -109,9 +109,24 @@ export async function generateLocalAIPlanning(
       currentDate.setDate(currentDate.getDate() + 1); // Commencer le jour suivant
     }
 
+    // Éviter les week-ends (samedi = 6, dimanche = 0)
+    const dayOfWeek = currentDate.getDay();
+    if (dayOfWeek === 6) {
+      // Si samedi, passer au lundi
+      currentDate.setDate(currentDate.getDate() + 2);
+    } else if (dayOfWeek === 0) {
+      // Si dimanche, passer au lundi
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+
     const taskStartDate = new Date(currentDate);
     const taskEndDate = new Date(currentDate);
     taskEndDate.setDate(taskEndDate.getDate() + daysNeeded);
+    
+    // Ajuster la date de fin si elle tombe un week-end
+    while (taskEndDate.getDay() === 6 || taskEndDate.getDay() === 0) {
+      taskEndDate.setDate(taskEndDate.getDate() + 1);
+    }
 
     // Assigner un worker approprié
     const requiredRole = task.required_role;
