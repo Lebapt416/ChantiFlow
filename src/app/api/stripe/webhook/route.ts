@@ -65,6 +65,7 @@ export async function POST(request: Request) {
   // Gérer les événements Stripe
   switch (event.type) {
     case 'checkout.session.completed': {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const session = event.data.object as any;
       const customerEmail = session.customer_email || session.customer_details?.email;
       
@@ -78,7 +79,6 @@ export async function POST(request: Request) {
       
       if (session.line_items?.data) {
         // Si on a les line_items, on peut déterminer le plan
-        const priceId = session.line_items.data[0]?.price?.id;
         // Vous devrez mapper vos price IDs ici si nécessaire
         // Pour l'instant, on va utiliser une autre méthode
       }
@@ -160,7 +160,6 @@ export async function POST(request: Request) {
           
           const lineItems = sessionDetails.line_items?.data;
           if (lineItems && lineItems.length > 0) {
-            const priceId = lineItems[0].price?.id;
             const amount = lineItems[0].amount_total;
             
             // Déterminer le plan par le montant
@@ -192,7 +191,7 @@ export async function POST(request: Request) {
         const currentMetadata = user.user_metadata || {};
         const currentAddOns = currentMetadata.addOns || { extra_workers: 0, extra_sites: 0 };
         
-        let updatedAddOns = { ...currentAddOns };
+        const updatedAddOns = { ...currentAddOns };
         
         if (amountTotal === 1000) {
           // Add-on +5 employés (10€)
@@ -248,6 +247,7 @@ export async function POST(request: Request) {
 
     case 'customer.subscription.updated':
     case 'customer.subscription.deleted': {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const subscription = event.data.object as any;
       const customerId = subscription.customer;
 

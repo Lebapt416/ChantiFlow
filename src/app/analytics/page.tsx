@@ -32,10 +32,15 @@ export default async function AnalyticsPage() {
   const adminClient = createSupabaseAdminClient();
 
   // Récupérer toutes les données du site
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let allUsers: any[] = [];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let allSites: any[] = [];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let allTasks: any[] = [];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let allReports: any[] = [];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let allWorkers: any[] = [];
 
   try {

@@ -19,7 +19,6 @@ type Props = {
 
 export function DashboardCharts({
   sites,
-  totalTasks,
   doneTasks,
   pendingTasks,
   nextDeadlines,

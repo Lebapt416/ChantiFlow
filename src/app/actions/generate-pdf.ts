@@ -64,6 +64,7 @@ export async function generatePDFAction(siteId: string) {
         name: site.name,
         deadline: site.deadline,
         created_at: site.created_at,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         address: (site as any).address || 'Non spécifiée',
       },
       stats: {
@@ -76,7 +77,9 @@ export async function generatePDFAction(siteId: string) {
       },
       tasks:
         tasks?.map((t) => {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const assignedWorker = (t as any).planned_worker_id
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             ? workerMap.get((t as any).planned_worker_id)
             : null;
           return {
@@ -84,7 +87,9 @@ export async function generatePDFAction(siteId: string) {
             status: t.status,
             role: t.required_role,
             duration_hours: t.duration_hours,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             startDate: (t as any).planned_start,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             endDate: (t as any).planned_end,
             assignedWorkerName: assignedWorker?.name || null,
           };

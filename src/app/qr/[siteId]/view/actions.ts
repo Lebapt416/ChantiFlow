@@ -34,6 +34,7 @@ export async function createTestWorkerAction(siteId: string): Promise<TestWorker
     const accessCode = generateAccessCode();
 
     // Essayer d'insérer avec access_code
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const insertData: any = {
       site_id: siteId,
       name: 'Test Employé',
@@ -44,7 +45,7 @@ export async function createTestWorkerAction(siteId: string): Promise<TestWorker
     // Ajouter access_code si possible
     try {
       insertData.access_code = accessCode;
-    } catch (e) {
+    } catch {
       // Ignorer si la colonne n'existe pas
     }
 

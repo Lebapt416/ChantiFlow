@@ -44,7 +44,7 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
                   Erreur inattendue
                 </h1>
                 <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                  Une erreur s'est produite
+                  Une erreur s&apos;est produite
                 </p>
               </div>
             </div>
@@ -78,13 +78,13 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
                 }}
                 className="flex-1 rounded-lg border border-zinc-300 bg-white px-4 py-2.5 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 focus:outline-none focus:ring-2 focus:ring-zinc-500 focus:ring-offset-2 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800"
               >
-                Retour à l'accueil
+                Retour à l&apos;accueil
               </button>
             </div>
 
             {error.digest && (
               <p className="text-center text-xs text-zinc-400">
-                Code d'erreur: {error.digest}
+                Code d&apos;erreur: {error.digest}
               </p>
             )}
           </div>

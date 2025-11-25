@@ -44,7 +44,7 @@ export default async function SuccessPage({ searchParams }: SearchParams) {
             Votre abonnement a été activé avec succès. Vous avez maintenant accès à toutes les fonctionnalités de votre plan.
           </p>
           <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-500">
-            Le webhook Stripe mettra à jour votre plan automatiquement. Si le changement n'apparaît pas immédiatement, attendez quelques secondes et rafraîchissez la page.
+            Le webhook Stripe mettra à jour votre plan automatiquement. Si le changement n&apos;apparaît pas immédiatement, attendez quelques secondes et rafraîchissez la page.
           </p>
           {sessionId && (
             <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-500">

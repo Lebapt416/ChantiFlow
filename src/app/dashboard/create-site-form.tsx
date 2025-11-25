@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useState } from "react";
+import { useActionState, useEffect } from "react";
 import { useFormStatus } from "react-dom";
 import { useRouter } from "next/navigation";
 import { createSiteAction, type CreateSiteState } from './actions';
@@ -98,7 +98,7 @@ export function CreateSiteForm({ onSuccess }: Props) {
           className="w-full rounded-md border border-zinc-200 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-black/60 dark:border-zinc-700 dark:bg-zinc-950 dark:text-white"
         />
         <p className="text-xs text-zinc-500 dark:text-zinc-400">
-          🌤️ La ville permet à l'IA d'optimiser le planning selon la météo locale (toutes les villes de France sont supportées)
+          🌤️ La ville permet à l&apos;IA d&apos;optimiser le planning selon la météo locale (toutes les villes de France sont supportées)
         </p>
       </div>
 

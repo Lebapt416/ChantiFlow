@@ -2,7 +2,6 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { CreateSiteForm } from './create-site-form';
-import { signOutAction } from '../actions';
 import { AppShell } from '@/components/app-shell';
 import { DashboardCharts } from './dashboard-charts';
 import { SitePlanningMini } from '@/components/site-planning-mini';
@@ -24,7 +23,7 @@ export default async function DashboardPage() {
     redirect('/login');
   }
 
-  const { data: sites, error } = await supabase
+  const { data: sites } = await supabase
     .from('sites')
     .select('id, name, deadline, created_at, completed_at')
     .eq('created_by', user.id)
@@ -55,9 +54,10 @@ export default async function DashboardPage() {
     .slice(0, 4);
 
   // Récupérer les workers en attente de validation
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let pendingWorkers: any[] = [];
   try {
-    const { data: testData, error: testError } = await supabase
+    const { error: testError } = await supabase
       .from('workers')
       .select('id, name, email, role, created_at, status')
       .eq('created_by', user.id)
@@ -72,6 +72,7 @@ export default async function DashboardPage() {
         .is('site_id', null)
         .order('created_at', { ascending: false });
       
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       pendingWorkers = (allAccountWorkers ?? []).filter((w: any) => w.status === 'pending');
     }
   } catch (error) {
@@ -93,6 +94,7 @@ export default async function DashboardPage() {
           .eq('site_id', site.id),
       ]);
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let planning: any[] = [];
       if (tasks && tasks.length > 0) {
         try {
@@ -100,8 +102,10 @@ export default async function DashboardPage() {
             tasks || [],
             workers || [],
             site.deadline,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             (site as any).address || undefined,
           );
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           planning = planningResult.orderedTasks.map((p: any) => ({
             taskId: p.taskId,
             taskTitle: tasks.find((t) => t.id === p.taskId)?.title || 'Tâche',
@@ -284,6 +288,7 @@ export default async function DashboardPage() {
             </Link>
           </div>
           <div className="space-y-3">
+            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
             {pendingWorkers.slice(0, 5).map((worker: any) => (
               <div
                 key={worker.id}
@@ -415,7 +420,7 @@ export default async function DashboardPage() {
                   Occupation des chantiers
                 </h2>
                 <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                  Vue d'ensemble des plannings et de l'occupation
+                  Vue d&apos;ensemble des plannings et de l&apos;occupation
                 </p>
               </div>
               <Link

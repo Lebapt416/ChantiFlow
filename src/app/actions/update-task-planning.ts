@@ -24,6 +24,7 @@ export async function updateTaskPlanningAction({
 }: UpdateTaskPlanningPayload) {
   const supabase = await createSupabaseServerClient();
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const updatePayload: Record<string, any> = {
     planned_start: plannedStart,
     planned_end: plannedEnd,

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Plus, Users, Building2 } from 'lucide-react';
+import { Users, Building2 } from 'lucide-react';
 import { type Plan, type UserAddOns } from '@/lib/plans';
 
 type Props = {
@@ -13,7 +13,7 @@ type Props = {
   plan: Plan;
 };
 
-export function AddOnsSection({ user, currentAddOns, plan }: Props) {
+export function AddOnsSection({ currentAddOns, plan }: Props) {
   const [isLoading, setIsLoading] = useState<string | null>(null);
 
   // Liens Stripe pour les add-ons

@@ -1,15 +1,13 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useState } from 'react';
 import { Send } from 'lucide-react';
-import Link from 'next/link';
 import { AppShell } from '@/components/app-shell';
 
 export default function ContactPage() {
   const [email, setEmail] = useState('');
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
-  const [isPending, startTransition] = useTransition();
   const [isSent, setIsSent] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
@@ -82,7 +80,7 @@ export default function ContactPage() {
 
             {isSent ? (
               <div className="rounded-lg bg-emerald-50 p-4 text-sm text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300">
-                ✓ Votre client email va s'ouvrir. Le message sera envoyé à contact@chantiflow.com
+                ✓ Votre client email va s&apos;ouvrir. Le message sera envoyé à contact@chantiflow.com
               </div>
             ) : null}
 

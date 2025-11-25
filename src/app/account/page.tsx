@@ -1,7 +1,6 @@
 import { redirect } from 'next/navigation';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { AppShell } from '@/components/app-shell';
-import { signOutAction } from '../actions';
 import { SignOutButton } from './sign-out-button';
 import { ChangePlanButton } from './change-plan-button';
 import { getUserPlan, getUserAddOns, getPlanLimits, type Plan } from '@/lib/plans';

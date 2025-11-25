@@ -1,6 +1,5 @@
 import { notFound, redirect } from 'next/navigation';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
-import { ReportForm } from './report-form';
 
 type Params = {
   params: Promise<{
@@ -32,7 +31,7 @@ export default async function QrAccessPage({ params }: Params) {
     .single();
 
   // Récupérer les workers du chantier ET les workers au niveau du compte (réutilisables)
-  const [tasksResult, siteWorkersResult, accountWorkersResult] = await Promise.all([
+  const [, siteWorkersResult, accountWorkersResult] = await Promise.all([
     supabase
       .from('tasks')
       .select('id, title, status, required_role')
@@ -54,7 +53,6 @@ export default async function QrAccessPage({ params }: Params) {
       : Promise.resolve({ data: null }),
   ]);
 
-  const tasks = tasksResult.data;
   const siteWorkers = siteWorkersResult.data ?? [];
   const accountWorkers = accountWorkersResult.data ?? [];
 
@@ -74,8 +72,6 @@ export default async function QrAccessPage({ params }: Params) {
       workerMap.set(worker.email.toLowerCase(), worker);
     }
   });
-
-  const workers = Array.from(workerMap.values());
 
   // Rediriger automatiquement vers la page de connexion worker
   redirect(`/worker/login?siteId=${site.id}`);

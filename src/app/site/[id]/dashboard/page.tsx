@@ -247,8 +247,8 @@ export default async function SiteDashboardPage({ params }: Params) {
             </div>
           ) : (
             <p className="text-sm text-zinc-500 dark:text-zinc-400">
-              Aucune tâche planifiée pour aujourd'hui. Glissez-déposez une tâche sur la journée
-              souhaitée dans l'onglet Planning pour la programmer.
+              Aucune tâche planifiée pour aujourd&apos;hui. Glissez-déposez une tâche sur la journée
+              souhaitée dans l&apos;onglet Planning pour la programmer.
             </p>
           )}
         </section>
