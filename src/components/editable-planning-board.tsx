@@ -17,7 +17,7 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import { Clock, Edit3 } from 'lucide-react';
 import { updateTaskPlanningAction } from '@/app/actions/update-task-planning';
-import { MAX_WORKING_HOURS_PER_DAY } from '@/lib/ai/work-rules';
+import { MAX_WORKING_HOURS_PER_DAY, LUNCH_BREAK_DURATION_HOURS } from '@/lib/ai/work-rules';
 
 type Worker = {
   id: string;
@@ -46,6 +46,8 @@ type EditableTask = PlanningTask;
 
 type TaskWithDistributedHours = EditableTask & {
   hoursForDay: number; // Heures distribuées pour ce jour spécifique
+  dayStartTime: string; // Heure de début pour ce jour (format HH:mm)
+  dayEndTime: string; // Heure de fin pour ce jour (format HH:mm)
 };
 
 function getDayKey(date: string) {
@@ -106,15 +108,7 @@ function SortableTaskCard({
         <div>
           <p className="font-semibold">{task.taskTitle}</p>
           <p className="mt-0.5 text-[10px] text-zinc-500 dark:text-zinc-400">
-            {new Date(task.startDate).toLocaleTimeString('fr-FR', {
-              hour: '2-digit',
-              minute: '2-digit',
-            })}{' '}
-            -{' '}
-            {new Date(task.endDate).toLocaleTimeString('fr-FR', {
-              hour: '2-digit',
-              minute: '2-digit',
-            })}
+            {task.dayStartTime} - {task.dayEndTime}
           </p>
         </div>
         <button
@@ -292,6 +286,47 @@ export function EditablePlanningBoard({ siteId, initialPlanning, workers }: Prop
     });
   }, []);
 
+  // Fonction pour calculer les heures de début et de fin pour une journée
+  const calculateDayHours = (
+    hoursForDay: number,
+    defaultStartHour: string = '07:00',
+  ): { startTime: string; endTime: string } => {
+    if (hoursForDay <= 0) {
+      return { startTime: defaultStartHour, endTime: defaultStartHour };
+    }
+
+    const [startHour, startMin] = defaultStartHour.split(':').map(Number);
+    const startMinutes = startHour * 60 + startMin;
+
+    // Si 5h ou moins, tout le matin (pas besoin de pause déjeuner)
+    if (hoursForDay <= 5) {
+      const endMinutes = startMinutes + hoursForDay * 60;
+      const endHour = Math.floor(endMinutes / 60);
+      const endMin = endMinutes % 60;
+      return {
+        startTime: `${String(startHour).padStart(2, '0')}:${String(startMin).padStart(2, '0')}`,
+        endTime: `${String(endHour).padStart(2, '0')}:${String(endMin).padStart(2, '0')}`,
+      };
+    }
+
+    // Si plus de 5h, inclure la pause déjeuner de 1h
+    // Exemple pour 8h effectives: 7h-12h (5h) + pause 12h-13h (1h) + 13h-17h (4h) = 8h effectives, fin à 17h
+    // Structure: matin jusqu'à 12h (5h), pause 1h, puis après-midi
+    const morningHours = 5; // 7h-12h = 5h
+    const afternoonHours = hoursForDay - morningHours; // Reste pour l'après-midi
+    
+    // Heure de fin = 13h (après pause) + heures après-midi
+    const afternoonStartMinutes = 13 * 60; // 13h00
+    const endMinutes = afternoonStartMinutes + afternoonHours * 60;
+    const endHour = Math.floor(endMinutes / 60);
+    const endMin = endMinutes % 60;
+    
+    return {
+      startTime: `${String(startHour).padStart(2, '0')}:${String(startMin).padStart(2, '0')}`,
+      endTime: `${String(endHour).padStart(2, '0')}:${String(endMin).padStart(2, '0')}`,
+    };
+  };
+
   // Fonction pour distribuer les heures sur plusieurs jours
   const distributeHoursForDay = (
     totalHours: number,
@@ -353,9 +388,19 @@ export function EditablePlanningBoard({ siteId, initialPlanning, workers }: Prop
           );
           
           if (hoursForDay > 0) {
+            // Déterminer l'heure de début par défaut selon le rôle
+            // Pour l'instant, on utilise 07:00 par défaut (maçon, charpentier, etc.)
+            // On pourrait améliorer en utilisant getWorkRule(task.required_role)
+            const defaultStartHour = '07:00';
+            
+            // Calculer les heures de début et de fin pour ce jour
+            const { startTime, endTime } = calculateDayHours(hoursForDay, defaultStartHour);
+            
             tasksForDay.push({
               ...task,
               hoursForDay,
+              dayStartTime: startTime,
+              dayEndTime: endTime,
             });
           }
         }
