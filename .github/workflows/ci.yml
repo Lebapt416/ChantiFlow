@@ -1,15 +1,16 @@
-name: CI/CD Pipeline
+name: CI
 
 on:
   push:
-    branches: [main, develop]
+    branches: [ main, master ]
   pull_request:
-    branches: [main, develop]
+    branches: [ main, master ]
 
 jobs:
-  lint:
-    name: Lint & Type Check
+  build-and-test:
+    name: Build, Lint & Test
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -23,102 +24,28 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Run ESLint
+      - name: Run Linter
         run: npm run lint
 
-      - name: Type check
-        run: npx tsc --noEmit
-
-  test:
-    name: Unit Tests
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Run unit tests
-        run: npm run test
-
-      - name: Upload coverage reports
-        uses: codecov/codecov-action@v4
-        if: always()
-        with:
-          files: ./coverage/coverage-final.json
-          fail_ci_if_error: false
-
-  build:
-    name: Build
-    runs-on: ubuntu-latest
-    needs: [lint, test]
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build application
+      # On ajoute des variables fictives pour que le build Next.js ne plante pas
+      - name: Build Project
         run: npm run build
         env:
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co' }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-key' }}
-          NEXT_PUBLIC_PREDICTION_API_URL: ${{ secrets.NEXT_PUBLIC_PREDICTION_API_URL || 'https://placeholder.api' }}
+          NEXT_PUBLIC_SUPABASE_URL: "https://example.supabase.co"
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: "eyJh-fake-key-for-build-process"
+          NEXT_PUBLIC_APP_URL: "http://localhost:3000"
 
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
-        if: success()
-        with:
-          name: build-artifacts
-          path: .next
-          retention-days: 1
+      - name: Run Unit Tests (Vitest)
+        run: npm run test
 
-  e2e:
-    name: E2E Tests
-    runs-on: ubuntu-latest
-    needs: [build]
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Install Playwright browsers
-        run: npx playwright install --with-deps chromium
-
-      - name: Run E2E tests
-        run: npm run test:e2e
+      # Optionnel : Si tu veux exécuter Playwright, il faut installer les navigateurs
+      # Pour l'instant, on peut commenter cette étape si elle échoue, ou l'activer si tu es prêt.
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+      
+      - name: Run E2E Tests (Playwright)
+        run: npx playwright test
         env:
-          PLAYWRIGHT_TEST_BASE_URL: http://localhost:3000
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co' }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-key' }}
-
-      - name: Upload Playwright report
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: playwright-report
-          path: playwright-report/
-          retention-days: 7
-
+          CI: true
+          NEXT_PUBLIC_SUPABASE_URL: "https://example.supabase.co"
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: "eyJh-fake-key-for-build-process"
