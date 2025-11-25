@@ -9,9 +9,11 @@ export default function ContactPage() {
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
   const [isSent, setIsSent] = useState(false);
+  const [isPending, setIsPending] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setIsPending(true);
     
     // Créer un lien mailto avec les informations
     const mailtoLink = `mailto:contact@chantiflow.com?subject=${encodeURIComponent(subject || 'Contact depuis ChantiFlow')}&body=${encodeURIComponent(`Email: ${email}\n\n${message}`)}`;
@@ -19,6 +21,7 @@ export default function ContactPage() {
     // Ouvrir le client email
     window.location.href = mailtoLink;
     setIsSent(true);
+    setIsPending(false);
     
     // Reset après 3 secondes
     setTimeout(() => {

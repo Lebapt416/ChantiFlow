@@ -239,6 +239,7 @@ export async function sendAccountCreatedEmail({
 
     console.log('✅ Email identifiants envoyé à', userEmail);
     return { success: true, data };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     console.error('❌ Exception envoi email compte créé:', error);
     return { success: false, error: error?.message || 'Erreur inconnue' };
@@ -266,8 +267,6 @@ export async function sendSiteCompletedEmail({
     return { success: false, error: 'Service email non initialisé' };
   }
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_BASE_URL ?? '';
-
   try {
     const { data, error } = await resend.emails.send({
       from: process.env.RESEND_FROM_EMAIL || 'ChantiFlow <onboarding@resend.dev>',
@@ -286,6 +285,7 @@ export async function sendSiteCompletedEmail({
 
     console.log('✅ Email fin de chantier envoyé à', workerEmail);
     return { success: true, data };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     console.error('❌ Exception envoi email fin de chantier:', error);
     return { success: false, error: error?.message || 'Erreur inconnue' };

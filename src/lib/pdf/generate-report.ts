@@ -7,8 +7,11 @@ interface jsPDFCustom extends jsPDF {
 }
 
 export async function generateSiteReport(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   site: any,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   tasks: any[],
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   workers: any[],
   aiSummary: { summary: string; status: string } | null,
 ) {
@@ -168,8 +171,10 @@ export async function generateSiteReport(
   }
 
   // --- FOOTER (Sur toutes les pages) ---
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const pageCount = (doc as any).getNumberOfPages();
   for (let i = 1; i <= pageCount; i++) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (doc as any).setPage(i);
     doc.setFontSize(8);
     doc.setTextColor(150);

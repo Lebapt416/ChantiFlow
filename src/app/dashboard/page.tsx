@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { CreateSiteForm } from './create-site-form';
+import { signOutAction } from '../actions';
 import { AppShell } from '@/components/app-shell';
 import { DashboardCharts } from './dashboard-charts';
 import { SitePlanningMini } from '@/components/site-planning-mini';
