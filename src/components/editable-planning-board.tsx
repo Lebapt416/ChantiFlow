@@ -17,6 +17,7 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import { Clock, Edit3 } from 'lucide-react';
 import { updateTaskPlanningAction } from '@/app/actions/update-task-planning';
+import { MAX_WORKING_HOURS_PER_DAY } from '@/lib/ai/work-rules';
 
 type Worker = {
   id: string;
@@ -42,6 +43,10 @@ type Props = {
 };
 
 type EditableTask = PlanningTask;
+
+type TaskWithDistributedHours = EditableTask & {
+  hoursForDay: number; // Heures distribuées pour ce jour spécifique
+};
 
 function getDayKey(date: string) {
   return new Date(date).toISOString().split('T')[0];
@@ -71,7 +76,7 @@ function SortableTaskCard({
   task,
   onEdit,
 }: {
-  task: EditableTask;
+  task: TaskWithDistributedHours;
   onEdit: (task: EditableTask) => void;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
@@ -122,7 +127,12 @@ function SortableTaskCard({
       </div>
       <div className="mt-1 flex items-center gap-1 text-[10px] text-zinc-500 dark:text-zinc-400">
         <Clock className="h-3 w-3" />
-        {task.durationHours}h
+        {task.hoursForDay}h
+        {task.durationHours > task.hoursForDay && (
+          <span className="text-[9px] opacity-75">
+            ({task.durationHours}h total)
+          </span>
+        )}
       </div>
     </div>
   );
@@ -282,12 +292,78 @@ export function EditablePlanningBoard({ siteId, initialPlanning, workers }: Prop
     });
   }, []);
 
+  // Fonction pour distribuer les heures sur plusieurs jours
+  const distributeHoursForDay = (
+    totalHours: number,
+    startDate: Date,
+    endDate: Date,
+    currentDay: Date,
+  ): number => {
+    if (totalHours <= MAX_WORKING_HOURS_PER_DAY) {
+      // Si la tâche fait 8h ou moins, tout est sur le premier jour
+      if (currentDay.toDateString() === startDate.toDateString()) {
+        return totalHours;
+      }
+      return 0;
+    }
+
+    // Calculer le nombre de jours entre startDate et endDate (inclus)
+    const daysDiff = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+    
+    // Calculer le jour actuel dans la séquence (0 = premier jour)
+    const currentDayIndex = Math.floor((currentDay.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+    
+    if (currentDayIndex < 0 || currentDayIndex >= daysDiff) {
+      return 0;
+    }
+
+    // Distribuer les heures : 8h par jour sauf le dernier jour
+    if (currentDayIndex < daysDiff - 1) {
+      return MAX_WORKING_HOURS_PER_DAY;
+    } else {
+      // Dernier jour : reste des heures
+      const remainingHours = totalHours - (MAX_WORKING_HOURS_PER_DAY * (daysDiff - 1));
+      return Math.max(0, remainingHours);
+    }
+  };
+
   const tasksByDay = useMemo(() => {
-    const map: Record<string, EditableTask[]> = {};
+    const map: Record<string, TaskWithDistributedHours[]> = {};
+    
     weekDays.forEach((day) => {
       const key = day.toISOString().split('T')[0];
-      map[key] = tasks.filter((task) => getDayKey(task.startDate) === key);
+      const dayDate = new Date(day);
+      dayDate.setHours(0, 0, 0, 0);
+      
+      const tasksForDay: TaskWithDistributedHours[] = [];
+      
+      tasks.forEach((task) => {
+        const taskStart = new Date(task.startDate);
+        taskStart.setHours(0, 0, 0, 0);
+        const taskEnd = new Date(task.endDate);
+        taskEnd.setHours(0, 0, 0, 0);
+        
+        // Vérifier si le jour est dans la plage de la tâche (inclus)
+        if (dayDate >= taskStart && dayDate <= taskEnd) {
+          const hoursForDay = distributeHoursForDay(
+            task.durationHours,
+            taskStart,
+            taskEnd,
+            dayDate,
+          );
+          
+          if (hoursForDay > 0) {
+            tasksForDay.push({
+              ...task,
+              hoursForDay,
+            });
+          }
+        }
+      });
+      
+      map[key] = tasksForDay;
     });
+    
     return map;
   }, [tasks, weekDays]);
 
