@@ -100,39 +100,78 @@ export function InteractiveCalendar({
       Record<string, Array<PlanningTask & { hours: number }>>
     > = {};
 
+    // Fonction pour distribuer les heures sur plusieurs jours
+    const distributeHours = (totalHours: number, startDate: Date, endDate: Date, currentDay: Date): number => {
+      if (totalHours <= MAX_WORKING_HOURS_PER_DAY) {
+        // Si la tâche fait 8h ou moins, tout est sur le premier jour
+        if (currentDay.toDateString() === startDate.toDateString()) {
+          return totalHours;
+        }
+        return 0;
+      }
+
+      // Calculer le nombre de jours entre startDate et endDate (inclus)
+      const daysDiff = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+      
+      // Calculer le jour actuel dans la séquence (0 = premier jour)
+      const currentDayIndex = Math.floor((currentDay.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+      
+      if (currentDayIndex < 0 || currentDayIndex >= daysDiff) {
+        return 0;
+      }
+
+      // Distribuer les heures : 8h par jour sauf le dernier jour
+      if (currentDayIndex < daysDiff - 1) {
+        return MAX_WORKING_HOURS_PER_DAY;
+      } else {
+        // Dernier jour : reste des heures
+        const remainingHours = totalHours - (MAX_WORKING_HOURS_PER_DAY * (daysDiff - 1));
+        return Math.max(0, remainingHours);
+      }
+    };
+
     weekDays.forEach((day) => {
       const dayKey = day.toISOString().split('T')[0];
       grouped[dayKey] = {};
 
       planning.forEach((task) => {
         const taskStart = new Date(task.startDate);
+        taskStart.setHours(0, 0, 0, 0);
         const taskEnd = new Date(task.endDate);
+        taskEnd.setHours(0, 0, 0, 0);
         const dayDate = new Date(day);
         dayDate.setHours(0, 0, 0, 0);
 
-        if (dayDate >= taskStart && dayDate < taskEnd) {
-          // Utiliser assignedWorkerIds si disponible, sinon assignedWorkerId
-          const workerIds = task.assignedWorkerIds || (task.assignedWorkerId ? [task.assignedWorkerId] : []);
-          if (workerIds.length === 0) {
-            const workerId = 'unassigned';
-            if (!grouped[dayKey][workerId]) {
-              grouped[dayKey][workerId] = [];
-            }
-            grouped[dayKey][workerId].push({
-              ...task,
-              hours: task.hours || task.estimatedHours || 8,
-            });
-          } else {
-            // Assigner la tâche à tous les workers assignés
-            workerIds.forEach(workerId => {
+        // Vérifier si le jour est dans la plage de la tâche (inclus)
+        if (dayDate >= taskStart && dayDate <= taskEnd) {
+          const totalHours = task.hours || task.estimatedHours || 8;
+          // Distribuer les heures réellement sur chaque jour
+          const hoursForDay = distributeHours(totalHours, taskStart, taskEnd, dayDate);
+          
+          if (hoursForDay > 0) {
+            // Utiliser assignedWorkerIds si disponible, sinon assignedWorkerId
+            const workerIds = task.assignedWorkerIds || (task.assignedWorkerId ? [task.assignedWorkerId] : []);
+            if (workerIds.length === 0) {
+              const workerId = 'unassigned';
               if (!grouped[dayKey][workerId]) {
                 grouped[dayKey][workerId] = [];
               }
               grouped[dayKey][workerId].push({
                 ...task,
-                hours: task.hours || task.estimatedHours || 8,
+                hours: hoursForDay,
               });
-            });
+            } else {
+              // Assigner la tâche à tous les workers assignés
+              workerIds.forEach(workerId => {
+                if (!grouped[dayKey][workerId]) {
+                  grouped[dayKey][workerId] = [];
+                }
+                grouped[dayKey][workerId].push({
+                  ...task,
+                  hours: hoursForDay,
+                });
+              });
+            }
           }
         }
       });
@@ -297,13 +336,9 @@ export function InteractiveCalendar({
                       const dayKey = day.toISOString().split('T')[0];
                       const dayTasks =
                         tasksByDayAndWorker[dayKey]?.[worker.id] || [];
-                      // Limiter les heures affichées à 8h max par jour
-                      const totalHours = Math.min(
-                        dayTasks.reduce((sum, task) => sum + Math.min(task.hours, MAX_WORKING_HOURS_PER_DAY), 0),
-                        MAX_WORKING_HOURS_PER_DAY
-                      );
-                      const rawTotalHours = dayTasks.reduce((sum, task) => sum + task.hours, 0);
-                      const exceedsLimit = rawTotalHours > MAX_WORKING_HOURS_PER_DAY;
+                      // Les heures sont déjà distribuées correctement (max 8h/jour)
+                      const totalHours = dayTasks.reduce((sum, task) => sum + task.hours, 0);
+                      const exceedsLimit = totalHours > MAX_WORKING_HOURS_PER_DAY;
                       const isToday = day.toDateString() === new Date().toDateString();
                       const isDragOver =
                         dragOverCell?.workerId === worker.id && dragOverCell?.day === dayKey;
@@ -322,10 +357,7 @@ export function InteractiveCalendar({
                           {dayTasks.length > 0 ? (
                             <div className="space-y-1">
                               {dayTasks.map((task) => {
-                                // Limiter l'affichage à 8h max par tâche par jour
-                                const displayHours = Math.min(task.hours, MAX_WORKING_HOURS_PER_DAY);
-                                const taskExceedsLimit = task.hours > MAX_WORKING_HOURS_PER_DAY;
-                                
+                                // Les heures sont déjà distribuées (max 8h/jour par tâche)
                                 return (
                                   <div
                                     key={task.taskId}
@@ -337,17 +369,12 @@ export function InteractiveCalendar({
                                         : task.priority === 'medium'
                                           ? 'border-amber-200 bg-amber-50 text-amber-900 dark:border-amber-900/60 dark:bg-amber-900/20 dark:text-amber-200'
                                           : 'border-zinc-200 bg-zinc-50 text-zinc-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300'
-                                    } ${taskExceedsLimit ? 'border-rose-300 dark:border-rose-800' : ''}`}
+                                    }`}
                                   >
                                     <div className="font-semibold">{task.taskTitle}</div>
                                     <div className="mt-0.5 flex items-center gap-1 text-[10px] opacity-75">
                                       <Clock className="h-3 w-3" />
-                                      {displayHours}h
-                                      {taskExceedsLimit && (
-                                        <span className="text-rose-600 dark:text-rose-400" title={`Cette tâche de ${task.hours}h sera répartie sur plusieurs jours`}>
-                                          ⚠️
-                                        </span>
-                                      )}
+                                      {task.hours}h
                                     </div>
                                   </div>
                                 );
@@ -360,7 +387,7 @@ export function InteractiveCalendar({
                                 }`}>
                                   Total: {totalHours}h
                                   {exceedsLimit && (
-                                    <span className="ml-1 flex items-center gap-0.5" title={`Limite de ${MAX_WORKING_HOURS_PER_DAY}h/jour dépassée. Les heures supplémentaires seront réparties sur d'autres jours.`}>
+                                    <span className="ml-1 flex items-center gap-0.5" title={`Attention: ${totalHours}h ce jour (limite: ${MAX_WORKING_HOURS_PER_DAY}h/jour). Cela peut être dû à plusieurs tâches.`}>
                                       <AlertCircle className="h-3 w-3" />
                                     </span>
                                   )}
