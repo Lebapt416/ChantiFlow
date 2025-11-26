@@ -190,7 +190,6 @@ export async function addWorkerAction(
     // Générer un code d'accès unique
     let accessCode = generateAccessCode();
     let persistedAccessCode = accessCode;
-    let persistedAccessCode = accessCode;
     let attempts = 0;
     let codeExists = true;
     
