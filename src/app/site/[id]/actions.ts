@@ -103,6 +103,12 @@ export async function addWorkerAction(
     return { error: 'Non authentifié.' };
   }
 
+  const managerDisplayName =
+    (typeof user.user_metadata?.full_name === 'string' && user.user_metadata.full_name.trim().length > 0
+      ? user.user_metadata.full_name.trim()
+      : undefined) || user.email || undefined;
+  const managerEmail = user.email || undefined;
+
   // Vérifier que le chantier appartient à l'utilisateur et récupérer ses infos
   const { data: site } = await supabase
     .from('sites')
@@ -149,7 +155,7 @@ export async function addWorkerAction(
         } else if (!updateStatusError) {
           console.log('✅ Statut worker mis à jour: pending → approved');
         }
-      } catch (statusError) {
+    } catch {
         // Ne pas bloquer si la colonne status n'existe pas
         console.warn('⚠️ Impossible de mettre à jour le statut (colonne peut-être absente)');
       }
@@ -183,6 +189,8 @@ export async function addWorkerAction(
 
     // Générer un code d'accès unique
     let accessCode = generateAccessCode();
+    let persistedAccessCode = accessCode;
+    let persistedAccessCode = accessCode;
     let attempts = 0;
     let codeExists = true;
     
@@ -223,7 +231,7 @@ export async function addWorkerAction(
       if (error.message.includes('access_code') || error.message.includes('column')) {
         console.warn('⚠️ Colonne access_code non trouvée - migration SQL non exécutée');
         // Réessayer sans access_code
-        const { data: retryWorker, error: retryError } = await supabase
+        const { error: retryError } = await supabase
           .from('workers')
           .insert({
             site_id: siteId,
@@ -244,23 +252,27 @@ export async function addWorkerAction(
         return { error: error.message };
       }
     } else {
-      console.log('✅ Worker créé avec code:', newWorker?.access_code || accessCode);
+      if (newWorker?.access_code) {
+        persistedAccessCode = newWorker.access_code;
+      }
+      console.log('✅ Worker créé avec code:', persistedAccessCode);
     }
 
     // Envoyer un email de bienvenue si l'email est fourni
     if (existingWorker.email) {
       try {
-        console.log('📧 Envoi email avec code d\'accès:', accessCode, 'type:', typeof accessCode);
+        console.log('📧 Envoi email avec code d\'accès:', persistedAccessCode, 'type:', typeof persistedAccessCode);
         console.log('📧 Worker email:', existingWorker.email, 'Worker name:', existingWorker.name);
         const emailResult = await sendWorkerWelcomeEmail({
           workerEmail: existingWorker.email,
           workerName: existingWorker.name,
           siteName: site.name,
           siteId: siteId,
-          managerName: user.email || undefined,
-          accessCode: accessCode || undefined,
+          managerName: managerDisplayName,
+          managerEmail,
+          accessCode: persistedAccessCode || undefined,
         });
-        console.log('✅ Email envoyé avec succès, code:', accessCode, 'result:', emailResult);
+        console.log('✅ Email envoyé avec succès, code:', persistedAccessCode, 'result:', emailResult);
       } catch (error) {
         // Ne pas bloquer l'ajout si l'email échoue
         console.error('❌ Erreur envoi email bienvenue:', error);
@@ -313,7 +325,7 @@ export async function addWorkerAction(
       if (error.message.includes('access_code') || error.message.includes('column')) {
         console.warn('⚠️ Colonne access_code non trouvée - migration SQL non exécutée');
         // Réessayer sans access_code
-        const { data: retryWorker, error: retryError } = await supabase
+        const { error: retryError } = await supabase
           .from('workers')
           .insert({
             site_id: siteId,
@@ -334,23 +346,27 @@ export async function addWorkerAction(
         return { error: error.message };
       }
     } else {
-      console.log('✅ Worker créé avec code:', newWorker?.access_code || accessCode);
+      if (newWorker?.access_code) {
+        persistedAccessCode = newWorker.access_code;
+      }
+      console.log('✅ Worker créé avec code:', persistedAccessCode);
     }
 
     // Envoyer un email de bienvenue si l'email est fourni
     if (email) {
       try {
-        console.log('📧 Envoi email avec code d\'accès:', accessCode, 'type:', typeof accessCode);
+        console.log('📧 Envoi email avec code d\'accès:', persistedAccessCode, 'type:', typeof persistedAccessCode);
         console.log('📧 Worker email:', email, 'Worker name:', name);
         const emailResult = await sendWorkerWelcomeEmail({
           workerEmail: email,
           workerName: name,
           siteName: site.name,
           siteId: siteId,
-          managerName: user.email || undefined,
-          accessCode: accessCode || undefined,
+          managerName: managerDisplayName,
+          managerEmail,
+          accessCode: persistedAccessCode || undefined,
         });
-        console.log('✅ Email envoyé avec succès, code:', accessCode, 'result:', emailResult);
+        console.log('✅ Email envoyé avec succès, code:', persistedAccessCode, 'result:', emailResult);
       } catch (error) {
         // Ne pas bloquer l'ajout si l'email échoue
         console.error('❌ Erreur envoi email bienvenue:', error);

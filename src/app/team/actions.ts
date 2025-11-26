@@ -30,6 +30,13 @@ export async function addWorkerAction(
     return { error: 'Non authentifié.' };
   }
 
+  const managerDisplayName =
+    (typeof user.user_metadata?.full_name === 'string' && user.user_metadata.full_name.trim().length > 0
+      ? user.user_metadata.full_name.trim()
+      : undefined) || undefined;
+  const managerEmail = user.email || undefined;
+  const managerNameForTemplate = managerDisplayName || managerEmail;
+
   // Vérifier si un worker avec le même email existe déjà pour ce compte
   if (email) {
     try {
@@ -49,14 +56,16 @@ export async function addWorkerAction(
       if (existingWorker) {
         return { error: 'Un membre avec cet email existe déjà dans votre équipe.' };
       }
-    } catch (checkError: any) {
+    } catch (checkError) {
       // Si la colonne created_by n'existe pas encore, on continue quand même
-      console.warn('Erreur vérification worker existant:', checkError?.message);
+      const message = checkError instanceof Error ? checkError.message : String(checkError);
+      console.warn('Erreur vérification worker existant:', message);
     }
   }
 
   // Créer un worker au niveau du compte (sans site_id)
   // Les workers créés manuellement sont automatiquement approuvés
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const insertData: any = {
     created_by: user.id,
     name,
@@ -127,7 +136,8 @@ export async function addWorkerAction(
       const emailResult = await sendWorkerWelcomeEmail({
         workerEmail: email,
         workerName: name,
-        managerName: user.email || undefined,
+        managerName: managerNameForTemplate,
+        managerEmail,
         // Pas de siteId ni accessCode car worker au niveau du compte
       });
       if (!emailResult.success) {

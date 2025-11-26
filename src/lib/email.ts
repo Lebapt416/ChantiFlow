@@ -11,6 +11,51 @@ import {
 
 // Initialiser Resend seulement si la clé API est disponible
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
+const SUPPORT_EMAIL = process.env.SUPPORT_EMAIL || 'support@chantiflow.com';
+
+function buildWorkerWelcomePlainText({
+  workerName,
+  siteName,
+  managerName,
+  accessCode,
+  reportUrl,
+}: {
+  workerName: string;
+  siteName?: string;
+  managerName?: string;
+  accessCode?: string;
+  reportUrl: string;
+}) {
+  const lines: string[] = [
+    `Bonjour ${workerName},`,
+  ];
+
+  if (siteName) {
+    lines.push(
+      `Vous avez été assigné${
+        managerName ? ` par ${managerName}` : ''
+      } au chantier ${siteName}.`,
+    );
+  } else {
+    lines.push(
+      `Vous avez été ajouté${
+        managerName ? ` par ${managerName}` : ''
+      } à l'équipe ChantiFlow.`,
+    );
+  }
+
+  if (accessCode) {
+    lines.push(`Votre code d'accès : ${accessCode}`);
+    lines.push(`Gardez ce code. Il vous sera demandé après avoir scanné le QR code du chantier.`);
+  } else {
+    lines.push("Vous recevrez un code d'accès dès que vous serez assigné à un chantier.");
+  }
+
+  lines.push(`Accédez directement au formulaire : ${reportUrl}`);
+  lines.push('— Équipe ChantiFlow');
+
+  return lines.join('\n\n');
+}
 
 /**
  * Fonction générique pour envoyer un email
@@ -56,6 +101,7 @@ export async function sendWorkerWelcomeEmail({
   siteName,
   siteId,
   managerName,
+  managerEmail,
   accessCode,
 }: {
   workerEmail: string;
@@ -63,6 +109,7 @@ export async function sendWorkerWelcomeEmail({
   siteName?: string;
   siteId?: string;
   managerName?: string;
+  managerEmail?: string;
   accessCode?: string;
 }) {
   // Si Resend n'est pas configuré, on retourne silencieusement
@@ -95,6 +142,18 @@ export async function sendWorkerWelcomeEmail({
       return { success: false, error: 'Service email non configuré' };
     }
 
+    const normalizedAccessCode = accessCode?.trim()
+      ? accessCode.trim().toUpperCase()
+      : undefined;
+
+    const plainText = buildWorkerWelcomePlainText({
+      workerName,
+      siteName,
+      managerName,
+      accessCode: normalizedAccessCode,
+      reportUrl,
+    });
+
     const { data, error } = await resend.emails.send({
       from: process.env.RESEND_FROM_EMAIL || 'ChantiFlow <onboarding@resend.dev>',
       to: workerEmail,
@@ -105,10 +164,15 @@ export async function sendWorkerWelcomeEmail({
         workerName,
         siteName,
         managerName,
-        accessCode: accessCode || undefined,
+        accessCode: normalizedAccessCode,
         reportUrl,
         siteId: siteId || undefined,
       }),
+      text: plainText,
+      reply_to: managerEmail || SUPPORT_EMAIL,
+      headers: {
+        'List-Unsubscribe': `<mailto:${SUPPORT_EMAIL}>`,
+      },
     });
 
     if (error) {
