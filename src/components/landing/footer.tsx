@@ -1,5 +1,5 @@
+import Image from "next/image";
 import Link from "next/link";
-import { Zap } from "lucide-react";
 
 export function Footer() {
   return (
@@ -7,11 +7,17 @@ export function Footer() {
       <div className="mx-auto max-w-7xl px-6 py-12">
         <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
           <div className="col-span-1 md:col-span-2">
-            <div className="mb-4 flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-black text-white dark:bg-white dark:text-black">
-                <Zap className="h-5 w-5" />
-              </div>
-              <span className="text-lg font-bold text-zinc-900 dark:text-white">ChantiFlow</span>
+            <div className="mb-4 flex items-center gap-3">
+              <Image
+                src="/logo.svg"
+                alt="ChantiFlow"
+                width={32}
+                height={32}
+                className="h-8 w-8"
+              />
+              <span className="text-lg font-bold text-zinc-900 dark:text-white">
+                ChantiFlow
+              </span>
             </div>
             <p className="max-w-md text-sm text-zinc-600 dark:text-zinc-400">
               La gestion de chantier simplifiée, assistée par l&apos;intelligence artificielle.

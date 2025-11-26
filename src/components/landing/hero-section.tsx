@@ -1,5 +1,5 @@
+import Image from "next/image";
 import Link from "next/link";
-import { Zap } from "lucide-react";
 
 export function HeroSection() {
   return (
@@ -7,11 +7,18 @@ export function HeroSection() {
       <header className="border-b border-zinc-200 dark:border-zinc-800">
         <div className="mx-auto max-w-7xl px-6 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-black text-white dark:bg-white dark:text-black">
-                <Zap className="h-6 w-6" />
-              </div>
-              <span className="text-xl font-bold text-zinc-900 dark:text-white">ChantiFlow</span>
+            <div className="flex items-center gap-3">
+              <Image
+                src="/logo.svg"
+                alt="ChantiFlow"
+                width={40}
+                height={40}
+                priority
+                className="h-10 w-10"
+              />
+              <span className="text-xl font-bold text-zinc-900 dark:text-white">
+                ChantiFlow
+              </span>
             </div>
             <nav className="flex items-center gap-6">
               <Link
