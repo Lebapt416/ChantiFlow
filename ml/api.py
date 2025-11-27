@@ -69,6 +69,7 @@ class SiteSummaryInput(BaseModel):
 class SummaryResponse(BaseModel):
     summary: str
     status: str
+    sites_mentioned: Optional[List[str]] = None  # Noms des chantiers mentionnés
 
 
 class WeatherData(BaseModel):
@@ -341,11 +342,11 @@ async def health_check():
 async def generate_global_summary(data: GlobalSummaryInput):
     """Génère un résumé de l'état de santé de tous les chantiers"""
     if not data.sites:
-        return SummaryResponse(summary="Aucun chantier actif pour le moment.", status="good")
+        return SummaryResponse(summary="Aucun chantier actif pour le moment.", status="good", sites_mentioned=[])
 
     total_sites = len(data.sites)
-    sites_at_risk = 0
-    sites_critical = 0
+    sites_at_risk = []
+    sites_critical = []
     mean_v, std_v = get_norm_params()
 
     for site in data.sites:
@@ -361,15 +362,31 @@ async def generate_global_summary(data: GlobalSummaryInput):
         time_ratio = site.days_elapsed / max(1, predicted_duration)
 
         if time_ratio > 0.8 and progress_ratio < 0.5:
-            sites_critical += 1
+            sites_critical.append(site.name)
         elif time_ratio > 0.6 and progress_ratio < 0.4:
-            sites_at_risk += 1
+            sites_at_risk.append(site.name)
 
-    if sites_critical > 0:
-        text = f"⚠️ Attention requise : {sites_critical} chantier(s) en situation critique par rapport aux prédictions IA."
+    sites_mentioned = sites_critical + sites_at_risk
+    
+    if len(sites_critical) > 0:
+        if len(sites_critical) == 1:
+            text = f"⚠️ Attention requise : Le chantier « {sites_critical[0]} » est en situation critique par rapport aux prédictions IA."
+        elif len(sites_critical) <= 3:
+            sites_list = "« " + " », « ".join(sites_critical) + " »"
+            text = f"⚠️ Attention requise : {len(sites_critical)} chantiers en situation critique : {sites_list}."
+        else:
+            sites_list = "« " + " », « ".join(sites_critical[:3]) + " »"
+            text = f"⚠️ Attention requise : {len(sites_critical)} chantiers en situation critique, notamment : {sites_list}."
         status = "critical"
-    elif sites_at_risk > 0:
-        text = f"🟠 Vigilance : {sites_at_risk} chantier(s) montrent des signes de ralentissement d'après l'analyse."
+    elif len(sites_at_risk) > 0:
+        if len(sites_at_risk) == 1:
+            text = f"🟠 Vigilance : Le chantier « {sites_at_risk[0]} » montre des signes de ralentissement d'après l'analyse IA."
+        elif len(sites_at_risk) <= 3:
+            sites_list = "« " + " », « ".join(sites_at_risk) + " »"
+            text = f"🟠 Vigilance : {len(sites_at_risk)} chantiers montrent des signes de ralentissement : {sites_list}."
+        else:
+            sites_list = "« " + " », « ".join(sites_at_risk[:3]) + " »"
+            text = f"🟠 Vigilance : {len(sites_at_risk)} chantiers montrent des signes de ralentissement, notamment : {sites_list}."
         status = "warning"
     else:
         if total_sites == 1:
@@ -378,7 +395,7 @@ async def generate_global_summary(data: GlobalSummaryInput):
             text = f"✨ Tout va bien. Les {total_sites} chantiers avancent conformément aux estimations de l'IA."
         status = "good"
 
-    return SummaryResponse(summary=text, status=status)
+    return SummaryResponse(summary=text, status=status, sites_mentioned=sites_mentioned)
 
 
 @app.post("/summary/site", response_model=SummaryResponse)
@@ -397,18 +414,20 @@ async def generate_site_summary(data: SiteSummaryInput):
     progression = 1 - (data.tasks_pending / max(1, data.tasks_total))
 
     base_text = ""
+    site_name_ref = f"« {data.site_name} »"
+    
     if retard_estime > 5:
         status = "critical"
-        base_text = f"⚠️ Risque élevé : L'IA prévoit {int(predicted_total_days)} jours de travail (vs {data.planned_duration} prévus). Un retard de {int(retard_estime)} jours est probable."
+        base_text = f"⚠️ Risque élevé pour {site_name_ref} : L'IA prévoit {int(predicted_total_days)} jours de travail (vs {data.planned_duration} prévus). Un retard de {int(retard_estime)} jours est probable."
     elif retard_estime > 2:
         status = "warning"
-        base_text = f"🟠 Attention : Le rythme actuel suggère un léger dépassement ({int(retard_estime)} jours) par rapport au planning."
+        base_text = f"🟠 Attention pour {site_name_ref} : Le rythme actuel suggère un léger dépassement ({int(retard_estime)} jours) par rapport au planning."
     elif progression > 0.9:
         status = "good"
-        base_text = "✅ Chantier en phase de finition. Les objectifs sont atteints."
+        base_text = f"✅ {site_name_ref} est en phase de finition. Les objectifs sont atteints."
     else:
         status = "good"
-        base_text = f"✨ Le chantier avance normalement. L'estimation IA ({int(predicted_total_days)}j) est alignée avec votre planning."
+        base_text = f"✨ {site_name_ref} avance normalement. L'estimation IA ({int(predicted_total_days)}j) est alignée avec votre planning."
 
     # Ajouter recommandations météo si la localisation est fournie
     weather_note = ""
@@ -460,7 +479,7 @@ async def generate_site_summary(data: SiteSummaryInput):
 
     text = base_text + weather_note
 
-    return SummaryResponse(summary=text, status=status)
+    return SummaryResponse(summary=text, status=status, sites_mentioned=[data.site_name])
 
 
 @app.post("/planning/optimize-weather", response_model=OptimizedPlanningResponse)

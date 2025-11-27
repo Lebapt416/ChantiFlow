@@ -126,41 +126,46 @@ export default async function SiteDashboardPage({ params }: Params) {
         {/* Résumé IA du chantier */}
         {aiSummary && (
           <section
-            className={`rounded-3xl border p-6 shadow-sm ${
+            className={`rounded-3xl border p-6 shadow-lg ${
               aiSummary.status === 'critical'
-                ? 'border-rose-200 bg-rose-50 dark:border-rose-800 dark:bg-rose-900/20'
+                ? 'border-rose-300 bg-gradient-to-br from-rose-50 to-rose-100/50 dark:border-rose-700 dark:from-rose-900/30 dark:to-rose-800/20'
                 : aiSummary.status === 'warning'
-                  ? 'border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-900/20'
-                  : 'border-emerald-200 bg-emerald-50 dark:border-emerald-800 dark:bg-emerald-900/20'
+                  ? 'border-amber-300 bg-gradient-to-br from-amber-50 to-amber-100/50 dark:border-amber-700 dark:from-amber-900/30 dark:to-amber-800/20'
+                  : 'border-emerald-300 bg-gradient-to-br from-emerald-50 to-emerald-100/50 dark:border-emerald-700 dark:from-emerald-900/30 dark:to-emerald-800/20'
             }`}
           >
             <div className="flex items-start gap-4">
               <div className="flex-shrink-0">
                 {aiSummary.status === 'critical' ? (
-                  <div className="rounded-full bg-rose-100 p-2 dark:bg-rose-900/30">
-                    <span className="text-2xl">⚠️</span>
+                  <div className="rounded-full bg-rose-200 p-3 shadow-md dark:bg-rose-800/50">
+                    <span className="text-3xl">⚠️</span>
                   </div>
                 ) : aiSummary.status === 'warning' ? (
-                  <div className="rounded-full bg-amber-100 p-2 dark:bg-amber-900/30">
-                    <span className="text-2xl">🟠</span>
+                  <div className="rounded-full bg-amber-200 p-3 shadow-md dark:bg-amber-800/50">
+                    <span className="text-3xl">🟠</span>
                   </div>
                 ) : (
-                  <div className="rounded-full bg-emerald-100 p-2 dark:bg-emerald-900/30">
-                    <span className="text-2xl">✨</span>
+                  <div className="rounded-full bg-emerald-200 p-3 shadow-md dark:bg-emerald-800/50">
+                    <span className="text-3xl">✨</span>
                   </div>
                 )}
               </div>
               <div className="flex-1">
-                <h2 className="mb-1 text-lg font-semibold text-zinc-900 dark:text-white">
-                  Analyse IA du chantier
-                </h2>
+                <div className="mb-2 flex items-center gap-2">
+                  <h2 className="text-xl font-bold text-zinc-900 dark:text-white">
+                    Analyse IA du chantier
+                  </h2>
+                  <span className="rounded-full bg-white/80 px-2 py-0.5 text-xs font-semibold text-zinc-700 dark:bg-zinc-800/80 dark:text-zinc-300">
+                    IA
+                  </span>
+                </div>
                 <p
-                  className={`text-sm ${
+                  className={`text-base leading-relaxed ${
                     aiSummary.status === 'critical'
-                      ? 'text-rose-900 dark:text-rose-200'
+                      ? 'text-rose-900 dark:text-rose-100'
                       : aiSummary.status === 'warning'
-                        ? 'text-amber-900 dark:text-amber-200'
-                        : 'text-emerald-900 dark:text-emerald-200'
+                        ? 'text-amber-900 dark:text-amber-100'
+                        : 'text-emerald-900 dark:text-emerald-100'
                   }`}
                 >
                   {aiSummary.summary}
