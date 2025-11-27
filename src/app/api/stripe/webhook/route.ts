@@ -4,6 +4,24 @@ import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 import { stripe } from '@/lib/stripe';
 import { sendAccountCreatedEmail } from '@/lib/email';
 
+type PlanKey = 'plus' | 'pro';
+type AddOnKey = 'extra_workers' | 'extra_sites';
+
+function normalizePlanKey(value?: string | null): PlanKey | null {
+  if (!value) return null;
+  const normalized = value.toLowerCase();
+  return normalized === 'plus' || normalized === 'pro' ? normalized : null;
+}
+
+function normalizeAddOnKey(value?: string | null): AddOnKey | null {
+  if (!value) return null;
+  const normalized = value.toLowerCase();
+  if (normalized === 'extra_workers' || normalized === 'extra_sites') {
+    return normalized;
+  }
+  return null;
+}
+
 // Fonction pour générer un mot de passe sécurisé
 function generateSecurePassword(): string {
   const length = 16;
@@ -139,34 +157,67 @@ export async function POST(request: Request) {
         break;
       }
 
-      // Déterminer le plan en fonction du montant payé
-      // Pour les liens buy.stripe.com, on utilise le montant total
+      // Priorité : utiliser les métadonnées Stripe si disponibles
+      // ⚠️ Ajoutez la métadonnée plan_key (= plus | pro) sur vos Liens de Paiement Stripe
+      let planMetadata = normalizePlanKey(session.metadata?.plan_key as string | undefined);
+      if (planMetadata) {
+        plan = planMetadata;
+      }
+      // ⚠️ Ajoutez aussi la métadonnée addon_key (= extra_workers | extra_sites) sur vos Liens Stripe
+      let addOnType = normalizeAddOnKey(session.metadata?.addon_key as string | undefined);
+
+      // Fallback sécurisé : déterminer plan/add-on par le montant
       const amountTotal = session.amount_total; // en centimes
-      
-      if (amountTotal === 2900) {
-        // 29€ = Plus
-        plan = 'plus';
-      } else if (amountTotal === 7900) {
-        // 79€ = Pro
-        plan = 'pro';
+      if (!plan) {
+        if (amountTotal === 2900) {
+          plan = 'plus';
+        } else if (amountTotal === 7900) {
+          plan = 'pro';
+        }
+      }
+      if (!addOnType) {
+        if (amountTotal === 1000) {
+          addOnType = 'extra_workers';
+        } else if (amountTotal === 500) {
+          addOnType = 'extra_sites';
+        }
       }
 
-      // Si on n'a pas pu déterminer le plan par le montant, essayer de récupérer les détails de la session
-      if (!plan && stripe) {
+      // Si on n'a pas pu déterminer le plan/add-on, récupérer les détails de la session
+      if ((!plan || !addOnType) && stripe) {
         try {
           const sessionDetails = await stripe.checkout.sessions.retrieve(session.id, {
             expand: ['line_items'],
           });
+
+          if (!plan) {
+            planMetadata = normalizePlanKey(sessionDetails.metadata?.plan_key as string | undefined);
+            if (planMetadata) {
+              plan = planMetadata;
+            }
+          }
+          if (!addOnType) {
+            addOnType = normalizeAddOnKey(sessionDetails.metadata?.addon_key as string | undefined);
+          }
           
           const lineItems = sessionDetails.line_items?.data;
           if (lineItems && lineItems.length > 0) {
             const amount = lineItems[0].amount_total;
             
-            // Déterminer le plan par le montant
-            if (amount === 2900) {
-              plan = 'plus';
-            } else if (amount === 7900) {
-              plan = 'pro';
+            if (!plan) {
+              if (amount === 2900) {
+                plan = 'plus';
+              } else if (amount === 7900) {
+                plan = 'pro';
+              }
+            }
+
+            if (!addOnType) {
+              if (amount === 1000) {
+                addOnType = 'extra_workers';
+              } else if (amount === 500) {
+                addOnType = 'extra_sites';
+              }
             }
             
             // Alternative : utiliser l'URL de la session pour déterminer le plan
@@ -183,21 +234,20 @@ export async function POST(request: Request) {
         }
       }
 
-      // Vérifier si c'est un add-on ou un plan
-      const isAddOn = amountTotal === 1000 || amountTotal === 500; // 10€ ou 5€
+      const isAddOn = !!addOnType;
       
-      if (isAddOn) {
+      if (isAddOn && addOnType) {
         // C'est un add-on
         const currentMetadata = user.user_metadata || {};
         const currentAddOns = currentMetadata.addOns || { extra_workers: 0, extra_sites: 0 };
         
         const updatedAddOns = { ...currentAddOns };
         
-        if (amountTotal === 1000) {
+        if (addOnType === 'extra_workers') {
           // Add-on +5 employés (10€)
           updatedAddOns.extra_workers = (updatedAddOns.extra_workers || 0) + 1;
           console.log(`Add-on +5 employés acheté pour ${customerEmail}`);
-        } else if (amountTotal === 500) {
+        } else if (addOnType === 'extra_sites') {
           // Add-on +2 chantiers (5€)
           updatedAddOns.extra_sites = (updatedAddOns.extra_sites || 0) + 1;
           console.log(`Add-on +2 chantiers acheté pour ${customerEmail}`);
