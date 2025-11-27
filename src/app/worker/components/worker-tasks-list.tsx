@@ -42,23 +42,14 @@ export function WorkerTasksList({ tasks, groups }: Props) {
   }, [tasks]);
 
   const [selectedTask, setSelectedTask] = useState<TaskMeta | null>(null);
+  const groupsWithTasks = useMemo(
+    () => groups.filter((group) => tasksByGroup[group.key].length > 0),
+    [groups, tasksByGroup],
+  );
 
   return (
     <>
-      <section className="grid gap-4 md:grid-cols-3">
-        {groups.map((group) => (
-          <div
-            key={group.key}
-            className="rounded-3xl border border-zinc-200 bg-white/90 p-4 shadow-sm transition hover:shadow-lg dark:border-zinc-800 dark:bg-zinc-900/90"
-          >
-            <p className={`text-xs uppercase tracking-[0.3em] ${group.accent}`}>{group.label}</p>
-            <p className="mt-2 text-3xl font-semibold text-zinc-900 dark:text-white">{tasksByGroup[group.key].length}</p>
-            <p className="text-sm text-zinc-500 dark:text-zinc-400">{group.description}</p>
-          </div>
-        ))}
-      </section>
-
-      {groups.map((group) => (
+      {groupsWithTasks.map((group) => (
         <section
           key={group.key}
           className="rounded-3xl border border-zinc-200 bg-white/90 p-6 shadow-lg shadow-black/5 dark:border-zinc-800 dark:bg-zinc-900/90"
@@ -97,6 +88,15 @@ export function WorkerTasksList({ tasks, groups }: Props) {
           </div>
         </section>
       ))}
+
+      {!groupsWithTasks.length ? (
+        <section className="rounded-3xl border border-dashed border-zinc-200 bg-white/80 p-6 text-center shadow-inner dark:border-zinc-800 dark:bg-zinc-950/40">
+          <p className="text-lg font-semibold text-zinc-900 dark:text-white">Aucune mission pour le moment</p>
+          <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
+            Scannez un chantier pour recevoir vos premières tâches.
+          </p>
+        </section>
+      ) : null}
 
       {selectedTask ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4 py-10">
