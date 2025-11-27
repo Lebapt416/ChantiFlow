@@ -65,7 +65,7 @@ export async function joinSiteAction(scanValue: string): Promise<JoinSiteResult>
   const admin = createSupabaseAdminClient();
   const { data: worker, error: workerError } = await admin
     .from('workers')
-    .select('id, created_by, site_id')
+    .select('id, created_by, site_id, email')
     .eq('id', session.workerId)
     .single();
 
@@ -98,7 +98,34 @@ export async function joinSiteAction(scanValue: string): Promise<JoinSiteResult>
     };
   }
 
-  const { error: updateError } = await admin.from('workers').update({ site_id: site.id }).eq('id', worker.id);
+  let { error: updateError } = await admin.from('workers').update({ site_id: site.id }).eq('id', worker.id);
+
+  if (updateError?.code === '23505' && worker.email) {
+    // Fusionner les doublons hérités (même email déjà assigné au chantier)
+    try {
+      const { data: duplicates } = await admin
+        .from('workers')
+        .select('id')
+        .eq('email', worker.email)
+        .eq('site_id', site.id)
+        .neq('id', worker.id);
+
+      const duplicateIds = duplicates?.map((dup) => dup.id).filter(Boolean) ?? [];
+
+      if (duplicateIds.length > 0) {
+        await admin.from('tasks').update({ assigned_worker_id: worker.id }).in('assigned_worker_id', duplicateIds);
+        await admin.from('tasks').update({ planned_worker_id: worker.id }).in('planned_worker_id', duplicateIds);
+        await admin.from('reports').update({ worker_id: worker.id }).in('worker_id', duplicateIds);
+        await admin.from('workers').delete().in('id', duplicateIds);
+      }
+
+      // Retenter la mise à jour
+      const retry = await admin.from('workers').update({ site_id: site.id }).eq('id', worker.id);
+      updateError = retry.error;
+    } catch (mergeError) {
+      console.error('❌ Erreur fusion doublons worker:', mergeError);
+    }
+  }
 
   if (updateError) {
     console.error('❌ joinSiteAction updateError', updateError);
