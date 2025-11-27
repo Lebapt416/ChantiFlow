@@ -78,16 +78,20 @@ export function WorkerScanner() {
 
       {isScanning && (
         <div className="mt-6 overflow-hidden rounded-2xl border border-dashed border-emerald-200 bg-emerald-50/50 p-4 dark:border-emerald-800 dark:bg-emerald-900/10">
-          <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-emerald-700 dark:text-emerald-300">
-            <QrCode className="h-4 w-4" />
-            Caméra active
+          <div className="mb-2 flex items-center justify-between text-sm font-semibold text-emerald-700 dark:text-emerald-300">
+            <span className="flex items-center gap-2">
+              <QrCode className="h-4 w-4" />
+              Caméra active
+            </span>
+            <span className="text-xs text-emerald-500 dark:text-emerald-200">Ajustez le QR au centre du cadre</span>
           </div>
-          <div className="aspect-square w-full max-w-sm">
+          <div className="w-full max-w-sm rounded-2xl">
             <WorkerQrReader
               constraints={{ facingMode: 'environment' }}
               scanDelay={700}
+              containerStyle={{ width: '100%', height: '100%', paddingTop: 0 }}
+              videoContainerStyle={{ width: '100%', height: '320px', borderRadius: '1.5rem', overflow: 'hidden' }}
               videoStyle={{ width: '100%', height: '100%', objectFit: 'cover' }}
-              containerStyle={{ width: '100%', height: '100%' }}
               onResult={(result, err) => {
                 if (result?.getText()) {
                   setIsScanning(false);

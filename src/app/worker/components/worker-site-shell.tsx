@@ -11,10 +11,12 @@ type Tab = 'tasks' | 'planning' | 'reports' | 'info';
 
 type Props = {
   siteId: string;
+  defaultTab?: Tab;
+  showNavigation?: boolean;
 };
 
-export function WorkerSiteShell({ siteId }: Props) {
-  const [activeTab, setActiveTab] = useState<Tab>('planning');
+export function WorkerSiteShell({ siteId, defaultTab = 'planning', showNavigation = true }: Props) {
+  const [activeTab, setActiveTab] = useState<Tab>(defaultTab);
   const [workerId, setWorkerId] = useState<string | null>(null);
   const [workerName, setWorkerName] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
@@ -77,50 +79,52 @@ export function WorkerSiteShell({ siteId }: Props) {
         {activeTab === 'info' && <InfoTab siteId={siteId} workerId={workerId} workerName={workerName} />}
       </div>
 
-      <nav className="border-t border-zinc-200 bg-white text-xs font-medium dark:border-zinc-800 dark:bg-zinc-950">
-        <div className="grid grid-cols-4">
-          <button
-            onClick={() => setActiveTab('tasks')}
-            className={`flex flex-col items-center gap-1 py-3 transition ${
-              activeTab === 'tasks' ? 'text-emerald-600 dark:text-emerald-400' : 'text-zinc-500 dark:text-zinc-400'
-            }`}
-          >
-            <CheckSquare className="h-4 w-4" />
-            Tâches
-          </button>
-          <button
-            onClick={() => setActiveTab('planning')}
-            className={`flex flex-col items-center gap-1 py-3 transition ${
-              activeTab === 'planning'
-                ? 'text-emerald-600 dark:text-emerald-400'
-                : 'text-zinc-500 dark:text-zinc-400'
-            }`}
-          >
-            <Calendar className="h-4 w-4" />
-            Planning
-          </button>
-          <button
-            onClick={() => setActiveTab('reports')}
-            className={`flex flex-col items-center gap-1 py-3 transition ${
-              activeTab === 'reports'
-                ? 'text-emerald-600 dark:text-emerald-400'
-                : 'text-zinc-500 dark:text-zinc-400'
-            }`}
-          >
-            <FileText className="h-4 w-4" />
-            Rapports
-          </button>
-          <button
-            onClick={() => setActiveTab('info')}
-            className={`flex flex-col items-center gap-1 py-3 transition ${
-              activeTab === 'info' ? 'text-emerald-600 dark:text-emerald-400' : 'text-zinc-500 dark:text-zinc-400'
-            }`}
-          >
-            <Info className="h-4 w-4" />
-            Infos
-          </button>
-        </div>
-      </nav>
+      {showNavigation ? (
+        <nav className="border-t border-zinc-200 bg-white text-xs font-medium dark:border-zinc-800 dark:bg-zinc-950">
+          <div className="grid grid-cols-4">
+            <button
+              onClick={() => setActiveTab('tasks')}
+              className={`flex flex-col items-center gap-1 py-3 transition ${
+                activeTab === 'tasks' ? 'text-emerald-600 dark:text-emerald-400' : 'text-zinc-500 dark:text-zinc-400'
+              }`}
+            >
+              <CheckSquare className="h-4 w-4" />
+              Tâches
+            </button>
+            <button
+              onClick={() => setActiveTab('planning')}
+              className={`flex flex-col items-center gap-1 py-3 transition ${
+                activeTab === 'planning'
+                  ? 'text-emerald-600 dark:text-emerald-400'
+                  : 'text-zinc-500 dark:text-zinc-400'
+              }`}
+            >
+              <Calendar className="h-4 w-4" />
+              Planning
+            </button>
+            <button
+              onClick={() => setActiveTab('reports')}
+              className={`flex flex-col items-center gap-1 py-3 transition ${
+                activeTab === 'reports'
+                  ? 'text-emerald-600 dark:text-emerald-400'
+                  : 'text-zinc-500 dark:text-zinc-400'
+              }`}
+            >
+              <FileText className="h-4 w-4" />
+              Rapports
+            </button>
+            <button
+              onClick={() => setActiveTab('info')}
+              className={`flex flex-col items-center gap-1 py-3 transition ${
+                activeTab === 'info' ? 'text-emerald-600 dark:text-emerald-400' : 'text-zinc-500 dark:text-zinc-400'
+              }`}
+            >
+              <Info className="h-4 w-4" />
+              Infos
+            </button>
+          </div>
+        </nav>
+      ) : null}
     </div>
   );
 }

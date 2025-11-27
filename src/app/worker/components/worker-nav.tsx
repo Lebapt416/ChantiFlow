@@ -2,12 +2,13 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Calendar, Home, CheckSquare, QrCode } from 'lucide-react';
+import { Calendar, FileText, Home, CheckSquare, QrCode } from 'lucide-react';
 
 const items = [
   { href: '/worker/dashboard', label: 'Accueil', icon: Home },
   { href: '/worker/tasks', label: 'Tâches', icon: CheckSquare },
   { href: '/worker/planning', label: 'Planning', icon: Calendar },
+  { href: '/worker/reports', label: 'Rapports', icon: FileText },
   { href: '/worker/scanner', label: 'Scanner', icon: QrCode },
 ];
 

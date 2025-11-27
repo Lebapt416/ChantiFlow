@@ -8,7 +8,7 @@ import { WorkerSiteShell } from '../components/worker-site-shell';
 
 export const dynamic = 'force-dynamic';
 
-export default async function WorkerTasksPage() {
+export default async function WorkerReportsPage() {
   const session = await readWorkerSession();
   if (!session?.workerId) {
     redirect('/worker/login');
@@ -35,36 +35,30 @@ export default async function WorkerTasksPage() {
             </div>
             <div>
               <p className="text-xs uppercase tracking-[0.4em] text-zinc-500 dark:text-zinc-400">ChantiFlow</p>
-              <h1 className="text-2xl font-semibold text-zinc-900 dark:text-white">Mes tâches</h1>
+              <h1 className="text-2xl font-semibold text-zinc-900 dark:text-white">Rapports & remontées</h1>
               <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                Retrouvez l’ensemble de vos missions et validez vos actions en direct.
+                Envoyez des photos, commentaires et incidents à votre chef de chantier.
               </p>
             </div>
           </div>
           <Link
             href="/worker/scanner"
-            className="inline-flex items-center gap-2 rounded-full bg-emerald-600 px-4 py-2 text-xs font-semibold text-white transition hover:bg-emerald-700"
+            className="inline-flex items-center gap-2 rounded-full border border-zinc-300 px-4 py-2 text-xs font-semibold text-zinc-700 transition hover:border-zinc-400 hover:bg-white dark:border-zinc-700 dark:text-zinc-200 dark:hover:border-zinc-500"
           >
-            Scanner un chantier
+            Scanner un nouveau chantier
           </Link>
         </div>
       </header>
 
       <main className="mx-auto flex max-w-5xl flex-col gap-6 px-4 py-8">
         {worker.site_id ? (
-          <WorkerSiteShell siteId={worker.site_id} defaultTab="tasks" showNavigation={false} />
+          <WorkerSiteShell siteId={worker.site_id} defaultTab="reports" showNavigation={false} />
         ) : (
           <section className="rounded-3xl border border-dashed border-zinc-200 bg-white/80 p-6 text-center shadow-inner dark:border-zinc-800 dark:bg-zinc-950/40">
             <p className="text-lg font-semibold text-zinc-900 dark:text-white">Aucun chantier assigné</p>
             <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
-              Scannez le QR code d&apos;un chantier pour recevoir vos missions.
+              Rejoignez un chantier via QR code pour pouvoir envoyer des rapports et remontées.
             </p>
-            <Link
-              href="/worker/scanner"
-              className="mt-4 inline-flex items-center justify-center rounded-full bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700"
-            >
-              Ouvrir le scanner
-            </Link>
           </section>
         )}
       </main>
