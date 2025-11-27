@@ -65,7 +65,7 @@ export async function signUpAction(
         name: name || undefined,
         plan: 'basic',
       },
-      emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/home`,
+      emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_BASE_URL || 'http://localhost:3000'}/auth/callback?next=/home`,
     },
   });
 
