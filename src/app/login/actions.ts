@@ -8,6 +8,33 @@ export type AuthState = {
   success?: string;
 };
 
+const SUPABASE_PLACEHOLDER_HOSTS = ['example.supabase.co'];
+const SUPABASE_PLACEHOLDER_KEYS = ['example', 'your-anon-key'];
+
+const SUPABASE_DISABLED_MESSAGE =
+  "Erreur : l'authentification est désactivée sur cet environnement (configuration Supabase manquante).";
+const SUPABASE_UNREACHABLE_MESSAGE =
+  "Erreur : impossible de joindre le service d'authentification pour le moment.";
+
+function isSupabaseConfigured() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+
+  if (!url || !anonKey) {
+    return false;
+  }
+
+  if (SUPABASE_PLACEHOLDER_HOSTS.some((host) => url.includes(host))) {
+    return false;
+  }
+
+  if (SUPABASE_PLACEHOLDER_KEYS.some((fragment) => anonKey.includes(fragment))) {
+    return false;
+  }
+
+  return true;
+}
+
 export async function signInAction(
   _prevState: AuthState,
   formData: FormData,
@@ -19,23 +46,36 @@ export async function signInAction(
     return { error: 'Email et mot de passe sont requis.' };
   }
 
-  const supabase = await createSupabaseServerClient({ allowCookieSetter: true });
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email,
-    password,
-  });
-
-  if (error) {
-    return { error: error.message };
+  if (!isSupabaseConfigured()) {
+    console.warn('Supabase non configuré: retour erreur mock pour les tests E2E.');
+    return { error: SUPABASE_DISABLED_MESSAGE };
   }
 
-  // Rediriger vers /analytics si c'est le compte admin analytics (par ID ou email)
-  const authorizedUserId = 'e78e437e-a817-4da2-a091-a7f4e5e02583';
-  if (data.user?.id === authorizedUserId || data.user?.email === 'bcb83@icloud.com') {
-    redirect('/analytics');
+  try {
+    const supabase = await createSupabaseServerClient({ allowCookieSetter: true });
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) {
+      return { error: error.message };
+    }
+
+    // Rediriger vers /analytics si c'est le compte admin analytics (par ID ou email)
+    const authorizedUserId = 'e78e437e-a817-4da2-a091-a7f4e5e02583';
+    if (data.user?.id === authorizedUserId || data.user?.email === 'bcb83@icloud.com') {
+      redirect('/analytics');
+    }
+
+    redirect('/home');
+  } catch (error) {
+    console.error('Erreur signInAction (Supabase indisponible)', error);
+    return { error: SUPABASE_UNREACHABLE_MESSAGE };
   }
 
-  redirect('/home');
+  // Satisfait TypeScript : redirect ou retour
+  return { error: SUPABASE_UNREACHABLE_MESSAGE };
 }
 
 export async function signUpAction(
@@ -54,42 +94,52 @@ export async function signUpAction(
     return { error: 'Le mot de passe doit contenir au moins 6 caractères.' };
   }
 
-  const supabase = await createSupabaseServerClient({ allowCookieSetter: true });
-  
-  // Créer l'utilisateur
-  const { data, error } = await supabase.auth.signUp({
-    email,
-    password,
-    options: {
-      data: {
-        name: name || undefined,
-        plan: 'basic',
+  if (!isSupabaseConfigured()) {
+    console.warn('Supabase non configuré: signUp impossible sur cet environnement.');
+    return { error: SUPABASE_DISABLED_MESSAGE };
+  }
+
+  try {
+    const supabase = await createSupabaseServerClient({ allowCookieSetter: true });
+    
+    // Créer l'utilisateur
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          name: name || undefined,
+          plan: 'basic',
+        },
+        emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_BASE_URL || 'http://localhost:3000'}/auth/callback?next=/home`,
       },
-      emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_BASE_URL || 'http://localhost:3000'}/auth/callback?next=/home`,
-    },
-  });
+    });
 
-  if (error) {
-    return { error: error.message };
-  }
-
-  if (data.user) {
-    // Rediriger vers /analytics si c'est le compte admin analytics
-    const authorizedUserId = 'e78e437e-a817-4da2-a091-a7f4e5e02583';
-    if (data.user.id === authorizedUserId || data.user.email === 'bcb83@icloud.com') {
-      redirect('/analytics');
+    if (error) {
+      return { error: error.message };
     }
-    
-    // Si l'email n'est pas confirmé, afficher un message
-    if (!data.session) {
-      return { 
-        success: 'Compte créé ! Vérifiez votre email pour confirmer votre compte avant de vous connecter.' 
-      };
-    }
-    
-    redirect('/home');
-  }
 
-  return { error: 'Une erreur est survenue lors de la création du compte.' };
+    if (data.user) {
+      // Rediriger vers /analytics si c'est le compte admin analytics
+      const authorizedUserId = 'e78e437e-a817-4da2-a091-a7f4e5e02583';
+      if (data.user.id === authorizedUserId || data.user.email === 'bcb83@icloud.com') {
+        redirect('/analytics');
+      }
+      
+      // Si l'email n'est pas confirmé, afficher un message
+      if (!data.session) {
+        return { 
+          success: 'Compte créé ! Vérifiez votre email pour confirmer votre compte avant de vous connecter.' 
+        };
+      }
+      
+      redirect('/home');
+    }
+
+    return { error: 'Une erreur est survenue lors de la création du compte.' };
+  } catch (error) {
+    console.error('Erreur signUpAction (Supabase indisponible)', error);
+    return { error: SUPABASE_UNREACHABLE_MESSAGE };
+  }
 }
 
