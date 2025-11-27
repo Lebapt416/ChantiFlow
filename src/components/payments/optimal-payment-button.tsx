@@ -44,11 +44,11 @@ export function OptimalPaymentButton({
         type="button"
         onClick={handleClick}
         disabled={isLoading || disabled}
-        className="group relative w-full overflow-hidden rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 p-4 text-white shadow-lg transition-all duration-300 hover:scale-[1.02] hover:shadow-blue-500/25 hover:from-blue-500 hover:to-indigo-500 disabled:cursor-not-allowed disabled:opacity-80"
+        className="group relative w-full overflow-hidden rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 p-4 text-white shadow-lg transition-all duration-300 hover:scale-[1.02] hover:shadow-blue-500/25 hover:from-blue-500 hover:to-indigo-500 disabled:cursor-not-allowed disabled:opacity-80 min-h-[72px]"
       >
         <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-1000 group-hover:translate-x-full" />
 
-        <div className="relative flex items-center justify-center gap-3 text-lg font-semibold">
+        <div className="relative flex flex-wrap items-center justify-center gap-3 text-center text-lg font-semibold sm:flex-nowrap">
           {isLoading ? (
             <>
               <Loader2 className="h-5 w-5 animate-spin" />
@@ -56,7 +56,7 @@ export function OptimalPaymentButton({
             </>
           ) : (
             <>
-              <span>
+              <span className="flex-1 min-w-[120px]">
                 {ctaLabel} {planName}
               </span>
               <span className="flex items-center justify-center rounded-md bg-white/20 px-2 py-0.5 text-sm">
