@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
         get(name: string) {
           return cookieStore.get(name)?.value;
         },
-        set(name: string, value: string, options: any) {
+        set(name: string, value: string, options?: { maxAge?: number; path?: string; domain?: string; sameSite?: 'lax' | 'strict' | 'none'; secure?: boolean; httpOnly?: boolean }) {
           try {
             cookieStore.set({
               name,
@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
             // Ignorer les erreurs de mutation de cookies
           }
         },
-        remove(name: string, options: any) {
+        remove(name: string, options?: { path?: string; domain?: string }) {
           try {
             cookieStore.set({
               name,

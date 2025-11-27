@@ -10,7 +10,7 @@ type Props = {
   siteName: string;
 };
 
-export function TestWorkerButton({ siteId, siteName }: Props) {
+export function TestWorkerButton({ siteId }: Props) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);

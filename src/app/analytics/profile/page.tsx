@@ -67,7 +67,7 @@ export default async function AnalyticsProfilePage() {
                 <div>
                   <p className="text-sm text-zinc-400 mb-2">Description</p>
                   <p className="text-2xl font-bold text-emerald-400">
-                    C'est moi le patron babyyy
+                    C&apos;est moi le patron babyyy
                   </p>
                 </div>
                 <div>

@@ -41,7 +41,7 @@ export function AddTaskForm({ sites }: Props) {
   if (sites.length === 0) {
     return (
       <div className="rounded-2xl border border-dashed border-zinc-200 p-6 text-center text-sm text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">
-        Créez d'abord un chantier pour ajouter des tâches.
+        Créez d&apos;abord un chantier pour ajouter des tâches.
       </div>
     );
   }

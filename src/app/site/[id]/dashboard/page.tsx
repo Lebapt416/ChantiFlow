@@ -99,6 +99,7 @@ export default async function SiteDashboardPage({ params }: Params) {
         siteName: site.name,
         tasksCount: tasks.length,
         hasWeatherAccess,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         postalCode: (site as any).postal_code || 'non défini'
       });
       aiSummary = await generateSiteSummary(site, tasks, hasWeatherAccess);

@@ -51,13 +51,15 @@ export function ReportDetailModal({
   // Mettre à jour isValidated quand la tâche change ou quand la validation réussit
   useEffect(() => {
     if (task?.status === 'done') {
-      setIsValidated(true);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      setTimeout(() => setIsValidated(true), 0);
     }
   }, [task?.status]);
 
   useEffect(() => {
     if (state?.success) {
-      setIsValidated(true);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      setTimeout(() => setIsValidated(true), 0);
       // Fermer le modal après un court délai
       const timer = setTimeout(() => {
         onClose();

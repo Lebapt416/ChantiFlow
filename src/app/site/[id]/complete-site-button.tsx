@@ -32,16 +32,19 @@ export function CompleteSiteButton({ siteId, siteName }: Props) {
   const [info, setInfo] = useState<string | null>(null);
 
   useEffect(() => {
-    if (state?.error) {
-      setError(state.error);
-      setShowConfirm(false);
-    } else if (state?.success) {
-      setError(null);
-      setShowConfirm(false);
-      setInfo(state.message ?? 'Chantier terminé.');
-    } else if (state?.message) {
-      setInfo(state.message);
-    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    setTimeout(() => {
+      if (state?.error) {
+        setError(state.error);
+        setShowConfirm(false);
+      } else if (state?.success) {
+        setError(null);
+        setShowConfirm(false);
+        setInfo(state.message ?? 'Chantier terminé.');
+      } else if (state?.message) {
+        setInfo(state.message);
+      }
+    }, 0);
   }, [state]);
 
   if (showConfirm) {

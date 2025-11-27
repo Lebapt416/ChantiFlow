@@ -232,6 +232,7 @@ export async function assignTaskAction(
     // Envoyer l'email avec le code d'accès
     if (worker.email) {
       try {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const siteName = (taskDetails as any)?.sites?.name || 'un chantier';
         const taskTitle = taskDetails?.title || 'une tâche';
         

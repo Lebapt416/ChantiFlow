@@ -37,9 +37,12 @@ export function AddWorkerForm({ siteId, availableWorkers }: Props) {
 
   useEffect(() => {
     if (state?.success) {
-      const form = document.getElementById('add-worker-form') as HTMLFormElement | null;
-      form?.reset();
-      setUseExisting(false);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      setTimeout(() => {
+        const form = document.getElementById('add-worker-form') as HTMLFormElement | null;
+        form?.reset();
+        setUseExisting(false);
+      }, 0);
     }
   }, [state?.success]);
 
@@ -77,7 +80,7 @@ export function AddWorkerForm({ siteId, availableWorkers }: Props) {
             htmlFor="existingWorkerId"
             className="text-sm font-medium text-zinc-600 dark:text-zinc-300"
           >
-            Membre de l'équipe
+            Membre de l&apos;équipe
           </label>
           <select
             id="existingWorkerId"

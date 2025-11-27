@@ -38,7 +38,7 @@ export default async function QrHubPage() {
               QR codes disponibles
             </h2>
             <p className="text-sm text-zinc-500 dark:text-zinc-400">
-              Cliquez sur un QR code pour le voir, le tester et l'imprimer.
+              Cliquez sur un QR code pour le voir, le tester et l&apos;imprimer.
             </p>
           </div>
         </div>

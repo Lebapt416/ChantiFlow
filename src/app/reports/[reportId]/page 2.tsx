@@ -2,7 +2,7 @@ import { redirect, notFound } from 'next/navigation';
 import Image from 'next/image';
 import { AppShell } from '@/components/app-shell';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
-import { CheckCircle2, Calendar, User, Briefcase, FileText, ArrowLeft } from 'lucide-react';
+import { CheckCircle2, Calendar, User, FileText, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { ValidateReportButton } from './validate-report-button';
 
@@ -141,7 +141,7 @@ export default async function ReportDetailPage({ params }: Params) {
               <Calendar className="h-5 w-5 text-zinc-400 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 mb-1">
-                  Date d'envoi
+                  Date d&apos;envoi
                 </p>
                 <p className="text-sm font-medium text-zinc-900 dark:text-white">
                   {new Date(report.created_at ?? '').toLocaleString('fr-FR', {

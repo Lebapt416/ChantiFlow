@@ -209,7 +209,7 @@ export default async function SiteTeamPage({ params }: Params) {
                     )}
                     {worker.access_code && (
                       <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-emerald-600 dark:text-emerald-400">
-                        <span>Code d'accès :</span>
+                        <span>Code d&apos;accès :</span>
                         <span className="font-mono blur-sm hover:blur-none cursor-pointer transition">
                           {worker.access_code}
                         </span>

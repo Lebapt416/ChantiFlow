@@ -216,7 +216,7 @@ export default async function LandingPage() {
               <span className="text-2xl font-bold text-purple-600 dark:text-purple-400">3</span>
             </div>
             <h3 className="mt-6 text-lg font-semibold text-zinc-900 dark:text-white">
-              L'IA optimise tout
+              L&apos;IA optimise tout
             </h3>
             <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
               Planification automatique, suivi en temps réel, rapports générés automatiquement
@@ -232,7 +232,7 @@ export default async function LandingPage() {
             Pourquoi ChantiFlow ?
           </h2>
           <p className="mt-4 text-lg text-zinc-600 dark:text-zinc-400">
-            Les problèmes du BTP, résolus par l'IA
+            Les problèmes du BTP, résolus par l&apos;IA
           </p>
         </div>
 
@@ -272,7 +272,7 @@ export default async function LandingPage() {
               <FileText className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
             </div>
             <h3 className="mt-6 text-lg font-semibold text-zinc-900 dark:text-white">
-              Perte d'informations
+              Perte d&apos;informations
             </h3>
             <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
               <span className="font-semibold text-rose-600 dark:text-rose-400">Problème :</span> Photos perdues, rapports éparpillés
@@ -349,8 +349,8 @@ export default async function LandingPage() {
             </h2>
             <p className="mt-6 text-lg leading-8 text-zinc-600 dark:text-zinc-400">
               Nous sommes trois jeunes entrepreneurs passionnés par la modernisation du BTP. 
-              Face aux défis quotidiens des chantiers — retards, communication difficile, perte d'informations — 
-              nous avons créé ChantiFlow pour apporter une solution simple, efficace et assistée par l'IA.
+              Face aux défis quotidiens des chantiers — retards, communication difficile, perte d&apos;informations — 
+              nous avons créé ChantiFlow pour apporter une solution simple, efficace et assistée par l&apos;IA.
             </p>
             <p className="mt-4 text-base text-zinc-600 dark:text-zinc-400">
               Notre mission : rendre la gestion de chantier accessible à tous, sans complexité inutile.

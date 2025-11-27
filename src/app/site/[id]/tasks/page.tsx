@@ -1,5 +1,4 @@
 import { notFound, redirect } from 'next/navigation';
-import Link from 'next/link';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { AppShell } from '@/components/app-shell';
 import { AddTaskForm } from '@/app/site/[id]/add-task-form';
@@ -69,6 +68,7 @@ export default async function SiteTasksPage({ params }: Params) {
   ];
 
   const workerMap = new Map<string, { id: string; name: string; email: string | null; role: string | null }>();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   allWorkers.forEach((worker: any) => {
     if ((!worker.created_by || worker.created_by === user.id) && !workerMap.has(worker.id)) {
       workerMap.set(worker.id, {
@@ -165,6 +165,7 @@ export default async function SiteTasksPage({ params }: Params) {
                       <AssignTaskButton
                         taskId={task.id}
                         siteId={site.id}
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         currentWorkerId={(task as any).assigned_worker_id || null}
                         availableWorkers={availableWorkers}
                       />

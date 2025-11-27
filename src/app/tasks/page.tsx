@@ -68,6 +68,7 @@ export default async function TasksPage() {
 
       // Récupérer les workers au niveau du compte (sans site_id)
       // Gérer le cas où created_by n'existe pas encore
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let accountWorkers: any[] = [];
       try {
         const { data: accountWorkersData, error: accountWorkersError } = await supabase
@@ -101,6 +102,7 @@ export default async function TasksPage() {
 
       // Filtrer pour ne garder que ceux de l'utilisateur et dédupliquer par ID
       const workerMap = new Map<string, typeof availableWorkers[0]>();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       allWorkers.forEach((worker: any) => {
         // Si created_by existe, vérifier qu'il appartient à l'utilisateur
         // Sinon, inclure tous les workers (pour compatibilité)
@@ -191,6 +193,7 @@ export default async function TasksPage() {
         {pendingTasks.length ? (
           <div className="space-y-3">
             {pendingTasks.map((task) => {
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               const assignedWorkerId = (task as any).assigned_worker_id || null;
               return (
                 <div
@@ -224,7 +227,7 @@ export default async function TasksPage() {
                   </div>
                   {availableWorkers.length === 0 && (
                     <p className="mt-2 text-xs text-amber-600 dark:text-amber-400">
-                      ⚠️ Aucun membre d'équipe disponible. Ajoutez des membres dans la page "Équipe".
+                      ⚠️ Aucun membre d&apos;équipe disponible. Ajoutez des membres dans la page &quot;Équipe&quot;.
                     </p>
                   )}
                   <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-400">

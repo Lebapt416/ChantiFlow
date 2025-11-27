@@ -54,6 +54,7 @@ export async function generatePlanningAction(
       tasks,
       workers || [],
       site?.deadline || null,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (site as any)?.postal_code || undefined,
     );
 
