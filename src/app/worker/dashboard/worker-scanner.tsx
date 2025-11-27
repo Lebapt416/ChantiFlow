@@ -5,10 +5,9 @@ import { useState, useTransition } from 'react';
 import { Loader2, QrCode, Scan } from 'lucide-react';
 import { joinSiteAction } from './actions';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const QrReader = dynamic<any>(async () => {
-  const mod = await import('react-qr-reader');
-  return mod.QrReader || mod.default;
+const QrScanner = dynamic(async () => {
+  const mod = await import('@yudiel/react-qr-scanner');
+  return mod.QrScanner;
 }, { ssr: false });
 
 export function WorkerScanner() {
@@ -62,17 +61,21 @@ export function WorkerScanner() {
             Caméra active
           </div>
           <div className="aspect-square w-full max-w-sm">
-            <QrReader
+            <QrScanner
               constraints={{ facingMode: 'environment' }}
-              scanDelay={800}
-              onResult={(result, err) => {
-                if (result?.text) {
+              onDecode={(result) => {
+                if (result) {
                   setIsScanning(false);
-                  handleScan(result.text);
-                } else if (err) {
+                  handleScan(result);
+                }
+              }}
+              onError={(err) => {
+                if (err) {
                   console.debug('QR error', err);
                 }
               }}
+              containerStyle={{ width: '100%', height: '100%' }}
+              videoStyle={{ width: '100%', height: '100%', objectFit: 'cover' }}
             />
           </div>
         </div>
