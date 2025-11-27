@@ -94,10 +94,25 @@ export default async function SiteDashboardPage({ params }: Params) {
   let aiSummary: { summary: string; status: string } | null = null;
   if (tasks && tasks.length > 0) {
     try {
+      console.log('🔍 Génération résumé IA pour:', {
+        siteId: site.id,
+        siteName: site.name,
+        tasksCount: tasks.length,
+        hasWeatherAccess,
+        postalCode: (site as any).postal_code || 'non défini'
+      });
       aiSummary = await generateSiteSummary(site, tasks, hasWeatherAccess);
+      if (!aiSummary) {
+        console.warn('⚠️ Résumé IA retourné null - vérifier les logs API');
+      }
     } catch (error) {
-      console.error('Erreur génération résumé IA:', error);
+      console.error('❌ Erreur génération résumé IA:', error);
+      if (error instanceof Error) {
+        console.error('Détails erreur:', error.message, error.stack);
+      }
     }
+  } else {
+    console.log('ℹ️ Pas de tâches, résumé IA ignoré');
   }
 
   return (

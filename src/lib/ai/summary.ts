@@ -52,9 +52,14 @@ export async function generateGlobalSummary(sites: any[]) {
 
 export async function generateSiteSummary(site: any, tasks: any[], hasWeatherAccess: boolean = false) {
   if (!API_URL) {
-    console.warn('⚠️ URL API non configurée pour les résumés');
+    console.warn('⚠️ URL API non configurée pour les résumés. Variables:', {
+      NEXT_PUBLIC_PREDICTION_API_URL: process.env.NEXT_PUBLIC_PREDICTION_API_URL,
+      ML_API_URL: process.env.ML_API_URL
+    });
     return null;
   }
+  
+  console.log('🌐 API URL configurée:', API_URL);
 
   try {
     const totalTasks = tasks.length;
@@ -81,6 +86,15 @@ export async function generateSiteSummary(site: any, tasks: any[], hasWeatherAcc
       location: (hasWeatherAccess && site.postal_code) ? site.postal_code.trim() : null
     };
 
+    console.log('📤 Envoi résumé IA:', {
+      site_name: payload.site_name,
+      tasks_total: payload.tasks_total,
+      hasWeatherAccess,
+      postal_code: site.postal_code || 'non défini',
+      location: payload.location || 'non fourni',
+      api_url: API_URL
+    });
+
     const res = await fetch(`${API_URL}/summary/site`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -94,7 +108,9 @@ export async function generateSiteSummary(site: any, tasks: any[], hasWeatherAcc
       return null;
     }
     
-    return await res.json();
+    const result = await res.json();
+    console.log('✅ Résumé IA reçu:', { summary: result.summary?.substring(0, 100) + '...', status: result.status });
+    return result;
 
   } catch (e) {
     console.error("❌ Erreur résumé chantier:", e);
