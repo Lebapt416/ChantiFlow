@@ -77,7 +77,7 @@ export function PricingSection({ isAuthenticated = false, userEmail = null }: Pr
         {plans.map((plan) => (
           <div
             key={plan.name}
-            className={`relative rounded-3xl border p-8 shadow-lg ${
+            className={`relative flex h-full flex-col rounded-3xl border p-8 shadow-lg ${
               plan.popular
                 ? 'border-emerald-500 bg-emerald-50 dark:border-emerald-400 dark:bg-emerald-900/10'
                 : 'border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900'
@@ -106,7 +106,7 @@ export function PricingSection({ isAuthenticated = false, userEmail = null }: Pr
               </div>
             </div>
 
-            <ul className="mt-8 space-y-4">
+            <ul className="mt-8 flex-1 space-y-4">
               {plan.features.map((feature) => (
                 <li key={feature} className="flex items-start gap-3">
                   <Check
