@@ -11,6 +11,7 @@ type OptimalPaymentButtonProps = {
   ctaLabel?: string;
   disabled?: boolean;
   loadingLabel?: string;
+  showPlanName?: boolean;
 };
 
 /**
@@ -25,6 +26,7 @@ export function OptimalPaymentButton({
   ctaLabel = "Passer à l'offre",
   disabled = false,
   loadingLabel = 'Redirection sécurisée...',
+  showPlanName = true,
 }: OptimalPaymentButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
 
@@ -57,7 +59,7 @@ export function OptimalPaymentButton({
           ) : (
             <>
               <span className="flex-1 min-w-[120px]">
-                {ctaLabel} {planName}
+                {ctaLabel} {showPlanName ? planName : ''}
               </span>
               <span className="flex items-center justify-center rounded-md bg-white/20 px-2 py-0.5 text-sm">
                 {priceLabel ?? `${price}€ / mois`}

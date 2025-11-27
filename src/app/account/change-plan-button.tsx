@@ -113,6 +113,7 @@ export function ChangePlanButton({ plan, currentPlan, userEmail }: Props) {
         ctaLabel={ctaLabel}
         disabled={isPending}
         loadingLabel={plan === 'basic' || isAdmin ? 'Activation...' : 'Redirection sécurisée...'}
+        showPlanName={plan !== 'basic'}
         onClick={handleClick}
       />
       {state?.error && (

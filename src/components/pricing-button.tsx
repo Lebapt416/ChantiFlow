@@ -136,6 +136,7 @@ export function PricingButton({ plan, isAuthenticated, userEmail, ctaLabel }: Pr
       disabled={isPending}
       ctaLabel={ctaLabel}
       loadingLabel={plan === 'basic' ? 'Activation...' : 'Redirection sécurisée...'}
+      showPlanName={plan !== 'basic'}
     />
   );
 }
