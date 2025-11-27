@@ -169,7 +169,7 @@ export async function sendWorkerWelcomeEmail({
         siteId: siteId || undefined,
       }),
       text: plainText,
-      reply_to: managerEmail || SUPPORT_EMAIL,
+      replyTo: managerEmail || SUPPORT_EMAIL,
       headers: {
         'List-Unsubscribe': `<mailto:${SUPPORT_EMAIL}>`,
       },
