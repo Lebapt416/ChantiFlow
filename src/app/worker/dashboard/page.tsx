@@ -3,7 +3,6 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { readWorkerSession } from '@/lib/worker-session';
-import { WorkerSiteShell } from '../components/worker-site-shell';
 import { WorkerNav } from '../components/worker-nav';
 
 export const dynamic = 'force-dynamic';
@@ -188,24 +187,6 @@ export default async function WorkerDashboardPage() {
           </div>
         </section>
 
-        {worker.site_id ? (
-          <section className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs uppercase tracking-[0.3em] text-zinc-500 dark:text-zinc-400">Chantier actif</p>
-                <h2 className="text-lg font-semibold text-zinc-900 dark:text-white">Vos tâches en cours</h2>
-              </div>
-            </div>
-            <WorkerSiteShell siteId={worker.site_id} />
-          </section>
-        ) : (
-          <section className="rounded-3xl border border-dashed border-zinc-200 bg-white/80 p-6 text-center shadow-inner dark:border-zinc-800 dark:bg-zinc-950/40">
-            <p className="text-lg font-semibold text-zinc-900 dark:text-white">Aucun chantier scanné</p>
-            <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
-              Utilisez le bouton ci-dessus pour scanner le QR code installé sur le chantier et accéder automatiquement à votre planning.
-            </p>
-          </section>
-        )}
       </main>
       <WorkerNav />
     </div>

@@ -3,7 +3,6 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { readWorkerSession } from '@/lib/worker-session';
-import { WorkerSiteShell } from '../components/worker-site-shell';
 import { WorkerNav } from '../components/worker-nav';
 
 export const dynamic = 'force-dynamic';
@@ -51,22 +50,11 @@ export default async function WorkerTasksPage() {
       </header>
 
       <main className="mx-auto flex max-w-5xl flex-col gap-6 px-4 py-8">
-        {worker.site_id ? (
-          <WorkerSiteShell siteId={worker.site_id} />
-        ) : (
-          <section className="rounded-3xl border border-dashed border-zinc-200 bg-white/80 p-6 text-center shadow-inner dark:border-zinc-800 dark:bg-zinc-950/40">
-            <p className="text-lg font-semibold text-zinc-900 dark:text-white">Aucun chantier assigné</p>
-            <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
-              Rejoignez un chantier en scannant le QR code fourni par votre chef d’équipe.
-            </p>
-            <Link
-              href="/worker/scanner"
-              className="mt-4 inline-flex items-center justify-center rounded-full bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700"
-            >
-              Ouvrir le scanner
-            </Link>
-          </section>
-        )}
+        <section className="rounded-3xl border border-zinc-200 bg-white/90 p-6 shadow-lg shadow-black/5 dark:border-zinc-800 dark:bg-zinc-900/90">
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">
+            Consultez vos missions à jour directement depuis chaque chantier.
+          </p>
+        </section>
       </main>
 
       <WorkerNav />
