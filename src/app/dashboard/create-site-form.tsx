@@ -4,6 +4,7 @@ import { useActionState, useEffect } from "react";
 import { useFormStatus } from "react-dom";
 import { useRouter } from "next/navigation";
 import { createSiteAction, type CreateSiteState } from './actions';
+import { CityAutocomplete } from '@/components/city-autocomplete';
 
 const initialState: CreateSiteState = {};
 
@@ -82,23 +83,22 @@ export function CreateSiteForm({ onSuccess }: Props) {
         />
       </div>
 
-      {/* Ville du chantier */}
+      {/* Code postal du chantier */}
       <div className="space-y-2">
         <label
-          htmlFor="address"
+          htmlFor="postal_code"
           className="text-sm font-medium text-zinc-600 dark:text-zinc-300"
         >
-          Ville du chantier
+          Code postal du chantier
         </label>
-        <input
-          id="address"
-          name="address"
-          type="text"
-          placeholder="Ex: Paris, Lyon, Marseille, Toulouse..."
+        <CityAutocomplete
+          id="postal_code"
+          name="postal_code"
+          placeholder="Ex: 75001, 69001, 13001... ou tapez le nom de la ville"
           className="w-full rounded-md border border-zinc-200 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-black/60 dark:border-zinc-700 dark:bg-zinc-950 dark:text-white"
         />
         <p className="text-xs text-zinc-500 dark:text-zinc-400">
-          🌤️ La ville permet à l&apos;IA d&apos;optimiser le planning selon la météo locale (toutes les villes de France sont supportées)
+          🌤️ Le code postal permet à l&apos;IA d&apos;optimiser le planning selon la météo locale (tous les codes postaux de France sont supportés)
         </p>
       </div>
 

@@ -15,7 +15,7 @@ export async function createSiteAction(
 ): Promise<CreateSiteState> {
   const name = String(formData.get('name') ?? '').trim();
   const deadline = String(formData.get('deadline') ?? '');
-  const address = String(formData.get('address') ?? '').trim();
+  const postalCode = String(formData.get('postal_code') ?? '').trim();
 
   if (!name || !deadline) {
     return { error: 'Nom et deadline sont requis.' };
@@ -37,15 +37,44 @@ export async function createSiteAction(
     return { error: reason || 'Limite de chantiers atteinte pour votre plan.' };
   }
 
-  const { error } = await supabase.from('sites').insert({
+  // Préparer les données à insérer
+  const insertData: {
+    name: string;
+    deadline: string;
+    created_by: string;
+    postal_code?: string | null;
+  } = {
     name,
     deadline,
-    address: address || null,
     created_by: user.id,
-  });
+  };
+
+  // Ajouter le code postal seulement s'il est fourni et valide (5 chiffres)
+  if (postalCode && /^\d{5}$/.test(postalCode)) {
+    insertData.postal_code = postalCode;
+  } else if (postalCode && postalCode.trim() !== '') {
+    // Si ce n'est pas un code postal valide, ne pas l'ajouter
+    console.warn('⚠️ Code postal invalide:', postalCode);
+  }
+
+  const { error } = await supabase.from('sites').insert(insertData);
 
   if (error) {
-    return { error: error.message };
+    // Si l'erreur est liée à la colonne postal_code (n'existe pas), réessayer sans
+    if (error.message.includes('postal_code') || error.message.includes('column')) {
+      console.warn('⚠️ Colonne postal_code non trouvée - migration SQL non exécutée');
+      const { error: retryError } = await supabase.from('sites').insert({
+        name,
+        deadline,
+        created_by: user.id,
+      });
+      
+      if (retryError) {
+        return { error: `Erreur: ${retryError.message}. Veuillez exécuter la migration SQL (migration-site-address.sql)` };
+      }
+    } else {
+      return { error: error.message };
+    }
   }
 
   revalidatePath('/dashboard');

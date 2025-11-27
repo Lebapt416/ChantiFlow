@@ -104,7 +104,7 @@ export default async function DashboardPage() {
             workers || [],
             site.deadline,
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            (site as any).address || undefined,
+            (site as any).postal_code || undefined,
           );
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           planning = planningResult.orderedTasks.map((p: any) => ({

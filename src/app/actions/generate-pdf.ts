@@ -65,7 +65,7 @@ export async function generatePDFAction(siteId: string) {
         deadline: site.deadline,
         created_at: site.created_at,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        address: (site as any).address || 'Non spécifiée',
+        address: (site as any).postal_code || 'Non spécifié',
       },
       stats: {
         totalTasks,

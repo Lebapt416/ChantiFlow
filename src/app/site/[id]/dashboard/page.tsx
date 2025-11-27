@@ -254,7 +254,7 @@ export default async function SiteDashboardPage({ params }: Params) {
         </section>
 
         {/* Widget Météo */}
-        <WeatherWidget location={site.address || undefined} isLocked={!hasWeatherAccess} />
+        <WeatherWidget location={site.postal_code || undefined} isLocked={!hasWeatherAccess} />
 
         {/* Section Rapports avec bouton PDF */}
         <section className="rounded-2xl border border-zinc-100 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900">

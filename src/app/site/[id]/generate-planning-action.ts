@@ -42,10 +42,10 @@ export async function generatePlanningAction(
       return { error: 'Impossible de charger les données du chantier.' };
     }
 
-    // Récupérer la deadline et l'adresse du chantier
+    // Récupérer la deadline et le code postal du chantier
     const { data: site } = await supabase
       .from('sites')
-      .select('deadline, address')
+      .select('deadline, postal_code')
       .eq('id', siteId)
       .single();
 
@@ -54,7 +54,7 @@ export async function generatePlanningAction(
       tasks,
       workers || [],
       site?.deadline || null,
-      (site as any)?.address || undefined,
+      (site as any)?.postal_code || undefined,
     );
 
     // Mettre à jour la planification sauvegardée (dernière génération uniquement)

@@ -11,7 +11,7 @@ type WeatherData = {
 };
 
 type WeatherWidgetProps = {
-  location?: string; // Adresse ou ville du chantier
+  location?: string; // Code postal du chantier
   isLocked?: boolean; // Si true, affiche flouté avec cadenas
 };
 
@@ -42,63 +42,59 @@ export function WeatherWidget({ location, isLocked = false }: WeatherWidgetProps
   }>({ today: null, tomorrow: null });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [city, setCity] = useState<string>(location || 'Paris');
+  const [postalCode, setPostalCode] = useState<string>(location || '75001');
   const [showCityInput, setShowCityInput] = useState(!location);
 
-  // Géocodage de la ville en coordonnées - Optimisé pour les villes françaises
-  const geocodeCity = async (cityName: string): Promise<{ lat: number; lon: number } | null> => {
-    if (!cityName || !cityName.trim()) {
+  // Géocodage du code postal en coordonnées
+  const geocodePostalCode = async (code: string): Promise<{ lat: number; lon: number } | null> => {
+    if (!code || !code.trim()) {
       return null;
     }
 
     try {
-      // Préparer la requête avec "France" si pas déjà présent
-      let query = cityName.trim();
-      if (!query.toLowerCase().includes('france')) {
-        query = `${query}, France`;
+      // Vérifier que c'est un code postal valide (5 chiffres)
+      const cleanCode = code.trim();
+      if (!/^\d{5}$/.test(cleanCode)) {
+        return null;
       }
 
-      // Utiliser l'API de géocodage gratuite Nominatim avec restriction à la France
-      const url = new URL('https://nominatim.openstreetmap.org/search');
-      url.searchParams.set('q', query);
-      url.searchParams.set('format', 'json');
-      url.searchParams.set('limit', '1');
-      url.searchParams.set('countrycodes', 'fr'); // Restreindre à la France
-      url.searchParams.set('addressdetails', '1');
-
-      const response = await fetch(url.toString(), {
-        headers: {
-          'User-Agent': 'ChantiFlowApp/1.0 (contact@chantiflow.com)',
-        },
-      });
+      // Utiliser l'API Géo du gouvernement français pour obtenir les coordonnées
+      const response = await fetch(
+        `https://geo.api.gouv.fr/communes?codePostal=${encodeURIComponent(cleanCode)}&limit=1&fields=nom,code,centre`,
+        {
+          headers: {
+            Accept: 'application/json',
+          },
+        }
+      );
 
       if (!response.ok) {
         return null;
       }
 
       const data = await response.json();
-      if (data && data.length > 0) {
+      if (data && data.length > 0 && data[0].centre) {
         return {
-          lat: parseFloat(data[0].lat),
-          lon: parseFloat(data[0].lon),
+          lat: data[0].centre.coordinates[1], // Latitude
+          lon: data[0].centre.coordinates[0], // Longitude
         };
       }
       return null;
     } catch (err) {
-      console.error('Erreur géocodage:', err);
+      console.error('Erreur géocodage code postal:', err);
       return null;
     }
   };
 
   // Récupérer la météo depuis OpenMeteo
-  const fetchWeather = async (cityName: string) => {
+  const fetchWeather = async (code: string) => {
     setLoading(true);
     setError(null);
 
     try {
-      const coords = await geocodeCity(cityName);
+      const coords = await geocodePostalCode(code);
       if (!coords) {
-        setError('Ville non trouvée');
+        setError('Code postal non trouvé');
         setLoading(false);
         return;
       }
@@ -135,16 +131,19 @@ export function WeatherWidget({ location, isLocked = false }: WeatherWidgetProps
   };
 
   useEffect(() => {
-    if (city && !showCityInput) {
-      fetchWeather(city);
+    if (postalCode && !showCityInput) {
+      fetchWeather(postalCode);
     }
-  }, [city, showCityInput]);
+  }, [postalCode, showCityInput]);
 
   const handleCitySubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (city.trim()) {
+    const cleanCode = postalCode.trim();
+    if (cleanCode && /^\d{5}$/.test(cleanCode)) {
       setShowCityInput(false);
-      fetchWeather(city.trim());
+      fetchWeather(cleanCode);
+    } else {
+      setError('Veuillez entrer un code postal valide (5 chiffres)');
     }
   };
 
@@ -195,11 +194,16 @@ export function WeatherWidget({ location, isLocked = false }: WeatherWidgetProps
         <form onSubmit={handleCitySubmit} className="mt-4">
           <input
             type="text"
-            value={city}
-            onChange={(e) => setCity(e.target.value)}
-            placeholder="Entrez la ville du chantier"
+            value={postalCode}
+            onChange={(e) => setPostalCode(e.target.value)}
+            placeholder="Entrez le code postal (ex: 75001)"
+            pattern="\d{5}"
+            maxLength={5}
             className="w-full rounded-lg border border-zinc-300 px-4 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
           />
+          <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-400">
+            Code postal à 5 chiffres (ex: 75001 pour Paris)
+          </p>
           <button
             type="submit"
             className="mt-2 w-full rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700"
@@ -231,7 +235,7 @@ export function WeatherWidget({ location, isLocked = false }: WeatherWidgetProps
         <div className="py-8 text-center text-sm text-rose-600">
           {error}
           <button
-            onClick={() => fetchWeather(city)}
+            onClick={() => fetchWeather(postalCode)}
             className="ml-2 text-emerald-600 hover:underline"
           >
             Réessayer

@@ -77,8 +77,8 @@ export async function generateSiteSummary(site: any, tasks: any[], hasWeatherAcc
       complexity: Number(complexity.toFixed(2)),
       days_elapsed: Math.ceil((new Date().getTime() - new Date(site.created_at).getTime()) / (1000 * 3600 * 24)),
       planned_duration: plannedDays,
-      // Inclure la localisation seulement si l'utilisateur a accès à la météo
-      location: (hasWeatherAccess && site.address) ? site.address.trim() : null
+      // Inclure le code postal seulement si l'utilisateur a accès à la météo
+      location: (hasWeatherAccess && site.postal_code) ? site.postal_code.trim() : null
     };
 
     const res = await fetch(`${API_URL}/summary/site`, {

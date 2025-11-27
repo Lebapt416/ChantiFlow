@@ -63,7 +63,7 @@ class SiteSummaryInput(BaseModel):
     complexity: float
     days_elapsed: int
     planned_duration: int
-    location: Optional[str] = None  # Ville du chantier pour la météo
+    location: Optional[str] = None  # Code postal du chantier pour la météo
 
 
 class SummaryResponse(BaseModel):
@@ -124,36 +124,57 @@ def get_norm_params():
 
 
 def geocode_location(location: str) -> Optional[tuple[float, float]]:
-    """Géocode une ville en coordonnées lat/lon - Optimisé pour les villes françaises"""
+    """Géocode un code postal ou une ville en coordonnées lat/lon, avec préférence pour la France"""
     if not location or not location.strip():
         return None
     
     location_clean = location.strip()
     
-    # Si la ville ne contient pas "France", l'ajouter pour améliorer la précision
-    if "france" not in location_clean.lower():
-        location_clean = f"{location_clean}, France"
+    # Vérifier si c'est un code postal (5 chiffres)
+    is_postal_code = location_clean.isdigit() and len(location_clean) == 5
     
     try:
-        response = requests.get(
-            f"https://nominatim.openstreetmap.org/search",
-            params={
-                "q": location_clean,
-                "format": "json",
-                "limit": 1,
-                "countrycodes": "fr",  # Restreindre à la France
-                "addressdetails": 1
-            },
-            headers={"User-Agent": "ChantiFlowApp/1.0 (contact@chantiflow.com)"},
-            timeout=5
-        )
-        if response.ok:
-            data = response.json()
-            if data and len(data) > 0:
-                return (float(data[0]["lat"]), float(data[0]["lon"]))
+        if is_postal_code:
+            # Utiliser l'API Géo du gouvernement français pour les codes postaux
+            response = requests.get(
+                f"https://geo.api.gouv.fr/communes?codePostal={location_clean}&limit=1&fields=nom,code,centre",
+                headers={"Accept": "application/json"},
+                timeout=5
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data and len(data) > 0 and data[0].get("centre"):
+                    # L'API retourne [longitude, latitude]
+                    coords = data[0]["centre"]["coordinates"]
+                    return (float(coords[1]), float(coords[0]))  # (lat, lon)
+        else:
+            # Pour les villes, utiliser Nominatim
+            # Si la ville ne contient pas "France", l'ajouter pour améliorer la précision
+            if "france" not in location_clean.lower():
+                location_clean = f"{location_clean}, France"
+            
+            response = requests.get(
+                f"https://nominatim.openstreetmap.org/search",
+                params={
+                    "q": location_clean,
+                    "format": "json",
+                    "limit": 1,
+                    "countrycodes": "fr",  # Restreindre à la France
+                    "addressdetails": 1
+                },
+                headers={"User-Agent": "ChantiFlowApp/1.0 (contact@chantiflow.com)"},
+                timeout=5
+            )
+            if response.ok:
+                data = response.json()
+                if data and len(data) > 0:
+                    return (float(data[0]["lat"]), float(data[0]["lon"]))
+        
+        return None
     except Exception as e:
         print(f"Erreur géocodage pour '{location}': {e}")
-    return None
+        return None
 
 
 def get_weather_forecast(lat: float, lon: float, days: int = 7) -> List[WeatherData]:
