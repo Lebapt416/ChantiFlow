@@ -38,7 +38,7 @@ export async function generatePDFAction(siteId: string) {
   }
 
   // Générer le résumé IA
-  let aiSummary: { summary: string; status: string } | null = null;
+  let aiSummary: { summary: string; status: string; sites_mentioned?: string[] } | null = null;
   if (tasks && tasks.length > 0) {
     try {
       aiSummary = await generateSiteSummary(site, tasks);

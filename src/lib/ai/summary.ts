@@ -11,7 +11,13 @@ function normalizeUrl(rawUrl: string | undefined): string | null {
 
 const API_URL = normalizeUrl(process.env.NEXT_PUBLIC_PREDICTION_API_URL || process.env.ML_API_URL);
 
-export async function generateGlobalSummary(sites: any[]) {
+export type AISummaryResponse = {
+  summary: string;
+  status: string;
+  sites_mentioned?: string[];
+};
+
+export async function generateGlobalSummary(sites: any[]): Promise<AISummaryResponse | null> {
   if (!API_URL) {
     console.warn('⚠️ URL API non configurée pour les résumés');
     return null;
@@ -42,7 +48,7 @@ export async function generateGlobalSummary(sites: any[]) {
       return null;
     }
     
-    return await res.json();
+    return await res.json() as AISummaryResponse;
     
   } catch (e) {
     console.error("❌ Erreur résumé global:", e);
@@ -50,7 +56,7 @@ export async function generateGlobalSummary(sites: any[]) {
   }
 }
 
-export async function generateSiteSummary(site: any, tasks: any[], hasWeatherAccess: boolean = false) {
+export async function generateSiteSummary(site: any, tasks: any[], hasWeatherAccess: boolean = false): Promise<AISummaryResponse | null> {
   if (!API_URL) {
     console.warn('⚠️ URL API non configurée pour les résumés. Variables:', {
       NEXT_PUBLIC_PREDICTION_API_URL: process.env.NEXT_PUBLIC_PREDICTION_API_URL,

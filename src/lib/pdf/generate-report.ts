@@ -13,7 +13,7 @@ export async function generateSiteReport(
   tasks: any[],
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   workers: any[],
-  aiSummary: { summary: string; status: string } | null,
+  aiSummary: { summary: string; status: string; sites_mentioned?: string[] } | null,
 ) {
   const doc = new jsPDF() as jsPDFCustom;
   const pageWidth = doc.internal.pageSize.width;

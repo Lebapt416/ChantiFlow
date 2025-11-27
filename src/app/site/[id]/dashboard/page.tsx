@@ -91,7 +91,7 @@ export default async function SiteDashboardPage({ params }: Params) {
   const hasProAccess = canAccessProFeatures(userPlan);
 
   // Générer le résumé IA du chantier (avec météo si accès Plus/Pro)
-  let aiSummary: { summary: string; status: string } | null = null;
+  let aiSummary: { summary: string; status: string; sites_mentioned?: string[] } | null = null;
   if (tasks && tasks.length > 0) {
     try {
       console.log('🔍 Génération résumé IA pour:', {

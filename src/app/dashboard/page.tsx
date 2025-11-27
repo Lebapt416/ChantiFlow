@@ -129,7 +129,7 @@ export default async function DashboardPage() {
   );
 
   // Générer le résumé IA global
-  let aiSummary: { summary: string; status: string } | null = null;
+  let aiSummary: { summary: string; status: string; sites_mentioned?: string[] } | null = null;
   if (activeSites.length > 0) {
     try {
       // Récupérer toutes les tâches pour calculer la complexité
