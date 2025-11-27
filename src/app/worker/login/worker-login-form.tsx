@@ -1,8 +1,7 @@
 'use client';
 
-import { useState, useTransition, useEffect } from 'react';
+import { useState, useTransition } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useFormStatus } from 'react-dom';
 import { LogIn, Loader2 } from 'lucide-react';
 import { workerLoginAction } from './actions';
 
@@ -33,7 +32,7 @@ function SubmitButton({ isPending }: { isPending: boolean }) {
   );
 }
 
-export function WorkerLoginForm() {
+export function WorkerLoginForm({ tokenError }: { tokenError?: string | null }) {
   const [isPending, startTransition] = useTransition();
   const [state, setState] = useState<LoginState | null>(null);
   const router = useRouter();
@@ -49,9 +48,9 @@ export function WorkerLoginForm() {
     startTransition(async () => {
       const result = await workerLoginAction({}, formData);
       setState(result);
-      if (result.success && result.workerId && result.siteId) {
-        // Rediriger vers l'espace worker
-        router.push(`/worker/${result.siteId}`);
+      if (result.success && result.workerId) {
+        router.push('/worker/dashboard');
+        router.refresh();
       }
     });
   }
@@ -92,9 +91,9 @@ export function WorkerLoginForm() {
         </p>
       </div>
 
-      {state?.error && (
+      {(tokenError || state?.error) && (
         <div className="rounded-md bg-rose-50 p-3 text-sm text-rose-700 dark:bg-rose-900/30 dark:text-rose-300">
-          {state.error}
+          {tokenError || state?.error}
         </div>
       )}
 

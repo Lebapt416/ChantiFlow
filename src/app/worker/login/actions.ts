@@ -1,13 +1,14 @@
 'use server';
 
-import { cookies } from 'next/headers';
+import { randomUUID } from 'crypto';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { writeWorkerSession } from '@/lib/worker-session';
 
 export type WorkerLoginState = {
   error?: string;
   success?: boolean;
   workerId?: string;
-  siteId?: string;
+  siteId?: string | null;
 };
 
 /**
@@ -34,7 +35,7 @@ export async function workerLoginAction(
   // Rechercher le worker uniquement par code d'accès
   const { data: worker, error: workerError } = await supabase
     .from('workers')
-    .select('id, name, email, site_id, access_code')
+    .select('id, name, email, site_id, access_code, access_token')
     .eq('access_code', accessCode)
     .single();
 
@@ -93,25 +94,66 @@ export async function workerLoginAction(
     return { error: 'Aucun chantier trouvé. Contactez votre responsable.' };
   }
 
-  // Créer un cookie de session pour le worker
-  const cookieStore = await cookies();
-  cookieStore.set('worker_session', JSON.stringify({
+  // S'assurer qu'un access_token est présent
+  let accessToken = worker.access_token as string | null;
+  const updates: Record<string, unknown> = {
+    last_login: new Date().toISOString(),
+  };
+  if (!accessToken) {
+    accessToken = randomUUID();
+    updates.access_token = accessToken;
+  }
+  await supabase.from('workers').update(updates).eq('id', worker.id);
+
+  await writeWorkerSession({
     workerId: worker.id,
+    token: accessToken,
     siteId: finalSiteId,
     email: worker.email,
     name: worker.name,
-  }), {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-    maxAge: 60 * 60 * 24 * 7, // 7 jours
-    path: '/',
   });
 
   return {
     success: true,
     workerId: worker.id,
     siteId: finalSiteId,
+  };
+}
+
+export async function loginWorkerWithToken(token: string): Promise<WorkerLoginState> {
+  const sanitizedToken = token?.trim();
+  if (!sanitizedToken) {
+    return { error: 'Token manquant.' };
+  }
+
+  const supabase = await createSupabaseServerClient();
+  const { data: worker, error } = await supabase
+    .from('workers')
+    .select('id, name, email, site_id, access_token')
+    .eq('access_token', sanitizedToken)
+    .single();
+
+  if (error || !worker) {
+    return { error: 'Lien invalide ou expiré.' };
+  }
+
+  await supabase
+    .from('workers')
+    .update({ last_login: new Date().toISOString() })
+    .eq('id', worker.id);
+
+  await writeWorkerSession({
+    workerId: worker.id,
+    token: worker.access_token,
+    siteId: worker.site_id,
+    email: worker.email,
+    name: worker.name,
+  });
+
+  return {
+    success: true,
+    workerId: worker.id,
+    siteId: worker.site_id,
   };
 }
 

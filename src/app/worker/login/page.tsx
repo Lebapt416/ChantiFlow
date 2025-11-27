@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
-import { cookies } from 'next/headers';
 import { WorkerLoginForm } from './worker-login-form';
+import { readWorkerSession } from '@/lib/worker-session';
+import { loginWorkerWithToken } from './actions';
 
 export const dynamic = 'force-dynamic';
 
@@ -9,31 +10,27 @@ export const metadata = {
 };
 
 type Props = {
-  searchParams: Promise<{ siteId?: string }>;
+  searchParams?: {
+    token?: string;
+    siteId?: string;
+  };
 };
 
 export default async function WorkerLoginPage({ searchParams }: Props) {
-  const { siteId } = await searchParams;
-  
-  // Vérifier si l'utilisateur est déjà connecté
-  const cookieStore = await cookies();
-  const workerSession = cookieStore.get('worker_session');
-  
-  if (workerSession?.value) {
-    try {
-      const session = JSON.parse(workerSession.value);
-      if (session.workerId && session.siteId) {
-        // Si un siteId est fourni dans l'URL, vérifier qu'il correspond
-        if (siteId && session.siteId === siteId) {
-          redirect(`/worker/${siteId}`);
-        } else if (!siteId) {
-          // Pas de siteId dans l'URL, utiliser celui de la session
-          redirect(`/worker/${session.siteId}`);
-        }
-      }
-    } catch (error) {
-      // Session invalide, continuer vers le formulaire
+  const tokenParam = searchParams?.token;
+  let tokenError: string | null = null;
+
+  const existingSession = await readWorkerSession();
+  if (existingSession?.workerId) {
+    redirect('/worker/dashboard');
+  }
+
+  if (tokenParam && typeof tokenParam === 'string') {
+    const result = await loginWorkerWithToken(tokenParam);
+    if (result.success) {
+      redirect('/worker/dashboard');
     }
+    tokenError = result.error ?? 'Impossible de vous connecter avec ce lien.';
   }
 
   return (
@@ -42,18 +39,15 @@ export default async function WorkerLoginPage({ searchParams }: Props) {
         <div className="w-full max-w-md">
           <div className="rounded-3xl border border-zinc-200 bg-white p-8 shadow-xl dark:border-zinc-800 dark:bg-zinc-900">
             <div className="mb-6 text-center">
-              <h1 className="text-2xl font-bold text-zinc-900 dark:text-white">
-                Espace Employé
-              </h1>
+              <h1 className="text-2xl font-bold text-zinc-900 dark:text-white">Espace Employé</h1>
               <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
-                Connectez-vous avec votre code d&apos;accès unique
+                Scannez votre QR personnel ou saisissez votre code d&apos;accès.
               </p>
             </div>
-            <WorkerLoginForm />
+            <WorkerLoginForm tokenError={tokenError} />
           </div>
         </div>
       </div>
     </div>
   );
 }
-

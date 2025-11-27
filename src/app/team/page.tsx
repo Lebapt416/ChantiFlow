@@ -5,7 +5,7 @@ import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { AddWorkerForm } from './add-worker-form';
 import { AddWorkerToSiteForm } from './add-worker-to-site-form';
 import { DeleteWorkerButton } from '@/components/delete-worker-button';
-import { TeamQrSection } from './team-qr-section';
+import { WorkerConnectionQrButton } from '@/components/worker-connection-qr-button';
 
 export const metadata = {
   title: 'Équipe | ChantiFlow',
@@ -20,6 +20,7 @@ export default async function TeamPage() {
   if (!user) {
     redirect('/login');
   }
+  const appBaseUrl = process.env.NEXT_PUBLIC_APP_BASE_URL ?? 'http://localhost:3000';
 
   // Récupérer les workers au niveau du compte (sans site_id)
   // Gérer le cas où created_by n'existe pas encore (migration non exécutée)
@@ -31,9 +32,9 @@ export default async function TeamPage() {
   try {
     // Essayer de récupérer les workers avec created_by
     // Tester d'abord si la colonne status existe
-    const { data: testData, error: testError } = await supabase
+    const { error: testError } = await supabase
       .from('workers')
-      .select('id, name, email, role, created_at, status')
+      .select('id, name, email, role, created_at, status, access_token, site_id')
       .eq('created_by', user.id)
       .is('site_id', null)
       .limit(1);
@@ -45,7 +46,7 @@ export default async function TeamPage() {
         // Essayer sans status
         const { data: workersWithoutStatus } = await supabase
           .from('workers')
-          .select('id, name, email, role, created_at')
+          .select('id, name, email, role, created_at, access_token, site_id')
           .eq('created_by', user.id)
           .is('site_id', null)
           .order('created_at', { ascending: true });
@@ -59,7 +60,7 @@ export default async function TeamPage() {
       // Si pas d'erreur, récupérer tous les workers avec status
       const { data: allAccountWorkers, error: fetchError } = await supabase
         .from('workers')
-        .select('id, name, email, role, created_at, status')
+        .select('id, name, email, role, created_at, status, access_token, site_id')
         .eq('created_by', user.id)
         .is('site_id', null)
         .order('created_at', { ascending: true });
@@ -68,7 +69,7 @@ export default async function TeamPage() {
         // Si la colonne status n'existe pas, récupérer sans status
         const { data: workersWithoutStatus } = await supabase
           .from('workers')
-          .select('id, name, email, role, created_at')
+          .select('id, name, email, role, created_at, access_token, site_id')
           .eq('created_by', user.id)
           .is('site_id', null)
           .order('created_at', { ascending: true });
@@ -103,7 +104,7 @@ export default async function TeamPage() {
   const { data: siteWorkers } = siteIds.length
     ? await supabase
         .from('workers')
-        .select('id, name, email, role, site_id, created_at')
+        .select('id, name, email, role, site_id, created_at, access_token')
         .in('site_id', siteIds)
         .order('created_at', { ascending: true })
     : { data: [] };
@@ -282,7 +283,12 @@ export default async function TeamPage() {
                           {worker.email ?? 'Email non communiqué'}
                         </p>
                       </div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <WorkerConnectionQrButton
+                          token={worker.access_token}
+                          workerName={worker.name}
+                          baseUrl={appBaseUrl}
+                        />
                         <form action="/team/actions" method="post" className="inline">
                           <input type="hidden" name="action" value="approve" />
                           <input type="hidden" name="workerId" value={worker.id} />
@@ -333,10 +339,15 @@ export default async function TeamPage() {
                           {worker.email ?? 'Email non communiqué'}
                         </p>
                       </div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex flex-wrap items-center gap-2">
                         <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">
                           Disponible
                         </span>
+                        <WorkerConnectionQrButton
+                          token={worker.access_token}
+                          workerName={worker.name}
+                          baseUrl={appBaseUrl}
+                        />
                         <DeleteWorkerButton workerId={worker.id} workerName={worker.name} />
                       </div>
                     </div>
@@ -374,7 +385,7 @@ export default async function TeamPage() {
                     {worker.email ?? 'Email non communiqué'}
                   </p>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                   {worker.site_id ? (
                     <Link
                       href={`/site/${worker.site_id}`}
@@ -383,6 +394,11 @@ export default async function TeamPage() {
                       {siteMap[worker.site_id] ?? 'Site inconnu'} →
                     </Link>
                   ) : null}
+                  <WorkerConnectionQrButton
+                    token={worker.access_token}
+                    workerName={worker.name}
+                    baseUrl={appBaseUrl}
+                  />
                   <DeleteWorkerButton workerId={worker.id} workerName={worker.name} />
                 </div>
               </div>

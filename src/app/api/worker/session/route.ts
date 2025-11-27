@@ -1,19 +1,15 @@
-import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
+import { readWorkerSession } from '@/lib/worker-session';
 
 /**
  * API route pour vérifier la session worker
  */
 export async function GET() {
   try {
-    const cookieStore = await cookies();
-    const workerSession = cookieStore.get('worker_session');
-
-    if (!workerSession || !workerSession.value) {
+    const session = await readWorkerSession();
+    if (!session?.workerId) {
       return NextResponse.json({ error: 'Pas de session' }, { status: 401 });
     }
-
-    const session = JSON.parse(workerSession.value);
 
     return NextResponse.json({
       workerId: session.workerId,
