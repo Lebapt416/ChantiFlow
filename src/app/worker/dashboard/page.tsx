@@ -96,7 +96,7 @@ export default async function WorkerDashboardPage() {
       </header>
 
       <main className="mx-auto flex max-w-5xl flex-col gap-6 px-4 py-8">
-        <section className="grid gap-6 lg:grid-cols-3">
+        <section className="grid gap-6 lg:grid-cols-2">
           <div className="lg:col-span-2 rounded-3xl border border-zinc-200 bg-white/90 p-6 shadow-lg shadow-black/5 dark:border-zinc-800 dark:bg-zinc-900/90">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
@@ -184,27 +184,6 @@ export default async function WorkerDashboardPage() {
               <p className="text-xs text-zinc-500 dark:text-zinc-400">
                 Astuce : une fois la caméra autorisée, l&apos;accès reste ouvert pour les prochains scans.
               </p>
-            </div>
-          </div>
-        </section>
-
-        <section className="rounded-3xl border border-zinc-200 bg-white/90 p-6 shadow-lg shadow-black/5 dark:border-zinc-800 dark:bg-zinc-900/90">
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <div>
-              <p className="text-xs uppercase tracking-[0.3em] text-zinc-500 dark:text-zinc-400">Mes tâches</p>
-              <h2 className="text-2xl font-semibold text-zinc-900 dark:text-white">Accès rapide</h2>
-              <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                Consultez votre liste complète de missions et validez vos actions depuis la page dédiée.
-              </p>
-            </div>
-            <div className="flex flex-col items-end gap-2 text-sm font-semibold text-zinc-600 dark:text-zinc-200">
-              <span>{completedTasks}/{totalTasks} tâche(s) terminées</span>
-              <Link
-                href="/worker/tasks"
-                className="inline-flex items-center gap-2 rounded-full bg-zinc-900 px-4 py-2 text-xs font-semibold text-white transition hover:bg-zinc-800 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
-              >
-                Ouvrir mes tâches
-              </Link>
             </div>
           </div>
         </section>
