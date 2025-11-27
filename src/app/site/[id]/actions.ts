@@ -155,7 +155,7 @@ export async function addWorkerAction(
         } else if (!updateStatusError) {
           console.log('✅ Statut worker mis à jour: pending → approved');
         }
-    } catch {
+      } catch {
         // Ne pas bloquer si la colonne status n'existe pas
         console.warn('⚠️ Impossible de mettre à jour le statut (colonne peut-être absente)');
       }
@@ -285,6 +285,7 @@ export async function addWorkerAction(
 
     // Générer un code d'accès unique
     let accessCode = generateAccessCode();
+    let persistedAccessCode = accessCode;
     let attempts = 0;
     let codeExists = true;
     
