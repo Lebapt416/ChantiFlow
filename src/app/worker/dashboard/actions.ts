@@ -1,7 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 import { readWorkerSession, updateWorkerSession } from '@/lib/worker-session';
 
 type JoinSiteResult = {
@@ -62,8 +62,8 @@ export async function joinSiteAction(scanValue: string): Promise<JoinSiteResult>
     return { error: 'QR code invalide. Scan d\'un chantier ChantiFlow requis.' };
   }
 
-  const supabase = await createSupabaseServerClient();
-  const { data: worker, error: workerError } = await supabase
+  const admin = createSupabaseAdminClient();
+  const { data: worker, error: workerError } = await admin
     .from('workers')
     .select('id, created_by')
     .eq('id', session.workerId)
@@ -73,7 +73,7 @@ export async function joinSiteAction(scanValue: string): Promise<JoinSiteResult>
     return { error: 'Employé introuvable.' };
   }
 
-  const { data: site, error: siteError } = await supabase
+  const { data: site, error: siteError } = await admin
     .from('sites')
     .select('id, name, created_by')
     .eq('id', siteId)
@@ -87,12 +87,13 @@ export async function joinSiteAction(scanValue: string): Promise<JoinSiteResult>
     return { error: 'Ce QR code appartient à une autre entreprise.' };
   }
 
-  const { error: updateError } = await supabase
+  const { error: updateError } = await admin
     .from('workers')
     .update({ site_id: site.id })
     .eq('id', worker.id);
 
   if (updateError) {
+    console.error('❌ joinSiteAction updateError', updateError);
     return { error: 'Impossible d\'assigner ce chantier. Réessayez.' };
   }
 
