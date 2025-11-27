@@ -196,7 +196,7 @@ export default async function DashboardPage() {
       {/* Résumé IA Global */}
       {aiSummary && (
         <section
-          className={`rounded-3xl border p-6 shadow-lg ${
+          className={`mb-8 rounded-3xl border p-6 shadow-lg ${
             aiSummary.status === 'critical'
               ? 'border-rose-300 bg-gradient-to-br from-rose-50 to-rose-100/50 dark:border-rose-700 dark:from-rose-900/30 dark:to-rose-800/20'
               : aiSummary.status === 'warning'
@@ -240,7 +240,10 @@ export default async function DashboardPage() {
               >
                 {aiSummary.summary}
               </p>
-              {aiSummary.sites_mentioned && aiSummary.sites_mentioned.length > 0 && (
+              {/* Afficher les liens uniquement pour les chantiers concernés par l'alerte (critical ou warning) */}
+              {aiSummary.sites_mentioned && 
+               aiSummary.sites_mentioned.length > 0 && 
+               (aiSummary.status === 'critical' || aiSummary.status === 'warning') && (
                 <div className="mt-4 flex flex-wrap gap-2">
                   {aiSummary.sites_mentioned.map((siteName: string, index: number) => {
                     const site = activeSites.find((s) => s.name === siteName);
@@ -252,9 +255,7 @@ export default async function DashboardPage() {
                         className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition hover:scale-105 ${
                           aiSummary.status === 'critical'
                             ? 'bg-rose-200 text-rose-900 hover:bg-rose-300 dark:bg-rose-800/50 dark:text-rose-200 dark:hover:bg-rose-700/50'
-                            : aiSummary.status === 'warning'
-                              ? 'bg-amber-200 text-amber-900 hover:bg-amber-300 dark:bg-amber-800/50 dark:text-amber-200 dark:hover:bg-amber-700/50'
-                              : 'bg-emerald-200 text-emerald-900 hover:bg-emerald-300 dark:bg-emerald-800/50 dark:text-emerald-200 dark:hover:bg-emerald-700/50'
+                            : 'bg-amber-200 text-amber-900 hover:bg-amber-300 dark:bg-amber-800/50 dark:text-amber-200 dark:hover:bg-amber-700/50'
                         }`}
                       >
                         <span>🏗️</span>
