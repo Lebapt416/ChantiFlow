@@ -65,7 +65,7 @@ export async function joinSiteAction(scanValue: string): Promise<JoinSiteResult>
   const admin = createSupabaseAdminClient();
   const { data: worker, error: workerError } = await admin
     .from('workers')
-    .select('id, created_by')
+    .select('id, created_by, site_id')
     .eq('id', session.workerId)
     .single();
 
@@ -87,10 +87,18 @@ export async function joinSiteAction(scanValue: string): Promise<JoinSiteResult>
     return { error: 'Ce QR code appartient à une autre entreprise.' };
   }
 
-  const { error: updateError } = await admin
-    .from('workers')
-    .update({ site_id: site.id })
-    .eq('id', worker.id);
+  if (worker.site_id === site.id) {
+    await updateWorkerSession({ siteId: site.id });
+    revalidatePath('/worker/dashboard');
+    revalidatePath(`/worker/${site.id}`);
+    return {
+      success: true,
+      siteId: site.id,
+      siteName: site.name,
+    };
+  }
+
+  const { error: updateError } = await admin.from('workers').update({ site_id: site.id }).eq('id', worker.id);
 
   if (updateError) {
     console.error('❌ joinSiteAction updateError', updateError);
