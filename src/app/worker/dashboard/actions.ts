@@ -102,7 +102,8 @@ export async function joinSiteAction(scanValue: string): Promise<JoinSiteResult>
 
   if (updateError) {
     console.error('❌ joinSiteAction updateError', updateError);
-    return { error: 'Impossible d\'assigner ce chantier. Réessayez.' };
+    const details = updateError.message || updateError.code || 'raison inconnue';
+    return { error: `Impossible d'assigner ce chantier (${details}). Réessayez ou contactez votre chef.` };
   }
 
   await updateWorkerSession({ siteId: site.id });
