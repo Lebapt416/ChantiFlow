@@ -126,14 +126,8 @@ export function PricingSection({ isAuthenticated = false, userEmail = null }: Pr
                 plan={plan.name.toLowerCase() as 'basic' | 'plus' | 'pro'}
                 isAuthenticated={isAuthenticated}
                 userEmail={userEmail}
-                className={`w-full rounded-full px-6 py-3 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-50 ${
-                  plan.popular
-                    ? 'bg-emerald-600 text-white hover:bg-emerald-700 dark:bg-emerald-400 dark:text-zinc-900 dark:hover:bg-emerald-300'
-                    : 'bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200'
-                }`}
-              >
-                {plan.cta}
-              </PricingButton>
+                ctaLabel={plan.cta}
+              />
               <p className="mt-2 text-center text-xs text-zinc-500 dark:text-zinc-400">
                 {isAuthenticated
                   ? plan.name === 'Basic'

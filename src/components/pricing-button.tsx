@@ -4,18 +4,28 @@ import { useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { changePlanAction } from '@/app/account/actions';
 import { isAdminUser } from '@/lib/stripe';
+import { OptimalPaymentButton } from '@/components/payments/optimal-payment-button';
 
 type Props = {
   plan: 'basic' | 'plus' | 'pro';
   isAuthenticated: boolean;
-  className?: string;
-  children?: React.ReactNode;
   userEmail?: string | null;
+  ctaLabel: string;
 };
 
-export function PricingButton({ plan, isAuthenticated, className, children, userEmail }: Props) {
+export function PricingButton({ plan, isAuthenticated, userEmail, ctaLabel }: Props) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
+  const planNames: Record<Props['plan'], string> = {
+    basic: 'Basic',
+    plus: 'Plus',
+    pro: 'Pro',
+  };
+  const planPrices: Record<Props['plan'], string> = {
+    basic: '0',
+    plus: '29',
+    pro: '79',
+  };
 
   async function handleClick() {
     console.log('🔄 Clic sur plan (landing):', plan, 'Authentifié:', isAuthenticated);
@@ -118,14 +128,15 @@ export function PricingButton({ plan, isAuthenticated, className, children, user
   }
 
   return (
-    <button
-      type="button"
+    <OptimalPaymentButton
+      planName={planNames[plan]}
+      price={planPrices[plan]}
+      priceLabel={plan === 'basic' ? 'Gratuit' : undefined}
       onClick={handleClick}
       disabled={isPending}
-      className={className}
-    >
-      {isPending ? 'Chargement...' : children || 'Choisir ce plan'}
-    </button>
+      ctaLabel={ctaLabel}
+      loadingLabel={plan === 'basic' ? 'Activation...' : 'Redirection sécurisée...'}
+    />
   );
 }
 

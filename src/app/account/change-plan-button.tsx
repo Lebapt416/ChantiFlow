@@ -4,6 +4,7 @@ import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { changePlanAction, type ChangePlanState } from './actions';
 import { isAdminUser } from '@/lib/stripe';
+import { OptimalPaymentButton } from '@/components/payments/optimal-payment-button';
 
 type Props = {
   plan: 'basic' | 'plus' | 'pro';
@@ -17,6 +18,16 @@ export function ChangePlanButton({ plan, currentPlan, userEmail }: Props) {
   const router = useRouter();
   const isCurrent = plan === currentPlan;
   const isAdmin = userEmail ? isAdminUser(userEmail) : false;
+  const planNames: Record<Props['plan'], string> = {
+    basic: 'Basic',
+    plus: 'Plus',
+    pro: 'Pro',
+  };
+  const planPrices: Record<Props['plan'], string> = {
+    basic: '0',
+    plus: '29',
+    pro: '79',
+  };
 
   async function handleClick() {
     if (isCurrent || isPending) return;
@@ -82,30 +93,28 @@ export function ChangePlanButton({ plan, currentPlan, userEmail }: Props) {
     }
   }
 
+  if (isCurrent) {
+    return (
+      <div className="rounded-lg bg-emerald-600 px-3 py-2 text-center text-xs font-semibold text-white dark:bg-emerald-400 dark:text-zinc-900">
+        Plan actuel
+      </div>
+    );
+  }
+
+  const ctaLabel =
+    plan === 'basic' ? 'Choisir ce plan' : isAdmin ? 'Activer gratuitement' : "Passer à l'offre";
+
   return (
     <div>
-      <button
-        type="button"
+      <OptimalPaymentButton
+        planName={planNames[plan]}
+        price={planPrices[plan]}
+        priceLabel={plan === 'basic' ? 'Gratuit' : undefined}
+        ctaLabel={ctaLabel}
+        disabled={isPending}
+        loadingLabel={plan === 'basic' || isAdmin ? 'Activation...' : 'Redirection sécurisée...'}
         onClick={handleClick}
-        disabled={isPending || isCurrent}
-        className={`w-full rounded-lg px-3 py-2 text-xs font-semibold transition ${
-          isCurrent
-            ? 'bg-emerald-600 text-white dark:bg-emerald-400 dark:text-zinc-900'
-            : plan === 'basic'
-              ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900'
-              : 'bg-zinc-200 text-zinc-900 dark:bg-zinc-700 dark:text-white'
-        } disabled:cursor-not-allowed disabled:opacity-50`}
-      >
-        {isPending
-          ? 'Changement...'
-          : isCurrent
-            ? 'Plan actuel'
-            : isAdmin && plan !== 'basic'
-              ? 'Choisir (gratuit)'
-              : plan === 'basic'
-                ? 'Choisir ce plan'
-                : 'Payer et activer'}
-      </button>
+      />
       {state?.error && (
         <p className="mt-1 text-xs text-rose-500">{state.error}</p>
       )}
