@@ -164,7 +164,7 @@ function calculateWorkSchedule(
   workingHoursPerDay: number = FRENCH_LABOR_LAWS.STANDARD_WORKING_HOURS_PER_DAY,
 ): { startDate: Date; endDate: Date; actualDays: number; warnings: string[] } {
   const warnings: string[] = [];
-  let currentDate = new Date(startDate);
+  const currentDate = new Date(startDate);
   let remainingHours = taskHours;
   let actualDays = 0;
   
@@ -400,9 +400,9 @@ export async function generateImprovedPlanning(
 /**
  * Analyse les dépendances avec les patterns appris
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function analyzeDependenciesWithLearning(
   tasks: Task[],
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   learningPatterns: any,
 ): Record<string, string[]> {
   const dependencies: Record<string, string[]> = {};

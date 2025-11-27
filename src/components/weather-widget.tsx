@@ -166,7 +166,7 @@ export function WeatherWidget({ location, isLocked = false }: WeatherWidgetProps
           <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">Météo du chantier</h3>
           <div className="mt-4 grid grid-cols-2 gap-4">
             <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-700 dark:bg-zinc-800">
-              <p className="text-xs text-zinc-500">Aujourd'hui</p>
+              <p className="text-xs text-zinc-500">Aujourd&apos;hui</p>
               <div className="mt-2 flex items-center gap-2">
                 <Sun className="h-6 w-6 text-yellow-500" />
                 <span className="text-2xl font-bold">20°C</span>
@@ -246,7 +246,7 @@ export function WeatherWidget({ location, isLocked = false }: WeatherWidgetProps
       {!loading && !error && weather.today && weather.tomorrow && (
         <div className="grid grid-cols-2 gap-4">
           <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-700 dark:bg-zinc-800">
-            <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Aujourd'hui</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Aujourd&apos;hui</p>
             <div className="mt-2 flex items-center gap-2">
               {getWeatherIcon(weather.today.weatherCode, weather.today.precipitation)}
               <span className="text-2xl font-bold text-zinc-900 dark:text-white">

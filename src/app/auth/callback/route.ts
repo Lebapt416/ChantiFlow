@@ -24,6 +24,7 @@ export async function GET(request: NextRequest) {
         get(name: string) {
           return cookieStore.get(name)?.value;
         },
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         set(name: string, value: string, options?: any) {
           try {
             cookieStore.set({
@@ -39,6 +40,7 @@ export async function GET(request: NextRequest) {
             // Ignorer les erreurs de mutation de cookies
           }
         },
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         remove(name: string, options?: any) {
           try {
             cookieStore.set({

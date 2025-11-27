@@ -392,7 +392,7 @@ export default async function TeamPage() {
       ) : null}
       {(!accountWorkers || accountWorkers.length === 0) && (!siteWorkers || siteWorkers.length === 0) ? (
         <p className="text-sm text-zinc-500 dark:text-zinc-400">
-          Aucune ressource pour l'instant. Ajoutez des membres à votre équipe ci-dessus.
+          Aucune ressource pour l&apos;instant. Ajoutez des membres à votre équipe ci-dessus.
         </p>
       ) : null}
     </section>
