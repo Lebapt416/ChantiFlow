@@ -46,7 +46,7 @@ export default async function WorkerLoginPage({ searchParams }: Props) {
                 Espace Employé
               </h1>
               <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
-                Connectez-vous avec votre code d'accès unique
+                Connectez-vous avec votre code d&apos;accès unique
               </p>
             </div>
             <WorkerLoginForm />

@@ -275,7 +275,7 @@ export function InteractiveCalendar({
               onClick={today}
               className="rounded-lg border border-zinc-200 px-3 py-2 text-xs font-medium transition hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800"
             >
-              Aujourd'hui
+              Aujourd&apos;hui
             </button>
             <button
               type="button"
@@ -410,7 +410,7 @@ export function InteractiveCalendar({
                     colSpan={8}
                     className="border-r border-zinc-200 bg-white px-4 py-8 text-center text-sm text-zinc-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-400"
                   >
-                    Aucun employé assigné. Ajoutez des membres à l'équipe pour voir le planning.
+                    Aucun employé assigné. Ajoutez des membres à l&apos;équipe pour voir le planning.
                   </td>
                 </tr>
               )}

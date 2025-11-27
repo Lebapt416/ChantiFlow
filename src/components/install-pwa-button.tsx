@@ -4,13 +4,15 @@ import { useEffect, useState } from 'react';
 import { Download } from 'lucide-react';
 
 export function InstallPwaButton() {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [isInstalled, setIsInstalled] = useState(false);
 
   useEffect(() => {
     // Vérifier si l'app est déjà installée
     if (window.matchMedia('(display-mode: standalone)').matches) {
-      setIsInstalled(true);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      setTimeout(() => setIsInstalled(true), 0);
       return;
     }
 

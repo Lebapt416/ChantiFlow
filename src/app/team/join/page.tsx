@@ -58,7 +58,8 @@ export default function JoinTeamPage() {
 
       // Créer un worker au niveau du compte (sans site_id) avec status 'pending'
       // Essayer d'abord avec status, puis sans si la colonne n'existe pas
-      let insertData: any = {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const insertData: any = {
         created_by: userId,
         name: name.trim(),
         email: email.trim() || null,
@@ -68,7 +69,7 @@ export default function JoinTeamPage() {
 
       // Essayer d'ajouter avec status 'pending'
       insertData.status = 'pending';
-      let { error: insertError } = await supabase
+      const { error: insertError } = await supabase
         .from('workers')
         .insert(insertData);
 
@@ -142,10 +143,10 @@ export default function JoinTeamPage() {
       <div className="w-full max-w-md">
         <div className="rounded-3xl border border-zinc-200 bg-white/80 p-8 backdrop-blur dark:border-white/10 dark:bg-white/5 shadow-xl">
           <h1 className="text-3xl font-bold text-center mb-2 dark:text-white">
-            Rejoindre l'équipe
+            Rejoindre l&apos;équipe
           </h1>
           <p className="text-sm text-zinc-600 dark:text-zinc-400 text-center mb-8">
-            Remplissez vos informations pour rejoindre l'équipe. Vous serez ajouté au catalogue et pourrez être assigné à des chantiers.
+            Remplissez vos informations pour rejoindre l&apos;équipe. Vous serez ajouté au catalogue et pourrez être assigné à des chantiers.
           </p>
 
           {success ? (
@@ -216,7 +217,7 @@ export default function JoinTeamPage() {
                 disabled={isPending || !name.trim()}
                 className="w-full rounded-lg bg-emerald-600 px-6 py-3 text-base font-semibold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-70"
               >
-                {isPending ? 'Ajout en cours...' : 'Rejoindre l\'équipe'}
+                {isPending ? 'Ajout en cours...' : 'Rejoindre l&apos;équipe'}
               </button>
             </form>
           )}

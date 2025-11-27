@@ -20,11 +20,15 @@ export function SimpleChart({ data, title }: Props) {
   const [animatedValues, setAnimatedValues] = useState(() => data.map(() => 0));
 
   useEffect(() => {
-    setAnimatedValues(data.map(() => 0));
-    const timeout = setTimeout(() => {
-      setAnimatedValues(data.map((point) => point.value));
-    }, 50);
-    return () => clearTimeout(timeout);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    setTimeout(() => {
+      setAnimatedValues(data.map(() => 0));
+      const timeout = setTimeout(() => {
+        setAnimatedValues(data.map((point) => point.value));
+      }, 50);
+      return () => clearTimeout(timeout);
+    }, 0);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
 
   return (

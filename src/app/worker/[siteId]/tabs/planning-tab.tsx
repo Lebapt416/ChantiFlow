@@ -164,7 +164,7 @@ export function PlanningTab({ siteId, workerId }: Props) {
             Aucun planning généré pour le moment.
           </p>
           <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-2">
-            Le planning sera généré automatiquement par l'IA.
+            Le planning sera généré automatiquement par l&apos;IA.
           </p>
         </div>
       ) : (

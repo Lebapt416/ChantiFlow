@@ -123,13 +123,13 @@ export function AssignTaskButton({ taskId, siteId, currentWorkerId, availableWor
           {availableWorkers.length === 0 ? (
             <div className="space-y-2">
               <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                Aucun membre d'équipe disponible. Ajoutez des membres dans la page "Équipe".
+                Aucun membre d&apos;équipe disponible. Ajoutez des membres dans la page &quot;Équipe&quot;.
               </p>
               <Link
                 href="/team"
                 className="block rounded-md bg-emerald-600 px-3 py-1.5 text-center text-xs font-medium text-white transition hover:bg-emerald-700"
               >
-                Aller à l'équipe →
+                Aller à l&apos;équipe →
               </Link>
             </div>
           ) : (

@@ -63,7 +63,7 @@ export function WorkerLoginForm() {
           htmlFor="access_code"
           className="block text-sm font-medium text-zinc-700 dark:text-zinc-300"
         >
-          Code d'accès
+          Code d&apos;accès
         </label>
         <input
           id="access_code"
@@ -78,7 +78,7 @@ export function WorkerLoginForm() {
           autoFocus
           onChange={(e) => {
             // Forcer le format: 4 chiffres + 4 lettres
-            let value = e.target.value.toUpperCase().replace(/[^0-9A-Z]/g, '');
+            const value = e.target.value.toUpperCase().replace(/[^0-9A-Z]/g, '');
             // Séparer les chiffres et les lettres
             const digits = value.match(/[0-9]/g)?.join('') || '';
             const letters = value.match(/[A-Z]/g)?.join('') || '';
@@ -88,7 +88,7 @@ export function WorkerLoginForm() {
           }}
         />
         <p className="text-xs text-zinc-500 dark:text-zinc-400">
-          Format: 4 chiffres + 4 lettres (ex: 1234ABCD). Le code vous a été envoyé par email lors de l'assignation de votre tâche.
+          Format: 4 chiffres + 4 lettres (ex: 1234ABCD). Le code vous a été envoyé par email lors de l&apos;assignation de votre tâche.
         </p>
       </div>
 

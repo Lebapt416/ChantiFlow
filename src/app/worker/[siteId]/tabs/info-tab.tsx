@@ -11,7 +11,9 @@ type Props = {
 };
 
 export function InfoTab({ siteId, workerId, workerName }: Props) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [worker, setWorker] = useState<any>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [site, setSite] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -143,7 +145,7 @@ export function InfoTab({ siteId, workerId, workerName }: Props) {
 
       <div className="rounded-lg border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
         <p className="text-xs text-zinc-500 dark:text-zinc-400 mb-2">
-          Besoin d'aide ?
+          Besoin d&apos;aide ?
         </p>
         <p className="text-sm text-zinc-700 dark:text-zinc-300">
           Contactez votre chef de chantier pour toute question.

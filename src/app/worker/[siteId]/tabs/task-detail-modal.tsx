@@ -155,7 +155,7 @@ export function TaskDetailModal({ taskId, siteId, isOpen, onClose }: Props) {
                   <div className="flex items-center gap-2 mb-2">
                     <Sparkles className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
                     <h4 className="text-sm font-semibold text-emerald-900 dark:text-emerald-200">
-                      Description générée par l'IA
+                      Description générée par l&apos;IA
                     </h4>
                   </div>
                   <p className="text-sm text-emerald-800 dark:text-emerald-300 leading-relaxed">

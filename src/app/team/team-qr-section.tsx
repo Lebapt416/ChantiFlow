@@ -23,10 +23,10 @@ export function TeamQrSection({ qrUrl }: Props) {
     <div className="rounded-2xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900">
       <div className="mb-4">
         <h3 className="text-lg font-semibold text-zinc-900 dark:text-white mb-2">
-          QR code d'inscription à l'équipe
+          QR code d&apos;inscription à l&apos;équipe
         </h3>
         <p className="text-sm text-zinc-500 dark:text-zinc-400">
-          Partagez ce QR code pour permettre aux personnes de s'ajouter à votre équipe en le scannant.
+          Partagez ce QR code pour permettre aux personnes de s&apos;ajouter à votre équipe en le scannant.
         </p>
       </div>
 
@@ -41,7 +41,7 @@ export function TeamQrSection({ qrUrl }: Props) {
             className="mx-auto"
           />
           <p className="mt-4 text-center text-sm font-semibold text-zinc-900 dark:text-white">
-            Rejoindre l'équipe
+            Rejoindre l&apos;équipe
           </p>
         </div>
         {/* QR Code - visible uniquement à l'impression */}
@@ -54,7 +54,7 @@ export function TeamQrSection({ qrUrl }: Props) {
             className="mx-auto"
           />
           <p className="mt-4 text-center text-sm font-semibold text-black">
-            Rejoindre l'équipe
+            Rejoindre l&apos;équipe
           </p>
         </div>
       </div>

@@ -313,9 +313,9 @@ export function AIPlanningSection({ sites }: Props) {
       {/* Info */}
       <section className="rounded-xl border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-900">
         <p className="text-sm text-zinc-600 dark:text-zinc-400">
-          💡 <strong>Astuce :</strong> L'IA analyse vos tâches, identifie les dépendances, et
+          💡 <strong>Astuce :</strong> L&apos;IA analyse vos tâches, identifie les dépendances, et
           génère un planning optimisé avec dates de début/fin et priorités. Les tâches sont
-          classées par ordre logique d'exécution.
+          classées par ordre logique d&apos;exécution.
         </p>
         <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-500">
           ⚖️ <strong>Règles de travail appliquées :</strong> Maximum 8h de travail effectif par jour avec pause déjeuner obligatoire de 1h. 

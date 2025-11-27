@@ -23,6 +23,7 @@ export default async function TeamPage() {
 
   // Récupérer les workers au niveau du compte (sans site_id)
   // Gérer le cas où created_by n'existe pas encore (migration non exécutée)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let accountWorkers: any[] = [];
   
   // Vérifier d'abord si la colonne created_by existe en essayant une requête simple
@@ -75,6 +76,7 @@ export default async function TeamPage() {
         accountWorkers = allAccountWorkers ?? [];
       }
     }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     // Colonne created_by n'existe pas encore, on continue avec un tableau vide
     console.warn('Erreur récupération workers compte:', error?.message);
@@ -119,7 +121,9 @@ export default async function TeamPage() {
     .slice(0, 4);
 
   // Filtrer les workers en attente et approuvés
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const pendingWorkers = (accountWorkers || []).filter((w: any) => w.status === 'pending');
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const approvedWorkers = (accountWorkers || []).filter((w: any) => 
     w.status === 'approved' || w.status === null || w.status === undefined
   );
@@ -184,10 +188,10 @@ export default async function TeamPage() {
       <div className="mb-4 flex items-center justify-between">
         <div>
           <h2 className="text-lg font-semibold text-zinc-900 dark:text-white">
-            QR code d'inscription à l'équipe
+            QR code d&apos;inscription à l&apos;équipe
           </h2>
           <p className="text-sm text-zinc-500 dark:text-zinc-400">
-            Partagez ce QR code pour permettre aux personnes de s'ajouter à votre équipe en le scannant.
+            Partagez ce QR code pour permettre aux personnes de s&apos;ajouter à votre équipe en le scannant.
           </p>
         </div>
       </div>
@@ -196,7 +200,7 @@ export default async function TeamPage() {
           href="/team/qr"
           className="flex items-center justify-center gap-2 rounded-lg bg-emerald-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-emerald-700 active:scale-95"
         >
-          <span>Voir le QR code d'inscription</span>
+          <span>Voir le QR code d&apos;inscription</span>
         </Link>
       </div>
     </section>
@@ -208,7 +212,7 @@ export default async function TeamPage() {
             Ajouter rapidement un membre au catalogue
           </h2>
           <p className="text-sm text-zinc-500 dark:text-zinc-400">
-            Ajoutez un nouveau membre à votre catalogue d'équipe. Il sera disponible pour être assigné à n'importe quel chantier.
+            Ajoutez un nouveau membre à votre catalogue d&apos;équipe. Il sera disponible pour être assigné à n&apos;importe quel chantier.
           </p>
         </div>
       </div>
@@ -258,6 +262,7 @@ export default async function TeamPage() {
                 <h3 className="text-sm font-semibold text-amber-700 dark:text-amber-300 mb-2">
                   ⏳ Demandes en attente de validation ({pendingWorkers.length})
                 </h3>
+                {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                 {pendingWorkers.map((worker: any) => (
                   <div
                     key={worker.id}
@@ -308,6 +313,7 @@ export default async function TeamPage() {
                 <h3 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 mb-2">
                   Membres de votre équipe (disponibles pour tous les chantiers)
                 </h3>
+                {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                 {approvedWorkers.map((worker: any) => (
                   <div
                     key={worker.id}
@@ -338,7 +344,7 @@ export default async function TeamPage() {
             )}
             {pendingWorkers.length === 0 && approvedWorkers.length === 0 && (
               <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                Aucune ressource pour l'instant. Ajoutez des membres à votre équipe ci-dessus.
+                Aucune ressource pour l&apos;instant. Ajoutez des membres à votre équipe ci-dessus.
               </p>
             )}
           </>

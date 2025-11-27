@@ -17,7 +17,7 @@ export default function JoinTeamSuccessPage() {
           </h1>
           
           <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-6">
-            Votre demande d'ajout à l'équipe a bien été reçue.
+            Votre demande d&apos;ajout à l&apos;équipe a bien été reçue.
           </p>
           
           <div className="rounded-lg bg-amber-50 border border-amber-200 p-4 mb-6 dark:bg-amber-900/20 dark:border-amber-800">
@@ -30,7 +30,7 @@ export default function JoinTeamSuccessPage() {
           </div>
           
           <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-6">
-            En attendant, vous pouvez préparer vos informations et documents nécessaires pour votre intégration à l'équipe.
+              En attendant, vous pouvez préparer vos informations et documents nécessaires pour votre intégration à l&apos;équipe.
           </p>
           
           <Link

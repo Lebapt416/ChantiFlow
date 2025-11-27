@@ -19,7 +19,8 @@ function SubmitButton() {
   );
 }
 
-type Props = {};
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+type Props = Record<string, never>;
 
 export function AddWorkerForm({}: Props) {
   const [state, formAction] = useActionState(addWorkerAction, initialState);
@@ -89,7 +90,7 @@ export function AddWorkerForm({}: Props) {
       ) : null}
       {state?.success ? (
         <p className="md:col-span-3 text-sm text-emerald-400">
-          Membre ajouté à votre équipe. Vous pourrez l'assigner à un chantier plus tard.
+          Membre ajouté à votre équipe. Vous pourrez l&apos;assigner à un chantier plus tard.
         </p>
       ) : null}
     </form>

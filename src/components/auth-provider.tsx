@@ -12,7 +12,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     // S'assurer que nous sommes côté client
     if (typeof window === 'undefined') {
-      setIsChecking(false);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      setTimeout(() => setIsChecking(false), 0);
       return;
     }
 

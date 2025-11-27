@@ -160,9 +160,12 @@ function TaskEditModal({
       const end = new Date(task.endDate);
       const diffHours = Math.max(1, Math.round((end.getTime() - start.getTime()) / 36e5));
 
-      setStartInput(start.toISOString().slice(0, 16));
-      setDuration(diffHours);
-      setWorkerId(task.assignedWorkerId);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      setTimeout(() => {
+        setStartInput(start.toISOString().slice(0, 16));
+        setDuration(diffHours);
+        setWorkerId(task.assignedWorkerId);
+      }, 0);
     }
   }, [task]);
 

@@ -70,6 +70,7 @@ export async function getWorkerPlanning(
       pendingTasks,
       workers || [],
       site?.deadline || null,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (site as any)?.postal_code || undefined,
     );
 
