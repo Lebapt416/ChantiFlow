@@ -3,8 +3,8 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { readWorkerSession } from '@/lib/worker-session';
-import { WorkerScanner } from './worker-scanner';
 import { WorkerSiteShell } from '../components/worker-site-shell';
+import { WorkerNav } from '../components/worker-nav';
 
 export const dynamic = 'force-dynamic';
 
@@ -49,28 +49,11 @@ export default async function WorkerDashboardPage() {
   const activeSite = worker.site_id ? sitesById.get(worker.site_id) ?? null : null;
 
   const doneStatuses = new Set(['done', 'completed', 'terminé', 'validated', 'valide', 'réalisé']);
-  const siteSummaries = Array.from(siteIds).map((siteId) => {
-    const site = sitesById.get(siteId) ?? { id: siteId, name: 'Chantier', deadline: null, postal_code: null };
-    const tasksForSite = assignedTasks?.filter((task) => task.site_id === siteId) ?? [];
-    const completedForSite = tasksForSite.filter((task) =>
-      doneStatuses.has((task.status ?? '').toLowerCase()),
-    ).length;
-    const nextTaskDate =
-      tasksForSite
-        .map((task) => task.planned_start || task.planned_end || task.created_at)
-        .filter(Boolean)
-        .sort()[0] ?? null;
-    return {
-      site,
-      tasksCount: tasksForSite.length,
-      completedCount: completedForSite,
-      nextTaskDate,
-    };
-  });
 
   const upcomingTimeline =
     assignedTasks
-      ?.map((task) => ({
+      ?.filter((task) => !worker.site_id || task.site_id === worker.site_id)
+      .map((task) => ({
         id: task.id,
         title: task.title,
         date: task.planned_start || task.planned_end || task.created_at,
@@ -78,9 +61,7 @@ export default async function WorkerDashboardPage() {
         status: task.status,
       }))
       .filter((task) => task.date)
-      .sort((a, b) => {
-        return new Date(a.date ?? 0).getTime() - new Date(b.date ?? 0).getTime();
-      })
+      .sort((a, b) => new Date(a.date ?? 0).getTime() - new Date(b.date ?? 0).getTime())
       .slice(0, 6) ?? [];
 
   const totalTasks = assignedTasks?.length ?? 0;
@@ -88,7 +69,7 @@ export default async function WorkerDashboardPage() {
     assignedTasks?.filter((task) => doneStatuses.has((task.status ?? '').toLowerCase())).length ?? 0;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-zinc-50 via-white to-zinc-100 dark:from-zinc-950 dark:via-zinc-900 dark:to-zinc-950">
+    <div className="min-h-screen bg-gradient-to-b from-zinc-50 via-white to-zinc-100 pb-32 dark:from-zinc-950 dark:via-zinc-900 dark:to-zinc-950">
       <header className="border-b border-white/60 bg-white/80 px-4 py-6 backdrop-blur dark:border-zinc-900/60 dark:bg-zinc-900/80">
         <div className="mx-auto flex max-w-5xl flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex items-center gap-3">
@@ -187,63 +168,44 @@ export default async function WorkerDashboardPage() {
               </div>
             </div>
           </div>
-          <div>
-            <WorkerScanner />
+          <div className="rounded-3xl border border-zinc-200 bg-white/90 p-6 shadow-lg shadow-black/5 dark:border-zinc-800 dark:bg-zinc-900/90">
+            <p className="text-xs uppercase tracking-[0.3em] text-zinc-500 dark:text-zinc-400">Ajouter un chantier</p>
+            <h2 className="mt-2 text-xl font-semibold text-zinc-900 dark:text-white">Scanner un QR code</h2>
+            <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
+              Besoin de rejoindre un nouveau chantier ? Ouvre le scanner dédié pour te connecter instantanément.
+            </p>
+            <div className="mt-6 flex flex-col gap-3">
+              <Link
+                href="/worker/scanner"
+                className="inline-flex items-center justify-center gap-2 rounded-2xl bg-emerald-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-emerald-700 active:scale-[0.99]"
+              >
+                Ouvrir le scanner
+              </Link>
+              <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                Astuce : une fois la caméra autorisée, l&apos;accès reste ouvert pour les prochains scans.
+              </p>
+            </div>
           </div>
         </section>
 
         <section className="rounded-3xl border border-zinc-200 bg-white/90 p-6 shadow-lg shadow-black/5 dark:border-zinc-800 dark:bg-zinc-900/90">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
-              <p className="text-xs uppercase tracking-[0.3em] text-zinc-500 dark:text-zinc-400">Mes chantiers</p>
-              <h2 className="text-2xl font-semibold text-zinc-900 dark:text-white">Vos sites attribués</h2>
+              <p className="text-xs uppercase tracking-[0.3em] text-zinc-500 dark:text-zinc-400">Mes tâches</p>
+              <h2 className="text-2xl font-semibold text-zinc-900 dark:text-white">Accès rapide</h2>
               <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                Accédez en un geste à vos chantiers actifs et consultez le détail des tâches.
+                Consultez votre liste complète de missions et validez vos actions depuis la page dédiée.
               </p>
             </div>
-            <span className="rounded-full bg-zinc-900 px-4 py-1.5 text-xs font-semibold text-white dark:bg-white dark:text-zinc-900">
-              {siteSummaries.length} chantier(s)
-            </span>
-          </div>
-          <div className="mt-6 grid gap-4 md:grid-cols-2">
-            {siteSummaries.length ? (
-              siteSummaries.map(({ site, tasksCount, completedCount, nextTaskDate }) => (
-                <div
-                  key={site.id}
-                  className="flex flex-col gap-3 rounded-2xl border border-zinc-200 bg-zinc-50/80 p-4 dark:border-zinc-800 dark:bg-zinc-900/60"
-                >
-                  <div>
-                    <p className="text-xs uppercase tracking-[0.3em] text-zinc-500 dark:text-zinc-400">Chantier</p>
-                    <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">{site.name || 'Chantier'}</h3>
-                    <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                      Deadline : {site.deadline ? formatDate(site.deadline) : 'Non définie'}
-                    </p>
-                  </div>
-                  <div className="flex items-center justify-between text-sm text-zinc-600 dark:text-zinc-300">
-                    <span>{completedCount}/{tasksCount} tâche(s) terminées</span>
-                    <span>{nextTaskDate ? `Prochaine mission : ${formatDate(nextTaskDate)}` : 'Aucune mission'}</span>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    <Link
-                      href={`/worker/${site.id}`}
-                      className="inline-flex flex-1 items-center justify-center rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700 active:scale-[0.99]"
-                    >
-                      Ouvrir ce chantier
-                    </Link>
-                    <Link
-                      href={`/site/${site.id}/dashboard`}
-                      className="inline-flex flex-1 items-center justify-center rounded-xl border border-zinc-300 px-4 py-2 text-sm font-semibold text-zinc-700 transition hover:border-zinc-400 hover:bg-white dark:border-zinc-700 dark:text-zinc-200 dark:hover:border-zinc-600"
-                    >
-                      Vue chef
-                    </Link>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                Vous n&apos;êtes assigné à aucun chantier pour le moment. Scannez un QR code pour en rejoindre un nouveau.
-              </p>
-            )}
+            <div className="flex flex-col items-end gap-2 text-sm font-semibold text-zinc-600 dark:text-zinc-200">
+              <span>{completedTasks}/{totalTasks} tâche(s) terminées</span>
+              <Link
+                href="/worker/tasks"
+                className="inline-flex items-center gap-2 rounded-full bg-zinc-900 px-4 py-2 text-xs font-semibold text-white transition hover:bg-zinc-800 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
+              >
+                Ouvrir mes tâches
+              </Link>
+            </div>
           </div>
         </section>
 
@@ -266,6 +228,7 @@ export default async function WorkerDashboardPage() {
           </section>
         )}
       </main>
+      <WorkerNav />
     </div>
   );
 }
