@@ -2,7 +2,7 @@
   "name": "ChantiFlow",
   "short_name": "ChantiFlow",
   "description": "Planifie et pilote tes chantiers simplement",
-  "start_url": "/",
+  "start_url": "/worker/dashboard",
   "display": "standalone",
   "background_color": "#18181b",
   "theme_color": "#18181b",
@@ -26,17 +26,17 @@
   "screenshots": [],
   "shortcuts": [
     {
-      "name": "Dashboard",
-      "short_name": "Dashboard",
-      "description": "Accéder au dashboard",
-      "url": "/dashboard",
+      "name": "Espace ouvrier",
+      "short_name": "Ouvrier",
+      "description": "Ouvrir directement l'espace mobile",
+      "url": "/worker/dashboard",
       "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
     },
     {
-      "name": "Mes chantiers",
-      "short_name": "Chantiers",
-      "description": "Voir mes chantiers",
-      "url": "/home",
+      "name": "Connexion employé",
+      "short_name": "Connexion",
+      "description": "Scanner un QR et rejoindre un chantier",
+      "url": "/worker/login",
       "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
     }
   ]
