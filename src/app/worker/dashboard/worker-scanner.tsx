@@ -1,7 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import { useState, useTransition } from 'react';
+import { useEffect, useState, useTransition } from 'react';
 import { Loader2, QrCode, Scan } from 'lucide-react';
 import { joinSiteAction } from './actions';
 
@@ -15,6 +15,16 @@ export function WorkerScanner() {
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const granted = window.localStorage.getItem('worker_camera_permission');
+    if (granted === 'granted') {
+      const timeout = window.setTimeout(() => setIsScanning(true), 0);
+      return () => window.clearTimeout(timeout);
+    }
+    return undefined;
+  }, []);
 
   const handleScan = (value: string) => {
     startTransition(async () => {
@@ -34,6 +44,16 @@ export function WorkerScanner() {
     });
   };
 
+  const toggleScanner = () => {
+    setIsScanning((prev) => {
+      const next = !prev;
+      if (next && typeof window !== 'undefined') {
+        window.localStorage.setItem('worker_camera_permission', 'granted');
+      }
+      return next;
+    });
+  };
+
   return (
     <div className="rounded-3xl border border-zinc-200 bg-white p-6 shadow-lg dark:border-zinc-800 dark:bg-zinc-900">
       <div className="flex items-center justify-between gap-4">
@@ -46,8 +66,10 @@ export function WorkerScanner() {
         </div>
         <button
           type="button"
-          onClick={() => setIsScanning((prev) => !prev)}
-          className="inline-flex items-center gap-2 rounded-full bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700 active:scale-95"
+          onClick={toggleScanner}
+          className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold text-white transition active:scale-95 ${
+            isScanning ? 'bg-rose-600 hover:bg-rose-700' : 'bg-emerald-600 hover:bg-emerald-700'
+          }`}
         >
           <Scan className="h-4 w-4" />
           {isScanning ? 'Arrêter' : 'Lancer'}

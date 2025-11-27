@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { readWorkerSession } from '@/lib/worker-session';
@@ -24,33 +25,67 @@ export default async function WorkerDashboardPage() {
     redirect('/worker/login');
   }
 
-  let activeSite: { id: string; name: string | null; deadline: string | null; postal_code: string | null } | null = null;
-  let taskPreview:
-    | Array<{ id: string; title: string | null; status: string | null; created_at: string | null }>
-    | null = null;
+  const { data: assignedTasks } = await supabase
+    .from('tasks')
+    .select('id, title, status, planned_start, planned_end, created_at, site_id')
+    .eq('assigned_worker_id', worker.id)
+    .order('planned_start', { ascending: true });
 
-  if (worker.site_id) {
-    const { data: siteData } = await supabase
+  const siteIds = new Set<string>();
+  if (worker.site_id) siteIds.add(worker.site_id);
+  assignedTasks?.forEach((task) => {
+    if (task.site_id) siteIds.add(task.site_id);
+  });
+
+  let sitesById = new Map<string, { id: string; name: string | null; deadline: string | null; postal_code: string | null }>();
+  if (siteIds.size > 0) {
+    const { data: sitesData } = await supabase
       .from('sites')
       .select('id, name, deadline, postal_code')
-      .eq('id', worker.site_id)
-      .single();
-    activeSite = siteData ?? null;
-
-    const { data: tasks } = await supabase
-      .from('tasks')
-      .select('id, title, status, created_at')
-      .eq('site_id', worker.site_id)
-      .eq('assigned_worker_id', worker.id)
-      .order('created_at', { ascending: true })
-      .limit(3);
-    taskPreview = tasks ?? null;
+      .in('id', Array.from(siteIds));
+    sitesById = new Map((sitesData ?? []).map((site) => [site.id, site]));
   }
 
+  const activeSite = worker.site_id ? sitesById.get(worker.site_id) ?? null : null;
+
   const doneStatuses = new Set(['done', 'completed', 'terminé', 'validated', 'valide', 'réalisé']);
-  const totalTasks = taskPreview?.length ?? 0;
+  const siteSummaries = Array.from(siteIds).map((siteId) => {
+    const site = sitesById.get(siteId) ?? { id: siteId, name: 'Chantier', deadline: null, postal_code: null };
+    const tasksForSite = assignedTasks?.filter((task) => task.site_id === siteId) ?? [];
+    const completedForSite = tasksForSite.filter((task) =>
+      doneStatuses.has((task.status ?? '').toLowerCase()),
+    ).length;
+    const nextTaskDate =
+      tasksForSite
+        .map((task) => task.planned_start || task.planned_end || task.created_at)
+        .filter(Boolean)
+        .sort()[0] ?? null;
+    return {
+      site,
+      tasksCount: tasksForSite.length,
+      completedCount: completedForSite,
+      nextTaskDate,
+    };
+  });
+
+  const upcomingTimeline =
+    assignedTasks
+      ?.map((task) => ({
+        id: task.id,
+        title: task.title,
+        date: task.planned_start || task.planned_end || task.created_at,
+        siteId: task.site_id,
+        status: task.status,
+      }))
+      .filter((task) => task.date)
+      .sort((a, b) => {
+        return new Date(a.date ?? 0).getTime() - new Date(b.date ?? 0).getTime();
+      })
+      .slice(0, 6) ?? [];
+
+  const totalTasks = assignedTasks?.length ?? 0;
   const completedTasks =
-    taskPreview?.filter((task) => doneStatuses.has((task.status ?? '').toLowerCase())).length ?? 0;
+    assignedTasks?.filter((task) => doneStatuses.has((task.status ?? '').toLowerCase())).length ?? 0;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-zinc-50 via-white to-zinc-100 dark:from-zinc-950 dark:via-zinc-900 dark:to-zinc-950">
@@ -80,87 +115,135 @@ export default async function WorkerDashboardPage() {
       </header>
 
       <main className="mx-auto flex max-w-5xl flex-col gap-6 px-4 py-8">
-        <section className="grid gap-6 lg:grid-cols-2">
-          <div className="rounded-3xl border border-zinc-200 bg-white/90 p-6 shadow-lg shadow-black/5 dark:border-zinc-800 dark:bg-zinc-900/90">
-            <p className="text-xs uppercase tracking-[0.3em] text-zinc-500 dark:text-zinc-400">Chantier actif</p>
-            {activeSite ? (
-              <>
-                <h2 className="mt-2 text-2xl font-semibold text-zinc-900 dark:text-white">
-                  {activeSite.name || 'Chantier en cours'}
+        <section className="grid gap-6 lg:grid-cols-3">
+          <div className="lg:col-span-2 rounded-3xl border border-zinc-200 bg-white/90 p-6 shadow-lg shadow-black/5 dark:border-zinc-800 dark:bg-zinc-900/90">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <p className="text-xs uppercase tracking-[0.3em] text-zinc-500 dark:text-zinc-400">Vue d&apos;ensemble</p>
+                <h2 className="text-2xl font-semibold text-zinc-900 dark:text-white">
+                  {activeSite ? activeSite.name || 'Votre chantier' : 'Prêt pour votre prochain chantier'}
                 </h2>
-                <div className="mt-4 grid gap-4 text-sm text-zinc-600 dark:text-zinc-300 sm:grid-cols-2">
-                  <div>
-                    <p className="text-xs uppercase tracking-[0.3em] text-zinc-400">Deadline</p>
-                    <p className="text-base font-semibold text-zinc-900 dark:text-white">
-                      {activeSite.deadline
-                        ? new Date(activeSite.deadline).toLocaleDateString('fr-FR', {
-                            day: '2-digit',
-                            month: 'short',
-                          })
-                        : 'Non définie'}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-xs uppercase tracking-[0.3em] text-zinc-400">Code postal</p>
-                    <p className="text-base font-semibold text-zinc-900 dark:text-white">
-                      {activeSite.postal_code ?? '—'}
-                    </p>
-                  </div>
-                </div>
-                <div className="mt-6 rounded-2xl border border-zinc-200 bg-zinc-50/80 p-4 dark:border-zinc-800 dark:bg-zinc-900/60">
-                  <div className="flex items-center justify-between text-xs font-semibold uppercase tracking-[0.3em] text-zinc-500 dark:text-zinc-400">
-                    <span>Tâches assignées</span>
-                    <span>
-                      {completedTasks}/{totalTasks} terminées
-                    </span>
-                  </div>
-                  <div className="mt-3 space-y-3">
-                    {taskPreview && taskPreview.length > 0 ? (
-                      taskPreview.map((task) => (
-                        <div
-                          key={task.id}
-                          className="rounded-2xl border border-emerald-200 bg-gradient-to-r from-emerald-50 to-white/70 px-4 py-3 dark:border-emerald-900 dark:from-emerald-950/40 dark:to-zinc-900/40"
-                        >
-                          <p className="text-sm font-semibold text-emerald-900 dark:text-emerald-100">
-                            {task.title || 'Tâche à venir'}
-                          </p>
-                          <div className="mt-1 flex items-center justify-between text-xs text-emerald-700 dark:text-emerald-200">
-                            <span>{formatStatus(task.status)}</span>
-                            {task.created_at ? (
-                              <span>
-                                Ajoutée le{' '}
-                                {new Date(task.created_at).toLocaleDateString('fr-FR', {
-                                  day: '2-digit',
-                                  month: 'short',
-                                })}
-                              </span>
-                            ) : null}
-                          </div>
-                        </div>
-                      ))
-                    ) : (
-                      <div className="rounded-2xl border border-dashed border-zinc-300 px-4 py-3 text-sm text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">
-                        Aucune tâche assignée pour le moment. Votre chef de chantier vous enverra bientôt de nouvelles
-                        missions.
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </>
-            ) : (
-              <div className="mt-4 space-y-3">
-                <h2 className="text-2xl font-semibold text-zinc-900 dark:text-white">Pas encore de chantier</h2>
-                <p className="text-sm text-zinc-600 dark:text-zinc-400">
-                  Scannez un QR code pour rejoindre un chantier et recevoir instantanément votre planning.
-                </p>
-                <p className="text-xs text-zinc-500 dark:text-zinc-500">
-                  Astuce : gardez votre session ouverte pour accéder à vos tâches même sans connexion.
+                <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                  {activeSite
+                    ? 'Voici vos prochaines missions. Vous pouvez en ajouter d’autres en scannant un QR code.'
+                    : 'Rejoignez un chantier pour recevoir automatiquement votre planning.'}
                 </p>
               </div>
-            )}
+              <div className="rounded-2xl border border-zinc-200 bg-zinc-50 px-4 py-2 text-right text-sm font-semibold text-zinc-600 dark:border-zinc-800 dark:bg-zinc-900/70 dark:text-zinc-200">
+                <p>Tâches</p>
+                <p className="text-lg text-zinc-900 dark:text-white">
+                  {completedTasks}/{totalTasks} terminées
+                </p>
+              </div>
+            </div>
+            <div className="mt-6 grid gap-4 text-sm text-zinc-600 dark:text-zinc-300 sm:grid-cols-2">
+              <div>
+                <p className="text-xs uppercase tracking-[0.3em] text-zinc-400">Deadline</p>
+                <p className="text-base font-semibold text-zinc-900 dark:text-white">
+                  {activeSite?.deadline ? formatDate(activeSite.deadline) : 'Non définie'}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs uppercase tracking-[0.3em] text-zinc-400">Code postal</p>
+                <p className="text-base font-semibold text-zinc-900 dark:text-white">
+                  {activeSite?.postal_code ?? '—'}
+                </p>
+              </div>
+            </div>
+            <div className="mt-6 rounded-2xl border border-zinc-200 bg-zinc-50/80 p-4 dark:border-zinc-800 dark:bg-zinc-900/60">
+              <div className="flex items-center justify-between text-xs font-semibold uppercase tracking-[0.3em] text-zinc-500 dark:text-zinc-400">
+                <span>Prochaines missions</span>
+                <span className="text-zinc-900 dark:text-white">
+                  {upcomingTimeline.length} à venir
+                </span>
+              </div>
+              <div className="mt-3 space-y-3">
+                {upcomingTimeline.length ? (
+                  upcomingTimeline.map((task) => {
+                    const site = task.siteId ? sitesById.get(task.siteId) : null;
+                    return (
+                      <div
+                        key={task.id}
+                        className="rounded-2xl border border-emerald-200 bg-gradient-to-r from-emerald-50 to-white px-4 py-3 dark:border-emerald-900 dark:from-emerald-950/40 dark:to-zinc-900/40"
+                      >
+                        <div className="flex items-center justify-between text-xs text-emerald-700 dark:text-emerald-200">
+                          <span>{formatDate(task.date)}</span>
+                          <span>{site?.name || 'Chantier'}</span>
+                        </div>
+                        <p className="mt-1 text-sm font-semibold text-emerald-900 dark:text-emerald-100">
+                          {task.title || 'Tâche à venir'}
+                        </p>
+                        <p className="text-xs text-emerald-700 dark:text-emerald-200">
+                          {formatStatus(task.status)}
+                        </p>
+                      </div>
+                    );
+                  })
+                ) : (
+                  <div className="rounded-2xl border border-dashed border-zinc-300 px-4 py-3 text-sm text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">
+                    Aucune mission planifiée pour l’instant. Scannez un chantier pour démarrer.
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
           <div>
             <WorkerScanner />
+          </div>
+        </section>
+
+        <section className="rounded-3xl border border-zinc-200 bg-white/90 p-6 shadow-lg shadow-black/5 dark:border-zinc-800 dark:bg-zinc-900/90">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <p className="text-xs uppercase tracking-[0.3em] text-zinc-500 dark:text-zinc-400">Mes chantiers</p>
+              <h2 className="text-2xl font-semibold text-zinc-900 dark:text-white">Vos sites attribués</h2>
+              <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                Accédez en un geste à vos chantiers actifs et consultez le détail des tâches.
+              </p>
+            </div>
+            <span className="rounded-full bg-zinc-900 px-4 py-1.5 text-xs font-semibold text-white dark:bg-white dark:text-zinc-900">
+              {siteSummaries.length} chantier(s)
+            </span>
+          </div>
+          <div className="mt-6 grid gap-4 md:grid-cols-2">
+            {siteSummaries.length ? (
+              siteSummaries.map(({ site, tasksCount, completedCount, nextTaskDate }) => (
+                <div
+                  key={site.id}
+                  className="flex flex-col gap-3 rounded-2xl border border-zinc-200 bg-zinc-50/80 p-4 dark:border-zinc-800 dark:bg-zinc-900/60"
+                >
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.3em] text-zinc-500 dark:text-zinc-400">Chantier</p>
+                    <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">{site.name || 'Chantier'}</h3>
+                    <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                      Deadline : {site.deadline ? formatDate(site.deadline) : 'Non définie'}
+                    </p>
+                  </div>
+                  <div className="flex items-center justify-between text-sm text-zinc-600 dark:text-zinc-300">
+                    <span>{completedCount}/{tasksCount} tâche(s) terminées</span>
+                    <span>{nextTaskDate ? `Prochaine mission : ${formatDate(nextTaskDate)}` : 'Aucune mission'}</span>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    <Link
+                      href={`/worker/${site.id}`}
+                      className="inline-flex flex-1 items-center justify-center rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700 active:scale-[0.99]"
+                    >
+                      Ouvrir ce chantier
+                    </Link>
+                    <Link
+                      href={`/site/${site.id}/dashboard`}
+                      className="inline-flex flex-1 items-center justify-center rounded-xl border border-zinc-300 px-4 py-2 text-sm font-semibold text-zinc-700 transition hover:border-zinc-400 hover:bg-white dark:border-zinc-700 dark:text-zinc-200 dark:hover:border-zinc-600"
+                    >
+                      Vue chef
+                    </Link>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                Vous n&apos;êtes assigné à aucun chantier pour le moment. Scannez un QR code pour en rejoindre un nouveau.
+              </p>
+            )}
           </div>
         </section>
 
@@ -200,5 +283,17 @@ function formatStatus(status?: string | null) {
     return 'Bloqué';
   }
   return status.charAt(0).toUpperCase() + status.slice(1);
+}
+
+function formatDate(date?: string | null) {
+  if (!date) return 'Non définie';
+  try {
+    return new Date(date).toLocaleDateString('fr-FR', {
+      day: '2-digit',
+      month: 'short',
+    });
+  } catch {
+    return 'Non définie';
+  }
 }
 
