@@ -5,9 +5,9 @@ import { useState, useTransition } from 'react';
 import { Loader2, QrCode, Scan } from 'lucide-react';
 import { joinSiteAction } from './actions';
 
-const QrScanner = dynamic(async () => {
+const WorkerQrScanner = dynamic(async () => {
   const mod = await import('@yudiel/react-qr-scanner');
-  return mod.QrScanner;
+  return mod.Scanner;
 }, { ssr: false });
 
 export function WorkerScanner() {
@@ -61,7 +61,7 @@ export function WorkerScanner() {
             Caméra active
           </div>
           <div className="aspect-square w-full max-w-sm">
-            <QrScanner
+            <WorkerQrScanner
               constraints={{ facingMode: 'environment' }}
               onDecode={(result) => {
                 if (result) {
