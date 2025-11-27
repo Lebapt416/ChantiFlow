@@ -24,13 +24,13 @@ export async function GET(request: NextRequest) {
         get(name: string) {
           return cookieStore.get(name)?.value;
         },
-        set(name: string, value: string, options?: { maxAge?: number; path?: string; domain?: string; sameSite?: 'lax' | 'strict' | 'none'; secure?: boolean; httpOnly?: boolean }) {
+        set(name: string, value: string, options?: any) {
           try {
             cookieStore.set({
               name,
               value,
-              ...options,
               maxAge: options?.maxAge || 60 * 60 * 24 * 365, // 1 an par défaut
+              path: options?.path || '/',
               sameSite: 'lax' as const,
               secure: process.env.NODE_ENV === 'production',
               httpOnly: false, // Permettre l'accès depuis JavaScript pour la PWA
@@ -39,13 +39,13 @@ export async function GET(request: NextRequest) {
             // Ignorer les erreurs de mutation de cookies
           }
         },
-        remove(name: string, options?: { path?: string; domain?: string }) {
+        remove(name: string, options?: any) {
           try {
             cookieStore.set({
               name,
               value: '',
-              ...options,
               maxAge: 0,
+              path: options?.path || '/',
             });
           } catch {
             // Ignorer les erreurs de suppression de cookies

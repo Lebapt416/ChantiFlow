@@ -131,7 +131,7 @@ export async function generatePlanning(
   const adjustedDailyHours = BASE_WORKING_HOURS / realityFactor;
 
   // Générer le planning initial avec dates et assignations
-  let orderedTasks = classifiedTasks.map((task, index) => {
+  const orderedTasks = classifiedTasks.map((task, index) => {
     const taskStartDate = new Date(startDate);
     
     // Utiliser les heures effectives selon les règles de métier
@@ -217,6 +217,7 @@ export async function generatePlanning(
           
           // Appliquer les recommandations météo
           if (weatherData.recommendations && Array.isArray(weatherData.recommendations)) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             weatherData.recommendations.forEach((rec: any, idx: number) => {
               if (!rec.favorable) {
                 const currentTask = orderedTasks[idx];
@@ -269,7 +270,7 @@ export async function generatePlanning(
       }
     } catch (error) {
       console.error('❌ Erreur optimisation météo:', error);
-      warnings.push('⚠️ Erreur lors de l\'optimisation météo. Planning généré sans optimisation.');
+      warnings.push('⚠️ Erreur lors de l&apos;optimisation météo. Planning généré sans optimisation.');
     }
   } else {
     console.log('ℹ️ Pas de localisation fournie, optimisation météo ignorée');

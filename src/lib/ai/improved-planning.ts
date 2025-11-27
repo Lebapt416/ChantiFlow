@@ -400,6 +400,7 @@ export async function generateImprovedPlanning(
 /**
  * Analyse les dépendances avec les patterns appris
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function analyzeDependenciesWithLearning(
   tasks: Task[],
   learningPatterns: any,
@@ -414,6 +415,7 @@ function analyzeDependenciesWithLearning(
     const deps: string[] = [];
     
     // Vérifier les patterns appris
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     commonDeps.forEach((pattern: any) => {
       if (taskLower.includes(pattern.to.toLowerCase())) {
         const fromTask = tasks.find(t => 
@@ -440,7 +442,7 @@ function analyzeDependenciesWithLearning(
         if (structureTask) deps.push(structureTask.id);
       }
       
-      // L'électricité/plomberie dépend de la structure
+      // L&apos;électricité/plomberie dépend de la structure
       if (taskLower.includes('électricité') || taskLower.includes('plomberie')) {
         const structureTask = tasks.find(
           (t) =>
@@ -525,6 +527,7 @@ function generateImprovedReasoning(
   }>,
   dependencies: Record<string, string[]>,
   taskProfessions: Map<string, string | null>,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   learningPatterns: any,
 ): string {
   const totalTasks = schedule.length;

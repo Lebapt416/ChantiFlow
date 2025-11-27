@@ -37,7 +37,7 @@ export default function JoinTeamSuccessPage() {
             href="/"
             className="inline-block rounded-lg bg-emerald-600 px-6 py-3 text-base font-semibold text-white transition hover:bg-emerald-700"
           >
-            Retour à l'accueil
+            Retour à l&apos;accueil
           </Link>
         </div>
       </div>

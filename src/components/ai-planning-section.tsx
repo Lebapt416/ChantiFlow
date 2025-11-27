@@ -205,11 +205,11 @@ export function AIPlanningSection({ sites }: Props) {
                             <li>Vérifiez votre quota sur <a href="https://platform.openai.com/usage" target="_blank" rel="noopener noreferrer" className="underline">platform.openai.com/usage</a></li>
                             <li>Si nécessaire, passez à un plan payant OpenAI</li>
                           </ol>
-                          <p className="text-xs opacity-75">En attendant, le planning est généré avec l'algorithme de base.</p>
+                          <p className="text-xs opacity-75">En attendant, le planning est généré avec l&apos;algorithme de base.</p>
                         </>
                       ) : (
                         <>
-                          <p className="font-semibold mb-1">Pour activer l'IA OpenAI :</p>
+                          <p className="font-semibold mb-1">Pour activer l&apos;IA OpenAI :</p>
                           <ol className="list-decimal list-inside space-y-1">
                             <li>Vérifiez que OPENAI_API_KEY est bien configurée dans Vercel</li>
                             <li>Redéployez votre application après avoir ajouté la variable</li>

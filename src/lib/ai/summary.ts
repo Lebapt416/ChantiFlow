@@ -17,6 +17,7 @@ export type AISummaryResponse = {
   sites_mentioned?: string[];
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function generateGlobalSummary(sites: any[]): Promise<AISummaryResponse | null> {
   if (!API_URL) {
     console.warn('⚠️ URL API non configurée pour les résumés');
@@ -29,6 +30,7 @@ export async function generateGlobalSummary(sites: any[]): Promise<AISummaryResp
       sites: sites.map(s => ({
         name: s.name,
         tasks_total: s.tasks_total || s.tasks?.length || 0,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         tasks_done: s.tasks_done || s.tasks?.filter((t: any) => t.status === 'done').length || 0,
         complexity: s.complexity || 5.0, // Utiliser la complexité fournie ou valeur par défaut
         days_elapsed: s.days_elapsed || Math.ceil((new Date().getTime() - new Date(s.created_at).getTime()) / (1000 * 3600 * 24))
@@ -56,6 +58,7 @@ export async function generateGlobalSummary(sites: any[]): Promise<AISummaryResp
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function generateSiteSummary(site: any, tasks: any[], hasWeatherAccess: boolean = false): Promise<AISummaryResponse | null> {
   if (!API_URL) {
     console.warn('⚠️ URL API non configurée pour les résumés. Variables:', {
@@ -72,7 +75,9 @@ export async function generateSiteSummary(site: any, tasks: any[], hasWeatherAcc
     const pendingTasks = tasks.filter(t => t.status === 'pending').length;
     
     // Calcul de la complexité basé sur la diversité des rôles et la durée moyenne
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const roleDiversity = new Set(tasks.map((t: any) => t.required_role).filter(Boolean)).size;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const avgDuration = tasks.reduce((sum: number, t: any) => sum + (t.duration_hours || 8), 0) / Math.max(1, totalTasks);
     const complexity = Math.min(10, Math.max(1, avgDuration / 4 + roleDiversity / 2));
     

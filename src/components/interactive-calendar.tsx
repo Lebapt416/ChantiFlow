@@ -246,7 +246,7 @@ export function InteractiveCalendar({
       : monthNames[weekDays[0].getMonth()].slice(0, 3)
   } ${weekDays[0].getFullYear()}`;
 
-  // Tâches assignées à l'employé sélectionné
+  // Tâches assignées à l&apos;employé sélectionné
   const workerTasks = selectedWorker
     ? planning.filter((task) => task.assignedWorkerId === selectedWorker.id)
     : [];

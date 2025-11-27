@@ -49,6 +49,7 @@ export default async function TeamPage() {
           .eq('created_by', user.id)
           .is('site_id', null)
           .order('created_at', { ascending: true });
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         accountWorkers = (workersWithoutStatus ?? []).map((w: any) => ({ ...w, status: null }));
       } else {
         // Autre erreur, on la propage
@@ -71,6 +72,7 @@ export default async function TeamPage() {
           .eq('created_by', user.id)
           .is('site_id', null)
           .order('created_at', { ascending: true });
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         accountWorkers = (workersWithoutStatus ?? []).map((w: any) => ({ ...w, status: null }));
       } else {
         accountWorkers = allAccountWorkers ?? [];

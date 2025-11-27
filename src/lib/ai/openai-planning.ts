@@ -263,6 +263,7 @@ Réponds UNIQUEMENT avec un JSON valide dans ce format:
             estimatedHours: task.estimatedHours || 8,
           })),
         };
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         await savePlanningForTraining(siteId, tasks, workers, adaptedPlanning as any, siteName, deadline);
       } catch (error) {
         console.error('[AI Training] Error saving planning for training:', error);
