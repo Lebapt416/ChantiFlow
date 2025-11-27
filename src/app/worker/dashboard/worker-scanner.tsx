@@ -63,19 +63,20 @@ export function WorkerScanner() {
           <div className="aspect-square w-full max-w-sm">
             <WorkerQrScanner
               constraints={{ facingMode: 'environment' }}
-              onDecode={(result) => {
-                if (result) {
+              onScan={(detected) => {
+                const value = detected?.[0]?.rawValue;
+                if (value) {
                   setIsScanning(false);
-                  handleScan(result);
+                  handleScan(value);
                 }
               }}
               onError={(err) => {
-                if (err) {
-                  console.debug('QR error', err);
-                }
+                console.debug('QR error', err);
               }}
-              containerStyle={{ width: '100%', height: '100%' }}
-              videoStyle={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              styles={{
+                container: { width: '100%', height: '100%' },
+                video: { width: '100%', height: '100%', objectFit: 'cover' },
+              }}
             />
           </div>
         </div>
