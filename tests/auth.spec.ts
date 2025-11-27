@@ -10,7 +10,8 @@ test.describe('Page de connexion', () => {
     // Vérifier la présence du formulaire
     const emailInput = page.getByLabel(/email|e-mail/i).or(page.getByPlaceholder(/email/i));
     const passwordInput = page.getByLabel(/mot de passe|password/i).or(page.getByPlaceholder(/mot de passe|password/i));
-    const submitButton = page.getByRole('button', { name: /connexion|se connecter|login/i });
+    // Cibler spécifiquement le bouton de soumission (type="submit") avec le texte "Se connecter"
+    const submitButton = page.getByRole('button', { name: 'Se connecter' });
 
     await expect(emailInput).toBeVisible();
     await expect(passwordInput).toBeVisible();
@@ -23,7 +24,8 @@ test.describe('Page de connexion', () => {
     // Remplir le formulaire avec des données invalides
     const emailInput = page.getByLabel(/email|e-mail/i).or(page.getByPlaceholder(/email/i));
     const passwordInput = page.getByLabel(/mot de passe|password/i).or(page.getByPlaceholder(/mot de passe|password/i));
-    const submitButton = page.getByRole('button', { name: /connexion|se connecter|login/i });
+    // Cibler spécifiquement le bouton de soumission (type="submit") avec le texte "Se connecter"
+    const submitButton = page.getByRole('button', { name: 'Se connecter' });
 
     await emailInput.fill('invalid@example.com');
     await passwordInput.fill('wrongpassword');
@@ -42,7 +44,8 @@ test.describe('Page de connexion', () => {
 
     const emailInput = page.getByLabel(/email|e-mail/i).or(page.getByPlaceholder(/email/i));
     const passwordInput = page.getByLabel(/mot de passe|password/i).or(page.getByPlaceholder(/mot de passe|password/i));
-    const submitButton = page.getByRole('button', { name: /connexion|se connecter|login/i });
+    // Cibler spécifiquement le bouton de soumission (type="submit") avec le texte "Se connecter"
+    const submitButton = page.getByRole('button', { name: 'Se connecter' });
 
     // Tenter de soumettre sans remplir les champs
     await submitButton.click();
