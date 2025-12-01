@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useFormState } from 'react-dom';
+import { useActionState } from 'react';
 import { useFormStatus } from 'react-dom';
 import Link from 'next/link';
 import { signInAction, signUpAction, type AuthState } from './actions';
@@ -24,8 +24,8 @@ function SubmitButton({ isSignUp }: { isSignUp: boolean }) {
 
 export function AuthForm() {
   const [isSignUp, setIsSignUp] = useState(false);
-  const [signInState, signInFormAction] = useFormState(signInAction, initialState);
-  const [signUpState, signUpFormAction] = useFormState(signUpAction, initialState);
+  const [signInState, signInFormAction] = useActionState(signInAction, initialState);
+  const [signUpState, signUpFormAction] = useActionState(signUpAction, initialState);
 
   const currentState = isSignUp ? signUpState : signInState;
   const currentAction = isSignUp ? signUpFormAction : signInFormAction;

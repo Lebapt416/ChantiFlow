@@ -24,7 +24,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const supabase = createSupabaseBrowserClient();
 
     // Vérifier et restaurer la session au chargement
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(({ data: { session }, error }) => {
+      // Gérer les erreurs de refresh token invalide silencieusement
+      if (error && error.message.includes('Refresh Token')) {
+        console.warn('Token de rafraîchissement invalide, nettoyage de la session');
+        supabase.auth.signOut().catch(() => {
+          // Ignorer les erreurs de déconnexion
+        });
+        setIsChecking(false);
+        return;
+      }
+      
       setIsChecking(false);
       
       if (session) {
@@ -57,6 +67,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     }).catch((error) => {
       console.error('Erreur lors de la vérification de session:', error);
+      // Nettoyer la session en cas d'erreur
+      if (error.message?.includes('Refresh Token')) {
+        supabase.auth.signOut().catch(() => {
+          // Ignorer les erreurs de déconnexion
+        });
+      }
       setIsChecking(false);
     });
 
@@ -106,15 +122,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
   }, [router]);
 
-  // Afficher un loader pendant la vérification de session
-  if (isChecking && typeof window !== 'undefined') {
-    const currentPath = window.location.pathname;
+  // Ne pas afficher de loader côté serveur pour éviter les problèmes d'hydratation
+  // Le loader ne s'affichera que côté client après le premier rendu
+  if (isChecking) {
+    // Utiliser usePathname pour éviter les problèmes d'hydratation
+    const currentPath = pathname;
     if (currentPath === '/login' || currentPath === '/landing' || currentPath === '/') {
       return (
-        <div className="fixed inset-0 flex items-center justify-center bg-white dark:bg-zinc-950">
-          <div className="text-center">
-            <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-black border-r-transparent dark:border-white dark:border-r-transparent"></div>
-            <p className="mt-4 text-zinc-600 dark:text-zinc-400">Chargement...</p>
+        <div className="min-h-screen bg-white dark:bg-zinc-950">
+          <div className="fixed inset-0 flex items-center justify-center">
+            <div className="text-center">
+              <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-black border-r-transparent dark:border-white dark:border-r-transparent"></div>
+              <p className="mt-4 text-zinc-600 dark:text-zinc-400">Chargement...</p>
+            </div>
           </div>
         </div>
       );

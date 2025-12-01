@@ -1,6 +1,6 @@
 'use client';
 
-import { useFormState } from 'react-dom';
+import { useActionState } from 'react';
 import { useFormStatus } from 'react-dom';
 import { resetPasswordRequestAction, type AuthState } from '../actions';
 
@@ -21,7 +21,7 @@ function SubmitButton() {
 }
 
 export function ForgotPasswordForm() {
-  const [state, formAction] = useFormState(resetPasswordRequestAction, initialState);
+  const [state, formAction] = useActionState(resetPasswordRequestAction, initialState);
 
   return (
     <form action={formAction} className="space-y-4">
@@ -42,10 +42,28 @@ export function ForgotPasswordForm() {
         />
       </div>
       {state?.error ? (
-        <p className="text-sm text-rose-400">{state.error}</p>
+        <div className="space-y-2">
+          <p className="text-sm text-rose-400">{state.error}</p>
+          {state.error.includes('configuration') || state.error.includes('indisponible') ? (
+            <div className="rounded-md bg-amber-50 p-3 text-xs text-amber-700 dark:bg-amber-900/20 dark:text-amber-400">
+              <p className="font-medium mb-1">Vérifications à faire :</p>
+              <ul className="list-disc list-inside space-y-1">
+                <li>Vérifiez que l&apos;email est correct</li>
+                <li>Vérifiez vos spams/courriers indésirables</li>
+                <li>Assurez-vous que le service d&apos;email est configuré dans Supabase</li>
+                <li>Vérifiez que l&apos;URL de redirection est autorisée dans Supabase Dashboard</li>
+              </ul>
+            </div>
+          ) : null}
+        </div>
       ) : null}
       {state?.success ? (
-        <p className="text-sm text-emerald-400">{state.success}</p>
+        <div className="space-y-2">
+          <p className="text-sm text-emerald-400">{state.success}</p>
+          <p className="text-xs text-zinc-500 dark:text-zinc-400">
+            Le lien expire dans 1 heure. Si vous ne recevez pas l&apos;email, vérifiez vos spams.
+          </p>
+        </div>
       ) : null}
       <SubmitButton />
     </form>
