@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ResetPasswordHandler } from './reset-password-handler';
@@ -5,6 +6,16 @@ import { ResetPasswordHandler } from './reset-password-handler';
 export const metadata = {
   title: 'Réinitialiser le mot de passe | ChantiFlow',
 };
+
+function ResetPasswordHandlerFallback() {
+  return (
+    <div className="space-y-4">
+      <div className="rounded-md bg-zinc-50 p-3 text-sm text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400">
+        Chargement...
+      </div>
+    </div>
+  );
+}
 
 export default function ResetPasswordPage() {
   return (
@@ -27,7 +38,9 @@ export default function ResetPasswordPage() {
             </p>
           </div>
         </div>
-        <ResetPasswordHandler />
+        <Suspense fallback={<ResetPasswordHandlerFallback />}>
+          <ResetPasswordHandler />
+        </Suspense>
         <div className="mt-4 text-center">
           <Link
             href="/login"
