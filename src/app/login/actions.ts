@@ -83,7 +83,11 @@ export async function signInAction(
       password,
     });
     
-    console.log('[signInAction] Réponse Supabase:', { hasUser: !!data?.user, error: error?.message });
+    console.log('[signInAction] Réponse Supabase:', { 
+      hasUser: !!data?.user, 
+      hasSession: !!data?.session,
+      error: error?.message 
+    });
 
     if (error) {
       console.error('[signInAction] Erreur Supabase auth:', error);
@@ -102,13 +106,19 @@ export async function signInAction(
       return { error: 'Erreur lors de la connexion. Veuillez réessayer.' };
     }
 
-    // Rediriger vers /analytics si c'est le compte admin analytics (par ID ou email)
-    const authorizedUserId = 'e78e437e-a817-4da2-a091-a7f4e5e02583';
-    if (data.user.id === authorizedUserId || data.user.email === 'bcb83@icloud.com') {
-      redirect('/analytics');
+    if (!data.session) {
+      console.error('[signInAction] Pas de session créée');
+      return { error: 'Erreur lors de la création de la session. Veuillez réessayer.' };
     }
 
-    redirect('/home');
+    console.log('[signInAction] Connexion réussie, session créée');
+
+    // Ne pas rediriger directement ici, laisser l'AuthProvider gérer la redirection
+    // via onAuthStateChange pour éviter les problèmes de timing avec les cookies
+    // Retourner un succès pour que le formulaire ne montre pas d'erreur
+    // L'AuthProvider détectera la session et redirigera automatiquement
+    
+    return { success: 'Connexion réussie...' };
   } catch (error) {
     // Gérer spécifiquement les erreurs de configuration
     if (error instanceof Error) {

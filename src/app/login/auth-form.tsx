@@ -129,7 +129,10 @@ export function AuthForm() {
           <p className="text-sm text-rose-400">{currentState.error}</p>
         ) : null}
         {currentState?.success ? (
-          <p className="text-sm text-emerald-400">{currentState.success}</p>
+          <div className="space-y-2">
+            <p className="text-sm text-emerald-400">{currentState.success}</p>
+            <p className="text-xs text-zinc-500 dark:text-zinc-400">Redirection en cours...</p>
+          </div>
         ) : null}
         <SubmitButton isSignUp={isSignUp} />
       </form>
