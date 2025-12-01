@@ -57,8 +57,22 @@ export async function getUserPlan(user: {
 }): Promise<Plan> {
   // Lire le plan depuis les métadonnées utilisateur
   const planFromMetadata = user.user_metadata?.plan as Plan | undefined;
+  const planType = user.user_metadata?.plan_type as 'monthly' | 'annual' | undefined;
+  const planExpiresAt = user.user_metadata?.plan_expires_at as string | undefined;
 
   if (planFromMetadata && ['basic', 'plus', 'pro'].includes(planFromMetadata)) {
+    // Vérifier si c'est un plan annuel et s'il est expiré
+    if (planType === 'annual' && planExpiresAt) {
+      const expirationDate = new Date(planExpiresAt);
+      const now = new Date();
+      
+      if (now > expirationDate) {
+        console.log(`Plan ${planFromMetadata} expiré pour l'utilisateur ${user.id}. Expiration: ${expirationDate.toISOString()}`);
+        // Le plan est expiré, retourner 'basic'
+        return 'basic';
+      }
+    }
+    
     return planFromMetadata;
   }
 

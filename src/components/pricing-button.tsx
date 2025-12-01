@@ -11,9 +11,10 @@ type Props = {
   isAuthenticated: boolean;
   userEmail?: string | null;
   ctaLabel: string;
+  isAnnual?: boolean;
 };
 
-export function PricingButton({ plan, isAuthenticated, userEmail, ctaLabel }: Props) {
+export function PricingButton({ plan, isAuthenticated, userEmail, ctaLabel, isAnnual = false }: Props) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const planNames: Record<Props['plan'], string> = {
@@ -21,11 +22,23 @@ export function PricingButton({ plan, isAuthenticated, userEmail, ctaLabel }: Pr
     plus: 'Plus',
     pro: 'Pro',
   };
-  const planPrices: Record<Props['plan'], string> = {
+  const planPricesMonthly: Record<Props['plan'], string> = {
     basic: '0',
     plus: '29',
     pro: '79',
   };
+  const planPricesAnnual: Record<Props['plan'], string> = {
+    basic: '0',
+    plus: '278',
+    pro: '758',
+  };
+  
+  const currentPrice = isAnnual ? planPricesAnnual[plan] : planPricesMonthly[plan];
+  const priceLabel = plan === 'basic' 
+    ? 'Gratuit' 
+    : isAnnual 
+      ? `${currentPrice}€ / an`
+      : `${currentPrice}€ / mois`;
 
   async function handleClick() {
     console.log('🔄 Clic sur plan (landing):', plan, 'Authentifié:', isAuthenticated);
@@ -85,14 +98,20 @@ export function PricingButton({ plan, isAuthenticated, userEmail, ctaLabel }: Pr
     
     // Si l'utilisateur n'est pas connecté, rediriger directement vers le lien Stripe
     if (!isAuthenticated) {
-      const STRIPE_CHECKOUT_LINKS = {
+      const STRIPE_CHECKOUT_LINKS_MONTHLY = {
         plus: 'https://buy.stripe.com/6oUfZh8dFeSC3UbcG32VG00',
         pro: 'https://buy.stripe.com/9B6dR951t6m6aizfSf2VG01',
       };
       
-      const checkoutLink = STRIPE_CHECKOUT_LINKS[plan as 'plus' | 'pro'];
+      const STRIPE_CHECKOUT_LINKS_ANNUAL = {
+        plus: 'https://buy.stripe.com/aFa3cv79BaCmbmD49x2VG04',
+        pro: 'https://buy.stripe.com/cNibJ1alN9yi62j6hF2VG05',
+      };
+      
+      const checkoutLinks = isAnnual ? STRIPE_CHECKOUT_LINKS_ANNUAL : STRIPE_CHECKOUT_LINKS_MONTHLY;
+      const checkoutLink = checkoutLinks[plan as 'plus' | 'pro'];
       if (checkoutLink) {
-        console.log('✅ Redirection directe vers Stripe (non connecté):', checkoutLink);
+        console.log('✅ Redirection directe vers Stripe (non connecté):', checkoutLink, isAnnual ? '(annuel)' : '(mensuel)');
         window.location.href = checkoutLink;
         return;
       }
@@ -103,7 +122,7 @@ export function PricingButton({ plan, isAuthenticated, userEmail, ctaLabel }: Pr
       const response = await fetch('/api/stripe/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ plan }),
+        body: JSON.stringify({ plan, isAnnual }),
       });
 
       console.log('📡 Réponse API (landing):', response.status);
@@ -130,8 +149,8 @@ export function PricingButton({ plan, isAuthenticated, userEmail, ctaLabel }: Pr
   return (
     <OptimalPaymentButton
       planName={planNames[plan]}
-      price={planPrices[plan]}
-      priceLabel={plan === 'basic' ? 'Gratuit' : undefined}
+      price={currentPrice}
+      priceLabel={priceLabel}
       onClick={handleClick}
       disabled={isPending}
       ctaLabel={ctaLabel}

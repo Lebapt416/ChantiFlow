@@ -178,47 +178,47 @@ export default async function LandingPage() {
       {/* Comment ça marche */}
       <section className="mx-auto max-w-7xl px-6 py-20">
         <div className="mx-auto max-w-2xl text-center">
-          <h2 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-white sm:text-4xl">
+          <h2 className="text-3xl font-extrabold tracking-tight text-zinc-900 dark:text-white sm:text-4xl">
             Comment ça marche ?
           </h2>
-          <p className="mt-4 text-lg text-zinc-600 dark:text-zinc-400">
+          <p className="mt-4 text-lg text-zinc-700 dark:text-zinc-300 font-medium">
             En 3 étapes simples, transformez votre gestion de chantier
           </p>
         </div>
 
         <div className="mx-auto mt-16 grid max-w-2xl grid-cols-1 gap-8 sm:grid-cols-3 lg:max-w-none">
-          <div className="rounded-2xl border border-zinc-200 bg-white p-8 text-center shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+          <div className="rounded-2xl border border-white/20 dark:border-zinc-800/50 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md p-8 text-center shadow-lg">
             <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-900/30">
               <span className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">1</span>
             </div>
-            <h3 className="mt-6 text-lg font-semibold text-zinc-900 dark:text-white">
+            <h3 className="mt-6 text-lg font-extrabold text-zinc-900 dark:text-white">
               Créez votre chantier
             </h3>
-            <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+            <p className="mt-2 text-sm text-zinc-700 dark:text-zinc-300 font-medium">
               Définissez vos tâches, équipes et deadlines en quelques clics
             </p>
           </div>
 
-          <div className="rounded-2xl border border-zinc-200 bg-white p-8 text-center shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+          <div className="rounded-2xl border border-white/20 dark:border-zinc-800/50 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md p-8 text-center shadow-lg">
             <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/30">
               <span className="text-2xl font-bold text-blue-600 dark:text-blue-400">2</span>
             </div>
-            <h3 className="mt-6 text-lg font-semibold text-zinc-900 dark:text-white">
+            <h3 className="mt-6 text-lg font-extrabold text-zinc-900 dark:text-white">
               Liez vos équipes
             </h3>
-            <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+            <p className="mt-2 text-sm text-zinc-700 dark:text-zinc-300 font-medium">
               Partagez un QR code : vos employés accèdent instantanément à leurs tâches
             </p>
           </div>
 
-          <div className="rounded-2xl border border-zinc-200 bg-white p-8 text-center shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+          <div className="rounded-2xl border border-white/20 dark:border-zinc-800/50 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md p-8 text-center shadow-lg">
             <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-purple-100 dark:bg-purple-900/30">
               <span className="text-2xl font-bold text-purple-600 dark:text-purple-400">3</span>
             </div>
-            <h3 className="mt-6 text-lg font-semibold text-zinc-900 dark:text-white">
+            <h3 className="mt-6 text-lg font-extrabold text-zinc-900 dark:text-white">
               L&apos;IA optimise tout
             </h3>
-            <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+            <p className="mt-2 text-sm text-zinc-700 dark:text-zinc-300 font-medium">
               Planification automatique, suivi en temps réel, rapports générés automatiquement
             </p>
           </div>
@@ -228,56 +228,56 @@ export default async function LandingPage() {
       {/* Pourquoi ChantiFlow ? */}
       <section className="mx-auto max-w-7xl px-6 py-20">
         <div className="mx-auto max-w-2xl text-center">
-          <h2 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-white sm:text-4xl">
+          <h2 className="text-3xl font-extrabold tracking-tight text-zinc-900 dark:text-white sm:text-4xl">
             Pourquoi ChantiFlow ?
           </h2>
-          <p className="mt-4 text-lg text-zinc-600 dark:text-zinc-400">
+          <p className="mt-4 text-lg text-zinc-700 dark:text-zinc-300 font-medium">
             Les problèmes du BTP, résolus par l&apos;IA
           </p>
         </div>
 
         <div className="mx-auto mt-16 grid max-w-2xl grid-cols-1 gap-8 sm:grid-cols-3 lg:max-w-none">
-          <div className="rounded-2xl border border-zinc-200 bg-white p-8 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+          <div className="rounded-2xl border border-white/20 dark:border-zinc-800/50 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md p-8 shadow-lg">
             <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-rose-100 dark:bg-rose-900/30">
               <Clock className="h-6 w-6 text-rose-600 dark:text-rose-400" />
             </div>
-            <h3 className="mt-6 text-lg font-semibold text-zinc-900 dark:text-white">
+            <h3 className="mt-6 text-lg font-extrabold text-zinc-900 dark:text-white">
               Retards de chantier
             </h3>
-            <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-              <span className="font-semibold text-rose-600 dark:text-rose-400">Problème :</span> Délais non respectés, planning désorganisé
+            <p className="mt-2 text-sm text-zinc-700 dark:text-zinc-300 font-medium">
+              <span className="font-bold text-rose-600 dark:text-rose-400">Problème :</span> Délais non respectés, planning désorganisé
             </p>
-            <p className="mt-4 text-sm font-semibold text-emerald-600 dark:text-emerald-400">
+            <p className="mt-4 text-sm font-bold text-emerald-600 dark:text-emerald-400">
               ✓ Solution : Planning optimisé par IA, alertes automatiques, suivi en temps réel
             </p>
           </div>
 
-          <div className="rounded-2xl border border-zinc-200 bg-white p-8 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+          <div className="rounded-2xl border border-white/20 dark:border-zinc-800/50 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md p-8 shadow-lg">
             <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-amber-100 dark:bg-amber-900/30">
               <MessageSquare className="h-6 w-6 text-amber-600 dark:text-amber-400" />
             </div>
-            <h3 className="mt-6 text-lg font-semibold text-zinc-900 dark:text-white">
+            <h3 className="mt-6 text-lg font-extrabold text-zinc-900 dark:text-white">
               Mauvaise communication
             </h3>
-            <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-              <span className="font-semibold text-rose-600 dark:text-rose-400">Problème :</span> Appels multiples, informations perdues
+            <p className="mt-2 text-sm text-zinc-700 dark:text-zinc-300 font-medium">
+              <span className="font-bold text-rose-600 dark:text-rose-400">Problème :</span> Appels multiples, informations perdues
             </p>
-            <p className="mt-4 text-sm font-semibold text-emerald-600 dark:text-emerald-400">
+            <p className="mt-4 text-sm font-bold text-emerald-600 dark:text-emerald-400">
               ✓ Solution : QR codes instantanés, rapports centralisés, notifications automatiques
             </p>
           </div>
 
-          <div className="rounded-2xl border border-zinc-200 bg-white p-8 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+          <div className="rounded-2xl border border-white/20 dark:border-zinc-800/50 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md p-8 shadow-lg">
             <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-indigo-100 dark:bg-indigo-900/30">
               <FileText className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
             </div>
-            <h3 className="mt-6 text-lg font-semibold text-zinc-900 dark:text-white">
+            <h3 className="mt-6 text-lg font-extrabold text-zinc-900 dark:text-white">
               Perte d&apos;informations
             </h3>
-            <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-              <span className="font-semibold text-rose-600 dark:text-rose-400">Problème :</span> Photos perdues, rapports éparpillés
+            <p className="mt-2 text-sm text-zinc-700 dark:text-zinc-300 font-medium">
+              <span className="font-bold text-rose-600 dark:text-rose-400">Problème :</span> Photos perdues, rapports éparpillés
             </p>
-            <p className="mt-4 text-sm font-semibold text-emerald-600 dark:text-emerald-400">
+            <p className="mt-4 text-sm font-bold text-emerald-600 dark:text-emerald-400">
               ✓ Solution : Stockage centralisé, photos liées aux rapports, historique complet
             </p>
           </div>
@@ -317,21 +317,21 @@ export default async function LandingPage() {
       {/* Résultats constatés */}
       <section className="mx-auto max-w-7xl px-6 py-20">
         <div className="mx-auto max-w-2xl text-center">
-          <h2 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-white sm:text-4xl">
+          <h2 className="text-3xl font-extrabold tracking-tight text-zinc-900 dark:text-white sm:text-4xl">
             Des gains mesurables sur vos chantiers
           </h2>
-          <p className="mt-4 text-lg text-zinc-600 dark:text-zinc-400">
+          <p className="mt-4 text-lg text-zinc-700 dark:text-zinc-300 font-medium">
             Les entreprises utilisant ChantiFlow améliorent leur visibilité chantier et leur marge grâce à des
             données temps réel.
           </p>
         </div>
         <div className="mx-auto mt-12 grid max-w-4xl grid-cols-1 gap-6 sm:grid-cols-3">
           {proofMetrics.map((metric) => (
-            <div key={metric.label} className="rounded-2xl border border-zinc-200 bg-white p-6 text-center dark:border-zinc-800 dark:bg-zinc-900">
+            <div key={metric.label} className="rounded-2xl border border-white/20 dark:border-zinc-800/50 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md p-6 text-center shadow-lg">
               <LineChart className="mx-auto h-8 w-8 text-emerald-600 dark:text-emerald-400" />
               <p className="mt-4 text-4xl font-black text-zinc-900 dark:text-white">{metric.value}</p>
-              <p className="mt-2 text-sm font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">{metric.label}</p>
-              <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">{metric.description}</p>
+              <p className="mt-2 text-sm font-bold uppercase tracking-wide text-zinc-700 dark:text-zinc-300">{metric.label}</p>
+              <p className="mt-2 text-sm text-zinc-700 dark:text-zinc-300 font-medium">{metric.description}</p>
             </div>
           ))}
         </div>

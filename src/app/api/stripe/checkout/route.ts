@@ -1,13 +1,13 @@
 import { NextResponse } from 'next/server';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
-import { STRIPE_CHECKOUT_LINKS, isAdminUser } from '@/lib/stripe';
+import { isAdminUser } from '@/lib/stripe';
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { plan } = body;
+    const { plan, isAnnual = false } = body;
 
-    console.log('📥 Requête checkout reçue pour plan:', plan);
+    console.log('📥 Requête checkout reçue pour plan:', plan, isAnnual ? '(annuel)' : '(mensuel)');
 
     if (!plan || !['plus', 'pro'].includes(plan)) {
       console.error('❌ Plan invalide:', plan);
@@ -43,17 +43,28 @@ export async function POST(request: Request) {
     }
 
     // Rediriger vers le lien Stripe Checkout direct
-    const checkoutLink = STRIPE_CHECKOUT_LINKS[plan as 'plus' | 'pro'];
+    const STRIPE_CHECKOUT_LINKS_MONTHLY: Record<'plus' | 'pro', string> = {
+      plus: 'https://buy.stripe.com/6oUfZh8dFeSC3UbcG32VG00',
+      pro: 'https://buy.stripe.com/9B6dR951t6m6aizfSf2VG01',
+    };
+    
+    const STRIPE_CHECKOUT_LINKS_ANNUAL: Record<'plus' | 'pro', string> = {
+      plus: 'https://buy.stripe.com/aFa3cv79BaCmbmD49x2VG04',
+      pro: 'https://buy.stripe.com/cNibJ1alN9yi62j6hF2VG05',
+    };
+    
+    const checkoutLinks = isAnnual ? STRIPE_CHECKOUT_LINKS_ANNUAL : STRIPE_CHECKOUT_LINKS_MONTHLY;
+    const checkoutLink = checkoutLinks[plan as 'plus' | 'pro'];
     
     if (!checkoutLink) {
-      console.error('❌ Lien checkout non trouvé pour plan:', plan);
+      console.error('❌ Lien checkout non trouvé pour plan:', plan, isAnnual ? '(annuel)' : '(mensuel)');
       return NextResponse.json({ error: 'Lien de paiement non configuré' }, { status: 500 });
     }
 
     // Ajouter l'email comme paramètre pour faciliter l'identification
     const urlWithEmail = `${checkoutLink}?prefilled_email=${encodeURIComponent(user.email)}`;
 
-    console.log('✅ Redirection vers:', urlWithEmail);
+    console.log('✅ Redirection vers:', urlWithEmail, isAnnual ? '(annuel)' : '(mensuel)');
 
     return NextResponse.json({ url: urlWithEmail });
   } catch (error) {

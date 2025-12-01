@@ -222,9 +222,16 @@ export async function POST(request: Request) {
             
             // Alternative : utiliser l'URL de la session pour déterminer le plan
             if (!plan && sessionDetails.url) {
+              // Liens mensuels
               if (sessionDetails.url.includes('6oUfZh8dFeSC3UbcG32VG00')) {
                 plan = 'plus';
               } else if (sessionDetails.url.includes('9B6dR951t6m6aizfSf2VG01')) {
+                plan = 'pro';
+              }
+              // Liens annuels
+              else if (sessionDetails.url.includes('aFa3cv79BaCmbmD49x2VG04')) {
+                plan = 'plus';
+              } else if (sessionDetails.url.includes('cNibJ1alN9yi62j6hF2VG05')) {
                 plan = 'pro';
               }
             }
@@ -272,22 +279,52 @@ export async function POST(request: Request) {
         }
       } else if (plan) {
         // C'est un plan
+        // Déterminer si c'est annuel (vérifier l'URL de la session)
+        let isAnnualPayment = false;
+        if (session.url) {
+          // Liens annuels
+          if (session.url.includes('aFa3cv79BaCmbmD49x2VG04') || session.url.includes('cNibJ1alN9yi62j6hF2VG05')) {
+            isAnnualPayment = true;
+          }
+        }
+        // Vérifier aussi dans les métadonnées
+        if (session.metadata?.is_annual === 'true' || session.metadata?.is_annual === '1') {
+          isAnnualPayment = true;
+        }
+        
+        // Calculer la date d'expiration
+        const now = new Date();
+        const expirationDate = isAnnualPayment 
+          ? new Date(now.getFullYear() + 1, now.getMonth(), now.getDate())
+          : null; // Les paiements mensuels n'ont pas d'expiration (abonnement récurrent)
+        
         // Mettre à jour le plan de l'utilisateur
+        const metadataUpdate: Record<string, unknown> = {
+          ...user.user_metadata,
+          plan,
+          plan_updated_at: new Date().toISOString(),
+          stripe_customer_id: session.customer,
+          stripe_subscription_id: session.subscription,
+          stripe_checkout_session_id: session.id,
+        };
+        
+        if (isAnnualPayment && expirationDate) {
+          metadataUpdate.plan_expires_at = expirationDate.toISOString();
+          metadataUpdate.plan_type = 'annual';
+          console.log(`Plan ${plan} annuel activé pour ${customerEmail}, expire le ${expirationDate.toISOString()}`);
+        } else {
+          metadataUpdate.plan_type = 'monthly';
+          console.log(`Plan ${plan} mensuel activé pour ${customerEmail}`);
+        }
+        
         const { error } = await admin.auth.admin.updateUserById(user.id, {
-          user_metadata: {
-            ...user.user_metadata,
-            plan,
-            plan_updated_at: new Date().toISOString(),
-            stripe_customer_id: session.customer,
-            stripe_subscription_id: session.subscription,
-            stripe_checkout_session_id: session.id,
-          },
+          user_metadata: metadataUpdate,
         });
 
         if (error) {
           console.error('Erreur mise à jour plan:', error);
         } else {
-          console.log(`Plan ${plan} activé pour ${customerEmail}`);
+          console.log(`Plan ${plan} ${isAnnualPayment ? 'annuel' : 'mensuel'} activé pour ${customerEmail}`);
         }
       } else {
         console.warn(`Impossible de déterminer le plan ou add-on pour la session ${session.id}`);
