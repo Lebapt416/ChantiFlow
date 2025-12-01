@@ -7,6 +7,7 @@ import { createSupabaseServerClient } from '@/lib/supabase/server';
 export type AuthState = {
   error?: string;
   success?: string;
+  redirectTo?: string;
 };
 
 const SUPABASE_PLACEHOLDER_HOSTS = ['example.supabase.co'];
@@ -111,16 +112,16 @@ export async function signInAction(
       return { error: 'Erreur lors de la création de la session. Veuillez réessayer.' };
     }
 
-    console.log('[signInAction] Connexion réussie, session créée, redirection...');
+    console.log('[signInAction] Connexion réussie, session créée');
 
-    // Rediriger directement depuis la Server Action
-    // Les cookies sont déjà définis par createSupabaseServerClient avec allowCookieSetter: true
+    // Retourner l'URL de redirection au lieu de rediriger directement
+    // (redirect() ne fonctionne pas toujours avec useActionState)
     const authorizedUserId = 'e78e437e-a817-4da2-a091-a7f4e5e02583';
-    if (data.user.id === authorizedUserId || data.user.email === 'bcb83@icloud.com') {
-      redirect('/analytics');
-    }
+    const redirectTo = (data.user.id === authorizedUserId || data.user.email === 'bcb83@icloud.com') 
+      ? '/analytics' 
+      : '/home';
 
-    redirect('/home');
+    return { success: 'Connexion réussie', redirectTo };
   } catch (error) {
     // Gérer spécifiquement les erreurs de configuration
     if (error instanceof Error) {

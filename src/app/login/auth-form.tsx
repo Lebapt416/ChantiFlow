@@ -33,37 +33,13 @@ export function AuthForm() {
   const currentState = isSignUp ? signUpState : signInState;
   const currentAction = isSignUp ? signUpFormAction : signInFormAction;
 
-  // Si on arrive ici avec un succès, c'est que la redirection n'a pas fonctionné
-  // Forcer une redirection côté client en dernier recours
+  // Rediriger immédiatement après une connexion réussie
   useEffect(() => {
-    if (currentState?.success && !isSignUp) {
-      // Essayer plusieurs fois de détecter la session et rediriger
-      let attempts = 0;
-      const maxAttempts = 5;
-      
-      const checkAndRedirect = async () => {
-        const supabase = createSupabaseBrowserClient();
-        const { data: { session } } = await supabase.auth.getSession();
-        
-        if (session) {
-          const authorizedUserId = 'e78e437e-a817-4da2-a091-a7f4e5e02583';
-          if (session.user.id === authorizedUserId || session.user.email === 'bcb83@icloud.com') {
-            window.location.href = '/analytics';
-          } else {
-            window.location.href = '/home';
-          }
-        } else if (attempts < maxAttempts) {
-          attempts++;
-          setTimeout(checkAndRedirect, 200);
-        } else {
-          // Si après 5 tentatives on n'a toujours pas de session, forcer le refresh
-          router.refresh();
-        }
-      };
-      
-      checkAndRedirect();
+    if (currentState?.success && currentState?.redirectTo && !isSignUp) {
+      // Utiliser window.location.href pour une redirection complète qui recharge les cookies
+      window.location.href = currentState.redirectTo;
     }
-  }, [currentState?.success, isSignUp, router]);
+  }, [currentState?.success, currentState?.redirectTo, isSignUp]);
 
   return (
     <div className="space-y-4">
