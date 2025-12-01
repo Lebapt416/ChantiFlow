@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useFormState } from 'react-dom';
 import { useFormStatus } from 'react-dom';
+import Link from 'next/link';
 import { signInAction, signUpAction, type AuthState } from './actions';
 
 const initialState: AuthState = {};
@@ -76,12 +77,22 @@ export function AuthForm() {
           />
         </div>
         <div className="space-y-2">
-          <label
-            htmlFor="password"
-            className="text-sm font-medium text-zinc-600 dark:text-zinc-300"
-          >
-            Mot de passe
-          </label>
+          <div className="flex items-center justify-between">
+            <label
+              htmlFor="password"
+              className="text-sm font-medium text-zinc-600 dark:text-zinc-300"
+            >
+              Mot de passe
+            </label>
+            {!isSignUp && (
+              <Link
+                href="/login/forgot-password"
+                className="text-xs text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-300"
+              >
+                Mot de passe oublié ?
+              </Link>
+            )}
+          </div>
           <input
             id="password"
             name="password"

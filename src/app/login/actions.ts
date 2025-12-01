@@ -143,3 +143,93 @@ export async function signUpAction(
   }
 }
 
+export async function resetPasswordRequestAction(
+  _prevState: AuthState,
+  formData: FormData,
+): Promise<AuthState> {
+  const email = String(formData.get('email') ?? '').trim();
+
+  if (!email) {
+    return { error: 'Email requis.' };
+  }
+
+  if (!isSupabaseConfigured()) {
+    return { error: SUPABASE_DISABLED_MESSAGE };
+  }
+
+  try {
+    const supabase = await createSupabaseServerClient({ allowCookieSetter: true });
+    const baseUrl = process.env.NEXT_PUBLIC_APP_BASE_URL || 'http://localhost:3000';
+    const redirectTo = `${baseUrl}/login/reset-password`;
+
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo,
+    });
+
+    if (error) {
+      return { error: error.message };
+    }
+
+    // Toujours retourner un succès pour ne pas révéler si l'email existe ou non
+    return {
+      success: 'Si cet email existe, un lien de réinitialisation a été envoyé.',
+    };
+  } catch (error) {
+    console.error('Erreur resetPasswordRequestAction', error);
+    return { error: SUPABASE_UNREACHABLE_MESSAGE };
+  }
+}
+
+export async function resetPasswordAction(
+  _prevState: AuthState,
+  formData: FormData,
+): Promise<AuthState> {
+  const password = String(formData.get('password') ?? '');
+  const confirmPassword = String(formData.get('confirmPassword') ?? '');
+
+  if (!password || !confirmPassword) {
+    return { error: 'Les deux champs de mot de passe sont requis.' };
+  }
+
+  if (password.length < 6) {
+    return { error: 'Le mot de passe doit contenir au moins 6 caractères.' };
+  }
+
+  if (password !== confirmPassword) {
+    return { error: 'Les mots de passe ne correspondent pas.' };
+  }
+
+  if (!isSupabaseConfigured()) {
+    return { error: SUPABASE_DISABLED_MESSAGE };
+  }
+
+  try {
+    const supabase = await createSupabaseServerClient({ allowCookieSetter: true });
+    
+    // Vérifier que l'utilisateur est authentifié via le token de réinitialisation
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    
+    if (userError || !user) {
+      return { error: 'Lien de réinitialisation invalide ou expiré. Demandez un nouveau lien.' };
+    }
+
+    // Mettre à jour uniquement le mot de passe (les autres données utilisateur restent intactes)
+    const { error } = await supabase.auth.updateUser({
+      password,
+    });
+
+    if (error) {
+      return { error: error.message };
+    }
+
+    // Rediriger vers la page de connexion avec un message de succès
+    redirect('/login?reset=success');
+  } catch (error) {
+    console.error('Erreur resetPasswordAction', error);
+    return { error: SUPABASE_UNREACHABLE_MESSAGE };
+  }
+
+  // Satisfait TypeScript
+  return { error: SUPABASE_UNREACHABLE_MESSAGE };
+}
+
