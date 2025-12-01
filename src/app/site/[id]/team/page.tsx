@@ -60,12 +60,19 @@ export default async function SiteTeamPage({ params }: Params) {
     notFound();
   }
 
-  // Récupérer les workers assignés à ce chantier
+  // Récupérer les workers assignés à ce chantier avec le code d'accès
   const { data: siteWorkersData } = await supabase
     .from('workers')
     .select('id, name, email, role, created_at, access_code, status')
     .eq('site_id', id)
     .order('created_at', { ascending: false });
+  
+  // Log pour debug
+  console.log('[SiteTeamPage] Workers récupérés:', siteWorkersData?.map(w => ({ 
+    name: w.name, 
+    email: w.email, 
+    access_code: w.access_code 
+  })));
   const siteWorkers: TeamMember[] = (siteWorkersData ?? []).map((worker) => ({
     ...worker,
   }));
@@ -207,13 +214,20 @@ export default async function SiteTeamPage({ params }: Params) {
                         {worker.email}
                       </p>
                     )}
-                    {worker.access_code && (
-                      <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-emerald-600 dark:text-emerald-400">
-                        <span>Code d&apos;accès :</span>
-                        <span className="font-mono blur-sm hover:blur-none cursor-pointer transition">
+                    {worker.access_code ? (
+                      <div className="mt-2 flex flex-wrap items-center gap-2 text-xs">
+                        <span className="text-zinc-600 dark:text-zinc-400">Code d&apos;accès :</span>
+                        <span className="font-mono font-semibold text-emerald-600 dark:text-emerald-400">
                           {worker.access_code}
                         </span>
                         <CopyButton value={worker.access_code} />
+                        <span className="text-zinc-500 dark:text-zinc-500 text-[10px]">
+                          (envoyé par email)
+                        </span>
+                      </div>
+                    ) : (
+                      <div className="mt-2 text-xs text-zinc-500 dark:text-zinc-400">
+                        Code d&apos;accès : <span className="italic">Non généré (sera créé lors de l&apos;assignation d&apos;une tâche)</span>
                       </div>
                     )}
                   </div>

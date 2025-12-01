@@ -208,35 +208,56 @@ export async function assignTaskAction(
         .eq('id', workerId);
       
       if (updateError) {
-        console.error('Erreur lors de la mise à jour du code d\'accès:', updateError);
+        console.error('[assignTaskAction] Erreur lors de la mise à jour du code d\'accès:', updateError);
+        // Ne pas continuer si on ne peut pas sauvegarder le code
+        return { error: 'Impossible de générer le code d\'accès. Veuillez réessayer.' };
+      }
+      
+      console.log('[assignTaskAction] Code d\'accès sauvegardé:', accessCode);
+    }
+    
+    // Récupérer le code depuis la base de données pour s'assurer qu'on utilise le bon
+    const { data: updatedWorker } = await admin
+      .from('workers')
+      .select('access_code')
+      .eq('id', workerId)
+      .single();
+    
+    // Utiliser le code de la base de données (celui qui a été réellement sauvegardé)
+    const finalAccessCode = updatedWorker?.access_code || accessCode;
+    
+    // S'assurer que le code est en majuscules et respecte le format
+    let finalCode = String(finalAccessCode || '').toUpperCase().trim();
+    
+    // Vérifier le format final avant l'envoi (4 chiffres + 4 lettres)
+    if (!/^[0-9]{4}[A-Z]{4}$/.test(finalCode)) {
+      console.error('[assignTaskAction] Code d\'accès invalide avant envoi email:', finalCode, 'Régénération...');
+      // Régénérer si nécessaire
+      finalCode = generateWorkerAccessCodeAlphanumeric().toUpperCase();
+      const { error: finalUpdateError } = await admin
+        .from('workers')
+        .update({ access_code: finalCode })
+        .eq('id', workerId);
+      
+      if (finalUpdateError) {
+        console.error('[assignTaskAction] Erreur lors de la régénération du code:', finalUpdateError);
+        return { error: 'Impossible de générer un code d\'accès valide. Veuillez réessayer.' };
       }
     }
     
-    // S'assurer que le code est en majuscules et respecte le format
-    accessCode = String(accessCode || '').toUpperCase().trim();
-    
-    // Vérifier le format final avant l'envoi (4 chiffres + 4 lettres)
-    if (!/^[0-9]{4}[A-Z]{4}$/.test(accessCode)) {
-      console.error('Code d\'accès invalide avant envoi email:', accessCode, 'Régénération...');
-      // Régénérer si nécessaire
-      accessCode = generateWorkerAccessCodeAlphanumeric();
-      await admin
-        .from('workers')
-        .update({ access_code: accessCode })
-        .eq('id', workerId);
-    }
-    
-    // S'assurer que le code est en majuscules
-    accessCode = accessCode.toUpperCase();
+    // Utiliser le code final pour l'email
+    accessCode = finalCode;
 
     // Envoyer l'email avec le code d'accès
-    if (worker.email) {
+    if (worker.email && accessCode) {
       try {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const siteName = (taskDetails as any)?.sites?.name || 'un chantier';
         const taskTitle = taskDetails?.title || 'une tâche';
         
-        await sendEmail({
+        console.log('[assignTaskAction] Envoi email à:', worker.email, 'avec code:', accessCode);
+        
+        const emailResult = await sendEmail({
           to: worker.email,
           subject: `Nouvelle tâche assignée - ${taskTitle}`,
           html: `
@@ -292,9 +313,22 @@ export async function assignTaskAction(
             </html>
           `,
         });
+        
+        if (!emailResult.success) {
+          console.error('[assignTaskAction] Échec envoi email:', emailResult.error);
+        } else {
+          console.log('[assignTaskAction] Email envoyé avec succès à:', worker.email);
+        }
       } catch (emailError) {
-        console.error('Erreur lors de l\'envoi de l\'email:', emailError);
-        // Ne pas bloquer l'assignation si l'email échoue
+        console.error('[assignTaskAction] Exception lors de l\'envoi de l\'email:', emailError);
+        // Ne pas bloquer l'assignation si l'email échoue, mais logger l'erreur
+      }
+    } else {
+      if (!worker.email) {
+        console.warn('[assignTaskAction] Pas d\'email pour le worker, email non envoyé');
+      }
+      if (!accessCode) {
+        console.warn('[assignTaskAction] Pas de code d\'accès généré, email non envoyé');
       }
     }
   }
