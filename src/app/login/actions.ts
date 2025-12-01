@@ -111,14 +111,16 @@ export async function signInAction(
       return { error: 'Erreur lors de la création de la session. Veuillez réessayer.' };
     }
 
-    console.log('[signInAction] Connexion réussie, session créée');
+    console.log('[signInAction] Connexion réussie, session créée, redirection...');
 
-    // Ne pas rediriger directement ici, laisser l'AuthProvider gérer la redirection
-    // via onAuthStateChange pour éviter les problèmes de timing avec les cookies
-    // Retourner un succès pour que le formulaire ne montre pas d'erreur
-    // L'AuthProvider détectera la session et redirigera automatiquement
-    
-    return { success: 'Connexion réussie...' };
+    // Rediriger directement depuis la Server Action
+    // Les cookies sont déjà définis par createSupabaseServerClient avec allowCookieSetter: true
+    const authorizedUserId = 'e78e437e-a817-4da2-a091-a7f4e5e02583';
+    if (data.user.id === authorizedUserId || data.user.email === 'bcb83@icloud.com') {
+      redirect('/analytics');
+    }
+
+    redirect('/home');
   } catch (error) {
     // Gérer spécifiquement les erreurs de configuration
     if (error instanceof Error) {

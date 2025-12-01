@@ -90,20 +90,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const currentPath = window.location.pathname;
         const authorizedUserId = 'e78e437e-a817-4da2-a091-a7f4e5e02583';
         
-        // Attendre un peu pour que les cookies soient bien définis
-        setTimeout(() => {
-          if (session.user.id === authorizedUserId || session.user.email === 'bcb83@icloud.com') {
-            router.push('/analytics');
-          } else if (currentPath === '/login' || currentPath.startsWith('/login')) {
-            // Après connexion depuis la page login, toujours rediriger vers /home
-            router.push('/home');
-          } else if (isPWA && currentPath === '/landing') {
-            // En PWA uniquement : rediriger depuis landing vers home
-            router.push('/home');
-          } else {
-            router.refresh();
-          }
-        }, 100);
+        // Rediriger immédiatement (pas besoin d'attendre, les cookies sont déjà définis)
+        if (session.user.id === authorizedUserId || session.user.email === 'bcb83@icloud.com') {
+          router.push('/analytics');
+        } else if (currentPath === '/login' || currentPath.startsWith('/login')) {
+          // Après connexion depuis la page login, toujours rediriger vers /home
+          router.push('/home');
+        } else if (isPWA && currentPath === '/landing') {
+          // En PWA uniquement : rediriger depuis landing vers home
+          router.push('/home');
+        } else {
+          router.refresh();
+        }
       } else if (event === 'SIGNED_OUT') {
         console.log('❌ Utilisateur déconnecté');
         setIsChecking(false);
