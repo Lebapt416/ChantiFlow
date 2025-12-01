@@ -1,5 +1,15 @@
 @import "tailwindcss";
 
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 80px; /* Espace pour le header fixe */
+  -webkit-overflow-scrolling: touch; /* Scroll fluide sur iOS */
+}
+
+* {
+  scroll-margin-top: 80px; /* Marge pour les ancres */
+}
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -40,6 +50,7 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  overscroll-behavior-y: smooth; /* Évite les rebonds */
 }
 
 /* Styles d'impression pour les QR codes */

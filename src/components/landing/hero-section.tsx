@@ -178,15 +178,17 @@ export function HeroSection() {
           >
             <Link
               href="/login"
-              className="rounded-full bg-emerald-600 px-8 py-4 text-lg font-bold text-white shadow-xl shadow-emerald-500/20 transition hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600 hover:scale-105"
+              className="group relative overflow-hidden rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-500 px-8 py-4 text-lg font-bold text-white shadow-lg shadow-emerald-500/25 transition-all duration-300 hover:scale-105 hover:shadow-emerald-500/40 hover:from-emerald-500 hover:to-emerald-400 backdrop-blur-md border border-white/20 will-change-transform"
             >
-              Lancer mon 1er chantier
+              <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-1000 group-hover:translate-x-full" />
+              <span className="relative">Lancer mon 1er chantier</span>
             </Link>
             <Link
               href="/login"
-              className="rounded-full border-2 border-zinc-300/50 dark:border-zinc-700/50 bg-white/50 dark:bg-zinc-900/50 backdrop-blur-sm px-8 py-4 text-lg font-semibold text-zinc-900 dark:text-white transition hover:bg-zinc-100/50 dark:hover:bg-zinc-800/50 hover:scale-105"
+              className="group relative overflow-hidden rounded-xl border-2 border-white/20 dark:border-zinc-700/50 bg-white/30 dark:bg-zinc-900/30 backdrop-blur-md px-8 py-4 text-lg font-semibold text-zinc-900 dark:text-white shadow-lg transition-all duration-300 hover:scale-105 hover:bg-white/40 dark:hover:bg-zinc-800/40 hover:border-white/30 will-change-transform"
             >
-              Parler à un humain
+              <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/10 to-transparent transition-transform duration-1000 group-hover:translate-x-full" />
+              <span className="relative">Parler à un humain</span>
             </Link>
           </motion.div>
 
