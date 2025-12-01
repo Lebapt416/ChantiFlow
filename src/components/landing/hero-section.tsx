@@ -184,11 +184,13 @@ export function HeroSection() {
               <span className="relative">Lancer mon 1er chantier</span>
             </Link>
             <Link
-              href="/login"
+              href="https://forms.gle/ZQUYmuUYUJ66Znre8"
+              target="_blank"
+              rel="noopener noreferrer"
               className="group relative overflow-hidden rounded-xl border-2 border-white/20 dark:border-zinc-700/50 bg-white/30 dark:bg-zinc-900/30 backdrop-blur-md px-8 py-4 text-lg font-semibold text-zinc-900 dark:text-white shadow-lg transition-all duration-300 hover:scale-105 hover:bg-white/40 dark:hover:bg-zinc-800/40 hover:border-white/30 will-change-transform"
             >
               <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/10 to-transparent transition-transform duration-1000 group-hover:translate-x-full" />
-              <span className="relative">Parler à un humain</span>
+              <span className="relative">Nous contacter</span>
             </Link>
           </motion.div>
 
