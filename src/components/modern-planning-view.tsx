@@ -49,6 +49,7 @@ function getRoleColor(roleName: string | null | undefined): {
   bgColor: string;
   borderColor: string;
   barColor: string; // Couleur de la barre verticale
+  barNeonColor: string; // Effet néon pour la barre
   category: string; // Nom de la catégorie pour la légende
 } {
   const normalized = normalizeRole(roleName);
@@ -59,20 +60,21 @@ function getRoleColor(roleName: string | null | undefined): {
       bgColor: 'bg-zinc-800/80', 
       borderColor: 'border-zinc-500',
       barColor: 'bg-zinc-500',
+      barNeonColor: 'shadow-[0_0_8px_rgba(113,113,122,0.4)]',
       category: 'Autre'
     };
   }
 
   // Recherche directe pour les métiers les plus courants (optimisation)
-  const directMatches: Record<string, { labelColor: string; bgColor: string; borderColor: string; barColor: string; category: string }> = {
+  const directMatches: Record<string, { labelColor: string; bgColor: string; borderColor: string; barColor: string; barNeonColor: string; category: string }> = {
     // Gros Œuvre
-    'macon': { labelColor: 'text-emerald-400', bgColor: 'bg-zinc-900/80', borderColor: 'border-zinc-700', barColor: 'bg-emerald-500', category: 'Gros Œuvre' },
-    'plombier': { labelColor: 'text-cyan-400', bgColor: 'bg-zinc-900/80', borderColor: 'border-zinc-700', barColor: 'bg-cyan-500', category: 'Fluides & Tech' },
-    'architecte': { labelColor: 'text-violet-400', bgColor: 'bg-zinc-900/80', borderColor: 'border-zinc-700', barColor: 'bg-violet-500', category: 'Études / Gestion' },
-    'salinier': { labelColor: 'text-emerald-400', bgColor: 'bg-zinc-900/80', borderColor: 'border-zinc-700', barColor: 'bg-emerald-500', category: 'Gros Œuvre' },
-    'electricien': { labelColor: 'text-blue-400', bgColor: 'bg-zinc-900/80', borderColor: 'border-zinc-700', barColor: 'bg-blue-500', category: 'Fluides & Tech' },
-    'peintre': { labelColor: 'text-fuchsia-400', bgColor: 'bg-zinc-900/80', borderColor: 'border-zinc-700', barColor: 'bg-fuchsia-500', category: 'Finitions' },
-    'grutier': { labelColor: 'text-orange-400', bgColor: 'bg-zinc-900/80', borderColor: 'border-zinc-700', barColor: 'bg-orange-500', category: 'TP / Engins' },
+    'macon': { labelColor: 'text-emerald-300', bgColor: 'bg-zinc-900/80', borderColor: 'border-zinc-700', barColor: 'bg-emerald-500', barNeonColor: 'shadow-[0_0_8px_rgba(16,185,129,0.6)]', category: 'Gros Œuvre' },
+    'plombier': { labelColor: 'text-cyan-300', bgColor: 'bg-zinc-900/80', borderColor: 'border-zinc-700', barColor: 'bg-cyan-500', barNeonColor: 'shadow-[0_0_8px_rgba(6,182,212,0.6)]', category: 'Fluides & Tech' },
+    'architecte': { labelColor: 'text-violet-300', bgColor: 'bg-zinc-900/80', borderColor: 'border-zinc-700', barColor: 'bg-violet-500', barNeonColor: 'shadow-[0_0_8px_rgba(139,92,246,0.6)]', category: 'Études / Gestion' },
+    'salinier': { labelColor: 'text-emerald-300', bgColor: 'bg-zinc-900/80', borderColor: 'border-zinc-700', barColor: 'bg-emerald-500', barNeonColor: 'shadow-[0_0_8px_rgba(16,185,129,0.6)]', category: 'Gros Œuvre' },
+    'electricien': { labelColor: 'text-blue-300', bgColor: 'bg-zinc-900/80', borderColor: 'border-zinc-700', barColor: 'bg-blue-500', barNeonColor: 'shadow-[0_0_8px_rgba(59,130,246,0.6)]', category: 'Fluides & Tech' },
+    'peintre': { labelColor: 'text-fuchsia-300', bgColor: 'bg-zinc-900/80', borderColor: 'border-zinc-700', barColor: 'bg-fuchsia-500', barNeonColor: 'shadow-[0_0_8px_rgba(217,70,239,0.6)]', category: 'Finitions' },
+    'grutier': { labelColor: 'text-orange-300', bgColor: 'bg-zinc-900/80', borderColor: 'border-zinc-700', barColor: 'bg-orange-500', barNeonColor: 'shadow-[0_0_8px_rgba(249,115,22,0.6)]', category: 'TP / Engins' },
   };
 
   // Vérifier d'abord les correspondances directes
@@ -174,10 +176,11 @@ function getRoleColor(roleName: string | null | undefined): {
   // Catégorie 1: Gros Œuvre = Vert (emerald)
   if (checkKeywords(grosOeuvreKeywords)) {
     return { 
-      labelColor: 'text-emerald-400', 
+      labelColor: 'text-emerald-300', 
       bgColor: 'bg-zinc-900/80', 
       borderColor: 'border-zinc-700',
       barColor: 'bg-emerald-500',
+      barNeonColor: 'shadow-[0_0_8px_rgba(16,185,129,0.6)]',
       category: 'Gros Œuvre'
     };
   }
@@ -187,19 +190,21 @@ function getRoleColor(roleName: string | null | undefined): {
     // Électricité = Bleu
     if (normalized.includes('electric') || normalized.includes('elec')) {
       return { 
-        labelColor: 'text-blue-400', 
+        labelColor: 'text-blue-300', 
         bgColor: 'bg-zinc-900/80', 
         borderColor: 'border-zinc-700',
         barColor: 'bg-blue-500',
+        barNeonColor: 'shadow-[0_0_8px_rgba(59,130,246,0.6)]',
         category: 'Fluides & Tech'
       };
     }
     // Plomberie/CVC = Cyan
     return { 
-      labelColor: 'text-cyan-400', 
+      labelColor: 'text-cyan-300', 
       bgColor: 'bg-zinc-900/80', 
       borderColor: 'border-zinc-700',
       barColor: 'bg-cyan-500',
+      barNeonColor: 'shadow-[0_0_8px_rgba(6,182,212,0.6)]',
       category: 'Fluides & Tech'
     };
   }
@@ -209,19 +214,21 @@ function getRoleColor(roleName: string | null | undefined): {
     // Peinture = Magenta/Fuchsia
     if (normalized.includes('peintre') || normalized.includes('peinture')) {
       return { 
-        labelColor: 'text-fuchsia-400', 
+        labelColor: 'text-fuchsia-300', 
         bgColor: 'bg-zinc-900/80', 
         borderColor: 'border-zinc-700',
         barColor: 'bg-fuchsia-500',
+        barNeonColor: 'shadow-[0_0_8px_rgba(217,70,239,0.6)]',
         category: 'Finitions'
       };
     }
     // Sols/Menuiserie = Vert (emerald)
     return { 
-      labelColor: 'text-emerald-400', 
+      labelColor: 'text-emerald-300', 
       bgColor: 'bg-zinc-900/80', 
       borderColor: 'border-zinc-700',
       barColor: 'bg-emerald-500',
+      barNeonColor: 'shadow-[0_0_8px_rgba(16,185,129,0.6)]',
       category: 'Finitions'
     };
   }
@@ -229,10 +236,11 @@ function getRoleColor(roleName: string | null | undefined): {
   // Catégorie 4: Encadrement/Études = Violet
   if (checkKeywords(encadrementKeywords)) {
     return { 
-      labelColor: 'text-violet-400', 
+      labelColor: 'text-violet-300', 
       bgColor: 'bg-zinc-900/80', 
       borderColor: 'border-zinc-700',
       barColor: 'bg-violet-500',
+      barNeonColor: 'shadow-[0_0_8px_rgba(139,92,246,0.6)]',
       category: 'Études / Gestion'
     };
   }
@@ -248,10 +256,11 @@ function getRoleColor(roleName: string | null | undefined): {
   ];
   if (checkKeywords(tpEnginsKeywords)) {
     return { 
-      labelColor: 'text-orange-400', 
+      labelColor: 'text-orange-300', 
       bgColor: 'bg-zinc-900/80', 
       borderColor: 'border-zinc-700',
       barColor: 'bg-orange-500',
+      barNeonColor: 'shadow-[0_0_8px_rgba(249,115,22,0.6)]',
       category: 'TP / Engins'
     };
   }
@@ -264,10 +273,11 @@ function getRoleColor(roleName: string | null | undefined): {
   ];
   if (checkKeywords(metiersArtKeywords)) {
     return { 
-      labelColor: 'text-teal-400', 
+      labelColor: 'text-teal-300', 
       bgColor: 'bg-zinc-900/80', 
       borderColor: 'border-zinc-700',
       barColor: 'bg-teal-500',
+      barNeonColor: 'shadow-[0_0_8px_rgba(20,184,166,0.6)]',
       category: 'Finitions'
     };
   }
@@ -280,10 +290,11 @@ function getRoleColor(roleName: string | null | undefined): {
   ];
   if (checkKeywords(maintenanceKeywords)) {
     return { 
-      labelColor: 'text-rose-400', 
+      labelColor: 'text-rose-300', 
       bgColor: 'bg-zinc-900/80', 
       borderColor: 'border-zinc-700',
       barColor: 'bg-rose-500',
+      barNeonColor: 'shadow-[0_0_8px_rgba(244,63,94,0.6)]',
       category: 'Autre'
     };
   }
@@ -296,10 +307,11 @@ function getRoleColor(roleName: string | null | undefined): {
   ];
   if (checkKeywords(specialitesKeywords)) {
     return { 
-      labelColor: 'text-indigo-400', 
+      labelColor: 'text-indigo-300', 
       bgColor: 'bg-zinc-900/80', 
       borderColor: 'border-zinc-700',
       barColor: 'bg-indigo-500',
+      barNeonColor: 'shadow-[0_0_8px_rgba(99,102,241,0.6)]',
       category: 'Autre'
     };
   }
@@ -311,9 +323,9 @@ function getRoleColor(roleName: string | null | undefined): {
   }, 0);
   
   const fallbackColors = [
-    { labelColor: 'text-zinc-400', bgColor: 'bg-zinc-900/80', borderColor: 'border-zinc-700', barColor: 'bg-zinc-500', category: 'Autre' },
-    { labelColor: 'text-slate-400', bgColor: 'bg-zinc-900/80', borderColor: 'border-zinc-700', barColor: 'bg-slate-500', category: 'Autre' },
-    { labelColor: 'text-gray-400', bgColor: 'bg-zinc-900/80', borderColor: 'border-zinc-700', barColor: 'bg-gray-500', category: 'Autre' },
+    { labelColor: 'text-zinc-400', bgColor: 'bg-zinc-900/80', borderColor: 'border-zinc-700', barColor: 'bg-zinc-500', barNeonColor: 'shadow-[0_0_8px_rgba(113,113,122,0.4)]', category: 'Autre' },
+    { labelColor: 'text-slate-400', bgColor: 'bg-zinc-900/80', borderColor: 'border-zinc-700', barColor: 'bg-slate-500', barNeonColor: 'shadow-[0_0_8px_rgba(100,116,139,0.4)]', category: 'Autre' },
+    { labelColor: 'text-gray-400', bgColor: 'bg-zinc-900/80', borderColor: 'border-zinc-700', barColor: 'bg-gray-500', barNeonColor: 'shadow-[0_0_8px_rgba(107,114,128,0.4)]', category: 'Autre' },
   ];
   
   return fallbackColors[Math.abs(hash) % fallbackColors.length];
@@ -410,8 +422,8 @@ export function ModernPlanningView({ siteName, phases, isAheadOfSchedule = false
               key={phase.id}
               className="relative overflow-hidden rounded-xl border border-zinc-700 bg-zinc-900/80 p-4"
             >
-              {/* Barre verticale colorée à gauche */}
-              <div className={`absolute left-0 top-0 bottom-0 w-1 ${roleColors.barColor}`} />
+              {/* Barre verticale colorée à gauche avec effet néon */}
+              <div className={`absolute left-0 top-0 bottom-0 w-1 ${roleColors.barColor} ${roleColors.barNeonColor}`} />
 
               {/* Contenu de la carte */}
               <div className="pl-3">
