@@ -26,11 +26,12 @@ function ProductScreenshot() {
   return (
     <Image
       src="/capture-planning.png"
-      alt="Capture d'écran du planning ChantiFlow"
+      alt="Capture d'écran du planning ChantiFlow - Interface de planification intelligente avec drag & drop"
       fill
-      className="object-contain"
+      className="object-contain p-4"
       priority
       onError={() => setImageError(true)}
+      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 1200px"
     />
   );
 }
@@ -202,7 +203,7 @@ export function HeroSection() {
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
           >
             <motion.div
-              className="relative mx-auto max-w-5xl rounded-2xl border border-white/20 dark:border-zinc-800/50 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md shadow-2xl shadow-emerald-500/20 overflow-hidden"
+              className="relative mx-auto max-w-6xl rounded-2xl border border-white/20 dark:border-zinc-800/50 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md shadow-2xl shadow-emerald-500/20 overflow-hidden"
               style={{
                 perspective: "1000px",
                 transformStyle: "preserve-3d",
@@ -213,7 +214,13 @@ export function HeroSection() {
               }}
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
             >
-              <div className="aspect-video relative bg-zinc-100 dark:bg-zinc-950">
+              <div
+                className="relative bg-zinc-100 dark:bg-zinc-950"
+                style={{
+                  aspectRatio: "1353 / 768",
+                  minHeight: "400px",
+                }}
+              >
                 <ProductScreenshot />
               </div>
             </motion.div>
