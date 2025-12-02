@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 import { sendReportNotificationEmail } from '@/lib/email';
+import { capitalizeRoleWords } from '@/lib/utils/role-formatting';
 
 export type ReportState = {
   error?: string;
@@ -19,7 +20,8 @@ export async function submitReportAction(
   const taskId = String(formData.get('taskId') ?? '');
   const email = String(formData.get('email') ?? '').trim().toLowerCase();
   const name = String(formData.get('name') ?? '').trim();
-  const role = String(formData.get('role') ?? '').trim();
+  const roleRaw = String(formData.get('role') ?? '').trim();
+  const role = roleRaw ? capitalizeRoleWords(roleRaw) : '';
   const description = String(formData.get('description') ?? '').trim();
   const markDone = formData.get('mark_done') === 'on';
   const file = formData.get('photo') as File | null;

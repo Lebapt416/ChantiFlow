@@ -3,6 +3,7 @@
 import { startTransition, useActionState, useEffect, useMemo, useState } from "react";
 import { useFormStatus } from "react-dom";
 import { submitReportAction, type ReportState } from './actions';
+import { capitalizeRoleWords } from '@/lib/utils/role-formatting';
 
 const initialState: ReportState = {};
 
@@ -176,6 +177,11 @@ export function ReportForm({ siteId, tasks, workers }: Props) {
             className="w-full rounded-md border border-zinc-200 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-black/60 dark:border-zinc-700 dark:bg-zinc-950 dark:text-white"
             value={role}
             onChange={(event) => setRole(event.target.value)}
+            onBlur={(event) => {
+              const capitalized = capitalizeRoleWords(event.target.value);
+              setRole(capitalized);
+              event.target.value = capitalized;
+            }}
           />
         </div>
       </div>

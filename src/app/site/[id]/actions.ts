@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { capitalizeRoleWords } from '@/lib/utils/role-formatting';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 import { sendWorkerWelcomeEmail, sendSiteCompletedEmail } from '@/lib/email';
 import { generateAccessCode } from '@/lib/access-code';
@@ -56,7 +57,8 @@ export async function addTaskAction(
 ): Promise<ActionState> {
   const siteId = String(formData.get('siteId') ?? '');
   const title = String(formData.get('title') ?? '').trim();
-  const requiredRole = String(formData.get('required_role') ?? '').trim();
+  const requiredRoleRaw = String(formData.get('required_role') ?? '').trim();
+  const requiredRole = requiredRoleRaw ? capitalizeRoleWords(requiredRoleRaw) : null;
   const durationHours = Number(formData.get('duration_hours') ?? 0);
 
   if (!siteId || !title) {
@@ -67,7 +69,7 @@ export async function addTaskAction(
   const { error } = await supabase.from('tasks').insert({
     site_id: siteId,
     title,
-    required_role: requiredRole || null,
+    required_role: requiredRole,
     duration_hours: Number.isFinite(durationHours) ? durationHours : null,
     status: 'pending',
   });
@@ -88,7 +90,8 @@ export async function addWorkerAction(
   const existingWorkerId = String(formData.get('existingWorkerId') ?? '').trim();
   const name = String(formData.get('name') ?? '').trim();
   const email = String(formData.get('email') ?? '').trim();
-  const role = String(formData.get('role') ?? '').trim();
+  const roleRaw = String(formData.get('role') ?? '').trim();
+  const role = roleRaw ? capitalizeRoleWords(roleRaw) : null;
 
   if (!siteId) {
     return { error: 'Site requis.' };

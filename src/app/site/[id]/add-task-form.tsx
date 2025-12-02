@@ -1,8 +1,9 @@
 "use client";
 
-import { useActionState, useEffect } from "react";
+import { useActionState, useEffect, useState } from "react";
 import { useFormStatus } from "react-dom";
 import { addTaskAction, type ActionState } from './actions';
+import { capitalizeRoleWords } from '@/lib/utils/role-formatting';
 
 const initialState: ActionState = {};
 
@@ -25,11 +26,13 @@ type Props = {
 
 export function AddTaskForm({ siteId }: Props) {
   const [state, formAction] = useActionState(addTaskAction, initialState);
+  const [requiredRole, setRequiredRole] = useState('');
 
   useEffect(() => {
     if (state?.success) {
       const form = document.getElementById('add-task-form') as HTMLFormElement | null;
       form?.reset();
+      setRequiredRole('');
     }
   }, [state?.success]);
 
@@ -66,6 +69,13 @@ export function AddTaskForm({ siteId }: Props) {
           id="required_role"
           name="required_role"
           placeholder="Maçon"
+          value={requiredRole}
+          onChange={(e) => setRequiredRole(e.target.value)}
+          onBlur={(e) => {
+            const capitalized = capitalizeRoleWords(e.target.value);
+            setRequiredRole(capitalized);
+            e.target.value = capitalized;
+          }}
           className="w-full rounded-md border border-zinc-200 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-black/60 dark:border-zinc-700 dark:bg-zinc-950 dark:text-white"
         />
       </div>

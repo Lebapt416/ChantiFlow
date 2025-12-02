@@ -38,31 +38,41 @@ function normalizeRole(role: string | null | undefined): string {
 
 /**
  * Détermine la catégorie d'un métier et retourne sa couleur selon le code couleur :
- * - Gros Œuvre = Gris/Noir (zinc/slate)
+ * - Gros Œuvre = Vert (emerald)
  * - Second Œuvre (Élec/Plomberie) = Bleu/Cyan
- * - Finitions (Peinture/Sols) = Vert/Orange
+ * - Finitions (Peinture/Sols) = Magenta/Vert
  * - Encadrement/Études = Violet
+ * - TP / Engins = Orange
  */
 function getRoleColor(roleName: string | null | undefined): {
   labelColor: string;
   bgColor: string;
   borderColor: string;
+  barColor: string; // Couleur de la barre verticale
+  category: string; // Nom de la catégorie pour la légende
 } {
   const normalized = normalizeRole(roleName);
   if (!normalized) {
     // Fallback par défaut
-    return { labelColor: 'text-zinc-400', bgColor: 'bg-zinc-800/80', borderColor: 'border-zinc-500' };
+    return { 
+      labelColor: 'text-zinc-400', 
+      bgColor: 'bg-zinc-800/80', 
+      borderColor: 'border-zinc-500',
+      barColor: 'bg-zinc-500',
+      category: 'Autre'
+    };
   }
 
   // Recherche directe pour les métiers les plus courants (optimisation)
-  const directMatches: Record<string, { labelColor: string; bgColor: string; borderColor: string }> = {
+  const directMatches: Record<string, { labelColor: string; bgColor: string; borderColor: string; barColor: string; category: string }> = {
     // Gros Œuvre
-    'macon': { labelColor: 'text-zinc-300', bgColor: 'bg-zinc-950/80', borderColor: 'border-zinc-500' },
-    'plombier': { labelColor: 'text-cyan-400', bgColor: 'bg-cyan-950/80', borderColor: 'border-cyan-500' },
-    'architecte': { labelColor: 'text-violet-400', bgColor: 'bg-violet-950/80', borderColor: 'border-violet-500' },
-    'salinier': { labelColor: 'text-zinc-300', bgColor: 'bg-zinc-950/80', borderColor: 'border-zinc-500' },
-    'electricien': { labelColor: 'text-blue-400', bgColor: 'bg-blue-950/80', borderColor: 'border-blue-500' },
-    'peintre': { labelColor: 'text-emerald-400', bgColor: 'bg-emerald-950/80', borderColor: 'border-emerald-500' },
+    'macon': { labelColor: 'text-emerald-400', bgColor: 'bg-zinc-900/80', borderColor: 'border-zinc-700', barColor: 'bg-emerald-500', category: 'Gros Œuvre' },
+    'plombier': { labelColor: 'text-cyan-400', bgColor: 'bg-zinc-900/80', borderColor: 'border-zinc-700', barColor: 'bg-cyan-500', category: 'Fluides & Tech' },
+    'architecte': { labelColor: 'text-violet-400', bgColor: 'bg-zinc-900/80', borderColor: 'border-zinc-700', barColor: 'bg-violet-500', category: 'Études / Gestion' },
+    'salinier': { labelColor: 'text-emerald-400', bgColor: 'bg-zinc-900/80', borderColor: 'border-zinc-700', barColor: 'bg-emerald-500', category: 'Gros Œuvre' },
+    'electricien': { labelColor: 'text-blue-400', bgColor: 'bg-zinc-900/80', borderColor: 'border-zinc-700', barColor: 'bg-blue-500', category: 'Fluides & Tech' },
+    'peintre': { labelColor: 'text-fuchsia-400', bgColor: 'bg-zinc-900/80', borderColor: 'border-zinc-700', barColor: 'bg-fuchsia-500', category: 'Finitions' },
+    'grutier': { labelColor: 'text-orange-400', bgColor: 'bg-zinc-900/80', borderColor: 'border-zinc-700', barColor: 'bg-orange-500', category: 'TP / Engins' },
   };
 
   // Vérifier d'abord les correspondances directes
@@ -161,34 +171,89 @@ function getRoleColor(roleName: string | null | undefined): {
     });
   };
 
-  // Catégorie 1: Gros Œuvre = Gris/Noir (zinc/slate)
+  // Catégorie 1: Gros Œuvre = Vert (emerald)
   if (checkKeywords(grosOeuvreKeywords)) {
-    return { labelColor: 'text-zinc-300', bgColor: 'bg-zinc-950/80', borderColor: 'border-zinc-500' };
+    return { 
+      labelColor: 'text-emerald-400', 
+      bgColor: 'bg-zinc-900/80', 
+      borderColor: 'border-zinc-700',
+      barColor: 'bg-emerald-500',
+      category: 'Gros Œuvre'
+    };
   }
 
   // Catégorie 2: Second Œuvre (Élec/Plomberie) = Bleu/Cyan
   if (checkKeywords(secondOeuvreKeywords)) {
     // Électricité = Bleu
     if (normalized.includes('electric') || normalized.includes('elec')) {
-      return { labelColor: 'text-blue-400', bgColor: 'bg-blue-950/80', borderColor: 'border-blue-500' };
+      return { 
+        labelColor: 'text-blue-400', 
+        bgColor: 'bg-zinc-900/80', 
+        borderColor: 'border-zinc-700',
+        barColor: 'bg-blue-500',
+        category: 'Fluides & Tech'
+      };
     }
     // Plomberie/CVC = Cyan
-    return { labelColor: 'text-cyan-400', bgColor: 'bg-cyan-950/80', borderColor: 'border-cyan-500' };
+    return { 
+      labelColor: 'text-cyan-400', 
+      bgColor: 'bg-zinc-900/80', 
+      borderColor: 'border-zinc-700',
+      barColor: 'bg-cyan-500',
+      category: 'Fluides & Tech'
+    };
   }
 
-  // Catégorie 3: Finitions = Vert/Orange
+  // Catégorie 3: Finitions = Magenta/Vert
   if (checkKeywords(finitionsKeywords)) {
-    // Peinture = Vert
+    // Peinture = Magenta/Fuchsia
     if (normalized.includes('peintre') || normalized.includes('peinture')) {
-      return { labelColor: 'text-emerald-400', bgColor: 'bg-emerald-950/80', borderColor: 'border-emerald-500' };
+      return { 
+        labelColor: 'text-fuchsia-400', 
+        bgColor: 'bg-zinc-900/80', 
+        borderColor: 'border-zinc-700',
+        barColor: 'bg-fuchsia-500',
+        category: 'Finitions'
+      };
     }
-    // Sols/Menuiserie = Orange
-    return { labelColor: 'text-orange-400', bgColor: 'bg-orange-950/80', borderColor: 'border-orange-500' };
+    // Sols/Menuiserie = Vert (emerald)
+    return { 
+      labelColor: 'text-emerald-400', 
+      bgColor: 'bg-zinc-900/80', 
+      borderColor: 'border-zinc-700',
+      barColor: 'bg-emerald-500',
+      category: 'Finitions'
+    };
   }
 
   // Catégorie 4: Encadrement/Études = Violet
   if (checkKeywords(encadrementKeywords)) {
-    return { labelColor: 'text-violet-400', bgColor: 'bg-violet-950/80', borderColor: 'border-violet-500' };
+    return { 
+      labelColor: 'text-violet-400', 
+      bgColor: 'bg-zinc-900/80', 
+      borderColor: 'border-zinc-700',
+      barColor: 'bg-violet-500',
+      category: 'Études / Gestion'
+    };
+  }
+
+  // TP / Engins = Orange
+  const tpEnginsKeywords = [
+    'grutier', 'grue', 'conducteur de pelle', 'conducteur de chargeuse', 'conducteur de tractopelle',
+    'conducteur de bouteur', 'bulldozer', 'conducteur de niveleuse', 'conducteur de decapeuse',
+    'scraper', 'conducteur de compacteur', 'conducteur de finisseur', 'conducteur de tombereau',
+    'dumper', 'conducteur de camion benne', 'conducteur de camion toupie', 'conducteur de camion pompe',
+    'pompiste beton', 'conducteur de nacelle', 'pemp', 'conducteur de chariot', 'terrassier',
+    'terrassement', 'tp', 'travaux publics', 'engins'
+  ];
+  if (checkKeywords(tpEnginsKeywords)) {
+    return { 
+      labelColor: 'text-orange-400', 
+      bgColor: 'bg-zinc-900/80', 
+      borderColor: 'border-zinc-700',
+      barColor: 'bg-orange-500',
+      category: 'TP / Engins'
+    };
   }
 
   // Métiers d'Art & Patrimoine = Couleur spéciale (teal)
@@ -198,7 +263,13 @@ function getRoleColor(roleName: string | null | undefined): {
     'lauzier', 'metiers dart', 'patrimoine'
   ];
   if (checkKeywords(metiersArtKeywords)) {
-    return { labelColor: 'text-teal-400', bgColor: 'bg-teal-950/80', borderColor: 'border-teal-500' };
+    return { 
+      labelColor: 'text-teal-400', 
+      bgColor: 'bg-zinc-900/80', 
+      borderColor: 'border-zinc-700',
+      barColor: 'bg-teal-500',
+      category: 'Finitions'
+    };
   }
 
   // Maintenance & Services = Couleur spéciale (rose)
@@ -208,7 +279,13 @@ function getRoleColor(roleName: string | null | undefined): {
     'serrurier depanneur', 'vitrier depanneur', 'maintenance', 'services generaux'
   ];
   if (checkKeywords(maintenanceKeywords)) {
-    return { labelColor: 'text-rose-400', bgColor: 'bg-rose-950/80', borderColor: 'border-rose-500' };
+    return { 
+      labelColor: 'text-rose-400', 
+      bgColor: 'bg-zinc-900/80', 
+      borderColor: 'border-zinc-700',
+      barColor: 'bg-rose-500',
+      category: 'Autre'
+    };
   }
 
   // Spécialités diverses = Couleur spéciale (indigo)
@@ -218,7 +295,13 @@ function getRoleColor(roleName: string | null | undefined): {
     'specialites', 'diverses'
   ];
   if (checkKeywords(specialitesKeywords)) {
-    return { labelColor: 'text-indigo-400', bgColor: 'bg-indigo-950/80', borderColor: 'border-indigo-500' };
+    return { 
+      labelColor: 'text-indigo-400', 
+      bgColor: 'bg-zinc-900/80', 
+      borderColor: 'border-zinc-700',
+      barColor: 'bg-indigo-500',
+      category: 'Autre'
+    };
   }
 
   // Fallback : générer une couleur basée sur le hash du nom pour les métiers non reconnus
@@ -228,9 +311,9 @@ function getRoleColor(roleName: string | null | undefined): {
   }, 0);
   
   const fallbackColors = [
-    { labelColor: 'text-zinc-400', bgColor: 'bg-zinc-800/80', borderColor: 'border-zinc-500' },
-    { labelColor: 'text-slate-400', bgColor: 'bg-slate-800/80', borderColor: 'border-slate-500' },
-    { labelColor: 'text-gray-400', bgColor: 'bg-gray-800/80', borderColor: 'border-gray-500' },
+    { labelColor: 'text-zinc-400', bgColor: 'bg-zinc-900/80', borderColor: 'border-zinc-700', barColor: 'bg-zinc-500', category: 'Autre' },
+    { labelColor: 'text-slate-400', bgColor: 'bg-zinc-900/80', borderColor: 'border-zinc-700', barColor: 'bg-slate-500', category: 'Autre' },
+    { labelColor: 'text-gray-400', bgColor: 'bg-zinc-900/80', borderColor: 'border-zinc-700', barColor: 'bg-gray-500', category: 'Autre' },
   ];
   
   return fallbackColors[Math.abs(hash) % fallbackColors.length];
@@ -299,7 +382,7 @@ export function ModernPlanningView({ siteName, phases, isAheadOfSchedule = false
       </div>
 
       {/* Cartes de phases horizontales */}
-      <div className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {phases.map((phase) => {
           const statusConfig = getStatusConfig(phase.status);
           const StatusIcon = statusConfig.statusIcon;
@@ -307,24 +390,69 @@ export function ModernPlanningView({ siteName, phases, isAheadOfSchedule = false
           // Obtenir les couleurs basées sur le métier (nom de la phase)
           const roleColors = getRoleColor(phase.name);
 
+          // Déterminer le style du badge selon le statut
+          const getBadgeStyle = () => {
+            switch (phase.status) {
+              case 'completed':
+                return 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30';
+              case 'delayed':
+                return 'bg-red-500/20 text-red-400 border-red-500/30';
+              case 'in_progress':
+                return 'bg-zinc-500/20 text-zinc-300 border-zinc-500/30';
+              case 'pending':
+              default:
+                return 'bg-zinc-500/20 text-zinc-300 border-zinc-500/30';
+            }
+          };
+
           return (
             <div
               key={phase.id}
-              className={`relative overflow-hidden rounded-xl border ${roleColors.borderColor} ${roleColors.bgColor} p-4`}
+              className="relative overflow-hidden rounded-xl border border-zinc-700 bg-zinc-900/80 p-4"
             >
-              {/* Label de la phase */}
-              <div className={`mb-3 text-sm font-semibold ${roleColors.labelColor}`}>
-                {phase.name}
-              </div>
+              {/* Barre verticale colorée à gauche */}
+              <div className={`absolute left-0 top-0 bottom-0 w-1 ${roleColors.barColor}`} />
 
-              {/* Statut avec icône */}
-              <div className="flex items-center gap-2 text-sm font-semibold text-white">
-                <StatusIcon className="h-4 w-4 shrink-0" />
-                <span>{statusConfig.statusText}</span>
+              {/* Contenu de la carte */}
+              <div className="pl-3">
+                {/* Titre coloré */}
+                <div className={`mb-3 text-sm font-semibold ${roleColors.labelColor}`}>
+                  {phase.name}
+                </div>
+
+                {/* Badge de statut avec icône */}
+                <div className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium ${getBadgeStyle()}`}>
+                  <StatusIcon className="h-3 w-3 shrink-0" />
+                  <span>{statusConfig.statusText}</span>
+                </div>
               </div>
             </div>
           );
         })}
+      </div>
+
+      {/* Légende des catégories */}
+      <div className="mt-6 flex flex-wrap items-center gap-4 border-t border-zinc-800 pt-4">
+        <div className="flex items-center gap-2">
+          <div className="h-3 w-3 rounded-full bg-emerald-500" />
+          <span className="text-xs text-zinc-300">Gros Œuvre</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="h-3 w-3 rounded-full bg-blue-500" />
+          <span className="text-xs text-zinc-300">Fluides & Tech</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="h-3 w-3 rounded-full bg-fuchsia-500" />
+          <span className="text-xs text-zinc-300">Finitions</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="h-3 w-3 rounded-full bg-orange-500" />
+          <span className="text-xs text-zinc-300">TP / Engins</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="h-3 w-3 rounded-full bg-violet-500" />
+          <span className="text-xs text-zinc-300">Études / Gestion</span>
+        </div>
       </div>
 
       {/* Message de statut IA en bas */}

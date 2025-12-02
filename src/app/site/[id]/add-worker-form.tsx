@@ -3,6 +3,7 @@
 import { useState, useActionState, useEffect } from "react";
 import { useFormStatus } from "react-dom";
 import { addWorkerAction, type ActionState } from './actions';
+import { capitalizeRoleWords } from '@/lib/utils/role-formatting';
 
 const initialState: ActionState = {};
 
@@ -34,6 +35,7 @@ type Props = {
 export function AddWorkerForm({ siteId, availableWorkers }: Props) {
   const [useExisting, setUseExisting] = useState(false);
   const [state, formAction] = useActionState(addWorkerAction, initialState);
+  const [role, setRole] = useState('');
 
   useEffect(() => {
     if (state?.success) {
@@ -139,6 +141,13 @@ export function AddWorkerForm({ siteId, availableWorkers }: Props) {
               id="role"
               name="role"
               placeholder="Chef d'équipe"
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+              onBlur={(e) => {
+                const capitalized = capitalizeRoleWords(e.target.value);
+                setRole(capitalized);
+                e.target.value = capitalized;
+              }}
               className="w-full rounded-md border border-zinc-200 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-black/60 dark:border-zinc-700 dark:bg-zinc-950 dark:text-white"
             />
           </div>
