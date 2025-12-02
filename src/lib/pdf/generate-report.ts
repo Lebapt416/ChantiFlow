@@ -8,11 +8,11 @@ interface jsPDFCustom extends jsPDF {
 
 // Couleurs professionnelles
 const COLORS = {
-  navy: [13, 27, 62], // Bleu foncé (navy) pour les en-têtes
-  lightGray: [245, 245, 247], // Gris très clair pour les lignes alternées
-  white: [255, 255, 255],
-  darkGray: [100, 100, 100],
-  textDark: [30, 30, 30],
+  navy: [13, 27, 62] as [number, number, number], // Bleu foncé (navy) pour les en-têtes
+  lightGray: [245, 245, 247] as [number, number, number], // Gris très clair pour les lignes alternées
+  white: [255, 255, 255] as [number, number, number],
+  darkGray: [100, 100, 100] as [number, number, number],
+  textDark: [30, 30, 30] as [number, number, number],
 };
 
 /**
@@ -55,18 +55,18 @@ export async function generateSiteReport(
   // Logo / Nom de l'entreprise à gauche
   doc.setFontSize(20);
   doc.setFont('helvetica', 'bold');
-  doc.setTextColor(...COLORS.navy);
+  doc.setTextColor(COLORS.navy[0], COLORS.navy[1], COLORS.navy[2]);
   doc.text('ChantiFlow', margin, currentY + 10);
   
   doc.setFontSize(9);
   doc.setFont('helvetica', 'normal');
-  doc.setTextColor(...COLORS.darkGray);
+  doc.setTextColor(COLORS.darkGray[0], COLORS.darkGray[1], COLORS.darkGray[2]);
   doc.text('Gestion intelligente de chantiers', margin, currentY + 16);
 
   // Titre du rapport et date à droite
   doc.setFontSize(18);
   doc.setFont('helvetica', 'bold');
-  doc.setTextColor(...COLORS.textDark);
+  doc.setTextColor(COLORS.textDark[0], COLORS.textDark[1], COLORS.textDark[2]);
   doc.text('Rapport de Chantier', pageWidth - margin, currentY + 8, { align: 'right' });
   
   const dateStr = new Date().toLocaleDateString('fr-FR', {
@@ -77,7 +77,7 @@ export async function generateSiteReport(
   });
   doc.setFontSize(10);
   doc.setFont('helvetica', 'normal');
-  doc.setTextColor(...COLORS.darkGray);
+  doc.setTextColor(COLORS.darkGray[0], COLORS.darkGray[1], COLORS.darkGray[2]);
   doc.text(`Généré le ${dateStr}`, pageWidth - margin, currentY + 16, { align: 'right' });
 
   // Ligne de séparation
@@ -94,7 +94,7 @@ export async function generateSiteReport(
   const infoBoxPadding = 10;
 
   // Fond gris clair
-  doc.setFillColor(...COLORS.lightGray);
+  doc.setFillColor(COLORS.lightGray[0], COLORS.lightGray[1], COLORS.lightGray[2]);
   doc.setDrawColor(220, 220, 220);
   doc.setLineWidth(0.5);
   doc.roundedRect(margin, currentY, pageWidth - margin * 2, infoBoxHeight, 3, 3, 'FD');
@@ -106,13 +106,13 @@ export async function generateSiteReport(
 
   doc.setFontSize(12);
   doc.setFont('helvetica', 'bold');
-  doc.setTextColor(...COLORS.textDark);
+  doc.setTextColor(COLORS.textDark[0], COLORS.textDark[1], COLORS.textDark[2]);
   doc.text('Informations du Chantier', infoStartX, infoY);
   infoY += 8;
 
   doc.setFontSize(10);
   doc.setFont('helvetica', 'normal');
-  doc.setTextColor(...COLORS.darkGray);
+  doc.setTextColor(COLORS.darkGray[0], COLORS.darkGray[1], COLORS.darkGray[2]);
 
   // Nom du client / Chantier
   const siteName = site.name || 'Non spécifié';
@@ -137,7 +137,7 @@ export async function generateSiteReport(
   // ============================================
   doc.setFontSize(14);
   doc.setFont('helvetica', 'bold');
-  doc.setTextColor(...COLORS.textDark);
+  doc.setTextColor(COLORS.textDark[0], COLORS.textDark[1], COLORS.textDark[2]);
   doc.text('État des Tâches', margin, currentY);
   currentY += 8;
 
@@ -226,7 +226,7 @@ export async function generateSiteReport(
 function addFooter(doc: jsPDF, pageWidth: number, pageHeight: number, margin: number, currentPage: number, pageCount: number) {
   doc.setFontSize(9);
   doc.setFont('helvetica', 'normal');
-  doc.setTextColor(...COLORS.darkGray);
+  doc.setTextColor(COLORS.darkGray[0], COLORS.darkGray[1], COLORS.darkGray[2]);
   
   // Numéro de page centré
   const footerText = `Page ${currentPage} sur ${pageCount}`;
