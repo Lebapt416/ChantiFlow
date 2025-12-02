@@ -24,10 +24,24 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
       stack: error.stack,
     }, error);
 
-    // TODO: Envoyer à Sentry en production
-    // if (typeof window !== 'undefined' && window.Sentry) {
-    //   window.Sentry.captureException(error);
-    // }
+    // Envoyer à Sentry si disponible (côté client)
+    if (typeof window !== 'undefined') {
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const Sentry = (window as any).Sentry;
+        if (Sentry) {
+          Sentry.captureException(error, {
+            contexts: {
+              error: {
+                digest: error.digest,
+              },
+            },
+          });
+        }
+      } catch {
+        // Sentry non disponible - ignorer silencieusement
+      }
+    }
   }, [error]);
 
   return (

@@ -191,30 +191,57 @@ export async function generatePlanning(
     try {
       const apiUrl = process.env.NEXT_PUBLIC_PREDICTION_API_URL || process.env.ML_API_URL || '';
       if (apiUrl) {
-        console.log('🌤️ Optimisation météo pour:', location);
-        warnings.push(`🌤️ Optimisation météo activée pour ${location}`);
-        const weatherOptimization = await fetch(`${apiUrl.replace(/\/$/, '')}/planning/optimize-weather`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            tasks: orderedTasks.map((ot) => {
-              const task = classifiedTasks.find((t) => t.id === ot.taskId);
-              return {
-                task_role: task?.required_role || null,
-                task_title: task?.title || '',
-                planned_date: ot.startDate,
-              };
-            }),
-            location: location.trim(),
-            start_date: startDate.toISOString().split('T')[0],
-          }),
-          cache: 'no-store',
-        });
-
-        if (weatherOptimization.ok) {
-          const weatherData = await weatherOptimization.json();
-          console.log('✅ Données météo reçues:', weatherData);
+        // Importer le cache météo
+        const { weatherCache } = await import('@/lib/ai/weather-cache');
+        
+        const locationKey = location.trim();
+        console.log('🌤️ Optimisation météo pour:', locationKey);
+        
+        // Vérifier le cache avant d'appeler l'API
+        const cachedData = weatherCache.get(locationKey);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        let weatherData: any = null;
+        
+        if (cachedData) {
+          console.log('✅ Données météo récupérées depuis le cache');
+          weatherData = cachedData;
+        } else {
+          console.log('🌐 Appel API météo (cache vide ou expiré)');
+          warnings.push(`🌤️ Optimisation météo activée pour ${locationKey}`);
           
+          const weatherOptimization = await fetch(`${apiUrl.replace(/\/$/, '')}/planning/optimize-weather`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              tasks: orderedTasks.map((ot) => {
+                const task = classifiedTasks.find((t) => t.id === ot.taskId);
+                return {
+                  task_role: task?.required_role || null,
+                  task_title: task?.title || '',
+                  planned_date: ot.startDate,
+                };
+              }),
+              location: locationKey,
+              start_date: startDate.toISOString().split('T')[0],
+            }),
+            cache: 'no-store',
+          });
+
+          if (weatherOptimization.ok) {
+            weatherData = await weatherOptimization.json();
+            console.log('✅ Données météo reçues depuis l\'API');
+            
+            // Mettre en cache les données pour 1 heure
+            weatherCache.set(locationKey, weatherData);
+          } else {
+            const errorText = await weatherOptimization.text();
+            console.warn('⚠️ Erreur API météo:', weatherOptimization.status, errorText);
+            warnings.push('⚠️ Impossible de récupérer les prévisions météo pour optimiser le planning.');
+          }
+        }
+        
+        // Traiter les données météo (depuis le cache ou l'API)
+        if (weatherData) {
           // Appliquer les recommandations météo
           if (weatherData.recommendations && Array.isArray(weatherData.recommendations)) {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -257,13 +284,9 @@ export async function generatePlanning(
           }
 
           // Ajouter les warnings de l'API
-          if (weatherData.warnings && Array.isArray(weatherData.warnings)) {
+          if ('warnings' in weatherData && Array.isArray(weatherData.warnings)) {
             warnings.push(...weatherData.warnings);
           }
-        } else {
-          const errorText = await weatherOptimization.text();
-          console.warn('⚠️ Erreur API météo:', weatherOptimization.status, errorText);
-          warnings.push('⚠️ Impossible de récupérer les prévisions météo pour optimiser le planning.');
         }
       } else {
         console.warn('⚠️ URL API non configurée pour la météo');

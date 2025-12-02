@@ -73,12 +73,66 @@ class Logger {
       console.log(JSON.stringify(entry));
     }
 
-    // TODO: Intégrer Sentry ici
-    // if (level === 'error' && typeof window !== 'undefined' && window.Sentry) {
-    //   window.Sentry.captureException(error || new Error(message), {
-    //     contexts: { custom: context },
-    //   });
-    // }
+    // Intégration Sentry (si installé)
+    if (level === 'error') {
+      // Côté serveur (Node.js)
+      if (typeof window === 'undefined' && typeof process !== 'undefined') {
+        try {
+          // eslint-disable-next-line @typescript-eslint/no-var-requires
+          const Sentry = require('@sentry/nextjs');
+          if (Sentry && error) {
+            Sentry.captureException(error, {
+              contexts: { custom: context },
+              tags: {
+                userId: entry.userId,
+                siteId: entry.siteId,
+              },
+            });
+          } else if (Sentry && !error) {
+            Sentry.captureMessage(message, {
+              level: 'error',
+              contexts: { custom: context },
+              tags: {
+                userId: entry.userId,
+                siteId: entry.siteId,
+              },
+            });
+          }
+        } catch {
+          // Sentry non installé ou erreur d'import - ignorer silencieusement
+        }
+      }
+      
+      // Côté client (browser)
+      if (typeof window !== 'undefined') {
+        try {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const Sentry = (window as any).Sentry;
+          if (Sentry) {
+            if (error) {
+              Sentry.captureException(error, {
+                contexts: { custom: context },
+                tags: {
+                  userId: entry.userId,
+                  siteId: entry.siteId,
+                },
+              });
+            } else {
+              Sentry.captureMessage(message, {
+                level: 'error',
+                contexts: { custom: context },
+                tags: {
+                  userId: entry.userId,
+                  siteId: entry.siteId,
+                },
+              });
+            }
+          }
+        } catch {
+          // Sentry non disponible - ignorer silencieusement
+        }
+      }
+    }
   }
 
   /**

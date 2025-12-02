@@ -14,6 +14,8 @@ export type WorkerPlanningResult = {
     assignedWorkerIds?: string[];
     priority: 'high' | 'medium' | 'low';
     estimatedHours?: number;
+    status?: string | null;
+    requiredRole?: string | null;
   }>;
   error?: string;
 };
@@ -105,6 +107,8 @@ export async function getWorkerPlanning(
         assignedWorkerIds,
         priority: p.priority,
         estimatedHours,
+        status: task?.status ?? null,
+        requiredRole: task?.required_role ?? null,
       };
     });
 

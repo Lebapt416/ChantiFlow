@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { createSupabaseBrowserClient } from '@/lib/supabase/client';
 import { getWorkerPlanning } from '../actions';
 import { CheckCircle2, XCircle, Calendar, Clock, AlertCircle, Eye } from 'lucide-react';
 import { PlanningDetailModal } from './planning-detail-modal';
+import { ModernPlanningView } from '@/components/modern-planning-view';
 
 type PlanningTask = {
   taskId: string;
@@ -17,6 +18,8 @@ type PlanningTask = {
   priority: 'high' | 'medium' | 'low';
   estimatedHours?: number;
   validated?: boolean;
+  status?: string | null;
+  requiredRole?: string | null;
 };
 
 type Props = {
@@ -124,39 +127,65 @@ export function PlanningTab({ siteId, workerId }: Props) {
     });
   };
 
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case 'high':
-        return 'border-rose-200 bg-rose-50 text-rose-900 dark:border-rose-900/60 dark:bg-rose-900/20 dark:text-rose-200';
-      case 'medium':
-        return 'border-amber-200 bg-amber-50 text-amber-900 dark:border-amber-900/60 dark:bg-amber-900/20 dark:text-amber-200';
-      default:
-        return 'border-zinc-200 bg-zinc-50 text-zinc-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300';
-    }
-  };
+  // Transformer les tâches en phases pour la vue moderne
+  const modernPhases = useMemo(() => {
+    if (planning.length === 0) return [];
+
+    // Grouper par tâche (chaque tâche = une phase pour l'employé)
+    return planning.map((task) => {
+      let status: 'completed' | 'in_progress' | 'pending' = 'pending';
+      let progress = 0;
+
+      const taskStatus = task.status?.toLowerCase() || 'pending';
+      
+      if (task.validated || taskStatus === 'done' || taskStatus === 'completed') {
+        status = 'completed';
+        progress = 100;
+      } else if (taskStatus === 'in_progress' || taskStatus === 'progress') {
+        status = 'in_progress';
+        // Calculer le pourcentage de progression basé sur les dates
+        const now = new Date();
+        const startDate = new Date(task.startDate);
+        const endDate = new Date(task.endDate);
+        const totalDuration = endDate.getTime() - startDate.getTime();
+        if (totalDuration > 0) {
+          const elapsed = Math.max(0, now.getTime() - startDate.getTime());
+          progress = Math.min(Math.max(Math.round((elapsed / totalDuration) * 100), 10), 90);
+        } else {
+          progress = 50;
+        }
+      } else {
+        // Vérifier si la tâche devrait être en cours (date actuelle entre startDate et endDate)
+        const now = new Date();
+        const startDate = new Date(task.startDate);
+        const endDate = new Date(task.endDate);
+        
+        if (now >= startDate && now <= endDate) {
+          status = 'in_progress';
+          const totalDuration = endDate.getTime() - startDate.getTime();
+          if (totalDuration > 0) {
+            const elapsed = now.getTime() - startDate.getTime();
+            progress = Math.min(Math.max(Math.round((elapsed / totalDuration) * 100), 10), 90);
+          } else {
+            progress = 50;
+          }
+        } else if (now > endDate) {
+          status = 'in_progress';
+          progress = 90;
+        }
+      }
+
+      return {
+        id: task.taskId,
+        name: task.taskTitle,
+        status,
+        progress,
+      };
+    });
+  }, [planning]);
 
   return (
     <div className="p-3 sm:p-4 md:p-6 space-y-4 sm:space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-base sm:text-lg font-semibold text-zinc-900 dark:text-white mb-1">
-            Mon emploi du temps
-          </h2>
-          <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400">
-            {siteName || 'Chantier'} • {planning.length} tâche{planning.length > 1 ? 's' : ''} planifiée{planning.length > 1 ? 's' : ''}
-          </p>
-        </div>
-        {planning.length > 0 && (
-          <button
-            onClick={() => setShowDetailModal(true)}
-            className="flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-xs font-medium text-zinc-700 transition hover:bg-zinc-50 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
-          >
-            <Eye className="h-4 w-4" />
-            <span className="hidden sm:inline">Voir en détail</span>
-          </button>
-        )}
-      </div>
-
       {planning.length === 0 ? (
         <div className="text-center py-12">
           <Calendar className="h-12 w-12 text-zinc-400 mx-auto mb-4" />
@@ -168,67 +197,26 @@ export function PlanningTab({ siteId, workerId }: Props) {
           </p>
         </div>
       ) : (
-        <div className="space-y-2 sm:space-y-3">
-          {planning.map((task) => (
-            <div
-              key={task.taskId}
-              className={`rounded-lg border p-3 sm:p-4 transition ${
-                task.validated
-                  ? 'border-emerald-200 bg-emerald-50 dark:border-emerald-900/60 dark:bg-emerald-900/20'
-                  : getPriorityColor(task.priority)
-              }`}
-            >
-              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-2">
-                    <h3 className="font-semibold text-sm sm:text-base text-zinc-900 dark:text-white break-words">
-                      {task.taskTitle}
-                    </h3>
-                    {task.validated && (
-                      <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
-                    )}
-                  </div>
-                  
-                  <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs text-zinc-600 dark:text-zinc-400">
-                    <div className="flex items-center gap-1">
-                      <Calendar className="h-3 w-3" />
-                      <span>
-                        {formatDate(task.startDate)} - {formatDate(task.endDate)}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Clock className="h-3 w-3" />
-                      <span>Ordre: {task.order}</span>
-                    </div>
-                    <span className="px-2 py-0.5 rounded-full bg-zinc-200 dark:bg-zinc-700 text-zinc-700 dark:text-zinc-300 text-[10px] sm:text-xs">
-                      {task.priority === 'high' ? 'Priorité haute' : task.priority === 'medium' ? 'Priorité moyenne' : 'Priorité basse'}
-                    </span>
-                  </div>
-                </div>
+        <>
+          {/* Vue moderne du planning */}
+          <ModernPlanningView
+            siteName={siteName || 'Chantier'}
+            phases={modernPhases}
+            isAheadOfSchedule={false}
+            showAIBadge={true}
+          />
 
-                <div className="flex sm:flex-col gap-2">
-                  {!task.validated ? (
-                    <button
-                      onClick={() => handleValidate(task.taskId, true)}
-                      className="flex items-center justify-center gap-2 rounded-lg bg-emerald-600 px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-white transition hover:bg-emerald-700 active:scale-95 w-full sm:w-auto"
-                    >
-                      <CheckCircle2 className="h-3 w-3 sm:h-4 sm:w-4" />
-                      <span className="sm:inline">Valider</span>
-                    </button>
-                  ) : (
-                    <button
-                      onClick={() => handleValidate(task.taskId, false)}
-                      className="flex items-center justify-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-zinc-700 transition hover:bg-zinc-50 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700 active:scale-95 w-full sm:w-auto"
-                    >
-                      <XCircle className="h-3 w-3 sm:h-4 sm:w-4" />
-                      <span className="sm:inline">Annuler</span>
-                    </button>
-                  )}
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+          {/* Bouton pour voir les détails */}
+          <div className="flex justify-end">
+            <button
+              onClick={() => setShowDetailModal(true)}
+              className="flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-xs font-medium text-zinc-700 transition hover:bg-zinc-50 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
+            >
+              <Eye className="h-4 w-4" />
+              <span>Voir en détail</span>
+            </button>
+          </div>
+        </>
       )}
 
       {/* Modal de détails du planning */}
