@@ -1,13 +1,15 @@
 import type { LucideIcon } from 'lucide-react';
 import Link from 'next/link';
-import { Suspense } from 'react';
+import { Suspense, lazy } from 'react';
 import { Clock, MessageSquare, FileText, HardHat, Hammer, Building2, Ruler, LineChart } from 'lucide-react';
 import { PricingSection } from '@/components/pricing-section';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { HeroSection } from '@/components/landing/hero-section';
-import { FeaturesSection } from '@/components/landing/features-section';
-import { FaqSection } from '@/components/landing/faq-section';
-import { Footer } from '@/components/landing/footer';
+
+// Lazy load des sections en bas de page pour ne pas bloquer le FCP
+const FeaturesSection = lazy(() => import('@/components/landing/features-section').then(mod => ({ default: mod.FeaturesSection })));
+const FaqSection = lazy(() => import('@/components/landing/faq-section').then(mod => ({ default: mod.FaqSection })));
+const Footer = lazy(() => import('@/components/landing/footer').then(mod => ({ default: mod.Footer })));
 
 export const metadata = {
   title: 'ChantiFlow - Gestion de chantiers simplifiée avec IA',
@@ -22,6 +24,9 @@ export const metadata = {
     canonical: '/',
   },
 };
+
+// Cache la page pendant 1 heure (ISR)
+export const revalidate = 3600;
 
 type SectorHighlight = {
   title: string;
@@ -317,7 +322,10 @@ export default async function LandingPage() {
         </div>
       </section>
 
-      <FeaturesSection />
+      {/* Features Section - Lazy loaded */}
+      <Suspense fallback={<div className="h-96" />}>
+        <FeaturesSection />
+      </Suspense>
 
       {/* Résultats constatés */}
       <section className="mx-auto max-w-7xl px-6 py-20">
@@ -387,9 +395,15 @@ export default async function LandingPage() {
         </div>
       </section>
 
-      <FaqSection entries={faqEntries} />
+      {/* FAQ Section - Lazy loaded */}
+      <Suspense fallback={<div className="h-96" />}>
+        <FaqSection entries={faqEntries} />
+      </Suspense>
 
-      <Footer />
+      {/* Footer - Lazy loaded */}
+      <Suspense fallback={<div className="h-32" />}>
+        <Footer />
+      </Suspense>
     </div>
   );
 }

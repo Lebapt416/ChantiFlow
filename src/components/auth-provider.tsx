@@ -17,13 +17,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
+    // Ne pas bloquer le rendu initial - vérifier la session de manière asynchrone
+    setIsChecking(false);
+
     // Vérifier si on est en mode PWA (standalone)
     const isPWA = window.matchMedia('(display-mode: standalone)').matches;
 
     // Restaurer la session au chargement de l'app (important pour PWA)
+    // Fait de manière asynchrone pour ne pas bloquer le FCP
     const supabase = createSupabaseBrowserClient();
 
-    // Vérifier et restaurer la session au chargement
+    // Vérifier et restaurer la session au chargement (non-bloquant)
     supabase.auth.getSession().then(({ data: { session }, error }) => {
       // Gérer les erreurs de refresh token invalide silencieusement
       if (error && error.message.includes('Refresh Token')) {
@@ -31,11 +35,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         supabase.auth.signOut().catch(() => {
           // Ignorer les erreurs de déconnexion
         });
-        setIsChecking(false);
         return;
       }
-      
-      setIsChecking(false);
       
       if (session) {
         console.log('✅ Session restaurée automatiquement:', session.user.email);
@@ -123,25 +124,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
   }, [router]);
 
-  // Ne pas afficher de loader côté serveur pour éviter les problèmes d'hydratation
-  // Le loader ne s'affichera que côté client après le premier rendu
-  if (isChecking) {
-    // Utiliser usePathname pour éviter les problèmes d'hydratation
-    const currentPath = pathname;
-    if (currentPath === '/login' || currentPath === '/landing' || currentPath === '/') {
-      return (
-        <div className="min-h-screen bg-white dark:bg-zinc-950">
-          <div className="fixed inset-0 flex items-center justify-center">
-            <div className="text-center">
-              <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-black border-r-transparent dark:border-white dark:border-r-transparent"></div>
-              <p className="mt-4 text-zinc-600 dark:text-zinc-400">Chargement...</p>
-            </div>
-          </div>
-        </div>
-      );
-    }
-  }
-
+  // Ne jamais bloquer le rendu initial - toujours afficher le contenu
+  // La vérification de session se fait de manière asynchrone en arrière-plan
   return <>{children}</>;
 }
 
