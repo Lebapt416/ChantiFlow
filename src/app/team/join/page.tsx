@@ -139,25 +139,25 @@ export default function JoinTeamPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-zinc-100 via-white to-zinc-50 p-6 text-zinc-900 dark:from-zinc-900 dark:via-zinc-800 dark:to-black dark:text-white flex items-center justify-center">
+    <div className="min-h-screen bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 p-6 text-white flex items-center justify-center">
       <div className="w-full max-w-md">
-        <div className="rounded-3xl border border-zinc-200 bg-white/80 p-8 backdrop-blur dark:border-white/10 dark:bg-white/5 shadow-xl">
-          <h1 className="text-3xl font-bold text-center mb-2 dark:text-white">
+        <div className="rounded-3xl border border-zinc-700/50 bg-zinc-800/90 p-8 backdrop-blur shadow-2xl">
+          <h1 className="text-3xl font-bold text-center mb-2 text-zinc-100">
             Rejoindre l&apos;équipe
           </h1>
-          <p className="text-sm text-zinc-600 dark:text-zinc-400 text-center mb-8">
+          <p className="text-sm text-zinc-400 text-center mb-8">
             Remplissez vos informations pour rejoindre l&apos;équipe. Vous serez ajouté au catalogue et pourrez être assigné à des chantiers.
           </p>
 
           {success ? (
-            <div className="rounded-lg bg-emerald-50 p-4 text-sm text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300 text-center">
+            <div className="rounded-lg bg-emerald-900/30 p-4 text-sm text-emerald-300 text-center">
               <p className="font-semibold mb-2">✅ Inscription réussie !</p>
               <p>Vous allez être redirigé vers la page équipe...</p>
             </div>
           ) : (
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-5">
               <div>
-                <label htmlFor="name" className="block text-sm font-semibold text-zinc-800 dark:text-zinc-100 mb-2">
+                <label htmlFor="name" className="block text-sm font-semibold text-zinc-300 mb-2">
                   Nom complet *
                 </label>
                 <input
@@ -166,14 +166,14 @@ export default function JoinTeamPage() {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Jean Dupont"
-                  className="w-full rounded-lg border border-zinc-300 bg-white px-4 py-3 text-zinc-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:border-zinc-600 dark:bg-zinc-800 dark:text-white"
+                  className="w-full rounded-lg border-2 border-emerald-500/50 bg-zinc-900/50 px-4 py-3 text-zinc-100 placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors"
                   required
                   autoFocus
                 />
               </div>
 
               <div>
-                <label htmlFor="email" className="block text-sm font-semibold text-zinc-800 dark:text-zinc-100 mb-2">
+                <label htmlFor="email" className="block text-sm font-semibold text-zinc-300 mb-2">
                   Email
                 </label>
                 <input
@@ -182,12 +182,12 @@ export default function JoinTeamPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="jean.dupont@example.com"
-                  className="w-full rounded-lg border border-zinc-300 bg-white px-4 py-3 text-zinc-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:border-zinc-600 dark:bg-zinc-800 dark:text-white"
+                  className="w-full rounded-lg border border-zinc-600 bg-zinc-900/50 px-4 py-3 text-zinc-100 placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors"
                 />
               </div>
 
               <div>
-                <label htmlFor="role" className="block text-sm font-semibold text-zinc-800 dark:text-zinc-100 mb-2">
+                <label htmlFor="role" className="block text-sm font-semibold text-zinc-300 mb-2">
                   Métier
                 </label>
                 <input
@@ -196,18 +196,18 @@ export default function JoinTeamPage() {
                   value={role}
                   onChange={(e) => setRole(e.target.value)}
                   placeholder="Chef d'équipe"
-                  className="w-full rounded-lg border border-zinc-300 bg-white px-4 py-3 text-zinc-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:border-zinc-600 dark:bg-zinc-800 dark:text-white"
+                  className="w-full rounded-lg border border-zinc-600 bg-zinc-900/50 px-4 py-3 text-zinc-100 placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors"
                 />
               </div>
 
               {error && (
-                <div className="rounded-lg bg-rose-50 p-3 text-sm text-rose-800 dark:bg-rose-900/30 dark:text-rose-300">
+                <div className="rounded-lg bg-rose-900/30 p-3 text-sm text-rose-300">
                   {error}
                 </div>
               )}
 
               {emailError && (
-                <div className="rounded-lg bg-amber-50 p-3 text-sm text-amber-800 dark:bg-amber-900/30 dark:text-amber-300">
+                <div className="rounded-lg bg-amber-900/30 p-3 text-sm text-amber-300">
                   ⚠️ {emailError}
                 </div>
               )}
@@ -215,7 +215,7 @@ export default function JoinTeamPage() {
               <button
                 type="submit"
                 disabled={isPending || !name.trim()}
-                className="w-full rounded-lg bg-emerald-600 px-6 py-3 text-base font-semibold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-70"
+                className="w-full rounded-lg bg-emerald-600 px-6 py-3 text-base font-semibold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-70 shadow-lg shadow-emerald-600/20"
               >
                 {isPending ? 'Ajout en cours...' : 'Rejoindre l&apos;équipe'}
               </button>
