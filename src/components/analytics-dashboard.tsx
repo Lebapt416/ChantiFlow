@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { LayoutDashboard, User } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { LayoutDashboard, User, Trash2 } from 'lucide-react';
 import {
   LineChart,
   Line,
@@ -68,6 +69,15 @@ type AnalyticsDashboardProps = {
 
 const COLORS = ['#10b981', '#f59e0b', '#3b82f6', '#ef4444', '#8b5cf6', '#ec4899'];
 
+type ContactMessage = {
+  id: string;
+  name: string;
+  email: string;
+  company: string | null;
+  message: string;
+  created_at: string;
+};
+
 export function AnalyticsDashboard({
   totalUsers,
   totalSites,
@@ -105,9 +115,12 @@ export function AnalyticsDashboard({
   proUsers,
   basicUsers,
   mrrByDay,
-  contactMessages,
+  contactMessages: initialContactMessages,
 }: AnalyticsDashboardProps) {
   const [lastUpdate, setLastUpdate] = useState(new Date());
+  const [contactMessages, setContactMessages] = useState<ContactMessage[]>(initialContactMessages);
+  const [deletingIds, setDeletingIds] = useState<Set<string>>(new Set());
+  const router = useRouter();
 
   // Actualiser les données toutes les 30 secondes
   useEffect(() => {
@@ -118,6 +131,39 @@ export function AnalyticsDashboard({
 
     return () => clearInterval(interval);
   }, []);
+
+  // Fonction pour supprimer un message
+  const handleDeleteMessage = async (messageId: string) => {
+    if (!confirm('Êtes-vous sûr de vouloir supprimer ce message ?')) {
+      return;
+    }
+
+    setDeletingIds((prev) => new Set(prev).add(messageId));
+
+    try {
+      const response = await fetch(`/api/contact/delete?id=${messageId}`, {
+        method: 'DELETE',
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Erreur lors de la suppression');
+      }
+
+      // Retirer le message de la liste
+      setContactMessages((prev) => prev.filter((msg) => msg.id !== messageId));
+    } catch (error) {
+      console.error('Erreur suppression:', error);
+      alert('Erreur lors de la suppression du message. Veuillez réessayer.');
+    } finally {
+      setDeletingIds((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(messageId);
+        return newSet;
+      });
+    }
+  };
 
   // Formater les dates pour les graphiques
   const formatDate = (dateStr: string) => {
@@ -683,7 +729,7 @@ export function AnalyticsDashboard({
                       {msg.message}
                     </p>
                   </div>
-                  <div className="mt-3 flex gap-2">
+                  <div className="mt-3 flex items-center gap-2">
                     <a
                       href={`mailto:${msg.email}?subject=Re: Votre message de contact&cc=chantiflowct@gmail.com`}
                       className="text-xs px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white transition-colors"
@@ -691,7 +737,25 @@ export function AnalyticsDashboard({
                     >
                       Répondre
                     </a>
-                    <span className="text-xs text-zinc-400 self-center">
+                    <button
+                      onClick={() => handleDeleteMessage(msg.id)}
+                      disabled={deletingIds.has(msg.id)}
+                      className="text-xs px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-500 text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5"
+                      title="Supprimer ce message"
+                    >
+                      {deletingIds.has(msg.id) ? (
+                        <>
+                          <div className="h-3 w-3 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                          Suppression...
+                        </>
+                      ) : (
+                        <>
+                          <Trash2 className="h-3 w-3" />
+                          Supprimer
+                        </>
+                      )}
+                    </button>
+                    <span className="text-xs text-zinc-400 self-center ml-auto">
                       Depuis: chantiflowct@gmail.com
                     </span>
                   </div>
