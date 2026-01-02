@@ -32,8 +32,11 @@ export async function generateWithGemini(
 ): Promise<string> {
   try {
     const client = getGeminiClient();
+    // Utiliser gemini-1.5-flash qui est plus stable et disponible avec v1beta
+    // Fallback vers gemini-pro si nécessaire
+    const modelName = 'gemini-1.5-flash';
     const model = client.getGenerativeModel({
-      model: 'gemini-1.5-pro',
+      model: modelName,
       systemInstruction: systemInstruction || 'Tu es un assistant expert en gestion de chantiers de construction en France.',
     });
 
@@ -82,6 +85,46 @@ export async function generateWithGemini(
       }
       if (error.message.includes('SAFETY')) {
         throw new Error('Contenu bloqué par les filtres de sécurité Gemini');
+      }
+      // Si le modèle n'est pas trouvé, essayer avec gemini-pro
+      if (error.message.includes('not found') || error.message.includes('404')) {
+        console.warn('[Gemini] Modèle gemini-1.5-flash non disponible, tentative avec gemini-pro');
+        try {
+          const client = getGeminiClient();
+          const fallbackModel = client.getGenerativeModel({
+            model: 'gemini-pro',
+            systemInstruction: systemInstruction || 'Tu es un assistant expert en gestion de chantiers de construction en France.',
+          });
+          
+          const generationConfig: {
+            temperature?: number;
+            maxOutputTokens?: number;
+            responseMimeType?: string;
+          } = {};
+
+          if (options?.temperature !== undefined) {
+            generationConfig.temperature = options.temperature;
+          }
+
+          if (options?.maxOutputTokens !== undefined) {
+            generationConfig.maxOutputTokens = options.maxOutputTokens;
+          }
+
+          if (options?.responseFormat === 'json') {
+            generationConfig.responseMimeType = 'application/json';
+          }
+
+          const fallbackResult = await fallbackModel.generateContent({
+            contents: [{ role: 'user', parts: [{ text: prompt }] }],
+            generationConfig,
+          });
+          const fallbackText = fallbackResult.response.text();
+          if (fallbackText) {
+            return fallbackText;
+          }
+        } catch (fallbackError) {
+          throw new Error(`Modèle Gemini non disponible. Erreur: ${error.message}`);
+        }
       }
     }
     
