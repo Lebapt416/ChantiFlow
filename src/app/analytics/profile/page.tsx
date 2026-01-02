@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { LayoutDashboard, User } from 'lucide-react';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { SignOutButton } from '@/components/sign-out-button';
 
 export const metadata = {
   title: 'Profil | Analytics ChantiFlow',
@@ -83,6 +84,9 @@ export default async function AnalyticsProfilePage() {
                       year: 'numeric',
                     })}
                   </p>
+                </div>
+                <div className="pt-4 border-t border-zinc-800">
+                  <SignOutButton />
                 </div>
               </div>
             </div>
