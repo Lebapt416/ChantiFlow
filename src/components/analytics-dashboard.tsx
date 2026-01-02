@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { LayoutDashboard, User, Trash2 } from 'lucide-react';
+import { LayoutDashboard, User, Trash2, TestTube, CheckCircle2, XCircle, AlertCircle, Loader2 } from 'lucide-react';
 import {
   LineChart,
   Line,
@@ -121,6 +121,28 @@ export function AnalyticsDashboard({
   const [contactMessages, setContactMessages] = useState<ContactMessage[]>(initialContactMessages);
   const [deletingIds, setDeletingIds] = useState<Set<string>>(new Set());
   const router = useRouter();
+  
+  // État pour les tests système
+  const [systemTestResults, setSystemTestResults] = useState<{
+    summary?: {
+      score: number;
+      grade: string;
+      totalTests: number;
+      successTests: number;
+      errorTests: number;
+      warningTests: number;
+      totalDuration: number;
+    };
+    results?: Array<{
+      name: string;
+      status: 'success' | 'error' | 'warning';
+      message: string;
+      details?: string;
+      duration?: number;
+    }>;
+    timestamp?: string;
+  } | null>(null);
+  const [isTesting, setIsTesting] = useState(false);
 
   // Actualiser les données toutes les 30 secondes
   useEffect(() => {
@@ -131,6 +153,43 @@ export function AnalyticsDashboard({
 
     return () => clearInterval(interval);
   }, []);
+
+  // Fonction pour tester le système
+  const handleSystemTest = async () => {
+    setIsTesting(true);
+    setSystemTestResults(null);
+
+    try {
+      const response = await fetch('/api/system/test');
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Erreur lors du test');
+      }
+
+      setSystemTestResults(data);
+    } catch (error) {
+      console.error('Erreur test système:', error);
+      setSystemTestResults({
+        summary: {
+          score: 0,
+          grade: 'Erreur',
+          totalTests: 0,
+          successTests: 0,
+          errorTests: 1,
+          warningTests: 0,
+          totalDuration: 0,
+        },
+        results: [{
+          name: 'Test système',
+          status: 'error',
+          message: error instanceof Error ? error.message : 'Erreur inconnue',
+        }],
+      });
+    } finally {
+      setIsTesting(false);
+    }
+  };
 
   // Fonction pour supprimer un message
   const handleDeleteMessage = async (messageId: string) => {
@@ -238,6 +297,151 @@ export function AnalyticsDashboard({
                 <span className="text-sm font-semibold text-emerald-400">En direct</span>
               </div>
             </div>
+          </div>
+        </div>
+
+        {/* Section Test du Système */}
+        <div className="mb-8">
+          <div className="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 backdrop-blur">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+                  <TestTube className="h-6 w-6" />
+                  Test du Système
+                </h2>
+                <p className="mt-1 text-sm text-zinc-400">
+                  Vérifiez l'état de fonctionnement de tous les composants du système
+                </p>
+              </div>
+              <button
+                onClick={handleSystemTest}
+                disabled={isTesting}
+                className="px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              >
+                {isTesting ? (
+                  <>
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                    Test en cours...
+                  </>
+                ) : (
+                  <>
+                    <TestTube className="h-5 w-5" />
+                    Lancer les tests
+                  </>
+                )}
+              </button>
+            </div>
+
+            {systemTestResults && (
+              <div className="mt-6 space-y-4">
+                {/* Résumé global */}
+                {systemTestResults.summary && (
+                  <div className={`rounded-xl border-2 p-6 ${
+                    systemTestResults.summary.score >= 90
+                      ? 'border-emerald-500/50 bg-emerald-500/10'
+                      : systemTestResults.summary.score >= 75
+                      ? 'border-blue-500/50 bg-blue-500/10'
+                      : systemTestResults.summary.score >= 50
+                      ? 'border-yellow-500/50 bg-yellow-500/10'
+                      : 'border-red-500/50 bg-red-500/10'
+                  }`}>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="text-xl font-bold text-white mb-2">
+                          Note globale: {systemTestResults.summary.score}/100
+                        </h3>
+                        <p className={`text-2xl font-bold ${
+                          systemTestResults.summary.score >= 90
+                            ? 'text-emerald-400'
+                            : systemTestResults.summary.score >= 75
+                            ? 'text-blue-400'
+                            : systemTestResults.summary.score >= 50
+                            ? 'text-yellow-400'
+                            : 'text-red-400'
+                        }`}>
+                          {systemTestResults.summary.grade}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm text-zinc-400">
+                          {systemTestResults.summary.successTests} réussis
+                        </p>
+                        <p className="text-sm text-zinc-400">
+                          {systemTestResults.summary.errorTests} erreurs
+                        </p>
+                        {systemTestResults.summary.warningTests > 0 && (
+                          <p className="text-sm text-yellow-400">
+                            {systemTestResults.summary.warningTests} avertissements
+                          </p>
+                        )}
+                        <p className="text-xs text-zinc-500 mt-2">
+                          Durée: {systemTestResults.summary.totalDuration}ms
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Détail des tests */}
+                {systemTestResults.results && systemTestResults.results.length > 0 && (
+                  <div className="space-y-3">
+                    <h3 className="text-lg font-semibold text-white mb-3">Détail des tests</h3>
+                    {systemTestResults.results.map((result, index) => (
+                      <div
+                        key={index}
+                        className={`rounded-lg border p-4 ${
+                          result.status === 'success'
+                            ? 'border-emerald-500/30 bg-emerald-500/5'
+                            : result.status === 'error'
+                            ? 'border-red-500/30 bg-red-500/5'
+                            : 'border-yellow-500/30 bg-yellow-500/5'
+                        }`}
+                      >
+                        <div className="flex items-start gap-3">
+                          {result.status === 'success' && (
+                            <CheckCircle2 className="h-5 w-5 text-emerald-400 flex-shrink-0 mt-0.5" />
+                          )}
+                          {result.status === 'error' && (
+                            <XCircle className="h-5 w-5 text-red-400 flex-shrink-0 mt-0.5" />
+                          )}
+                          {result.status === 'warning' && (
+                            <AlertCircle className="h-5 w-5 text-yellow-400 flex-shrink-0 mt-0.5" />
+                          )}
+                          <div className="flex-1">
+                            <h4 className="font-semibold text-white mb-1">{result.name}</h4>
+                            <p className={`text-sm ${
+                              result.status === 'success'
+                                ? 'text-emerald-300'
+                                : result.status === 'error'
+                                ? 'text-red-300'
+                                : 'text-yellow-300'
+                            }`}>
+                              {result.message}
+                            </p>
+                            {result.details && (
+                              <p className="text-xs text-zinc-400 mt-2 whitespace-pre-wrap">
+                                {result.details}
+                              </p>
+                            )}
+                            {result.duration !== undefined && (
+                              <p className="text-xs text-zinc-500 mt-1">
+                                Durée: {result.duration}ms
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {systemTestResults.timestamp && (
+                  <p className="text-xs text-zinc-500 text-center mt-4">
+                    Test effectué le {new Date(systemTestResults.timestamp).toLocaleString('fr-FR')}
+                  </p>
+                )}
+              </div>
+            )}
           </div>
         </div>
 
