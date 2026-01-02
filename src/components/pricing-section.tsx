@@ -111,7 +111,7 @@ export function PricingSection({ isAuthenticated = false, userEmail = null }: Pr
         </div>
       </div>
 
-      <div className="mx-auto mt-16 grid max-w-5xl grid-cols-1 gap-8 lg:grid-cols-3">
+      <div className="mx-auto mt-16 grid max-w-7xl grid-cols-1 gap-6 md:grid-cols-3 md:gap-4 lg:gap-6">
         {plans.map((plan) => {
           const currentPrice = isAnnual ? plan.priceAnnual : plan.priceMonthly;
           const currentPeriod = isAnnual ? '/an' : '/mois';
@@ -123,7 +123,7 @@ export function PricingSection({ isAuthenticated = false, userEmail = null }: Pr
           return (
             <div
               key={plan.name}
-              className={`relative flex h-full flex-col rounded-3xl border border-white/20 dark:border-zinc-800/50 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md p-8 shadow-lg ${
+              className={`relative flex h-full flex-col rounded-3xl border border-white/20 dark:border-zinc-800/50 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md p-6 md:p-8 shadow-lg ${
                 plan.popular
                   ? 'border-emerald-500/50 dark:border-emerald-400/50 bg-emerald-50/80 dark:bg-emerald-900/20'
                   : ''
