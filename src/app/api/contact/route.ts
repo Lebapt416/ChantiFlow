@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
+import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 const CONTACT_EMAIL = process.env.CONTACT_EMAIL || 'contact@chantiflow.com';
@@ -157,6 +158,28 @@ Vous pouvez répondre directement à cet email pour contacter ${name}.
         { error: 'Erreur lors de l\'envoi de l\'email. Veuillez réessayer.' },
         { status: 500 }
       );
+    }
+
+    // Sauvegarder le message dans Supabase
+    try {
+      const adminClient = createSupabaseAdminClient();
+      const { error: dbError } = await adminClient
+        .from('contact_messages')
+        .insert({
+          name,
+          email,
+          company: company || null,
+          message,
+          created_at: new Date().toISOString(),
+        });
+
+      if (dbError) {
+        console.error('Erreur sauvegarde Supabase:', dbError);
+        // Ne pas faire échouer la requête si l'email a été envoyé
+      }
+    } catch (dbError) {
+      console.error('Erreur sauvegarde contact:', dbError);
+      // Ne pas faire échouer la requête si l'email a été envoyé
     }
 
     return NextResponse.json(

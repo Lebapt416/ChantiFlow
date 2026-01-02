@@ -56,6 +56,14 @@ type AnalyticsDashboardProps = {
   proUsers: number;
   basicUsers: number;
   mrrByDay: Array<{ date: string; mrr: number; plus: number; pro: number }>;
+  contactMessages: Array<{
+    id: string;
+    name: string;
+    email: string;
+    company: string | null;
+    message: string;
+    created_at: string;
+  }>;
 };
 
 const COLORS = ['#10b981', '#f59e0b', '#3b82f6', '#ef4444', '#8b5cf6', '#ec4899'];
@@ -97,6 +105,7 @@ export function AnalyticsDashboard({
   proUsers,
   basicUsers,
   mrrByDay,
+  contactMessages,
 }: AnalyticsDashboardProps) {
   const [lastUpdate, setLastUpdate] = useState(new Date());
 
@@ -619,6 +628,76 @@ export function AnalyticsDashboard({
                 )}
               </tbody>
             </table>
+          </div>
+        </div>
+      </div>
+
+      {/* Section Messages de Contact */}
+      <div className="mb-8">
+        <div className="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 backdrop-blur">
+          <div className="mb-6 flex items-center justify-between">
+            <div>
+              <h2 className="text-2xl font-bold text-white">Messages de Contact</h2>
+              <p className="mt-1 text-sm text-zinc-400">
+                {contactMessages.length} message{contactMessages.length > 1 ? 's' : ''} reçu{contactMessages.length > 1 ? 's' : ''}
+              </p>
+            </div>
+          </div>
+
+          <div className="space-y-4 max-h-[600px] overflow-y-auto">
+            {contactMessages.length > 0 ? (
+              contactMessages.map((msg) => (
+                <div
+                  key={msg.id}
+                  className="rounded-xl border border-zinc-800 bg-zinc-950/50 p-5 hover:bg-zinc-900/50 transition-colors"
+                >
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-2">
+                        <h3 className="text-lg font-semibold text-white">{msg.name}</h3>
+                        {msg.company && (
+                          <span className="text-xs px-2 py-1 rounded-full bg-zinc-800 text-zinc-300">
+                            {msg.company}
+                          </span>
+                        )}
+                      </div>
+                      <a
+                        href={`mailto:${msg.email}`}
+                        className="text-sm text-emerald-400 hover:text-emerald-300 transition-colors"
+                      >
+                        {msg.email}
+                      </a>
+                    </div>
+                    <span className="text-xs text-zinc-500">
+                      {new Date(msg.created_at).toLocaleDateString('fr-FR', {
+                        day: '2-digit',
+                        month: 'short',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
+                    </span>
+                  </div>
+                  <div className="mt-3 p-3 rounded-lg bg-zinc-900/50 border border-zinc-800">
+                    <p className="text-sm text-zinc-300 whitespace-pre-wrap leading-relaxed">
+                      {msg.message}
+                    </p>
+                  </div>
+                  <div className="mt-3 flex gap-2">
+                    <a
+                      href={`mailto:${msg.email}?subject=Re: Votre message de contact`}
+                      className="text-xs px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white transition-colors"
+                    >
+                      Répondre
+                    </a>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="text-center py-12 text-zinc-400">
+                <p>Aucun message de contact pour le moment</p>
+              </div>
+            )}
           </div>
         </div>
       </div>

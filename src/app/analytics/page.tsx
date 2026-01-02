@@ -42,6 +42,8 @@ export default async function AnalyticsPage() {
   let allReports: any[] = [];
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let allWorkers: any[] = [];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let contactMessages: any[] = [];
 
   try {
     const [
@@ -50,6 +52,7 @@ export default async function AnalyticsPage() {
       { data: tasksData },
       { data: reportsData },
       { data: workersData },
+      { data: contactMessagesData },
     ] = await Promise.all([
       // Tous les utilisateurs via admin client
       adminClient.auth.admin.listUsers(),
@@ -61,6 +64,8 @@ export default async function AnalyticsPage() {
       adminClient.from('reports').select('id, task_id, worker_id, created_at, photo_url, description'),
       // Tous les workers
       adminClient.from('workers').select('id, site_id, name, email, role, status, created_at'),
+      // Tous les messages de contact
+      adminClient.from('contact_messages').select('id, name, email, company, message, created_at').order('created_at', { ascending: false }),
     ]);
 
     allUsers = allUsersData?.users ?? [];
@@ -68,6 +73,7 @@ export default async function AnalyticsPage() {
     allTasks = tasksData ?? [];
     allReports = reportsData ?? [];
     allWorkers = workersData ?? [];
+    contactMessages = contactMessagesData ?? [];
   } catch (error) {
     console.error('Erreur lors de la récupération des données analytics:', error);
     // Continuer avec des données vides plutôt que de planter
@@ -307,6 +313,7 @@ export default async function AnalyticsPage() {
       proUsers={proUsers}
       basicUsers={basicUsers}
       mrrByDay={mrrByDay}
+      contactMessages={contactMessages}
     />
   );
 }
