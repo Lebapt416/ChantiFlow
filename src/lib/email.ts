@@ -1,4 +1,5 @@
 import { Resend } from 'resend';
+import { randomUUID } from 'crypto';
 import {
   getWorkerWelcomeEmailTemplate,
   getReportNotificationEmailTemplate,
@@ -75,11 +76,25 @@ export async function sendEmail({
   }
 
   try {
+    const fromEmail = process.env.RESEND_FROM_EMAIL || 'ChantiFlow <onboarding@resend.dev>';
+    const supportEmail = process.env.SUPPORT_EMAIL || 'support@chantiflow.com';
+    
     const { data, error } = await resend.emails.send({
-      from: process.env.RESEND_FROM_EMAIL || 'ChantiFlow <onboarding@resend.dev>',
+      from: fromEmail,
       to,
       subject,
       html,
+      headers: {
+        'X-Entity-Ref-ID': randomUUID(),
+        'List-Unsubscribe': `<mailto:${supportEmail}?subject=unsubscribe>`,
+        'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+        'X-Priority': '1',
+        'X-MSMail-Priority': 'High',
+      },
+      tags: [
+        { name: 'category', value: 'transactional' },
+        { name: 'source', value: 'chantiflow' },
+      ],
     });
 
     if (error) {
@@ -154,8 +169,11 @@ export async function sendWorkerWelcomeEmail({
       reportUrl,
     });
 
+    const fromEmail = process.env.RESEND_FROM_EMAIL || 'ChantiFlow <onboarding@resend.dev>';
+    const supportEmail = SUPPORT_EMAIL;
+    
     const { data, error } = await resend.emails.send({
-      from: process.env.RESEND_FROM_EMAIL || 'ChantiFlow <onboarding@resend.dev>',
+      from: fromEmail,
       to: workerEmail,
       subject: siteName
         ? `Bienvenue sur le chantier ${siteName} - ChantiFlow`
@@ -169,10 +187,20 @@ export async function sendWorkerWelcomeEmail({
         siteId: siteId || undefined,
       }),
       text: plainText,
-      replyTo: managerEmail || SUPPORT_EMAIL,
+      replyTo: managerEmail || supportEmail,
       headers: {
-        'List-Unsubscribe': `<mailto:${SUPPORT_EMAIL}>`,
+        'X-Entity-Ref-ID': randomUUID(),
+        'List-Unsubscribe': `<mailto:${supportEmail}?subject=unsubscribe>`,
+        'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+        'X-Priority': '1',
+        'X-MSMail-Priority': 'High',
+        'Precedence': 'bulk',
       },
+      tags: [
+        { name: 'category', value: 'transactional' },
+        { name: 'type', value: 'welcome' },
+        { name: 'source', value: 'chantiflow' },
+      ],
     });
 
     if (error) {
@@ -227,8 +255,11 @@ export async function sendReportNotificationEmail({
 
   try {
 
+    const fromEmail = process.env.RESEND_FROM_EMAIL || 'ChantiFlow <onboarding@resend.dev>';
+    const supportEmail = SUPPORT_EMAIL;
+    
     const { data, error } = await resend.emails.send({
-      from: process.env.RESEND_FROM_EMAIL || 'ChantiFlow <onboarding@resend.dev>',
+      from: fromEmail,
       to: managerEmail,
       subject: `Nouveau rapport - ${taskTitle} - ${siteName}`,
       html: getReportNotificationEmailTemplate({
@@ -239,6 +270,18 @@ export async function sendReportNotificationEmail({
         siteName,
         reportUrl,
       }),
+      headers: {
+        'X-Entity-Ref-ID': randomUUID(),
+        'List-Unsubscribe': `<mailto:${supportEmail}?subject=unsubscribe>`,
+        'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+        'X-Priority': '1',
+        'X-MSMail-Priority': 'High',
+      },
+      tags: [
+        { name: 'category', value: 'notification' },
+        { name: 'type', value: 'report' },
+        { name: 'source', value: 'chantiflow' },
+      ],
     });
 
     if (error) {
@@ -285,8 +328,11 @@ export async function sendAccountCreatedEmail({
   const loginUrl = `${appUrl}/login`;
 
   try {
+    const fromEmail = process.env.RESEND_FROM_EMAIL || 'ChantiFlow <onboarding@resend.dev>';
+    const supportEmail = SUPPORT_EMAIL;
+    
     const { data, error } = await resend.emails.send({
-      from: process.env.RESEND_FROM_EMAIL || 'ChantiFlow <onboarding@resend.dev>',
+      from: fromEmail,
       to: userEmail,
       subject: 'Bienvenue sur ChantiFlow - Votre compte a été créé',
       html: getAccountCreatedEmailTemplate({
@@ -294,6 +340,18 @@ export async function sendAccountCreatedEmail({
         temporaryPassword,
         loginUrl,
       }),
+      headers: {
+        'X-Entity-Ref-ID': randomUUID(),
+        'List-Unsubscribe': `<mailto:${supportEmail}?subject=unsubscribe>`,
+        'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+        'X-Priority': '1',
+        'X-MSMail-Priority': 'High',
+      },
+      tags: [
+        { name: 'category', value: 'transactional' },
+        { name: 'type', value: 'account-created' },
+        { name: 'source', value: 'chantiflow' },
+      ],
     });
 
     if (error) {
@@ -332,14 +390,29 @@ export async function sendSiteCompletedEmail({
   }
 
   try {
+    const fromEmail = process.env.RESEND_FROM_EMAIL || 'ChantiFlow <onboarding@resend.dev>';
+    const supportEmail = SUPPORT_EMAIL;
+    
     const { data, error } = await resend.emails.send({
-      from: process.env.RESEND_FROM_EMAIL || 'ChantiFlow <onboarding@resend.dev>',
+      from: fromEmail,
       to: workerEmail,
       subject: `Chantier terminé - ${siteName} - ChantiFlow`,
       html: getSiteCompletedEmailTemplate({
         workerName,
         siteName,
       }),
+      headers: {
+        'X-Entity-Ref-ID': randomUUID(),
+        'List-Unsubscribe': `<mailto:${supportEmail}?subject=unsubscribe>`,
+        'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+        'X-Priority': '1',
+        'X-MSMail-Priority': 'High',
+      },
+      tags: [
+        { name: 'category', value: 'notification' },
+        { name: 'type', value: 'site-completed' },
+        { name: 'source', value: 'chantiflow' },
+      ],
     });
 
     if (error) {
@@ -387,14 +460,29 @@ export async function sendTeamJoinConfirmationEmail({
     console.log('📧 Resend: Préparation envoi email à:', workerEmail);
     console.log('📧 Resend: From email:', process.env.RESEND_FROM_EMAIL || 'ChantiFlow <onboarding@resend.dev>');
     
+    const fromEmail = process.env.RESEND_FROM_EMAIL || 'ChantiFlow <onboarding@resend.dev>';
+    const supportEmail = SUPPORT_EMAIL;
+    
     const { data, error } = await resend.emails.send({
-      from: process.env.RESEND_FROM_EMAIL || 'ChantiFlow <onboarding@resend.dev>',
+      from: fromEmail,
       to: workerEmail,
       subject: 'Demande d\'ajout à l\'équipe - En attente de validation',
       html: getTeamJoinConfirmationEmailTemplate({
         workerName,
         managerName,
       }),
+      headers: {
+        'X-Entity-Ref-ID': randomUUID(),
+        'List-Unsubscribe': `<mailto:${supportEmail}?subject=unsubscribe>`,
+        'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+        'X-Priority': '1',
+        'X-MSMail-Priority': 'High',
+      },
+      tags: [
+        { name: 'category', value: 'transactional' },
+        { name: 'type', value: 'team-join-confirmation' },
+        { name: 'source', value: 'chantiflow' },
+      ],
     });
 
     if (error) {
@@ -458,14 +546,29 @@ export async function sendTeamApprovalEmail({
   }
 
   try {
+    const fromEmail = process.env.RESEND_FROM_EMAIL || 'ChantiFlow <onboarding@resend.dev>';
+    const supportEmail = SUPPORT_EMAIL;
+    
     const { data, error } = await resend.emails.send({
-      from: process.env.RESEND_FROM_EMAIL || 'ChantiFlow <onboarding@resend.dev>',
+      from: fromEmail,
       to: workerEmail,
       subject: 'Demande d\'ajout à l\'équipe - Approuvée',
       html: getTeamApprovalEmailTemplate({
         workerName,
         managerName,
       }),
+      headers: {
+        'X-Entity-Ref-ID': randomUUID(),
+        'List-Unsubscribe': `<mailto:${supportEmail}?subject=unsubscribe>`,
+        'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+        'X-Priority': '1',
+        'X-MSMail-Priority': 'High',
+      },
+      tags: [
+        { name: 'category', value: 'transactional' },
+        { name: 'type', value: 'team-approval' },
+        { name: 'source', value: 'chantiflow' },
+      ],
     });
 
     if (error) {
@@ -517,14 +620,29 @@ export async function sendTeamRejectionEmail({
   }
 
   try {
+    const fromEmail = process.env.RESEND_FROM_EMAIL || 'ChantiFlow <onboarding@resend.dev>';
+    const supportEmail = SUPPORT_EMAIL;
+    
     const { data, error } = await resend.emails.send({
-      from: process.env.RESEND_FROM_EMAIL || 'ChantiFlow <onboarding@resend.dev>',
+      from: fromEmail,
       to: workerEmail,
       subject: 'Demande d\'ajout à l\'équipe - Refusée',
       html: getTeamRejectionEmailTemplate({
         workerName,
         managerName,
       }),
+      headers: {
+        'X-Entity-Ref-ID': randomUUID(),
+        'List-Unsubscribe': `<mailto:${supportEmail}?subject=unsubscribe>`,
+        'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+        'X-Priority': '1',
+        'X-MSMail-Priority': 'High',
+      },
+      tags: [
+        { name: 'category', value: 'transactional' },
+        { name: 'type', value: 'team-rejection' },
+        { name: 'source', value: 'chantiflow' },
+      ],
     });
 
     if (error) {

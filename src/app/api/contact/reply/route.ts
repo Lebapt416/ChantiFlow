@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
+import { randomUUID } from 'crypto';
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 const CONTACT_EMAIL = 'chantiflowct@gmail.com';
@@ -41,6 +42,15 @@ export async function POST(request: NextRequest) {
       to: to,
       replyTo: CONTACT_EMAIL,
       subject: subject || 'Re: Votre message de contact',
+      headers: {
+        'X-Entity-Ref-ID': randomUUID(),
+        'X-Priority': '1',
+        'X-MSMail-Priority': 'High',
+      },
+      tags: [
+        { name: 'category', value: 'contact-reply' },
+        { name: 'source', value: 'chantiflow' },
+      ],
       html: `
         <!DOCTYPE html>
         <html>
