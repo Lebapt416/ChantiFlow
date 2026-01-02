@@ -65,7 +65,7 @@ export default async function AnalyticsPage() {
       // Tous les workers
       adminClient.from('workers').select('id, site_id, name, email, role, status, created_at'),
       // Tous les messages de contact
-      adminClient.from('contact_messages').select('id, name, email, company, message, created_at').order('created_at', { ascending: false }),
+      adminClient.from('contact_messages').select('id, name, email, company, message, created_at').order('created_at', { ascending: false }).limit(100),
     ]);
 
     allUsers = allUsersData?.users ?? [];
@@ -74,6 +74,13 @@ export default async function AnalyticsPage() {
     allReports = reportsData ?? [];
     allWorkers = workersData ?? [];
     contactMessages = contactMessagesData ?? [];
+
+    // Log pour déboguer
+    if (contactMessagesData === null || contactMessagesData === undefined) {
+      console.warn('⚠️ Aucun message de contact trouvé. Vérifiez que la table contact_messages existe dans Supabase.');
+    } else {
+      console.log(`✅ ${contactMessages.length} message(s) de contact récupéré(s)`);
+    }
   } catch (error) {
     console.error('Erreur lors de la récupération des données analytics:', error);
     // Continuer avec des données vides plutôt que de planter

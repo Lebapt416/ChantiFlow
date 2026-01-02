@@ -163,7 +163,7 @@ Vous pouvez répondre directement à cet email pour contacter ${name}.
     // Sauvegarder le message dans Supabase
     try {
       const adminClient = createSupabaseAdminClient();
-      const { error: dbError } = await adminClient
+      const { data: insertData, error: dbError } = await adminClient
         .from('contact_messages')
         .insert({
           name,
@@ -171,14 +171,23 @@ Vous pouvez répondre directement à cet email pour contacter ${name}.
           company: company || null,
           message,
           created_at: new Date().toISOString(),
-        });
+        })
+        .select();
 
       if (dbError) {
-        console.error('Erreur sauvegarde Supabase:', dbError);
+        console.error('❌ Erreur sauvegarde Supabase:', dbError);
+        console.error('Détails:', {
+          code: dbError.code,
+          message: dbError.message,
+          details: dbError.details,
+          hint: dbError.hint,
+        });
         // Ne pas faire échouer la requête si l'email a été envoyé
+      } else {
+        console.log('✅ Message sauvegardé dans Supabase:', insertData);
       }
     } catch (dbError) {
-      console.error('Erreur sauvegarde contact:', dbError);
+      console.error('❌ Erreur sauvegarde contact (catch):', dbError);
       // Ne pas faire échouer la requête si l'email a été envoyé
     }
 
