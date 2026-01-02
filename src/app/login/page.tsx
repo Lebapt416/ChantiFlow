@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import { AuthForm } from './auth-form';
+import { AuthFormAPI } from './auth-form-api';
 
 export const metadata = {
   title: 'Connexion | ChantiFlow',
@@ -38,7 +38,7 @@ export default function LoginPage({
             Mot de passe réinitialisé avec succès ! Vous pouvez maintenant vous connecter.
           </div>
         )}
-        <AuthForm />
+        <AuthFormAPI />
       </div>
     </div>
   );
