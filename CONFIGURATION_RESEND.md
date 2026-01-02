@@ -62,7 +62,7 @@ NEXT_PUBLIC_APP_BASE_URL=http://localhost:3000
 NEXT_PUBLIC_SUPABASE_URL=votre_url_supabase
 NEXT_PUBLIC_SUPABASE_ANON_KEY=votre_cle_anon
 SUPABASE_SERVICE_ROLE_KEY=votre_service_role_key
-OPENAI_API_KEY=votre_cle_openai
+GOOGLE_GEMINI_API_KEY=votre_cle_gemini
 RESEND_API_KEY=re_xxxxxxxxxxxxx
 RESEND_FROM_EMAIL=ChantiFlow <noreply@chantiflow.com>
 ```

@@ -32,47 +32,31 @@ export async function POST(request: NextRequest) {
       description += ` Aucun rapport n'a encore été envoyé pour cette tâche.`;
     }
 
-    // Si OpenAI est configuré, utiliser l'API pour une description plus riche
-    if (process.env.OPENAI_API_KEY) {
+    // Si Google Gemini est configuré, utiliser l'API pour une description plus riche
+    const { isGeminiConfigured, generateWithGemini } = await import('@/lib/ai/gemini');
+    
+    if (await isGeminiConfigured()) {
       try {
-        const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            model: 'gpt-3.5-turbo',
-            messages: [
-              {
-                role: 'system',
-                content: 'Tu es un assistant expert en gestion de chantiers de construction. Génère une description claire et professionnelle d\'une tâche de chantier en français.',
-              },
-              {
-                role: 'user',
-                content: `Génère une description détaillée pour cette tâche de chantier:
+        const systemInstruction = 'Tu es un assistant expert en gestion de chantiers de construction. Génère une description claire et professionnelle d\'une tâche de chantier en français.';
+        
+        const prompt = `Génère une description détaillée pour cette tâche de chantier:
 - Titre: ${taskTitle}
 ${requiredRole ? `- Rôle requis: ${requiredRole}` : ''}
 ${durationHours ? `- Durée estimée: ${durationHours} heures` : ''}
 ${reportCount > 0 ? `- Nombre de rapports: ${reportCount}` : 'Aucun rapport encore'}
 
-La description doit être professionnelle, claire et aider l'employé à comprendre ce qu'il doit faire.`,
-              },
-            ],
-            max_tokens: 200,
-            temperature: 0.7,
-          }),
+La description doit être professionnelle, claire et aider l'employé à comprendre ce qu'il doit faire.`;
+
+        const aiDescription = await generateWithGemini(prompt, systemInstruction, {
+          temperature: 0.7,
+          maxOutputTokens: 200,
         });
 
-        if (openaiResponse.ok) {
-          const data = await openaiResponse.json();
-          const aiDescription = data.choices?.[0]?.message?.content;
-          if (aiDescription) {
-            return NextResponse.json({ description: aiDescription });
-          }
+        if (aiDescription) {
+          return NextResponse.json({ description: aiDescription });
         }
       } catch (error) {
-        console.error('Erreur OpenAI:', error);
+        console.error('Erreur Gemini:', error);
         // Continuer avec la description générée localement
       }
     }

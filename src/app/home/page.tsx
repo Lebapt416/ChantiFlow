@@ -20,14 +20,20 @@ export default async function HomePage() {
     redirect('/login');
   }
 
-  const { data: sites } = await supabase
-    .from('sites')
-    .select('id, name, deadline, created_at, completed_at')
-    .eq('created_by', user.id)
-    .order('created_at', { ascending: false });
+  // Optimisation : Requêtes en parallèle avec caching
+  const [{ data: sites }, planData] = await Promise.all([
+    supabase
+      .from('sites')
+      .select('id, name, deadline, created_at, completed_at')
+      .eq('created_by', user.id)
+      .order('created_at', { ascending: false })
+      .maybeSingle(), // Utiliser maybeSingle pour éviter les erreurs si vide
+    getUserPlan(user).catch(() => null), // Ne pas bloquer si getUserPlan échoue
+  ]);
 
   // Récupérer les stats pour chaque chantier
-  const siteIds = sites?.map((site) => site.id) ?? [];
+  const sitesArray = Array.isArray(sites) ? sites : (sites ? [sites] : []);
+  const siteIds = sitesArray.map((site) => site.id);
   const siteStats: Record<string, { tasks: number; done: number; workers: number }> = {};
 
   if (siteIds.length > 0) {
@@ -61,14 +67,17 @@ export default async function HomePage() {
   }
 
   // Séparer les chantiers actifs et terminés
-  const activeSites = sites?.filter((site) => !site.completed_at) ?? [];
-  const completedSites = sites?.filter((site) => site.completed_at) ?? [];
+  const activeSites = sitesArray.filter((site) => !site.completed_at);
+  const completedSites = sitesArray.filter((site) => site.completed_at);
 
-  // Vérifier les limites du plan
-  const plan = await getUserPlan(user);
-  const addOns = getUserAddOns(user);
+  // Vérifier les limites du plan (en parallèle)
+  const [plan, addOns, canCreateData] = await Promise.all([
+    getUserPlan(user),
+    getUserAddOns(user),
+    canCreateSite(user.id),
+  ]);
   const limits = getPlanLimits(plan, addOns);
-  const { allowed: canCreate, reason: limitReason } = await canCreateSite(user.id);
+  const { allowed: canCreate, reason: limitReason } = canCreateData;
   // Compter uniquement les chantiers actifs (non terminés)
   const currentCount = activeSites.length;
 
@@ -139,7 +148,7 @@ export default async function HomePage() {
         </div>
       </div>
 
-      {sites?.length === 0 && (
+      {sitesArray.length === 0 && (
         <div className="rounded-2xl border border-zinc-200 bg-white p-8 text-center dark:border-zinc-800 dark:bg-zinc-900">
           <p className="text-sm text-zinc-500 dark:text-zinc-400">
             Aucun chantier pour le moment. Créez votre premier chantier pour commencer.

@@ -140,7 +140,8 @@ export function AIPlanningSection({ sites }: Props) {
             <section
               className={`rounded-2xl border p-6 ${
                 result.reasoning.includes('algorithme de base') ||
-                result.reasoning.includes('Erreur lors de l\'appel OpenAI')
+                result.reasoning.includes('Erreur lors de l\'appel Gemini') ||
+                result.reasoning.includes('Gemini non disponible')
                   ? result.reasoning.includes('429') || result.reasoning.includes('Quota')
                     ? 'border-amber-200 bg-amber-50 dark:border-amber-900/60 dark:bg-amber-900/20'
                     : 'border-blue-200 bg-blue-50 dark:border-blue-900/60 dark:bg-blue-900/20'
@@ -170,48 +171,48 @@ export function AIPlanningSection({ sites }: Props) {
                     }`}
                   >
                     {result.reasoning.includes('429') || result.reasoning.includes('Quota')
-                      ? '⚠️ Quota OpenAI dépassé'
+                      ? '⚠️ Quota Gemini dépassé'
                       : result.reasoning.includes('algorithme de base')
                         ? '⚠️ Mode basique'
-                        : result.reasoning.includes('OpenAI non disponible')
+                        : result.reasoning.includes('Gemini non disponible')
                           ? '🤖 IA Locale Avancée'
                           : 'Analyse IA'}
                   </h3>
                   <p
                     className={`mt-2 text-sm whitespace-pre-line ${
                       result.reasoning.includes('algorithme de base') ||
-                      result.reasoning.includes('Erreur lors de l\'appel OpenAI') ||
-                      result.reasoning.includes('OpenAI non disponible')
+                      result.reasoning.includes('Erreur lors de l\'appel Gemini') ||
+                      result.reasoning.includes('Gemini non disponible')
                         ? result.reasoning.includes('429') || result.reasoning.includes('Quota')
                           ? 'text-amber-800 dark:text-amber-200'
                           : 'text-blue-800 dark:text-blue-200'
                         : 'text-emerald-800 dark:text-emerald-200'
                     }`}
                   >
-                    {result.reasoning.includes('OpenAI non disponible') && !result.reasoning.includes('429')
+                    {result.reasoning.includes('Gemini non disponible') && !result.reasoning.includes('429')
                       ? result.reasoning.split('). ')[1] || result.reasoning
                       : result.reasoning}
                   </p>
                   {(result.reasoning.includes('algorithme de base') ||
-                    result.reasoning.includes('Erreur lors de l\'appel OpenAI') ||
-                    (result.reasoning.includes('OpenAI non disponible') && result.reasoning.includes('429'))) && (
+                    result.reasoning.includes('Erreur lors de l\'appel Gemini') ||
+                    (result.reasoning.includes('Gemini non disponible') && result.reasoning.includes('429'))) && (
                     <div className="mt-4 rounded-lg bg-white/50 p-3 text-xs dark:bg-black/20">
                       {result.reasoning.includes('429') || result.reasoning.includes('Quota') ? (
                         <>
-                          <p className="font-semibold mb-2">⚠️ Quota OpenAI dépassé</p>
+                          <p className="font-semibold mb-2">⚠️ Quota Google Gemini dépassé</p>
                           <p className="mb-2">Vous avez fait trop de requêtes. Solutions :</p>
                           <ol className="list-decimal list-inside space-y-1 mb-2">
                             <li>Attendez 1-2 minutes avant de réessayer</li>
-                            <li>Vérifiez votre quota sur <a href="https://platform.openai.com/usage" target="_blank" rel="noopener noreferrer" className="underline">platform.openai.com/usage</a></li>
-                            <li>Si nécessaire, passez à un plan payant OpenAI</li>
+                            <li>Vérifiez votre quota sur <a href="https://console.cloud.google.com/apis/api/generativelanguage.googleapis.com/quotas" target="_blank" rel="noopener noreferrer" className="underline">Google Cloud Console</a></li>
+                            <li>Si nécessaire, augmentez votre quota ou passez à un plan payant</li>
                           </ol>
                           <p className="text-xs opacity-75">En attendant, le planning est généré avec l&apos;algorithme de base.</p>
                         </>
                       ) : (
                         <>
-                          <p className="font-semibold mb-1">Pour activer l&apos;IA OpenAI :</p>
+                          <p className="font-semibold mb-1">Pour activer l&apos;IA Google Gemini :</p>
                           <ol className="list-decimal list-inside space-y-1">
-                            <li>Vérifiez que OPENAI_API_KEY est bien configurée dans Vercel</li>
+                            <li>Vérifiez que GOOGLE_GEMINI_API_KEY est bien configurée dans Vercel</li>
                             <li>Redéployez votre application après avoir ajouté la variable</li>
                             <li>Vérifiez les logs Vercel pour voir les erreurs détaillées</li>
                           </ol>

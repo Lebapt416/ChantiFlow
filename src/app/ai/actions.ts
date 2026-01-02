@@ -94,7 +94,7 @@ export async function generateAIPlanningAction(
       return { error: 'Aucune tâche en attente à planifier.' };
     }
 
-    // Générer le planning avec l'IA OpenAI
+    // Générer le planning avec l'IA Google Gemini
     const planning = await generateAIPlanning(
       pendingTasks,
       workers,

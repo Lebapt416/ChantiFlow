@@ -35,8 +35,8 @@ type PlanningResult = {
 };
 
 /**
- * Génère un planning intelligent avec OpenAI
- * Utilise l'API OpenAI pour analyser et optimiser le planning
+ * Génère un planning intelligent avec Google Gemini
+ * Utilise l'API Google Gemini pour analyser et optimiser le planning
  */
 export async function generateAIPlanning(
   tasks: Task[],
@@ -45,11 +45,11 @@ export async function generateAIPlanning(
   siteName: string,
   siteId?: string,
 ): Promise<PlanningResult> {
-  const apiKey = process.env.OPENAI_API_KEY;
+  const { isGeminiConfigured, generateWithGemini } = await import('./gemini');
 
-  // Si pas d'API key, utiliser l'IA locale avancée
-  if (!apiKey || apiKey.trim() === '') {
-    console.log('[AI Planning] Pas d\'API key OpenAI, utilisation de l\'IA locale');
+  // Si pas d'API key Gemini, utiliser l'IA locale avancée
+  if (!(await isGeminiConfigured())) {
+    console.log('[AI Planning] Pas d\'API key Google Gemini, utilisation de l\'IA locale');
     const { generateLocalAIPlanning } = await import('./local-planning');
     const planning = await generateLocalAIPlanning(tasks, workers, deadline, siteName);
     
@@ -63,8 +63,8 @@ export async function generateAIPlanning(
   }
 
   try {
-    console.log('[AI Planning] Appel OpenAI avec', tasks.length, 'tâches');
-    // Préparer le prompt pour OpenAI
+    console.log('[AI Planning] Appel Google Gemini avec', tasks.length, 'tâches');
+    // Préparer le prompt pour Gemini
     const tasksDescription = tasks
       .map(
         (task, index) =>
@@ -141,58 +141,20 @@ Réponds UNIQUEMENT avec un JSON valide dans ce format:
   "reasoning": "Explication détaillée de ton analyse, des lois respectées, et des choix de collaboration"
 }`;
 
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages: [
-          {
-            role: 'system',
-            content:
-              'Tu es un expert en gestion de projets de construction en France. Tu génères des plannings optimisés en JSON en respectant STRICTEMENT les lois du travail françaises (Code du travail). Tu reconnais les métiers et permets la collaboration entre workers du même métier. Tu prends en compte le temps estimé (duration_hours) de chaque tâche. Réponds UNIQUEMENT en JSON valide.',
-          },
-          {
-            role: 'user',
-            content: prompt,
-          },
-        ],
-        temperature: 0.7,
-        response_format: { type: 'json_object' },
-      }),
+    const systemInstruction = 'Tu es un expert en gestion de projets de construction en France. Tu génères des plannings optimisés en JSON en respectant STRICTEMENT les lois du travail françaises (Code du travail). Tu reconnais les métiers et permets la collaboration entre workers du même métier. Tu prends en compte le temps estimé (duration_hours) de chaque tâche. Réponds UNIQUEMENT en JSON valide.';
+
+    const content = await generateWithGemini(prompt, systemInstruction, {
+      temperature: 0.7,
+      maxOutputTokens: 4000,
+      responseFormat: 'json',
     });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('[AI Planning] Erreur OpenAI:', response.status, errorText);
-      
-      // Gestion spécifique de l'erreur 429 (rate limit)
-      if (response.status === 429) {
-        throw new Error(
-          'Quota OpenAI dépassé (429). Vous avez fait trop de requêtes. Attendez quelques minutes ou vérifiez votre quota sur platform.openai.com/usage',
-        );
-      }
-      
-      // Gestion de l'erreur 401 (clé invalide)
-      if (response.status === 401) {
-        throw new Error('Clé API OpenAI invalide. Vérifiez votre clé sur platform.openai.com/api-keys');
-      }
-      
-      throw new Error(`OpenAI API error: ${response.status} ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    const content = data.choices[0]?.message?.content;
-
     if (!content) {
-      console.error('[AI Planning] Réponse OpenAI vide:', data);
-      throw new Error('Réponse OpenAI vide');
+      console.error('[AI Planning] Réponse Gemini vide');
+      throw new Error('Réponse Gemini vide');
     }
 
-    console.log('[AI Planning] Réponse OpenAI reçue, longueur:', content.length);
+    console.log('[AI Planning] Réponse Gemini reçue, longueur:', content.length);
 
     let planning: PlanningResult;
     try {
@@ -200,7 +162,7 @@ Réponds UNIQUEMENT avec un JSON valide dans ce format:
     } catch (parseError) {
       console.error('[AI Planning] Erreur parsing JSON:', parseError);
       console.error('[AI Planning] Contenu reçu:', content.substring(0, 500));
-      throw new Error('Erreur lors du parsing de la réponse OpenAI');
+      throw new Error('Erreur lors du parsing de la réponse Gemini');
     }
 
     // Valider et compléter les dates en respectant les lois du travail
@@ -245,7 +207,7 @@ Réponds UNIQUEMENT avec un JSON valide dans ce format:
     // Valider que le planning contient les bonnes données
     if (!planning.orderedTasks || !Array.isArray(planning.orderedTasks)) {
       console.error('[AI Planning] Format de planning invalide');
-      throw new Error('Format de planning invalide depuis OpenAI');
+      throw new Error('Format de planning invalide depuis Gemini');
     }
 
     console.log('[AI Planning] Planning généré avec succès:', planning.orderedTasks.length, 'tâches');
@@ -274,10 +236,10 @@ Réponds UNIQUEMENT avec un JSON valide dans ce format:
     return planning;
   } catch (error) {
     // En cas d'erreur, utiliser l'IA locale avancée
-    console.error('[AI Planning] Erreur OpenAI, fallback IA locale:', error);
+    console.error('[AI Planning] Erreur Gemini, fallback IA locale:', error);
     const { generateLocalAIPlanning } = await import('./local-planning');
     const localPlanning = await generateLocalAIPlanning(tasks, workers, deadline, siteName);
-    localPlanning.reasoning = `⚠️ OpenAI non disponible (${error instanceof Error ? error.message : 'Erreur inconnue'}). ${localPlanning.reasoning}`;
+    localPlanning.reasoning = `⚠️ Google Gemini non disponible (${error instanceof Error ? error.message : 'Erreur inconnue'}). ${localPlanning.reasoning}`;
     return localPlanning;
   }
 }
@@ -341,7 +303,7 @@ function generateBasicPlanning(
   return {
     orderedTasks,
     warnings: [],
-    reasoning: 'Planning généré avec un algorithme de base (sans IA). Pour une analyse plus poussée, configurez OPENAI_API_KEY.',
+    reasoning: 'Planning généré avec un algorithme de base (sans IA). Pour une analyse plus poussée, configurez GOOGLE_GEMINI_API_KEY.',
   };
 }
 

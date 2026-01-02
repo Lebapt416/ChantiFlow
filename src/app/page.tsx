@@ -1,5 +1,6 @@
 import type { LucideIcon } from 'lucide-react';
 import Link from 'next/link';
+import { Suspense } from 'react';
 import { Clock, MessageSquare, FileText, HardHat, Hammer, Building2, Ruler, LineChart } from 'lucide-react';
 import { PricingSection } from '@/components/pricing-section';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
@@ -130,8 +131,8 @@ const faqSchema = {
   })),
 };
 
-export default async function LandingPage() {
-  // Vérifier si l'utilisateur est connecté
+// Composant wrapper pour PricingSection avec auth check asynchrone
+async function PricingSectionWrapper() {
   let isAuthenticated = false;
   try {
     const supabase = await createSupabaseServerClient();
@@ -142,6 +143,10 @@ export default async function LandingPage() {
   } catch {
     isAuthenticated = false;
   }
+  return <PricingSection isAuthenticated={isAuthenticated} userEmail={null} />;
+}
+
+export default async function LandingPage() {
   return (
     <div className="min-h-screen bg-white dark:bg-zinc-950">
       <script
@@ -337,8 +342,10 @@ export default async function LandingPage() {
         </div>
       </section>
 
-      {/* Pricing Section */}
-      <PricingSection isAuthenticated={isAuthenticated} userEmail={null} />
+      {/* Pricing Section - Chargé de manière asynchrone pour ne pas bloquer le FCP */}
+      <Suspense fallback={<PricingSection isAuthenticated={false} userEmail={null} />}>
+        <PricingSectionWrapper />
+      </Suspense>
 
       {/* À propos */}
       <section className="mx-auto max-w-7xl px-6 py-20">
