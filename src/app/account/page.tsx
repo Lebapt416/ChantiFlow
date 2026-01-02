@@ -5,8 +5,6 @@ import { SignOutButton } from './sign-out-button';
 import { ChangePlanButton } from './change-plan-button';
 import { getUserPlan, getUserAddOns, getPlanLimits, type Plan } from '@/lib/plans';
 import { AddOnsSection } from './add-ons-section';
-import { isAdmin } from '@/lib/admin';
-import { SystemTestButton } from './system-test-button';
 
 export const metadata = {
   title: 'Mon compte | ChantiFlow',
@@ -25,9 +23,6 @@ export default async function AccountPage() {
   const plan = await getUserPlan(user);
   const addOns = getUserAddOns(user);
   const limits = getPlanLimits(plan, addOns);
-  
-  // Vérification admin
-  const userIsAdmin = isAdmin(user.email);
 
   const planNames: Record<Plan, string> = {
     basic: 'Basic',
@@ -148,38 +143,6 @@ export default async function AccountPage() {
               );
             })}
           </div>
-        </section>
-
-        {/* Tests système (admin uniquement) */}
-        <section className="rounded-2xl border border-zinc-100 bg-white p-6 shadow-lg shadow-black/5 dark:border-zinc-800 dark:bg-zinc-900">
-          <h2 className="text-lg font-semibold text-zinc-900 dark:text-white">Tests système</h2>
-          {userIsAdmin ? (
-            <>
-              <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-                Vérifiez le bon fonctionnement de l'application et obtenez un rapport détaillé des erreurs.
-              </p>
-              <div className="mt-4">
-                <SystemTestButton />
-              </div>
-            </>
-          ) : (
-            <>
-              <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-                Cette fonctionnalité est réservée aux administrateurs.
-              </p>
-              <div className="mt-4 rounded-lg border border-yellow-200 bg-yellow-50 p-3 dark:border-yellow-800 dark:bg-yellow-900/20">
-                <p className="text-xs text-yellow-800 dark:text-yellow-200">
-                  <strong>Email actuel :</strong> {user.email}
-                </p>
-                <p className="mt-1 text-xs text-yellow-800 dark:text-yellow-200">
-                  <strong>Pour activer :</strong> Ajoutez votre email dans la variable d'environnement <code className="rounded bg-yellow-100 px-1 dark:bg-yellow-900/40">ADMIN_EMAILS</code>
-                </p>
-                <p className="mt-1 text-xs text-yellow-800 dark:text-yellow-200">
-                  Format : <code className="rounded bg-yellow-100 px-1 dark:bg-yellow-900/40">ADMIN_EMAILS={user.email}</code>
-                </p>
-              </div>
-            </>
-          )}
         </section>
 
         {/* Déconnexion */}
