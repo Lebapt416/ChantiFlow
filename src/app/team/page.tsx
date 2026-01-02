@@ -6,6 +6,7 @@ import { AddWorkerForm } from './add-worker-form';
 import { AddWorkerToSiteForm } from './add-worker-to-site-form';
 import { DeleteWorkerButton } from '@/components/delete-worker-button';
 import { WorkerConnectionQrButton } from '@/components/worker-connection-qr-button';
+import { CopyButton } from '@/components/copy-button';
 
 export const metadata = {
   title: 'Équipe | ChantiFlow',
@@ -34,7 +35,7 @@ export default async function TeamPage() {
     // Tester d'abord si la colonne status existe
     const { error: testError } = await supabase
       .from('workers')
-      .select('id, name, email, role, created_at, status, access_token, site_id')
+      .select('id, name, email, role, created_at, status, access_token, access_code, site_id')
       .eq('created_by', user.id)
       .is('site_id', null)
       .limit(1);
@@ -43,10 +44,10 @@ export default async function TeamPage() {
       // Si l'erreur mentionne created_by ou column, la migration n'est pas exécutée
       if (testError.message.includes('created_by') || testError.message.includes('column') || testError.code === '42703') {
         console.warn('Colonne created_by ou status non trouvée - migration non exécutée');
-        // Essayer sans status
+        // Essayer sans status et access_code
         const { data: workersWithoutStatus } = await supabase
           .from('workers')
-          .select('id, name, email, role, created_at, access_token, site_id')
+          .select('id, name, email, role, created_at, access_token, access_code, site_id')
           .eq('created_by', user.id)
           .is('site_id', null)
           .order('created_at', { ascending: true });
@@ -60,7 +61,7 @@ export default async function TeamPage() {
       // Si pas d'erreur, récupérer tous les workers avec status
       const { data: allAccountWorkers, error: fetchError } = await supabase
         .from('workers')
-        .select('id, name, email, role, created_at, status, access_token, site_id')
+        .select('id, name, email, role, created_at, status, access_token, access_code, site_id')
         .eq('created_by', user.id)
         .is('site_id', null)
         .order('created_at', { ascending: true });
@@ -69,7 +70,7 @@ export default async function TeamPage() {
         // Si la colonne status n'existe pas, récupérer sans status
         const { data: workersWithoutStatus } = await supabase
           .from('workers')
-          .select('id, name, email, role, created_at, access_token, site_id')
+          .select('id, name, email, role, created_at, access_token, access_code, site_id')
           .eq('created_by', user.id)
           .is('site_id', null)
           .order('created_at', { ascending: true });
@@ -104,7 +105,7 @@ export default async function TeamPage() {
   const { data: siteWorkers } = siteIds.length
     ? await supabase
         .from('workers')
-        .select('id, name, email, role, site_id, created_at, access_token')
+        .select('id, name, email, role, site_id, created_at, access_token, access_code')
         .in('site_id', siteIds)
         .order('created_at', { ascending: true })
     : { data: [] };
@@ -273,9 +274,17 @@ export default async function TeamPage() {
                   >
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <div className="flex-1">
-                        <p className="text-sm font-semibold text-zinc-900 dark:text-white">
-                          {worker.name}
-                        </p>
+                        <div className="flex items-center gap-2">
+                          <p className="text-sm font-semibold text-zinc-900 dark:text-white">
+                            {worker.name}
+                          </p>
+                          {worker.access_code && (
+                            <span className="inline-flex items-center gap-1 rounded-md bg-emerald-100 px-2 py-0.5 text-xs font-mono font-semibold text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">
+                              {worker.access_code}
+                              <CopyButton value={worker.access_code} />
+                            </span>
+                          )}
+                        </div>
                         <p className="text-xs text-zinc-500 dark:text-zinc-400">
                           {worker.role ?? 'Rôle non défini'}
                         </p>
@@ -329,9 +338,17 @@ export default async function TeamPage() {
                   >
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <div className="flex-1">
-                        <p className="text-sm font-semibold text-zinc-900 dark:text-white">
-                          {worker.name}
-                        </p>
+                        <div className="flex items-center gap-2">
+                          <p className="text-sm font-semibold text-zinc-900 dark:text-white">
+                            {worker.name}
+                          </p>
+                          {worker.access_code && (
+                            <span className="inline-flex items-center gap-1 rounded-md bg-emerald-100 px-2 py-0.5 text-xs font-mono font-semibold text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">
+                              {worker.access_code}
+                              <CopyButton value={worker.access_code} />
+                            </span>
+                          )}
+                        </div>
                         <p className="text-xs text-zinc-500 dark:text-zinc-400">
                           {worker.role ?? 'Rôle non défini'}
                         </p>
@@ -375,9 +392,17 @@ export default async function TeamPage() {
             >
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div className="flex-1">
-                  <p className="text-sm font-semibold text-zinc-900 dark:text-white">
-                    {worker.name}
-                  </p>
+                  <div className="flex items-center gap-2">
+                    <p className="text-sm font-semibold text-zinc-900 dark:text-white">
+                      {worker.name}
+                    </p>
+                    {worker.access_code && (
+                      <span className="inline-flex items-center gap-1 rounded-md bg-emerald-100 px-2 py-0.5 text-xs font-mono font-semibold text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">
+                        {worker.access_code}
+                        <CopyButton value={worker.access_code} />
+                      </span>
+                    )}
+                  </div>
                   <p className="text-xs text-zinc-500 dark:text-zinc-400">
                     {worker.role ?? 'Rôle non défini'}
                   </p>

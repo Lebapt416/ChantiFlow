@@ -29,7 +29,7 @@ export function CopyButton({ value }: Props) {
           : 'border-zinc-200 text-zinc-700 hover:border-zinc-900 hover:text-zinc-900 dark:border-zinc-600 dark:text-zinc-200 dark:hover:border-white dark:hover:text-white'
       }`}
     >
-      {copied ? 'Lien copié !' : 'Copier le lien'}
+      {copied ? '✓ Copié' : '📋'}
     </button>
   );
 }

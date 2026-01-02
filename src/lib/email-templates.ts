@@ -450,9 +450,11 @@ export function getTeamJoinConfirmationEmailTemplate({
 export function getTeamApprovalEmailTemplate({
   workerName,
   managerName,
+  accessCode,
 }: {
   workerName: string;
   managerName?: string;
+  accessCode?: string;
 }) {
   let content = getEmailBase('Demande approuvée !', PRIMARY_COLOR);
   
@@ -475,9 +477,26 @@ export function getTeamApprovalEmailTemplate({
                       </p>
                     </div>
                     
+                    ${accessCode ? `
+                    <!-- Code d'accès -->
+                    <div style="background: #ffffff; border: 2px solid ${PRIMARY_COLOR}; border-radius: 12px; padding: 32px; margin: 32px 0; text-align: center;">
+                      <p style="margin: 0 0 12px 0; color: #92400e; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">
+                        Votre code d'accès unique
+                      </p>
+                      <div style="background: ${PRIMARY_COLOR}; border-radius: 8px; padding: 20px; margin: 16px 0;">
+                        <p style="margin: 0; color: #ffffff; font-size: 32px; font-weight: 700; letter-spacing: 4px; font-family: 'Courier New', monospace;">
+                          ${String(accessCode).toUpperCase().replace(/[^0-9A-Z]/g, '')}
+                        </p>
+                      </div>
+                      <p style="margin: 16px 0 0 0; color: ${TEXT_SECONDARY}; font-size: 14px; line-height: 1.6;">
+                        Utilisez ce code pour accéder à votre espace ouvrier sur ChantiFlow. Gardez-le précieusement !
+                      </p>
+                    </div>
+                    ` : `
                     <p style="margin: 32px 0 0 0; color: ${TEXT_SECONDARY}; font-size: 14px; border-top: 1px solid ${BORDER_COLOR}; padding-top: 24px;">
                       Vous recevrez un email avec votre code d'accès unique lorsque vous serez assigné à un chantier spécifique.
                     </p>
+                    `}
   `;
 
   content += getEmailFooter();

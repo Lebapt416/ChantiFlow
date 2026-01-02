@@ -522,10 +522,12 @@ export async function sendTeamApprovalEmail({
   workerEmail,
   workerName,
   managerName,
+  accessCode,
 }: {
   workerEmail?: string;
   workerName: string;
   managerName?: string;
+  accessCode?: string;
 }) {
   // Si Resend n'est pas configuré, on retourne silencieusement
   if (!process.env.RESEND_API_KEY) {
@@ -556,6 +558,7 @@ export async function sendTeamApprovalEmail({
       html: getTeamApprovalEmailTemplate({
         workerName,
         managerName,
+        accessCode,
       }),
       headers: {
         'X-Entity-Ref-ID': randomUUID(),
