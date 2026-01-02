@@ -69,12 +69,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }).catch((error) => {
       console.error('Erreur lors de la vérification de session:', error);
       // Nettoyer la session en cas d'erreur
-      if (error.message?.includes('Refresh Token')) {
+      if (error?.message?.includes('Refresh Token')) {
         supabase.auth.signOut().catch(() => {
           // Ignorer les erreurs de déconnexion
         });
       }
-      setIsChecking(false);
+      // Ne pas bloquer même en cas d'erreur - le contenu s'affiche quand même
     });
 
     // Écouter les changements d'authentification
