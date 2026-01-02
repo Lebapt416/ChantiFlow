@@ -1,9 +1,10 @@
 "use client";
 
-import { startTransition, useActionState, useEffect, useMemo, useState } from "react";
+import { startTransition, useActionState, useEffect, useMemo, useState, useRef } from "react";
 import { useFormStatus } from "react-dom";
 import { submitReportAction, type ReportState } from './actions';
 import { capitalizeRoleWords } from '@/lib/utils/role-formatting';
+import { useOfflineSync } from '@/hooks/useOfflineSync';
 
 const initialState: ReportState = {};
 
@@ -42,6 +43,8 @@ export function ReportForm({ siteId, tasks, workers }: Props) {
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
   const [role, setRole] = useState('');
+  const photoFileRef = useRef<File | null>(null);
+  const { isOnline, savePendingReport, syncAllPendingReports } = useOfflineSync();
 
   const matchedWorker = useMemo(
     () =>
@@ -53,10 +56,18 @@ export function ReportForm({ siteId, tasks, workers }: Props) {
     [email, workers],
   );
 
+  // Synchroniser automatiquement quand on revient en ligne
+  useEffect(() => {
+    if (isOnline) {
+      syncAllPendingReports(submitReportAction);
+    }
+  }, [isOnline, syncAllPendingReports]);
+
   useEffect(() => {
     if (state?.success) {
       const form = document.getElementById('employee-report-form') as HTMLFormElement | null;
       form?.reset();
+      photoFileRef.current = null;
       startTransition(() => {
         setEmail('');
         setName('');
@@ -65,10 +76,64 @@ export function ReportForm({ siteId, tasks, workers }: Props) {
     }
   }, [state?.success]);
 
+  // Gérer la soumission du formulaire avec support offline
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+
+    const taskId = formData.get('taskId') as string;
+    const emailValue = formData.get('email') as string;
+    const nameValue = formData.get('name') as string;
+    const roleValue = formData.get('role') as string;
+    const description = formData.get('description') as string;
+    const markDone = formData.get('mark_done') === 'on';
+    const photo = photoFileRef.current;
+
+    if (!taskId || !emailValue) {
+      return;
+    }
+
+    // Si on est offline, sauvegarder localement
+    if (!isOnline) {
+      try {
+        await savePendingReport({
+          siteId,
+          taskId,
+          email: emailValue.trim().toLowerCase(),
+          name: nameValue.trim(),
+          role: roleValue.trim(),
+          description: description.trim(),
+          photo: photo || undefined,
+          markDone,
+        });
+
+        // Réinitialiser le formulaire
+        form.reset();
+        photoFileRef.current = null;
+        startTransition(() => {
+          setEmail('');
+          setName('');
+          setRole('');
+        });
+
+        // Afficher un message de succès local
+        alert('✅ Rapport sauvegardé localement. Il sera synchronisé automatiquement dès que vous serez en ligne.');
+      } catch (error) {
+        console.error('Erreur lors de la sauvegarde locale:', error);
+        alert('❌ Erreur lors de la sauvegarde locale du rapport.');
+      }
+      return;
+    }
+
+    // Si on est online, soumettre normalement
+    formAction(formData);
+  };
+
   return (
     <form
       id="employee-report-form"
-      action={formAction}
+      onSubmit={handleSubmit}
       className="space-y-4 rounded-2xl border border-zinc-200 bg-white/80 p-6 backdrop-blur dark:border-white/30 dark:bg-white/70"
     >
       <input type="hidden" name="siteId" value={siteId} />
@@ -215,6 +280,9 @@ export function ReportForm({ siteId, tasks, workers }: Props) {
           type="file"
           accept="image/*"
           className="w-full rounded-md border border-dashed border-zinc-300 px-3 py-2 text-sm text-zinc-500 dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-200"
+          onChange={(e) => {
+            photoFileRef.current = e.target.files?.[0] || null;
+          }}
         />
         <p className="text-xs text-zinc-500 dark:text-zinc-300">
           Formats acceptés: JPG, PNG. Taille max définie par Supabase Storage.
@@ -232,6 +300,16 @@ export function ReportForm({ siteId, tasks, workers }: Props) {
 
       <SubmitButton />
 
+      {!isOnline && (
+        <div className="rounded-md border border-amber-200 bg-amber-50 p-3 dark:border-amber-800 dark:bg-amber-950/50">
+          <p className="text-sm font-semibold text-amber-900 dark:text-amber-100">
+            ⚠️ Mode Hors-ligne
+          </p>
+          <p className="text-xs text-amber-700 dark:text-amber-300">
+            Votre rapport sera sauvegardé localement et synchronisé automatiquement dès que vous serez en ligne.
+          </p>
+        </div>
+      )}
       {state?.error ? (
         <p className="text-sm text-rose-400">{state.error}</p>
       ) : null}

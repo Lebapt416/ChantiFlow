@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { PwaRegister } from "@/components/pwa-register";
 import { AuthProvider } from "@/components/auth-provider";
+import { OfflineIndicator } from "@/components/offline-indicator";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -103,6 +104,7 @@ export default function RootLayout({
         <AuthProvider>
           {children}
           <PwaRegister />
+          <OfflineIndicator />
           <SpeedInsights />
         </AuthProvider>
       </body>
