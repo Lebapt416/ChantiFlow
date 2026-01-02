@@ -133,14 +133,12 @@ export function HeroSection() {
               >
                 <span className="relative">Lancer mon 1er chantier</span>
               </Link>
-              <Link
-                href="https://forms.gle/ZQUYmuUYUJ66Znre8"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group relative overflow-hidden rounded-xl border-2 border-white/20 dark:border-zinc-700/50 bg-white/30 dark:bg-zinc-900/30 backdrop-blur-md px-8 py-4 text-lg font-semibold text-zinc-900 dark:text-white shadow-lg transition-all duration-300 hover:scale-105 hover:bg-white/40 dark:hover:bg-zinc-800/40 hover:border-white/30 will-change-transform"
-              >
-                <span className="relative">Nous contacter</span>
-              </Link>
+            <Link
+              href="/contact"
+              className="group relative overflow-hidden rounded-xl border-2 border-white/20 dark:border-zinc-700/50 bg-white/30 dark:bg-zinc-900/30 backdrop-blur-md px-8 py-4 text-lg font-semibold text-zinc-900 dark:text-white shadow-lg transition-all duration-300 hover:scale-105 hover:bg-white/40 dark:hover:bg-zinc-800/40 hover:border-white/30 will-change-transform"
+            >
+              <span className="relative">Nous contacter</span>
+            </Link>
             </div>
             <div className="mt-16 relative">
               <div className="relative mx-auto max-w-6xl rounded-2xl border border-white/20 dark:border-zinc-800/50 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md shadow-2xl shadow-emerald-500/20 overflow-hidden">
@@ -284,15 +282,13 @@ export function HeroSection() {
               <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-1000 group-hover:translate-x-full" />
               <span className="relative">Lancer mon 1er chantier</span>
             </Link>
-            <Link
-              href="https://forms.gle/ZQUYmuUYUJ66Znre8"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group relative overflow-hidden rounded-xl border-2 border-white/20 dark:border-zinc-700/50 bg-white/30 dark:bg-zinc-900/30 backdrop-blur-md px-8 py-4 text-lg font-semibold text-zinc-900 dark:text-white shadow-lg transition-all duration-300 hover:scale-105 hover:bg-white/40 dark:hover:bg-zinc-800/40 hover:border-white/30 will-change-transform"
-            >
-              <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/10 to-transparent transition-transform duration-1000 group-hover:translate-x-full" />
-              <span className="relative">Nous contacter</span>
-            </Link>
+              <Link
+                href="/contact"
+                className="group relative overflow-hidden rounded-xl border-2 border-white/20 dark:border-zinc-700/50 bg-white/30 dark:bg-zinc-900/30 backdrop-blur-md px-8 py-4 text-lg font-semibold text-zinc-900 dark:text-white shadow-lg transition-all duration-300 hover:scale-105 hover:bg-white/40 dark:hover:bg-zinc-800/40 hover:border-white/30 will-change-transform"
+              >
+                <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/10 to-transparent transition-transform duration-1000 group-hover:translate-x-full" />
+                <span className="relative">Nous contacter</span>
+              </Link>
           </motion.div>
 
           {/* Product screenshot avec rotation 3D */}
