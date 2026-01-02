@@ -1,15 +1,12 @@
 import type { LucideIcon } from 'lucide-react';
 import Link from 'next/link';
-import { Suspense, lazy } from 'react';
+import { Suspense } from 'react';
 import { Clock, MessageSquare, FileText, HardHat, Hammer, Building2, Ruler, LineChart } from 'lucide-react';
 import { PricingSection } from '@/components/pricing-section';
-import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { HeroSection } from '@/components/landing/hero-section';
-
-// Lazy load des sections en bas de page pour ne pas bloquer le FCP
-const FeaturesSection = lazy(() => import('@/components/landing/features-section').then(mod => ({ default: mod.FeaturesSection })));
-const FaqSection = lazy(() => import('@/components/landing/faq-section').then(mod => ({ default: mod.FaqSection })));
-const Footer = lazy(() => import('@/components/landing/footer').then(mod => ({ default: mod.Footer })));
+import { FeaturesSection } from '@/components/landing/features-section';
+import { FaqSection } from '@/components/landing/faq-section';
+import { Footer } from '@/components/landing/footer';
 
 export const metadata = {
   title: 'ChantiFlow - Gestion de chantiers simplifiée avec IA',
@@ -136,20 +133,8 @@ const faqSchema = {
   })),
 };
 
-// Composant wrapper pour PricingSection avec auth check asynchrone
-async function PricingSectionWrapper() {
-  let isAuthenticated = false;
-  try {
-    const supabase = await createSupabaseServerClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    isAuthenticated = !!user;
-  } catch {
-    isAuthenticated = false;
-  }
-  return <PricingSection isAuthenticated={isAuthenticated} userEmail={null} />;
-}
+// PricingSection est déjà un Client Component
+// Pas besoin de wrapper, l'auth check se fait côté client si nécessaire
 
 export default async function LandingPage() {
   return (
@@ -322,10 +307,8 @@ export default async function LandingPage() {
         </div>
       </section>
 
-      {/* Features Section - Lazy loaded */}
-      <Suspense fallback={<div className="h-96" />}>
-        <FeaturesSection />
-      </Suspense>
+      {/* Features Section */}
+      <FeaturesSection />
 
       {/* Résultats constatés */}
       <section className="mx-auto max-w-7xl px-6 py-20">
@@ -350,10 +333,8 @@ export default async function LandingPage() {
         </div>
       </section>
 
-      {/* Pricing Section - Chargé de manière asynchrone pour ne pas bloquer le FCP */}
-      <Suspense fallback={<PricingSection isAuthenticated={false} userEmail={null} />}>
-        <PricingSectionWrapper />
-      </Suspense>
+      {/* Pricing Section - Client component, ne bloque pas le cache ISR */}
+      <PricingSection isAuthenticated={false} userEmail={null} />
 
       {/* À propos */}
       <section className="mx-auto max-w-7xl px-6 py-20">
@@ -395,15 +376,11 @@ export default async function LandingPage() {
         </div>
       </section>
 
-      {/* FAQ Section - Lazy loaded */}
-      <Suspense fallback={<div className="h-96" />}>
-        <FaqSection entries={faqEntries} />
-      </Suspense>
+      {/* FAQ Section */}
+      <FaqSection entries={faqEntries} />
 
-      {/* Footer - Lazy loaded */}
-      <Suspense fallback={<div className="h-32" />}>
-        <Footer />
-      </Suspense>
+      {/* Footer */}
+      <Footer />
     </div>
   );
 }

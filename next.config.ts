@@ -11,6 +11,8 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  // Compression activée pour réduire la taille des réponses
+  compress: true,
   // Forcer la compilation des Server Actions
   experimental: {
     serverActions: {
