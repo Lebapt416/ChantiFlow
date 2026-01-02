@@ -685,11 +685,15 @@ export function AnalyticsDashboard({
                   </div>
                   <div className="mt-3 flex gap-2">
                     <a
-                      href={`mailto:${msg.email}?subject=Re: Votre message de contact`}
+                      href={`mailto:${msg.email}?subject=Re: Votre message de contact&cc=chantiflowct@gmail.com`}
                       className="text-xs px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white transition-colors"
+                      title="Répondre (utilisez chantiflowct@gmail.com comme expéditeur)"
                     >
                       Répondre
                     </a>
+                    <span className="text-xs text-zinc-400 self-center">
+                      Depuis: chantiflowct@gmail.com
+                    </span>
                   </div>
                 </div>
               ))
