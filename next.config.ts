@@ -11,6 +11,12 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  // Forcer la compilation des Server Actions
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '2mb',
+    },
+  },
 };
 
 export default nextConfig;
