@@ -59,11 +59,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         
         // Si pas de session et qu'on est sur une page protégée, rediriger vers login
         const currentPath = window.location.pathname;
-        const protectedPaths = ['/home', '/dashboard', '/sites', '/planning', '/reports', '/qr', '/team', '/analytics'];
-        const isProtectedPath = protectedPaths.some(path => currentPath.startsWith(path));
+        // Pages publiques qui ne nécessitent pas d'authentification
+        const publicPaths = ['/team/join', '/team/join/success', '/login', '/', '/contact'];
+        const isPublicPath = publicPaths.some(path => currentPath.startsWith(path));
         
-        if (isProtectedPath) {
-          router.push('/login');
+        if (!isPublicPath) {
+          const protectedPaths = ['/home', '/dashboard', '/sites', '/planning', '/reports', '/qr', '/team', '/analytics'];
+          const isProtectedPath = protectedPaths.some(path => currentPath.startsWith(path));
+          
+          if (isProtectedPath) {
+            router.push('/login');
+          }
         }
       }
     }).catch((error) => {
@@ -107,10 +113,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         console.log('❌ Utilisateur déconnecté');
         setIsChecking(false);
         const currentPath = window.location.pathname;
-        // Rediriger vers login seulement si on est sur une page protégée
-        const protectedPaths = ['/home', '/dashboard', '/sites', '/planning', '/reports', '/qr', '/team', '/analytics'];
-        if (protectedPaths.some(path => currentPath.startsWith(path))) {
-          router.push('/login');
+        // Pages publiques qui ne nécessitent pas d'authentification
+        const publicPaths = ['/team/join', '/team/join/success', '/login', '/', '/contact'];
+        const isPublicPath = publicPaths.some(path => currentPath.startsWith(path));
+        
+        if (!isPublicPath) {
+          // Rediriger vers login seulement si on est sur une page protégée
+          const protectedPaths = ['/home', '/dashboard', '/sites', '/planning', '/reports', '/qr', '/team', '/analytics'];
+          if (protectedPaths.some(path => currentPath.startsWith(path))) {
+            router.push('/login');
+          }
         }
       } else if (event === 'TOKEN_REFRESHED' && session) {
         console.log('🔄 Token rafraîchi');
