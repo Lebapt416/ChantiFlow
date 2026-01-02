@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { LayoutDashboard, User, Trash2, TestTube } from 'lucide-react';
 import {
   LineChart,
@@ -121,16 +121,25 @@ export function AnalyticsDashboard({
   const [contactMessages, setContactMessages] = useState<ContactMessage[]>(initialContactMessages);
   const [deletingIds, setDeletingIds] = useState<Set<string>>(new Set());
   const router = useRouter();
+  const pathname = usePathname();
 
-  // Actualiser les données toutes les 30 secondes
+  // Actualiser les données toutes les 30 secondes (uniquement sur la page analytics principale)
   useEffect(() => {
+    // Ne pas recharger si on est sur la page des tests
+    if (pathname?.includes('/system-test')) {
+      return;
+    }
+
     const interval = setInterval(() => {
       setLastUpdate(new Date());
-      window.location.reload();
+      // Ne recharger que si on est toujours sur la page analytics principale
+      if (!window.location.pathname.includes('/system-test')) {
+        window.location.reload();
+      }
     }, 30000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [pathname]);
 
   // Fonction pour supprimer un message
   const handleDeleteMessage = async (messageId: string) => {
