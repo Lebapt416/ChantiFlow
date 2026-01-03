@@ -94,9 +94,12 @@ export function ReportForm({ siteId, tasks, workers }: Props) {
       return;
     }
 
-    // Si on est offline, sauvegarder localement
+    // Si on est offline, sauvegarder localement avec priorité
     if (!isOnline) {
       try {
+        // Déterminer la priorité: high si tâche marquée comme faite, medium sinon
+        const priority: 'high' | 'medium' | 'low' = markDone ? 'high' : 'medium';
+        
         await savePendingReport({
           siteId,
           taskId,
@@ -106,7 +109,7 @@ export function ReportForm({ siteId, tasks, workers }: Props) {
           description: description.trim(),
           photo: photo || undefined,
           markDone,
-        });
+        }, priority);
 
         // Réinitialiser le formulaire
         form.reset();

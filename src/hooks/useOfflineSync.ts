@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { OfflineQueue, type QueuePriority } from '@/lib/offline-queue';
 
 export type PendingReport = {
   id: string;
@@ -13,11 +14,14 @@ export type PendingReport = {
   photo?: File;
   markDone: boolean;
   createdAt: number;
+  lastModified: number;
   retryCount: number;
+  version: number;
+  priority: QueuePriority;
 };
 
 const DB_NAME = 'ChantiFlowOffline';
-const DB_VERSION = 1;
+const DB_VERSION = 2; // Incrémenté pour migration
 const STORE_NAME = 'pendingReports';
 
 /**
@@ -47,43 +51,118 @@ export function useOfflineSync() {
 
       request.onupgradeneeded = (event) => {
         const db = (event.target as IDBOpenDBRequest).result;
+        
+        // Migration: créer ou mettre à jour le store
         if (!db.objectStoreNames.contains(STORE_NAME)) {
+          // Nouveau store
           const objectStore = db.createObjectStore(STORE_NAME, { keyPath: 'id' });
           objectStore.createIndex('createdAt', 'createdAt', { unique: false });
           objectStore.createIndex('siteId', 'siteId', { unique: false });
+          objectStore.createIndex('lastModified', 'lastModified', { unique: false });
+          objectStore.createIndex('priority', 'priority', { unique: false });
+          objectStore.createIndex('retryCount', 'retryCount', { unique: false });
+        } else {
+          // Migration: ajouter les nouveaux index si nécessaire
+          const transaction = (event.target as IDBOpenDBRequest).transaction;
+          if (transaction) {
+            const objectStore = transaction.objectStore(STORE_NAME);
+            
+            // Ajouter index lastModified si absent
+            if (!objectStore.indexNames.contains('lastModified')) {
+              objectStore.createIndex('lastModified', 'lastModified', { unique: false });
+            }
+            
+            // Ajouter index priority si absent
+            if (!objectStore.indexNames.contains('priority')) {
+              objectStore.createIndex('priority', 'priority', { unique: false });
+            }
+            
+            // Ajouter index retryCount si absent
+            if (!objectStore.indexNames.contains('retryCount')) {
+              objectStore.createIndex('retryCount', 'retryCount', { unique: false });
+            }
+          }
         }
       };
     });
   }, []);
 
-  // Sauvegarder un rapport en attente
+  // Sauvegarder un rapport en attente avec gestion de conflits
   const savePendingReport = useCallback(
-    async (report: Omit<PendingReport, 'id' | 'createdAt' | 'retryCount'>): Promise<string> => {
+    async (
+      report: Omit<PendingReport, 'id' | 'createdAt' | 'lastModified' | 'retryCount' | 'version' | 'priority'>,
+      priority: QueuePriority = 'medium',
+    ): Promise<string> => {
       const db = await initDB();
+      const now = Date.now();
       const id = crypto.randomUUID();
+      
       const pendingReport: PendingReport = {
         ...report,
         id,
-        createdAt: Date.now(),
+        createdAt: now,
+        lastModified: now,
         retryCount: 0,
+        version: 1,
+        priority,
       };
 
       return new Promise((resolve, reject) => {
         const transaction = db.transaction([STORE_NAME], 'readwrite');
         const store = transaction.objectStore(STORE_NAME);
-        const request = store.add(pendingReport);
-
-        request.onsuccess = () => {
-          setPendingCount((prev) => prev + 1);
-          resolve(id);
+        
+        // Vérifier si un rapport similaire existe déjà (même siteId + taskId + email)
+        const index = store.index('siteId');
+        const getRequest = index.getAll(report.siteId);
+        
+        getRequest.onsuccess = () => {
+          const existing = (getRequest.result as PendingReport[]).find(
+            (r) => r.taskId === report.taskId && r.email === report.email,
+          );
+          
+          if (existing) {
+            // Résolution de conflit: Last Write Wins
+            if (now > existing.lastModified) {
+              // Mettre à jour l'existant
+              const updated: PendingReport = {
+                ...existing,
+                ...report,
+                lastModified: now,
+                version: existing.version + 1,
+                priority,
+              };
+              
+              const putRequest = store.put(updated);
+              putRequest.onsuccess = () => {
+                setPendingCount((prev) => {
+                  // Ne pas incrémenter si c'était une mise à jour
+                  return prev;
+                });
+                resolve(existing.id);
+              };
+              putRequest.onerror = () => reject(putRequest.error);
+            } else {
+              // Version existante plus récente, garder l'existant
+              resolve(existing.id);
+            }
+          } else {
+            // Nouveau rapport
+            const addRequest = store.add(pendingReport);
+            addRequest.onsuccess = () => {
+              setPendingCount((prev) => prev + 1);
+              resolve(id);
+            };
+            addRequest.onerror = () => reject(addRequest.error);
+          }
         };
-        request.onerror = () => reject(request.error);
+        
+        getRequest.onerror = () => reject(getRequest.error);
       });
     },
     [initDB]
   );
 
-  // Récupérer tous les rapports en attente
+  // Récupérer tous les rapports en attente, triés par priorité puis date
   const getPendingReports = useCallback(async (): Promise<PendingReport[]> => {
     const db = await initDB();
     return new Promise((resolve, reject) => {
@@ -93,7 +172,23 @@ export function useOfflineSync() {
 
       request.onsuccess = () => {
         const reports = request.result as PendingReport[];
-        resolve(reports.sort((a, b) => a.createdAt - b.createdAt));
+        
+        // Trier par priorité (high > medium > low) puis par date de création
+        const priorityWeights: Record<QueuePriority, number> = {
+          high: 3,
+          medium: 2,
+          low: 1,
+        };
+        
+        const sorted = reports.sort((a, b) => {
+          const priorityDiff = priorityWeights[b.priority] - priorityWeights[a.priority];
+          if (priorityDiff !== 0) {
+            return priorityDiff;
+          }
+          return a.createdAt - b.createdAt;
+        });
+        
+        resolve(sorted);
       };
       request.onerror = () => reject(request.error);
     });
@@ -118,7 +213,7 @@ export function useOfflineSync() {
     [initDB]
   );
 
-  // Mettre à jour le compteur de retry
+  // Mettre à jour le compteur de retry avec timestamp
   const incrementRetryCount = useCallback(
     async (id: string): Promise<void> => {
       const db = await initDB();
@@ -131,6 +226,7 @@ export function useOfflineSync() {
           const report = getRequest.result as PendingReport;
           if (report) {
             report.retryCount += 1;
+            report.lastModified = Date.now();
             const putRequest = store.put(report);
             putRequest.onsuccess = () => resolve();
             putRequest.onerror = () => reject(putRequest.error);
@@ -181,7 +277,7 @@ export function useOfflineSync() {
     [removePendingReport, incrementRetryCount]
   );
 
-  // Synchroniser tous les rapports en attente
+  // Synchroniser tous les rapports en attente avec queue et retry logic
   const syncAllPendingReports = useCallback(
     async <T = unknown>(submitFn: (prevState: T, formData: FormData) => Promise<{ error?: string; success?: boolean }>): Promise<void> => {
       if (!isOnline || isSyncing) return;
@@ -190,19 +286,70 @@ export function useOfflineSync() {
       try {
         const pendingReports = await getPendingReports();
         
+        // Créer une queue avec les rapports
+        const queue = new OfflineQueue<PendingReport>({
+          maxRetries: 5,
+          baseDelayMs: 1000,
+          maxDelayMs: 30000,
+        });
+        
+        // Ajouter tous les rapports à la queue
         for (const report of pendingReports) {
-          // Limiter à 5 tentatives par rapport
-          if (report.retryCount >= 5) {
-            console.warn(`Rapport ${report.id} a atteint le maximum de tentatives, suppression...`);
-            await removePendingReport(report.id);
+          queue.enqueue(report.id, report, report.priority, report.version);
+        }
+        
+        // Traiter la queue
+        let processed = 0;
+        const maxConcurrent = 3; // Traiter max 3 rapports en parallèle
+        
+        while (queue.size() > 0 && processed < maxConcurrent) {
+          const item = queue.dequeue();
+          if (!item) break;
+          
+          // Vérifier si on peut retenter
+          if (item.retryCount >= 5) {
+            console.warn(`Rapport ${item.id} a atteint le maximum de tentatives, suppression...`);
+            await removePendingReport(item.id);
             continue;
           }
-
-          const success = await syncReport(report, submitFn);
-          if (!success) {
-            // Attendre un peu avant la prochaine tentative
-            await new Promise((resolve) => setTimeout(resolve, 2000));
+          
+          // Vérifier le backoff
+          if (!queue.canRetry(item.id) && item.retryCount > 0) {
+            // Remettre dans la queue pour plus tard
+            queue.enqueue(item.id, item.data, item.priority, item.version);
+            continue;
           }
+          
+          // Marquer comme en traitement
+          queue.markProcessing(item.id);
+          
+          // Synchroniser
+          const success = await syncReport(item.data, submitFn);
+          
+          if (success) {
+            // Succès: retirer de la queue
+            queue.remove(item.id);
+          } else {
+            // Échec: remettre dans la queue avec priorité réduite si trop d'échecs
+            if (item.retryCount >= 3 && item.priority === 'high') {
+              queue.enqueue(item.id, item.data, 'medium', item.version);
+            } else {
+              queue.enqueue(item.id, item.data, item.priority, item.version);
+            }
+          }
+          
+          processed++;
+          
+          // Petit délai entre chaque rapport pour éviter la surcharge
+          if (processed < maxConcurrent) {
+            await new Promise((resolve) => setTimeout(resolve, 500));
+          }
+        }
+        
+        // Nettoyer les éléments qui ont dépassé le max de retries
+        const removedIds = queue.cleanup();
+        for (const id of removedIds) {
+          await removePendingReport(id);
         }
       } catch (error) {
         console.error('Erreur lors de la synchronisation:', error);
@@ -269,5 +416,20 @@ export function useOfflineSync() {
     removePendingReport,
     syncAllPendingReports,
   };
+}
+
+/**
+ * Résout un conflit entre deux versions d'un rapport (Last Write Wins)
+ */
+export function resolveConflict(
+  local: PendingReport,
+  server: PendingReport,
+): PendingReport {
+  // Si la version serveur est plus récente, utiliser celle-ci
+  if (server.lastModified > local.lastModified || server.version > local.version) {
+    return server;
+  }
+  // Sinon, utiliser la version locale
+  return local;
 }
 
