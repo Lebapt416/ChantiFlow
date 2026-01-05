@@ -5,7 +5,7 @@ import { useOfflineSync } from '@/hooks/useOfflineSync';
 import { useState, useEffect } from 'react';
 
 export function OfflineIndicator() {
-  const { isOnline, pendingCount, isSyncing, getPendingReports } = useOfflineSync();
+  const { isOnline, pendingCount, isSyncing } = useOfflineSync();
   const [priorityCounts, setPriorityCounts] = useState<{ high: number; medium: number; low: number }>({
     high: 0,
     medium: 0,
