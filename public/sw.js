@@ -5,11 +5,8 @@ const STATIC_CACHE = `chantiflow-static-${CACHE_VERSION}`;
 const DYNAMIC_CACHE = `chantiflow-dynamic-${CACHE_VERSION}`;
 
 // Ressources statiques à mettre en cache immédiatement
+// IMPORTANT : Ne pas mettre en cache les pages HTML (elles peuvent contenir des redirections)
 const STATIC_URLS = [
-  '/',
-  '/login',
-  '/home',
-  '/dashboard',
   '/manifest.json',
 ];
 
