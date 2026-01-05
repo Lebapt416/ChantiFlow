@@ -50,7 +50,7 @@ export function SiteCard({ site, stats }: Props) {
         setShowDeleteConfirm(false);
         // Recharger la page après un court délai
         setTimeout(() => {
-          router.refresh();
+          router.push('/sites');
         }, 1000);
       } else {
         setError(result.error || 'Erreur lors de la suppression.');
@@ -76,7 +76,7 @@ export function SiteCard({ site, stats }: Props) {
         setShowCompleteConfirm(false);
         // Recharger la page après un court délai
         setTimeout(() => {
-          router.refresh();
+          router.push('/sites');
         }, 1500);
       } else {
         setError(result.error || 'Erreur lors de la terminaison.');

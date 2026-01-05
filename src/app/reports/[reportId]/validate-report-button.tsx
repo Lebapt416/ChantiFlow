@@ -24,7 +24,7 @@ export function ValidateReportButton({ reportId, taskId }: Props) {
       
       if (result.success) {
         // Recharger la page pour afficher le statut mis à jour
-        router.refresh();
+        router.push(`/reports/${reportId}`);
       } else if (result.error) {
         alert(result.error);
       }

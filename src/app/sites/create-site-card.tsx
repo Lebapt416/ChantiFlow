@@ -19,7 +19,8 @@ export function CreateSiteCard({ canCreate, limitReason, currentCount, maxSites 
 
   function handleSuccess() {
     setIsFormOpen(false);
-    router.refresh();
+    // Recharger la page pour afficher le nouveau chantier
+    router.push('/sites');
   }
 
   if (!canCreate) {

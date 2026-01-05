@@ -42,7 +42,7 @@ export function ChangePlanButton({ plan, currentPlan, userEmail }: Props) {
         const result = await changePlanAction({}, formData);
         setState(result);
         if (result.success) {
-          router.refresh();
+          router.push('/account');
         }
       });
       return;
@@ -57,7 +57,7 @@ export function ChangePlanButton({ plan, currentPlan, userEmail }: Props) {
         const result = await changePlanAction({}, formData);
         setState(result);
         if (result.success) {
-          router.refresh();
+          router.push('/account');
         }
       });
       return;

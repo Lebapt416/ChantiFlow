@@ -38,7 +38,6 @@ export function CreateSiteForm({ onSuccess }: Props) {
         onSuccess();
       } else {
         router.push('/sites');
-        router.refresh();
       }
     }
   }, [state?.success, router, onSuccess]);

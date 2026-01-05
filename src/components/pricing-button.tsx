@@ -57,7 +57,6 @@ export function PricingButton({ plan, isAuthenticated, userEmail, ctaLabel, isAn
           const result = await changePlanAction({}, formData);
           if (result.success) {
             router.push('/account');
-            router.refresh();
           }
         } catch (error) {
           console.error('Error changing plan:', error);
@@ -83,7 +82,6 @@ export function PricingButton({ plan, isAuthenticated, userEmail, ctaLabel, isAn
             const result = await changePlanAction({}, formData);
             if (result.success) {
               router.push('/account');
-              router.refresh();
             }
           } catch (error) {
             console.error('Error changing plan:', error);

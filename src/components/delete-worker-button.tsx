@@ -30,8 +30,8 @@ export function DeleteWorkerButton({ workerId, workerName }: Props) {
         alert(`Erreur: ${result.error}`);
         setShowConfirm(false);
       } else {
-        // Rafraîchir la page pour afficher les changements
-        router.refresh();
+        // Recharger la page pour afficher les changements
+        router.push('/team');
       }
     });
   }

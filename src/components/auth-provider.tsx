@@ -1,30 +1,36 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { createSupabaseBrowserClient } from '@/lib/supabase/client';
 import { useRouter, usePathname } from 'next/navigation';
 
+/**
+ * AuthProvider optimisé - Zéro re-render, Zéro boucle infinie
+ * 
+ * Règles strictes :
+ * 1. Ne jamais appeler router.refresh()
+ * 2. Ne rediriger QUE si pathname est différent de la destination
+ * 3. Ignorer complètement INITIAL_SESSION et TOKEN_REFRESHED
+ * 4. Vérification immédiate mais non-bloquante
+ */
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
-  const [isChecking, setIsChecking] = useState(true);
   
-  // Refs pour tracker l'état précédent et éviter les boucles infinies
+  // Refs pour tracker l'état et éviter les boucles
   const previousUserIdRef = useRef<string | null>(null);
   const previousPathRef = useRef<string | null>(null);
   const hasRedirectedRef = useRef(false);
   const subscriptionRef = useRef<{ unsubscribe: () => void } | null>(null);
-  const routerRef = useRef(router); // Stabiliser la référence du router
-  
-  // Mettre à jour la ref du router sans déclencher de re-render
+  const isInitializedRef = useRef(false);
+  const routerRef = useRef(router);
+  const pathnameRef = useRef(pathname);
+
+  // Synchroniser les refs sans déclencher de re-render
   useEffect(() => {
     routerRef.current = router;
-  }, [router]);
-
-  // Ne jamais bloquer le rendu initial
-  useEffect(() => {
-    setIsChecking(false);
-  }, []);
+    pathnameRef.current = pathname;
+  }, [router, pathname]);
 
   useEffect(() => {
     if (typeof window === 'undefined') {
@@ -33,9 +39,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const supabase = createSupabaseBrowserClient();
     let isMounted = true;
-    let hasInitialized = false; // Flag pour s'assurer qu'on ne s'abonne qu'une fois
 
-    // Vérification initiale de session (une seule fois)
+    // Vérification initiale IMMÉDIATE mais non-bloquante
     supabase.auth.getSession().then(({ data: { session }, error }) => {
       if (!isMounted) return;
 
@@ -46,83 +51,77 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (session) {
         previousUserIdRef.current = session.user.id;
-        previousPathRef.current = window.location.pathname;
+        previousPathRef.current = pathnameRef.current;
       }
-      hasInitialized = true;
+      isInitializedRef.current = true;
     }).catch(() => {
-      hasInitialized = true;
+      isInitializedRef.current = true;
     });
 
-    // Écouter les changements d'authentification avec protection contre les boucles
+    // Écouter les changements d'authentification
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (!isMounted || !hasInitialized) return;
+      if (!isMounted || !isInitializedRef.current) return;
 
-      // IGNORER complètement INITIAL_SESSION et TOKEN_REFRESHED
-      // Ce sont les causes principales des rafraîchissements infinis
+      // IGNORER complètement ces événements (causes de boucles)
       if (event === 'INITIAL_SESSION' || event === 'TOKEN_REFRESHED') {
         if (session) {
           previousUserIdRef.current = session.user.id;
-          previousPathRef.current = window.location.pathname;
+          previousPathRef.current = pathnameRef.current;
         }
-        return; // Ne rien faire sur ces événements
-      }
-
-      // Log temporaire pour diagnostic (à supprimer après)
-      if (process.env.NODE_ENV === 'development') {
-        console.log('[AuthProvider] Event:', event, 'Path:', window.location.pathname);
+        return; // Ne rien faire
       }
 
       const currentUserId = session?.user?.id || null;
-      const currentPath = window.location.pathname;
-      const isPWA = window.matchMedia('(display-mode: standalone)').matches;
+      const currentPath = pathnameRef.current;
       const authorizedUserId = 'e78e437e-a817-4da2-a091-a7f4e5e02583';
+      const isAuthorized = currentUserId === authorizedUserId || session?.user?.email === 'bcb83@icloud.com';
 
-      // Protection contre les boucles : ne rediriger que si l'état a vraiment changé
+      // Protection stricte : ne rediriger QUE si l'utilisateur a changé
       const userIdChanged = previousUserIdRef.current !== currentUserId;
 
-      // Ne rediriger QUE sur SIGNED_IN ou SIGNED_OUT réels (pas INITIAL_SESSION)
+      // SIGNED_IN : Rediriger uniquement depuis /login et si pathname différent
       if (event === 'SIGNED_IN' && session && userIdChanged) {
         previousUserIdRef.current = currentUserId;
         previousPathRef.current = currentPath;
         hasRedirectedRef.current = false;
 
-        // Rediriger uniquement depuis /login ou /landing (PWA)
+        // Condition STRICTE : pathname doit être /login ET destination différente
         if (currentPath === '/login' || currentPath.startsWith('/login')) {
-          if (session.user.id === authorizedUserId || session.user.email === 'bcb83@icloud.com') {
-            if (!hasRedirectedRef.current) {
+          if (isAuthorized) {
+            // Rediriger vers /analytics SEULEMENT si on n'y est pas déjà
+            if (currentPath !== '/analytics') {
               hasRedirectedRef.current = true;
               routerRef.current.push('/analytics');
             }
           } else {
-            if (!hasRedirectedRef.current) {
+            // Rediriger vers /home SEULEMENT si on n'y est pas déjà
+            if (currentPath !== '/home') {
               hasRedirectedRef.current = true;
               routerRef.current.push('/home');
             }
           }
-        } else if (isPWA && currentPath === '/landing') {
-          if (!hasRedirectedRef.current) {
-            hasRedirectedRef.current = true;
-            routerRef.current.push('/home');
-          }
         }
         // Ne JAMAIS appeler router.refresh() ici
-      } else if (event === 'SIGNED_OUT' && userIdChanged) {
+      } 
+      // SIGNED_OUT : Rediriger uniquement depuis chemins protégés
+      else if (event === 'SIGNED_OUT' && userIdChanged) {
         previousUserIdRef.current = null;
         previousPathRef.current = currentPath;
         hasRedirectedRef.current = false;
 
         const publicPaths = ['/team/join', '/team/join/success', '/login', '/', '/contact'];
-        const isPublicPath = publicPaths.some(path => currentPath.startsWith(path));
+        const isPublicPath = publicPaths.some(path => currentPath === path || currentPath.startsWith(path));
 
         if (!isPublicPath) {
-          const protectedPaths = ['/home', '/dashboard', '/sites', '/planning', '/reports', '/qr', '/team', '/analytics'];
-          if (protectedPaths.some(path => currentPath.startsWith(path))) {
-            if (!hasRedirectedRef.current) {
-              hasRedirectedRef.current = true;
-              routerRef.current.push('/login');
-            }
+          const protectedPaths = ['/home', '/dashboard', '/sites', '/planning', '/reports', '/qr', '/team', '/analytics', '/account'];
+          const isProtectedPath = protectedPaths.some(path => currentPath.startsWith(path));
+          
+          // Rediriger vers /login SEULEMENT si on n'y est pas déjà
+          if (isProtectedPath && currentPath !== '/login') {
+            hasRedirectedRef.current = true;
+            routerRef.current.push('/login');
           }
         }
       }
@@ -137,10 +136,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         subscriptionRef.current = null;
       }
     };
-  }, []); // AUCUNE dépendance - s'exécute une seule fois au montage
+  }, []); // AUCUNE dépendance - exécution unique
 
-  // Ne jamais bloquer le rendu initial - toujours afficher le contenu
-  // La vérification de session se fait de manière asynchrone en arrière-plan
+  // Ne jamais bloquer le rendu - toujours afficher immédiatement
   return <>{children}</>;
 }
-

@@ -50,7 +50,6 @@ export function WorkerLoginForm({ tokenError }: { tokenError?: string | null }) 
       setState(result);
       if (result.success && result.workerId) {
         router.push('/worker/dashboard');
-        router.refresh();
       }
     });
   }

@@ -34,7 +34,7 @@ export function WorkerScanner() {
       if (result.success && result.siteId) {
         setMessage(`Chantier détecté: ${result.siteName ?? result.siteId}`);
         setTimeout(() => {
-          window.location.reload();
+          router.push('/worker/dashboard');
         }, 1200);
       } else if (result.error) {
         setError(result.error);
