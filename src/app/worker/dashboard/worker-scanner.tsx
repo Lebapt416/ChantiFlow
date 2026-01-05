@@ -2,6 +2,7 @@
 
 import dynamic from 'next/dynamic';
 import { useEffect, useState, useTransition } from 'react';
+import { useRouter } from 'next/navigation';
 import { Loader2, QrCode, Scan } from 'lucide-react';
 import { joinSiteAction } from './actions';
 
@@ -11,6 +12,7 @@ const WorkerQrReader = dynamic(async () => {
 }, { ssr: false });
 
 export function WorkerScanner() {
+  const router = useRouter();
   const [isScanning, setIsScanning] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);

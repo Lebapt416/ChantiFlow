@@ -56,15 +56,11 @@ export async function middleware(request: NextRequest) {
   } else if (user && pathname === '/login') {
     // Session active et sur /login → rediriger selon le rôle
     if (isAuthorized) {
-      if (pathname !== '/analytics') {
-        const analyticsUrl = new URL('/analytics', request.url);
-        return NextResponse.redirect(analyticsUrl);
-      }
+      const analyticsUrl = new URL('/analytics', request.url);
+      return NextResponse.redirect(analyticsUrl);
     } else {
-      if (pathname !== '/home') {
-        const homeUrl = new URL('/home', request.url);
-        return NextResponse.redirect(homeUrl);
-      }
+      const homeUrl = new URL('/home', request.url);
+      return NextResponse.redirect(homeUrl);
     }
   }
 
