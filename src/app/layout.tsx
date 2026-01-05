@@ -110,6 +110,28 @@ export default function RootLayout({
           <PwaRegister />
           <OfflineIndicator />
           <SpeedInsights />
+          {/* Debug temporaire pour identifier les reloads */}
+          {process.env.NODE_ENV === 'development' && (
+            <script
+              dangerouslySetInnerHTML={{
+                __html: `
+                  (function() {
+                    let reloadCount = 0;
+                    const originalReload = window.location.reload;
+                    window.location.reload = function() {
+                      reloadCount++;
+                      console.error('[DEBUG] 🔴 RELOAD #' + reloadCount, new Error().stack);
+                      return originalReload.apply(this, arguments);
+                    };
+                    window.addEventListener('beforeunload', function() {
+                      console.warn('[DEBUG] ⚠️ BEFOREUNLOAD triggered');
+                    });
+                    console.log('[DEBUG] Script de diagnostic chargé');
+                  })();
+                `,
+              }}
+            />
+          )}
         </AuthProvider>
       </body>
     </html>
