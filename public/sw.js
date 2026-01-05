@@ -1,5 +1,5 @@
 // Service Worker pour PWA - Production Grade avec invalidation de cache
-const CACHE_VERSION = 'v3'; // Incrémenter pour forcer l'invalidation
+const CACHE_VERSION = 'v4'; // Incrémenter pour forcer l'invalidation (v4 pour fix CSS)
 const CACHE_NAME = `chantiflow-${CACHE_VERSION}`;
 const STATIC_CACHE = `chantiflow-static-${CACHE_VERSION}`;
 const DYNAMIC_CACHE = `chantiflow-dynamic-${CACHE_VERSION}`;
@@ -78,6 +78,19 @@ self.addEventListener('fetch', (event) => {
   // Ignorer les requêtes vers Supabase Storage (trop volumineuses)
   if (url.hostname.includes('supabase.co') && url.pathname.includes('/storage/')) {
     return;
+  }
+
+  // CRITIQUE : Ne JAMAIS mettre en cache les CSS/JS de Next.js
+  // Ils doivent toujours être servis depuis le réseau pour éviter les problèmes de styles
+  if (url.pathname.startsWith('/_next/static/css/') || 
+      url.pathname.startsWith('/_next/static/chunks/') ||
+      url.pathname.includes('.css') ||
+      url.pathname.includes('.js')) {
+    // Toujours servir depuis le réseau, ne jamais utiliser le cache
+    return fetch(request).catch(() => {
+      // En cas d'erreur réseau, ne pas utiliser le cache
+      return new Response('Ressource non disponible', { status: 503 });
+    });
   }
 
   // Stratégie : Cache First pour les ressources statiques
