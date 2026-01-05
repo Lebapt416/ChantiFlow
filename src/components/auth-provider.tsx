@@ -63,6 +63,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return; // Ne rien faire sur ces événements
       }
 
+      // Log temporaire pour diagnostic (à supprimer après)
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[AuthProvider] Event:', event, 'Path:', window.location.pathname);
+      }
+
       const currentUserId = session?.user?.id || null;
       const currentPath = window.location.pathname;
       const isPWA = window.matchMedia('(display-mode: standalone)').matches;
