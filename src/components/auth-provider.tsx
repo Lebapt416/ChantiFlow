@@ -99,25 +99,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       // DISJONCTEUR : Si erreur d'authentification, nettoyer
       if (error) {
-        console.warn('[AuthProvider] ⚠️ Erreur d\'authentification détectée:', error.message);
+        const errorMessage = error.message || '';
+        console.warn('[AuthProvider] ⚠️ Erreur d\'authentification détectée:', errorMessage);
         
         if (!hasCleanedRef.current) {
           hasCleanedRef.current = true;
           
           // Nettoyer la session et le localStorage
-          supabase.auth.signOut().catch(() => {});
-          clearLocalStorageSafely();
-          setUser(null);
-        }
-        return;
-      }
-
-      // Vérifier si le token est invalide ou expiré
-      if (error?.message?.includes('Refresh Token') || error?.message?.includes('JWT')) {
-        console.warn('[AuthProvider] ⚠️ Token invalide - Nettoyage automatique');
-        
-        if (!hasCleanedRef.current) {
-          hasCleanedRef.current = true;
           supabase.auth.signOut().catch(() => {});
           clearLocalStorageSafely();
           setUser(null);
