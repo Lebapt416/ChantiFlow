@@ -8,11 +8,42 @@ import { NextResponse, type NextRequest } from 'next/server';
  * 1. Toutes les redirections sont gérées ici (côté serveur)
  * 2. Protection contre les boucles de redirection
  * 3. Synchronisation correcte des cookies Supabase
- * 4. Redirections uniquement si le path est différent
+ * 4. Suppression active des cookies malformés
+ * 5. Redirections uniquement si le path est différent
  */
 export async function middleware(request: NextRequest) {
   const response = NextResponse.next();
   
+  // Liste des cookies Supabase à vérifier
+  const supabaseCookieNames = [
+    'sb-access-token',
+    'sb-refresh-token',
+    'supabase-auth-token',
+  ];
+
+  // Vérifier et nettoyer les cookies malformés
+  const cookiesToRemove: string[] = [];
+  for (const cookieName of supabaseCookieNames) {
+    const cookie = request.cookies.get(cookieName);
+    if (cookie) {
+      const value = cookie.value;
+      // Détecter les cookies malformés (vide, trop court, ou format invalide)
+      if (!value || value.length < 10 || value === 'undefined' || value === 'null') {
+        cookiesToRemove.push(cookieName);
+      }
+    }
+  }
+
+  // Supprimer activement les cookies malformés
+  if (cookiesToRemove.length > 0) {
+    console.warn('[Middleware] 🧹 Suppression de cookies malformés:', cookiesToRemove);
+    for (const cookieName of cookiesToRemove) {
+      response.cookies.delete(cookieName);
+      // Supprimer aussi dans la requête pour éviter la propagation
+      request.cookies.delete(cookieName);
+    }
+  }
+
   // Créer un client Supabase pour le middleware avec synchronisation des cookies
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -97,7 +128,15 @@ export async function middleware(request: NextRequest) {
 
   // Cas 3 : Gestion des erreurs d'authentification
   if (authError && isProtectedPath && !isPublicPath) {
-    // Token invalide ou expiré → rediriger vers login
+    // Token invalide ou expiré → nettoyer les cookies et rediriger vers login
+    console.warn('[Middleware] 🧹 Erreur d\'authentification - Nettoyage des cookies');
+    
+    // Supprimer tous les cookies Supabase
+    for (const cookieName of supabaseCookieNames) {
+      response.cookies.delete(cookieName);
+      request.cookies.delete(cookieName);
+    }
+    
     if (pathname !== '/login' && !isRedirectLoop) {
       const loginUrl = new URL('/login', request.url);
       return NextResponse.redirect(loginUrl);

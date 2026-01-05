@@ -1,7 +1,8 @@
-// Service Worker pour PWA - Production Grade
-const CACHE_NAME = 'chantiflow-v2';
-const STATIC_CACHE = 'chantiflow-static-v2';
-const DYNAMIC_CACHE = 'chantiflow-dynamic-v2';
+// Service Worker pour PWA - Production Grade avec invalidation de cache
+const CACHE_VERSION = 'v3'; // Incrémenter pour forcer l'invalidation
+const CACHE_NAME = `chantiflow-${CACHE_VERSION}`;
+const STATIC_CACHE = `chantiflow-static-${CACHE_VERSION}`;
+const DYNAMIC_CACHE = `chantiflow-dynamic-${CACHE_VERSION}`;
 
 // Ressources statiques à mettre en cache immédiatement
 const STATIC_URLS = [
@@ -26,7 +27,7 @@ const CACHEABLE_TYPES = [
 
 // Installation du service worker
 self.addEventListener('install', (event) => {
-  console.log('[SW] Installation du service worker');
+  console.log('[SW] Installation du service worker', CACHE_VERSION);
   event.waitUntil(
     caches.open(STATIC_CACHE)
       .then((cache) => {
@@ -41,23 +42,27 @@ self.addEventListener('install', (event) => {
   self.skipWaiting();
 });
 
-// Activation du service worker
+// Activation du service worker avec invalidation de l'ancien cache
 self.addEventListener('activate', (event) => {
-  console.log('[SW] Activation du service worker');
+  console.log('[SW] Activation du service worker', CACHE_VERSION);
   event.waitUntil(
     caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((cacheName) => {
-          if (cacheName !== STATIC_CACHE && cacheName !== DYNAMIC_CACHE && cacheName !== CACHE_NAME) {
-            console.log('[SW] Suppression de l\'ancien cache:', cacheName);
-            return caches.delete(cacheName);
-          }
-        })
-      );
+      // Supprimer TOUS les anciens caches (même ceux qui ne correspondent pas au pattern)
+      const deletePromises = cacheNames.map((cacheName) => {
+        // Garder uniquement les caches de la version actuelle
+        if (cacheName !== STATIC_CACHE && cacheName !== DYNAMIC_CACHE && cacheName !== CACHE_NAME) {
+          console.log('[SW] 🧹 Suppression de l\'ancien cache:', cacheName);
+          return caches.delete(cacheName);
+        }
+        return Promise.resolve();
+      });
+      
+      return Promise.all(deletePromises);
+    }).then(() => {
+      // Prendre le contrôle immédiatement et forcer le rafraîchissement
+      return self.clients.claim();
     })
   );
-  // Prendre le contrôle immédiatement
-  return self.clients.claim();
 });
 
 // Stratégie de cache intelligente
@@ -139,5 +144,16 @@ self.addEventListener('fetch', (event) => {
 self.addEventListener('message', (event) => {
   if (event.data && event.data.type === 'SKIP_WAITING') {
     self.skipWaiting();
+  }
+  
+  // Nouveau : Message pour forcer l'invalidation du cache
+  if (event.data && event.data.type === 'CLEAR_CACHE') {
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames.map((cacheName) => caches.delete(cacheName))
+      );
+    }).then(() => {
+      console.log('[SW] 🧹 Cache complètement vidé');
+    });
   }
 });

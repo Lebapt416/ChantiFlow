@@ -25,13 +25,33 @@ export function useAuth() {
 }
 
 /**
- * AuthProvider - Fournisseur de contexte uniquement
+ * Nettoyer le localStorage en préservant les clés importantes
+ */
+function clearLocalStorageSafely() {
+  try {
+    const themeKey = 'chantiflow-theme';
+    const theme = localStorage.getItem(themeKey);
+    
+    // Vider complètement localStorage
+    localStorage.clear();
+    
+    // Restaurer uniquement le thème si présent
+    if (theme) {
+      localStorage.setItem(themeKey, theme);
+    }
+  } catch (error) {
+    console.error('[AuthProvider] Erreur lors du nettoyage localStorage:', error);
+  }
+}
+
+/**
+ * AuthProvider - Fournisseur de contexte avec disjoncteur de session
  * 
  * Règles strictes :
  * 1. Ne JAMAIS appeler router.push() ou router.refresh()
  * 2. Ne JAMAIS forcer de redirection
  * 3. Rendre {children} IMMÉDIATEMENT (LCP optimisé)
- * 4. Mettre à jour l'état de session en arrière-plan
+ * 4. Disjoncteur de session : nettoyage automatique si erreur ou timeout > 5s
  * 5. Laisser le Middleware gérer toutes les redirections
  */
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -39,6 +59,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
   const subscriptionRef = useRef<{ unsubscribe: () => void } | null>(null);
   const isMountedRef = useRef(true);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const hasCleanedRef = useRef(false);
 
   useEffect(() => {
     if (typeof window === 'undefined') {
@@ -52,24 +74,78 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Rendre immédiatement pour optimiser le LCP
     setIsLoading(false);
 
+    // DISJONCTEUR DE SESSION : Timeout de 5 secondes
+    timeoutRef.current = setTimeout(() => {
+      if (isMounted && isMountedRef.current && !hasCleanedRef.current) {
+        console.warn('[AuthProvider] ⚠️ Timeout de session (5s) - Nettoyage automatique');
+        hasCleanedRef.current = true;
+        
+        // Nettoyer la session et le localStorage
+        supabase.auth.signOut().catch(() => {});
+        clearLocalStorageSafely();
+        setUser(null);
+      }
+    }, 5000);
+
     // Vérification initiale de session (non-bloquante)
-    supabase.auth.getSession().then(({ data: { session }, error }) => {
+    const sessionPromise = supabase.auth.getSession().then(({ data: { session }, error }) => {
+      // Annuler le timeout si la vérification réussit
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
+
       if (!isMounted || !isMountedRef.current) return;
 
-      if (error && error.message.includes('Refresh Token')) {
-        supabase.auth.signOut().catch(() => {});
-        setUser(null);
+      // DISJONCTEUR : Si erreur d'authentification, nettoyer
+      if (error) {
+        console.warn('[AuthProvider] ⚠️ Erreur d\'authentification détectée:', error.message);
+        
+        if (!hasCleanedRef.current) {
+          hasCleanedRef.current = true;
+          
+          // Nettoyer la session et le localStorage
+          supabase.auth.signOut().catch(() => {});
+          clearLocalStorageSafely();
+          setUser(null);
+        }
         return;
       }
 
+      // Vérifier si le token est invalide ou expiré
+      if (error?.message?.includes('Refresh Token') || error?.message?.includes('JWT')) {
+        console.warn('[AuthProvider] ⚠️ Token invalide - Nettoyage automatique');
+        
+        if (!hasCleanedRef.current) {
+          hasCleanedRef.current = true;
+          supabase.auth.signOut().catch(() => {});
+          clearLocalStorageSafely();
+          setUser(null);
+        }
+        return;
+      }
+
+      // Session valide
       if (session?.user) {
         setUser(session.user);
       } else {
         setUser(null);
       }
-    }).catch(() => {
-      // Ignorer silencieusement les erreurs
-      if (isMounted && isMountedRef.current) {
+    }).catch((error) => {
+      // Annuler le timeout en cas d'erreur
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
+
+      console.error('[AuthProvider] ❌ Erreur lors de la vérification de session:', error);
+      
+      if (isMounted && isMountedRef.current && !hasCleanedRef.current) {
+        hasCleanedRef.current = true;
+        
+        // Nettoyer en cas d'erreur
+        supabase.auth.signOut().catch(() => {});
+        clearLocalStorageSafely();
         setUser(null);
       }
     });
@@ -80,8 +156,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (!isMounted || !isMountedRef.current) return;
 
-      // Mettre à jour l'état local uniquement
-      if (session?.user) {
+      // Annuler le timeout si on reçoit un événement valide
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
+
+      // DISJONCTEUR : Si erreur dans l'événement, nettoyer
+      if (event === 'SIGNED_OUT' || event === 'USER_UPDATED') {
+        // Mettre à jour l'état local uniquement
+        if (session?.user) {
+          setUser(session.user);
+        } else {
+          setUser(null);
+        }
+      } else if (session?.user) {
         setUser(session.user);
       } else {
         setUser(null);
@@ -96,6 +185,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => {
       isMounted = false;
       isMountedRef.current = false;
+      
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
+      
       if (subscriptionRef.current) {
         subscriptionRef.current.unsubscribe();
         subscriptionRef.current = null;
