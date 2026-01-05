@@ -14,6 +14,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const previousPathRef = useRef<string | null>(null);
   const hasRedirectedRef = useRef(false);
   const subscriptionRef = useRef<{ unsubscribe: () => void } | null>(null);
+  const routerRef = useRef(router); // Stabiliser la référence du router
+  
+  // Mettre à jour la ref du router sans déclencher de re-render
+  useEffect(() => {
+    routerRef.current = router;
+  }, [router]);
 
   // Ne jamais bloquer le rendu initial
   useEffect(() => {
@@ -87,18 +93,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           if (session.user.id === authorizedUserId || session.user.email === 'bcb83@icloud.com') {
             if (!hasRedirectedRef.current) {
               hasRedirectedRef.current = true;
-              router.push('/analytics');
+              routerRef.current.push('/analytics');
             }
           } else {
             if (!hasRedirectedRef.current) {
               hasRedirectedRef.current = true;
-              router.push('/home');
+              routerRef.current.push('/home');
             }
           }
         } else if (isPWA && currentPath === '/landing') {
           if (!hasRedirectedRef.current) {
             hasRedirectedRef.current = true;
-            router.push('/home');
+            routerRef.current.push('/home');
           }
         }
         // Ne JAMAIS appeler router.refresh() ici
@@ -115,7 +121,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           if (protectedPaths.some(path => currentPath.startsWith(path))) {
             if (!hasRedirectedRef.current) {
               hasRedirectedRef.current = true;
-              router.push('/login');
+              routerRef.current.push('/login');
             }
           }
         }
@@ -131,7 +137,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         subscriptionRef.current = null;
       }
     };
-  }, [router]); // Retirer pathname des dépendances pour éviter les re-renders
+  }, []); // AUCUNE dépendance - s'exécute une seule fois au montage
 
   // Ne jamais bloquer le rendu initial - toujours afficher le contenu
   // La vérification de session se fait de manière asynchrone en arrière-plan

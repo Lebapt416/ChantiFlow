@@ -130,13 +130,20 @@ export function AnalyticsDashboard({
       return;
     }
 
+    // DÉSACTIVÉ : Le reload automatique cause des problèmes de performance
+    // L'utilisateur peut rafraîchir manuellement si nécessaire
+    // const interval = setInterval(() => {
+    //   setLastUpdate(new Date());
+    //   // Ne recharger que si on est toujours sur la page analytics principale
+    //   if (!window.location.pathname.includes('/system-test')) {
+    //     window.location.reload();
+    //   }
+    // }, 30000);
+    
+    // Mise à jour de l'heure uniquement, sans reload
     const interval = setInterval(() => {
       setLastUpdate(new Date());
-      // Ne recharger que si on est toujours sur la page analytics principale
-      if (!window.location.pathname.includes('/system-test')) {
-        window.location.reload();
-      }
-    }, 30000);
+    }, 60000); // Mise à jour toutes les minutes sans reload
 
     return () => clearInterval(interval);
   }, [pathname]);

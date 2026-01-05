@@ -382,19 +382,38 @@ export function useOfflineSync() {
 
   // Mettre à jour le compteur de rapports en attente
   useEffect(() => {
+    let isMounted = true;
+    
     const updatePendingCount = async () => {
+      if (!isMounted) return;
+      
       try {
-        const reports = await getPendingReports();
-        setPendingCount(reports.length);
+        const db = await initDB();
+        const transaction = db.transaction([STORE_NAME], 'readonly');
+        const store = transaction.objectStore(STORE_NAME);
+        const request = store.getAll();
+
+        request.onsuccess = () => {
+          if (!isMounted) return;
+          const reports = request.result as PendingReport[];
+          setPendingCount(reports.length);
+        };
+        
+        request.onerror = () => {
+          // Ignorer silencieusement
+        };
       } catch (error) {
-        console.error('Erreur lors de la récupération du compteur:', error);
+        // Ignorer silencieusement
       }
     };
 
     updatePendingCount();
-    const interval = setInterval(updatePendingCount, 5000);
-    return () => clearInterval(interval);
-  }, [getPendingReports]);
+    const interval = setInterval(updatePendingCount, 10000); // Augmenté à 10s
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+    };
+  }, []); // Pas de dépendances - utilise initDB directement
 
   // Synchroniser automatiquement quand on revient en ligne
   useEffect(() => {

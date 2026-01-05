@@ -29,15 +29,27 @@ export function OfflineIndicator() {
       if (!isMounted || pendingCount === 0) return;
       
       try {
-        const reports = await getPendingReports();
-        if (!isMounted) return;
+        // Calculer directement depuis IndexedDB pour éviter les dépendances
+        const db = await new Promise<IDBDatabase>((resolve, reject) => {
+          const request = indexedDB.open('ChantiFlowOffline', 2);
+          request.onsuccess = () => resolve(request.result);
+          request.onerror = () => reject(request.error);
+        });
         
-        const counts = {
-          high: reports.filter((r) => r.priority === 'high').length,
-          medium: reports.filter((r) => r.priority === 'medium').length,
-          low: reports.filter((r) => r.priority === 'low').length,
+        const transaction = db.transaction(['pendingReports'], 'readonly');
+        const store = transaction.objectStore('pendingReports');
+        const request = store.getAll();
+        
+        request.onsuccess = () => {
+          if (!isMounted) return;
+          const reports = request.result as Array<{ priority: string }>;
+          const counts = {
+            high: reports.filter((r) => r.priority === 'high').length,
+            medium: reports.filter((r) => r.priority === 'medium').length,
+            low: reports.filter((r) => r.priority === 'low').length,
+          };
+          setPriorityCounts(counts);
         };
-        setPriorityCounts(counts);
       } catch (error) {
         // Ignorer silencieusement les erreurs
       }
@@ -46,17 +58,17 @@ export function OfflineIndicator() {
     // Délai initial pour ne pas bloquer le rendu
     const timeoutId = setTimeout(() => {
       updatePriorityCounts();
-    }, 2000); // Augmenté à 2s pour ne pas bloquer le FCP
+    }, 3000); // Augmenté à 3s pour ne pas bloquer le FCP
     
-    // Intervalle plus long (10s au lieu de 5s) pour réduire la charge
-    const interval = setInterval(updatePriorityCounts, 10000);
+    // Intervalle très long (30s) pour réduire la charge
+    const interval = setInterval(updatePriorityCounts, 30000);
     
     return () => {
       isMounted = false;
       clearTimeout(timeoutId);
       clearInterval(interval);
     };
-  }, [pendingCount]); // Retirer getPendingReports des dépendances
+  }, [pendingCount]); // Seulement pendingCount comme dépendance
 
   if (isOnline && pendingCount === 0) {
     return null;
