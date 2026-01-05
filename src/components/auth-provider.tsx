@@ -27,7 +27,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const supabase = createSupabaseBrowserClient();
     let isMounted = true;
-    let isInitialCheck = true; // Flag pour ignorer le premier événement INITIAL_SESSION
+    let hasInitialized = false; // Flag pour s'assurer qu'on ne s'abonne qu'une fois
 
     // Vérification initiale de session (une seule fois)
     supabase.auth.getSession().then(({ data: { session }, error }) => {
@@ -40,40 +40,39 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (session) {
         previousUserIdRef.current = session.user.id;
-        previousPathRef.current = pathname || window.location.pathname;
+        previousPathRef.current = window.location.pathname;
       }
+      hasInitialized = true;
     }).catch(() => {
-      // Ignorer les erreurs silencieusement
+      hasInitialized = true;
     });
 
     // Écouter les changements d'authentification avec protection contre les boucles
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (!isMounted) return;
+      if (!isMounted || !hasInitialized) return;
 
-      // IGNORER l'événement INITIAL_SESSION qui se déclenche au chargement
-      // C'est la cause principale des rafraîchissements infinis
-      if (event === 'INITIAL_SESSION') {
-        isInitialCheck = false;
+      // IGNORER complètement INITIAL_SESSION et TOKEN_REFRESHED
+      // Ce sont les causes principales des rafraîchissements infinis
+      if (event === 'INITIAL_SESSION' || event === 'TOKEN_REFRESHED') {
         if (session) {
           previousUserIdRef.current = session.user.id;
-          previousPathRef.current = pathname || window.location.pathname;
+          previousPathRef.current = window.location.pathname;
         }
-        return; // Ne rien faire sur INITIAL_SESSION
+        return; // Ne rien faire sur ces événements
       }
 
       const currentUserId = session?.user?.id || null;
-      const currentPath = pathname || window.location.pathname;
+      const currentPath = window.location.pathname;
       const isPWA = window.matchMedia('(display-mode: standalone)').matches;
       const authorizedUserId = 'e78e437e-a817-4da2-a091-a7f4e5e02583';
 
       // Protection contre les boucles : ne rediriger que si l'état a vraiment changé
       const userIdChanged = previousUserIdRef.current !== currentUserId;
-      const pathChanged = previousPathRef.current !== currentPath;
 
-      // Ne rediriger QUE si l'utilisateur vient de se connecter (SIGNED_IN) et que c'est un vrai changement
-      if (event === 'SIGNED_IN' && session && userIdChanged && !isInitialCheck) {
+      // Ne rediriger QUE sur SIGNED_IN ou SIGNED_OUT réels (pas INITIAL_SESSION)
+      if (event === 'SIGNED_IN' && session && userIdChanged) {
         previousUserIdRef.current = currentUserId;
         previousPathRef.current = currentPath;
         hasRedirectedRef.current = false;
@@ -97,8 +96,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             router.push('/home');
           }
         }
-        // Ne pas appeler router.refresh() ici pour éviter les boucles
-      } else if (event === 'SIGNED_OUT' && userIdChanged && !isInitialCheck) {
+        // Ne JAMAIS appeler router.refresh() ici
+      } else if (event === 'SIGNED_OUT' && userIdChanged) {
         previousUserIdRef.current = null;
         previousPathRef.current = currentPath;
         hasRedirectedRef.current = false;
@@ -115,10 +114,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             }
           }
         }
-      } else if (event === 'TOKEN_REFRESHED' && session) {
-        // Ne PAS appeler router.refresh() ici pour éviter les boucles infinies
-        // Le token est rafraîchi automatiquement, pas besoin de recharger la page
-        previousUserIdRef.current = session.user.id;
       }
     });
 
@@ -128,9 +123,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       isMounted = false;
       if (subscriptionRef.current) {
         subscriptionRef.current.unsubscribe();
+        subscriptionRef.current = null;
       }
     };
-  }, [router, pathname]);
+  }, [router]); // Retirer pathname des dépendances pour éviter les re-renders
 
   // Ne jamais bloquer le rendu initial - toujours afficher le contenu
   // La vérification de session se fait de manière asynchrone en arrière-plan

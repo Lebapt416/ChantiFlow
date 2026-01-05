@@ -17,37 +17,46 @@ export function OfflineIndicator() {
     // Ne pas exécuter immédiatement, attendre que le composant soit monté
     if (typeof window === 'undefined') return;
     
+    // Si pas de rapports en attente, ne rien faire
+    if (pendingCount === 0) {
+      setPriorityCounts({ high: 0, medium: 0, low: 0 });
+      return;
+    }
+    
+    let isMounted = true;
+    
     const updatePriorityCounts = async () => {
-      if (pendingCount > 0) {
-        try {
-          const reports = await getPendingReports();
-          const counts = {
-            high: reports.filter((r) => r.priority === 'high').length,
-            medium: reports.filter((r) => r.priority === 'medium').length,
-            low: reports.filter((r) => r.priority === 'low').length,
-          };
-          setPriorityCounts(counts);
-        } catch (error) {
-          console.error('Erreur lors de la récupération des priorités:', error);
-        }
-      } else {
-        setPriorityCounts({ high: 0, medium: 0, low: 0 });
+      if (!isMounted || pendingCount === 0) return;
+      
+      try {
+        const reports = await getPendingReports();
+        if (!isMounted) return;
+        
+        const counts = {
+          high: reports.filter((r) => r.priority === 'high').length,
+          medium: reports.filter((r) => r.priority === 'medium').length,
+          low: reports.filter((r) => r.priority === 'low').length,
+        };
+        setPriorityCounts(counts);
+      } catch (error) {
+        // Ignorer silencieusement les erreurs
       }
     };
 
     // Délai initial pour ne pas bloquer le rendu
     const timeoutId = setTimeout(() => {
       updatePriorityCounts();
-    }, 1000);
+    }, 2000); // Augmenté à 2s pour ne pas bloquer le FCP
     
-    // Intervalle plus long (5s au lieu de 2s) pour réduire la charge
-    const interval = setInterval(updatePriorityCounts, 5000);
+    // Intervalle plus long (10s au lieu de 5s) pour réduire la charge
+    const interval = setInterval(updatePriorityCounts, 10000);
     
     return () => {
+      isMounted = false;
       clearTimeout(timeoutId);
       clearInterval(interval);
     };
-  }, [pendingCount, getPendingReports]);
+  }, [pendingCount]); // Retirer getPendingReports des dépendances
 
   if (isOnline && pendingCount === 0) {
     return null;
