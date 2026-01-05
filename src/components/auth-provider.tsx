@@ -75,17 +75,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsLoading(false);
 
     // DISJONCTEUR DE SESSION : Timeout de 5 secondes
-    timeoutRef.current = setTimeout(() => {
-      if (isMounted && isMountedRef.current && !hasCleanedRef.current) {
-        console.warn('[AuthProvider] ⚠️ Timeout de session (5s) - Nettoyage automatique');
-        hasCleanedRef.current = true;
-        
-        // Nettoyer la session et le localStorage
-        supabase.auth.signOut().catch(() => {});
-        clearLocalStorageSafely();
-        setUser(null);
-      }
-    }, 5000);
+    // MAIS seulement si on est sur une page publique (pas pendant la connexion)
+    const isPublicPage = window.location.pathname === '/' || 
+                         window.location.pathname === '/login' ||
+                         window.location.pathname.startsWith('/contact') ||
+                         window.location.pathname.startsWith('/team/join');
+    
+    // Ne pas déclencher le disjoncteur sur les pages publiques (pour permettre la connexion)
+    if (!isPublicPage) {
+      timeoutRef.current = setTimeout(() => {
+        if (isMounted && isMountedRef.current && !hasCleanedRef.current) {
+          console.warn('[AuthProvider] ⚠️ Timeout de session (5s) - Nettoyage automatique');
+          hasCleanedRef.current = true;
+          
+          // Nettoyer la session et le localStorage
+          supabase.auth.signOut().catch(() => {});
+          clearLocalStorageSafely();
+          setUser(null);
+        }
+      }, 5000);
+    }
 
     // Vérification initiale de session (non-bloquante)
     const sessionPromise = supabase.auth.getSession().then(({ data: { session }, error }) => {
@@ -98,11 +107,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (!isMounted || !isMountedRef.current) return;
 
       // DISJONCTEUR : Si erreur d'authentification, nettoyer
+      // MAIS seulement si on n'est pas sur la page de login (pour permettre la connexion)
       if (error) {
         const errorMessage = error.message || '';
-        console.warn('[AuthProvider] ⚠️ Erreur d\'authentification détectée:', errorMessage);
+        const isOnLoginPage = window.location.pathname === '/login' || 
+                              window.location.pathname.startsWith('/login');
         
-        if (!hasCleanedRef.current) {
+        // Ne pas nettoyer sur la page de login (l'utilisateur est en train de se connecter)
+        if (!isOnLoginPage && !hasCleanedRef.current) {
+          console.warn('[AuthProvider] ⚠️ Erreur d\'authentification détectée:', errorMessage);
           hasCleanedRef.current = true;
           
           // Nettoyer la session et le localStorage
@@ -110,6 +123,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           clearLocalStorageSafely();
           setUser(null);
         }
+        
+        // Mettre à jour l'état même sur la page de login
+        setUser(null);
         return;
       }
 

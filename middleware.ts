@@ -127,9 +127,12 @@ export async function middleware(request: NextRequest) {
   }
 
   // Cas 3 : Gestion des erreurs d'authentification
-  if (authError && isProtectedPath && !isPublicPath) {
+  // Ne nettoyer les cookies QUE si l'erreur est vraiment critique (pas juste une absence de session)
+  if (authError && authError.message && 
+      (authError.message.includes('JWT') || authError.message.includes('expired') || authError.message.includes('invalid')) &&
+      isProtectedPath && !isPublicPath) {
     // Token invalide ou expiré → nettoyer les cookies et rediriger vers login
-    console.warn('[Middleware] 🧹 Erreur d\'authentification - Nettoyage des cookies');
+    console.warn('[Middleware] 🧹 Erreur d\'authentification critique - Nettoyage des cookies');
     
     // Supprimer tous les cookies Supabase
     for (const cookieName of supabaseCookieNames) {
