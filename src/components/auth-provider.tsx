@@ -20,15 +20,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Ne pas bloquer le rendu initial - vérifier la session de manière asynchrone
     setIsChecking(false);
 
-    // Vérifier si on est en mode PWA (standalone)
-    const isPWA = window.matchMedia('(display-mode: standalone)').matches;
+    // Utiliser requestIdleCallback pour différer la vérification de session
+    const checkSession = () => {
+      // Vérifier si on est en mode PWA (standalone)
+      const isPWA = window.matchMedia('(display-mode: standalone)').matches;
 
-    // Restaurer la session au chargement de l'app (important pour PWA)
-    // Fait de manière asynchrone pour ne pas bloquer le FCP
-    const supabase = createSupabaseBrowserClient();
+      // Restaurer la session au chargement de l'app (important pour PWA)
+      // Fait de manière asynchrone pour ne pas bloquer le FCP
+      const supabase = createSupabaseBrowserClient();
 
-    // Vérifier et restaurer la session au chargement (non-bloquant)
-    supabase.auth.getSession().then(({ data: { session }, error }) => {
+      // Vérifier et restaurer la session au chargement (non-bloquant)
+      supabase.auth.getSession().then(({ data: { session }, error }) => {
       // Gérer les erreurs de refresh token invalide silencieusement
       if (error && error.message.includes('Refresh Token')) {
         console.warn('Token de rafraîchissement invalide, nettoyage de la session');
@@ -81,9 +83,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         });
       }
       // Ne pas bloquer même en cas d'erreur - le contenu s'affiche quand même
-    });
+      });
+    };
 
-    // Écouter les changements d'authentification
+    // Différer la vérification de session pour ne pas bloquer le FCP
+    if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
+      requestIdleCallback(checkSession, { timeout: 2000 });
+    } else {
+      // Fallback: attendre 500ms avant de vérifier
+      setTimeout(checkSession, 500);
+    }
+
+    // Écouter les changements d'authentification (important pour PWA)
+    const supabase = createSupabaseBrowserClient();
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {

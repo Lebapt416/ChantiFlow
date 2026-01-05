@@ -12,8 +12,11 @@ export function OfflineIndicator() {
     low: 0,
   });
 
-  // Mettre à jour les compteurs par priorité
+  // Mettre à jour les compteurs par priorité (optimisé: moins fréquent)
   useEffect(() => {
+    // Ne pas exécuter immédiatement, attendre que le composant soit monté
+    if (typeof window === 'undefined') return;
+    
     const updatePriorityCounts = async () => {
       if (pendingCount > 0) {
         try {
@@ -32,9 +35,18 @@ export function OfflineIndicator() {
       }
     };
 
-    updatePriorityCounts();
-    const interval = setInterval(updatePriorityCounts, 2000);
-    return () => clearInterval(interval);
+    // Délai initial pour ne pas bloquer le rendu
+    const timeoutId = setTimeout(() => {
+      updatePriorityCounts();
+    }, 1000);
+    
+    // Intervalle plus long (5s au lieu de 2s) pour réduire la charge
+    const interval = setInterval(updatePriorityCounts, 5000);
+    
+    return () => {
+      clearTimeout(timeoutId);
+      clearInterval(interval);
+    };
   }, [pendingCount, getPendingReports]);
 
   if (isOnline && pendingCount === 0) {
