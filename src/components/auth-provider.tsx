@@ -76,10 +76,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     // DISJONCTEUR DE SESSION : Timeout de 5 secondes
     // MAIS seulement si on est sur une page publique (pas pendant la connexion)
-    const isPublicPage = window.location.pathname === '/' || 
-                         window.location.pathname === '/login' ||
-                         window.location.pathname.startsWith('/contact') ||
-                         window.location.pathname.startsWith('/team/join');
+    // Utiliser pathname de manière sécurisée (vérifier window existe)
+    let isPublicPage = false;
+    if (typeof window !== 'undefined') {
+      const pathname = window.location.pathname;
+      isPublicPage = pathname === '/' || 
+                     pathname === '/login' ||
+                     pathname.startsWith('/contact') ||
+                     pathname.startsWith('/team/join');
+    }
     
     // Ne pas déclencher le disjoncteur sur les pages publiques (pour permettre la connexion)
     if (!isPublicPage) {
@@ -110,8 +115,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // MAIS seulement si on n'est pas sur la page de login (pour permettre la connexion)
       if (error) {
         const errorMessage = error.message || '';
-        const isOnLoginPage = window.location.pathname === '/login' || 
-                              window.location.pathname.startsWith('/login');
+        let isOnLoginPage = false;
+        if (typeof window !== 'undefined') {
+          const pathname = window.location.pathname;
+          isOnLoginPage = pathname === '/login' || pathname.startsWith('/login');
+        }
         
         // Ne pas nettoyer sur la page de login (l'utilisateur est en train de se connecter)
         if (!isOnLoginPage && !hasCleanedRef.current) {
