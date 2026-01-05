@@ -1,5 +1,5 @@
 // Service Worker pour PWA - Production Grade avec invalidation de cache
-const CACHE_VERSION = 'v4'; // Incrémenter pour forcer l'invalidation (v4 pour fix CSS)
+const CACHE_VERSION = 'v5'; // Incrémenter pour forcer l'invalidation (v5 pour fix redirections)
 const CACHE_NAME = `chantiflow-${CACHE_VERSION}`;
 const STATIC_CACHE = `chantiflow-static-${CACHE_VERSION}`;
 const DYNAMIC_CACHE = `chantiflow-dynamic-${CACHE_VERSION}`;
@@ -80,6 +80,13 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  // CRITIQUE : Ne JAMAIS intercepter les pages HTML (elles peuvent contenir des redirections)
+  // Laisser le navigateur gérer les redirections nativement
+  if (request.headers.get('accept')?.includes('text/html')) {
+    // Ne pas intercepter les requêtes HTML - laisser passer au réseau
+    return;
+  }
+
   // CRITIQUE : Ne JAMAIS mettre en cache les CSS/JS de Next.js
   // Ils doivent toujours être servis depuis le réseau pour éviter les problèmes de styles
   if (url.pathname.startsWith('/_next/static/css/') || 
@@ -93,8 +100,13 @@ self.addEventListener('fetch', (event) => {
     });
   }
 
-  // Stratégie : Cache First pour les ressources statiques
-  if (STATIC_URLS.some(staticUrl => url.pathname === staticUrl)) {
+  // IMPORTANT : Ne plus mettre en cache les pages HTML pour éviter les problèmes de redirection
+  // Les pages HTML doivent toujours être servies depuis le réseau
+  // Le Service Worker ne doit gérer que les ressources statiques (images, fonts, etc.)
+  
+  // Stratégie : Cache First UNIQUEMENT pour les ressources vraiment statiques (images, fonts)
+  // Ne pas mettre en cache les pages HTML
+  if (url.pathname.match(/\.(png|jpg|jpeg|gif|svg|webp|woff|woff2|ttf|eot|ico)$/i)) {
     event.respondWith(
       caches.match(request)
         .then((cachedResponse) => {
@@ -102,6 +114,7 @@ self.addEventListener('fetch', (event) => {
             return cachedResponse;
           }
           return fetch(request).then((response) => {
+            // Mettre en cache uniquement les images et fonts (pas les HTML)
             if (response && response.status === 200) {
               const responseToCache = response.clone();
               caches.open(STATIC_CACHE).then((cache) => {
@@ -115,42 +128,9 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Stratégie : Network First avec fallback pour les autres ressources
-  event.respondWith(
-    fetch(request)
-      .then((response) => {
-        // Vérifier si la réponse est valide et cacheable
-        if (response && response.status === 200 && CACHEABLE_TYPES.some(type => response.headers.get('content-type')?.includes(type))) {
-          const responseToCache = response.clone();
-          caches.open(DYNAMIC_CACHE).then((cache) => {
-            cache.put(request, responseToCache);
-          });
-        }
-        return response;
-      })
-      .catch(() => {
-        // En cas d'erreur réseau, chercher dans le cache
-        return caches.match(request).then((cachedResponse) => {
-          if (cachedResponse) {
-            return cachedResponse;
-          }
-          // Si pas de cache, retourner une page offline basique pour les pages HTML
-          if (request.headers.get('accept')?.includes('text/html')) {
-            return caches.match('/').then((offlinePage) => {
-              return offlinePage || new Response('Mode hors-ligne - Veuillez vous reconnecter', {
-                status: 503,
-                statusText: 'Service Unavailable',
-                headers: { 'Content-Type': 'text/html' },
-              });
-            });
-          }
-          return new Response('Ressource non disponible hors-ligne', {
-            status: 503,
-            statusText: 'Service Unavailable',
-          });
-        });
-      })
-  );
+  // Pour toutes les autres ressources, laisser passer au réseau sans interception
+  // Cela évite les problèmes de redirections avec le Service Worker
+  return;
 });
 
 // Gestion des messages depuis l'application
