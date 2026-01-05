@@ -27,6 +27,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const supabase = createSupabaseBrowserClient();
     let isMounted = true;
+    let isInitialCheck = true; // Flag pour ignorer le premier événement INITIAL_SESSION
 
     // Vérification initiale de session (une seule fois)
     supabase.auth.getSession().then(({ data: { session }, error }) => {
@@ -39,6 +40,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (session) {
         previousUserIdRef.current = session.user.id;
+        previousPathRef.current = pathname || window.location.pathname;
       }
     }).catch(() => {
       // Ignorer les erreurs silencieusement
@@ -50,6 +52,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (!isMounted) return;
 
+      // IGNORER l'événement INITIAL_SESSION qui se déclenche au chargement
+      // C'est la cause principale des rafraîchissements infinis
+      if (event === 'INITIAL_SESSION') {
+        isInitialCheck = false;
+        if (session) {
+          previousUserIdRef.current = session.user.id;
+          previousPathRef.current = pathname || window.location.pathname;
+        }
+        return; // Ne rien faire sur INITIAL_SESSION
+      }
+
       const currentUserId = session?.user?.id || null;
       const currentPath = pathname || window.location.pathname;
       const isPWA = window.matchMedia('(display-mode: standalone)').matches;
@@ -59,7 +72,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const userIdChanged = previousUserIdRef.current !== currentUserId;
       const pathChanged = previousPathRef.current !== currentPath;
 
-      if (event === 'SIGNED_IN' && session && userIdChanged) {
+      // Ne rediriger QUE si l'utilisateur vient de se connecter (SIGNED_IN) et que c'est un vrai changement
+      if (event === 'SIGNED_IN' && session && userIdChanged && !isInitialCheck) {
         previousUserIdRef.current = currentUserId;
         previousPathRef.current = currentPath;
         hasRedirectedRef.current = false;
@@ -84,7 +98,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           }
         }
         // Ne pas appeler router.refresh() ici pour éviter les boucles
-      } else if (event === 'SIGNED_OUT' && userIdChanged) {
+      } else if (event === 'SIGNED_OUT' && userIdChanged && !isInitialCheck) {
         previousUserIdRef.current = null;
         previousPathRef.current = currentPath;
         hasRedirectedRef.current = false;
