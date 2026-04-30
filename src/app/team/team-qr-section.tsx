@@ -1,7 +1,6 @@
 'use client';
 
 import { QRCodeSVG } from 'qrcode.react';
-import { useRouter } from 'next/navigation';
 import { Printer, ExternalLink } from 'lucide-react';
 
 type Props = {
@@ -9,8 +8,6 @@ type Props = {
 };
 
 export function TeamQrSection({ qrUrl }: Props) {
-  const router = useRouter();
-
   function handlePrint() {
     window.print();
   }

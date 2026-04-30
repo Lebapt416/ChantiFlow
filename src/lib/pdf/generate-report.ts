@@ -16,20 +16,6 @@ const COLORS = {
 };
 
 /**
- * Convertit une couleur hex en RGB
- */
-function hexToRgb(hex: string): [number, number, number] {
-  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-  return result
-    ? [
-        parseInt(result[1], 16),
-        parseInt(result[2], 16),
-        parseInt(result[3], 16),
-      ]
-    : [0, 0, 0];
-}
-
-/**
  * Génère un rapport de chantier professionnel en PDF
  */
 export async function generateSiteReport(
@@ -38,9 +24,11 @@ export async function generateSiteReport(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   tasks: any[],
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  workers: any[],
-  aiSummary: { summary: string; status: string; sites_mentioned?: string[] } | null,
+  _workers: any[],
+  _aiSummary: { summary: string; status: string; sites_mentioned?: string[] } | null,
 ) {
+  void _workers;
+  void _aiSummary;
   const doc = new jsPDF() as jsPDFCustom;
   const pageWidth = doc.internal.pageSize.width;
   const pageHeight = doc.internal.pageSize.height;

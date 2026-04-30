@@ -243,7 +243,7 @@ export async function resetPasswordRequestAction(
         baseUrl = `${protocol}://${host}`;
         console.log('[resetPasswordRequestAction] URL détectée depuis headers:', baseUrl);
       }
-    } catch (headerError) {
+    } catch {
       // Si on ne peut pas accéder aux headers (par exemple dans certaines Server Actions),
       // utiliser la variable d'environnement
       console.log('[resetPasswordRequestAction] Utilisation de NEXT_PUBLIC_APP_BASE_URL:', baseUrl);
@@ -256,7 +256,7 @@ export async function resetPasswordRequestAction(
     console.log('[resetPasswordRequestAction] Envoi email de réinitialisation pour:', email);
     console.log('[resetPasswordRequestAction] URL de redirection:', redirectTo);
 
-    const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo,
       // Options supplémentaires pour améliorer la compatibilité
       captchaToken: undefined, // Pas de captcha pour l'instant

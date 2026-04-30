@@ -32,7 +32,12 @@ vi.mock('next/cache', () => ({
 }));
 
 describe('Server Actions - Site Actions', () => {
-  let mockSupabase: any;
+  type ChainableMock = Record<string, ReturnType<typeof vi.fn>>;
+  let mockSupabase: ChainableMock & {
+    auth: {
+      getUser: ReturnType<typeof vi.fn>;
+    };
+  };
 
   beforeEach(async () => {
     // Reset des mocks
@@ -53,7 +58,7 @@ describe('Server Actions - Site Actions', () => {
       // Faire en sorte que toutes les méthodes retournent l'objet chainable
       Object.keys(chain).forEach((key) => {
         if (key !== 'single' && key !== 'maybeSingle') {
-          (chain as any)[key] = vi.fn().mockReturnValue(chain);
+          chain[key] = vi.fn().mockReturnValue(chain);
         }
       });
       return chain;
@@ -67,7 +72,7 @@ describe('Server Actions - Site Actions', () => {
     };
 
     const { createSupabaseServerClient } = await import('@/lib/supabase/server');
-    vi.mocked(createSupabaseServerClient).mockResolvedValue(mockSupabase as any);
+    vi.mocked(createSupabaseServerClient).mockResolvedValue(mockSupabase as never);
   });
 
   describe('addTaskAction', () => {

@@ -380,6 +380,9 @@ export function ModernPlanningView({ siteName, phases, isAheadOfSchedule = false
           <p className="text-sm text-zinc-300">
             Glissez-déposez vos tâches. Si un retard survient, l&apos;IA recalcule automatiquement la fin du chantier.
           </p>
+          <p className="mt-1 text-xs text-zinc-400">
+            Chantier: {siteName} {isAheadOfSchedule ? '• En avance' : ''}
+          </p>
         </div>
       </div>
 

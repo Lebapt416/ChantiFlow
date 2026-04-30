@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
 
 function ProductScreenshot() {
@@ -62,12 +62,7 @@ const itemVariants = {
 };
 
 export function HeroSection() {
-  const [mounted, setMounted] = useState(false);
-
-  // Ne charger les animations qu'après le montage pour ne pas bloquer le FCP
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const [mounted] = useState(true);
 
   // Rendu statique initial pour le FCP
   if (!mounted) {

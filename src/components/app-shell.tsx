@@ -12,17 +12,9 @@ import {
   UsersRound,
   QrCode,
   FileText,
-  FolderKanban,
-  Sparkles,
   User,
   Calendar,
 } from 'lucide-react';
-
-type NavItem = {
-  href: string;
-  label: string;
-  icon: React.ComponentType<{ size?: number; strokeWidth?: number }>;
-};
 
 type PrimarySite = {
   id: string;
@@ -38,24 +30,11 @@ type AppShellProps = {
   actions?: ReactNode;
 };
 
-const baseNavItems: NavItem[] = [
-  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/home', label: 'Accueil', icon: Home },
-  { href: '/sites', label: 'Chantiers', icon: FolderKanban },
-  { href: '/planning', label: 'Planning IA', icon: Calendar },
-  { href: '/tasks', label: 'Tâches', icon: ListChecks },
-  { href: '/team', label: 'Équipe', icon: UsersRound },
-  { href: '/reports', label: 'Rapports', icon: FileText },
-  { href: '/qr', label: 'QR codes', icon: QrCode },
-  { href: '/account', label: 'Mon compte', icon: User },
-];
-
 export function AppShell({
   heading,
   subheading,
   userEmail,
   children,
-  primarySite,
   actions,
 }: AppShellProps) {
   const pathname = usePathname();

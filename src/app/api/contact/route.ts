@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Envoyer l'email
-    const { data, error } = await resend.emails.send({
+    const { error } = await resend.emails.send({
       from: RESEND_FROM_EMAIL,
       to: CONTACT_EMAIL,
       replyTo: email,

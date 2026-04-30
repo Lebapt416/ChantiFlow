@@ -1,5 +1,3 @@
-import type { LucideIcon } from 'lucide-react';
-import { HardHat, Hammer, Building2, Ruler } from 'lucide-react';
 import { LandingPageClient } from '@/components/landing/landing-page-client';
 
 export const metadata = {
@@ -18,39 +16,6 @@ export const metadata = {
 
 // Cache la page pendant 1 heure (ISR)
 export const revalidate = 3600;
-
-type SectorHighlight = {
-  title: string;
-  description: string;
-  icon: LucideIcon;
-};
-
-const sectorHighlights = [
-  {
-    title: 'Entreprises générales du BTP',
-    description:
-      'Pilotez simultanément les lots maçonnerie, gros œuvre et second œuvre avec un même tableau de bord.',
-    iconName: 'Building2',
-  },
-  {
-    title: 'Artisans & PME du bâtiment',
-    description:
-      'Centralisez les interventions plomberie, électricité, peinture ou rénovation sans multiplier les outils.',
-    iconName: 'Hammer',
-  },
-  {
-    title: 'Conducteurs de travaux',
-    description:
-      'Suivez budgets, retards et ressources en temps réel pour chaque chantier, même en mobilité.',
-    iconName: 'HardHat',
-  },
-  {
-    title: 'Bureaux d\'études / MOE',
-    description:
-      'Disposez d\'une traçabilité complète (rapports, photos, réserves) pour garantir la conformité de vos livrables.',
-    iconName: 'Ruler',
-  },
-];
 
 const faqEntries = [
   {
@@ -76,12 +41,6 @@ const faqEntries = [
 ];
 
 const baseUrl = process.env.NEXT_PUBLIC_APP_BASE_URL ?? 'https://www.chantiflow.com';
-
-const proofMetrics = [
-  { value: '30%', label: 'productivité gagnée', description: 'Gràce au planning IA et aux alertes.' },
-  { value: '2h', label: 'temps économisé par chef de chantier', description: 'Rapports et relances automatisés.' },
-  { value: '100%', label: 'traçabilité des rapports', description: 'Photos, réserves et documents centralisés.' },
-];
 
 const softwareSchema = {
   '@context': 'https://schema.org',
@@ -161,8 +120,6 @@ export default async function LandingPage() {
       />
       <LandingPageClient
         faqEntries={faqEntries}
-        sectorHighlights={sectorHighlights}
-        proofMetrics={proofMetrics}
       />
     </>
   );

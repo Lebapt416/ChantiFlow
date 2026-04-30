@@ -43,7 +43,6 @@ test.describe('Page de connexion', () => {
     await page.goto('/login');
 
     const emailInput = page.getByLabel(/email|e-mail/i).or(page.getByPlaceholder(/email/i));
-    const passwordInput = page.getByLabel(/mot de passe|password/i).or(page.getByPlaceholder(/mot de passe|password/i));
     // Cibler spécifiquement le bouton de soumission (type="submit") avec le texte "Se connecter"
     const submitButton = page.getByRole('button', { name: 'Se connecter' });
 

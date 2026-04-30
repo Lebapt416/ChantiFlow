@@ -43,7 +43,7 @@ export function AddWorkerToSiteForm({ sites, availableWorkers }: Props) {
 
   useEffect(() => {
     if (state?.success) {
-      // eslint-disable-next-line react-hooks/exhaustive-deps
+       
       setTimeout(() => {
         const form = document.getElementById('add-worker-to-site-form') as HTMLFormElement | null;
         form?.reset();
@@ -55,7 +55,7 @@ export function AddWorkerToSiteForm({ sites, availableWorkers }: Props) {
 
   // Filtrer les workers disponibles (ceux qui ne sont pas déjà assignés au chantier sélectionné)
   const filteredWorkers = selectedSiteId
-    ? availableWorkers.filter((worker) => {
+    ? availableWorkers.filter(() => {
         // Vérifier si le worker n'est pas déjà assigné à ce chantier
         // (on ne peut pas vérifier côté client, donc on affiche tous les workers disponibles)
         return true;

@@ -211,7 +211,18 @@ export default async function SitePlanningPage({ params }: Params) {
               <div className="mt-4">
                 <EditablePlanningBoard
                   siteId={site.id}
-                  initialPlanning={persistedPlanning.map(({ status, requiredRole, ...rest }) => rest)}
+                  initialPlanning={persistedPlanning.map((task) => ({
+                    taskId: task.taskId,
+                    taskTitle: task.taskTitle,
+                    order: task.order,
+                    startDate: task.startDate,
+                    endDate: task.endDate,
+                    durationHours: task.durationHours,
+                    assignedWorkerId: task.assignedWorkerId,
+                    status: task.status,
+                    requiredRole: task.requiredRole,
+                    priority: task.priority,
+                  }))}
                   workers={
                     workers?.map((w) => ({
                       id: w.id,

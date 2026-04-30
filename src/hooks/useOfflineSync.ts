@@ -402,7 +402,7 @@ export function useOfflineSync() {
         request.onerror = () => {
           // Ignorer silencieusement
         };
-      } catch (error) {
+      } catch {
         // Ignorer silencieusement
       }
     };
@@ -413,7 +413,7 @@ export function useOfflineSync() {
       isMounted = false;
       clearInterval(interval);
     };
-  }, []); // Pas de dépendances - utilise initDB directement
+  }, [initDB]);
 
   // Synchroniser automatiquement quand on revient en ligne
   useEffect(() => {

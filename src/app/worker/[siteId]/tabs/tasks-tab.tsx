@@ -17,7 +17,7 @@ type Props = {
   workerId: string;
 };
 
-export function TasksTab({ siteId, workerId }: Props) {
+export function TasksTab({ siteId }: Props) {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [siteName, setSiteName] = useState('');

@@ -10,7 +10,7 @@ type DashboardContentProps = {
   userMetadata?: Record<string, unknown> | null;
 };
 
-export async function DashboardContent({ userId, userEmail, userMetadata }: DashboardContentProps) {
+export async function DashboardContent({ userId, userMetadata }: DashboardContentProps) {
   const supabase = await createSupabaseServerClient();
 
   // Optimisation : Requêtes en parallèle avec caching

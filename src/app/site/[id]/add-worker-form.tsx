@@ -39,7 +39,7 @@ export function AddWorkerForm({ siteId, availableWorkers }: Props) {
 
   useEffect(() => {
     if (state?.success) {
-      // eslint-disable-next-line react-hooks/exhaustive-deps
+       
       setTimeout(() => {
         const form = document.getElementById('add-worker-form') as HTMLFormElement | null;
         form?.reset();

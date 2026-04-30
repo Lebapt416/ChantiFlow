@@ -1,6 +1,6 @@
 'use server';
 
-import { calculateDaysNeeded, MAX_WORKING_HOURS_PER_DAY, LUNCH_BREAK_DURATION_HOURS } from './work-rules';
+import { calculateDaysNeeded, MAX_WORKING_HOURS_PER_DAY } from './work-rules';
 
 type Task = {
   id: string;
@@ -178,6 +178,7 @@ export async function generateLocalAIPlanning(
     workers,
     taskSchedule,
     categorizedTasks,
+    siteName,
     taskDependencies,
   );
 
@@ -347,7 +348,7 @@ function topologicalSort(graph: Map<string, string[]>): string[] {
  * Génère une explication du raisonnement de l'algorithme
  */
 function generateReasoning(
-  tasks: Task[],
+  _tasks: Task[],
   workers: Worker[],
   schedule: Array<{
     taskId: string;
@@ -357,14 +358,15 @@ function generateReasoning(
     assignedWorkerId: string | null;
   }>,
   categorized: ReturnType<typeof categorizeTasks>,
+  siteName: string,
   dependencies: Record<string, string[]>,
 ): string {
+  void _tasks;
   const totalTasks = schedule.length;
-  const highPriorityCount = schedule.filter((t) => t.priority === 'high').length;
   const tasksWithDeps = schedule.filter((t) => t.dependencies.length > 0).length;
   const assignedWorkers = schedule.filter((t) => t.assignedWorkerId).length;
 
-  let reasoning = `J'ai analysé ${totalTasks} tâches et généré un planning optimisé.\n\n`;
+  let reasoning = `J'ai analysé ${totalTasks} tâches et généré un planning optimisé pour le chantier ${siteName}.\n\n`;
 
   if (categorized.preparation.length > 0) {
     reasoning += `• ${categorized.preparation.length} tâche(s) de préparation identifiée(s) (priorité haute)\n`;
@@ -384,6 +386,7 @@ function generateReasoning(
 
   reasoning +=
     '\nLes tâches sont ordonnées selon un tri topologique qui respecte les dépendances. Les dates sont calculées en fonction des durées estimées et des contraintes de séquencement.';
+  reasoning += `\nDépendances explicites détectées: ${Object.keys(dependencies).length}.`;
 
   return reasoning;
 }

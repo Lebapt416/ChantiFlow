@@ -5,7 +5,6 @@
 
 const PRIMARY_COLOR = '#10b981'; // Emerald 500
 const PRIMARY_DARK = '#059669'; // Emerald 600
-const SECONDARY_COLOR = '#3f3f46'; // Zinc 700
 const TEXT_PRIMARY = '#18181b'; // Zinc 900
 const TEXT_SECONDARY = '#71717a'; // Zinc 500
 const BG_LIGHT = '#f4f4f5'; // Zinc 100

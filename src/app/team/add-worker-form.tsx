@@ -19,7 +19,7 @@ function SubmitButton() {
   );
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+ 
 type Props = Record<string, never>;
 
 export function AddWorkerForm({}: Props) {

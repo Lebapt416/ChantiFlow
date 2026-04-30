@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { CheckCircle2, Eye, ArrowRight } from 'lucide-react';
+import { Eye, ArrowRight } from 'lucide-react';
 
 type Report = {
   id: string;

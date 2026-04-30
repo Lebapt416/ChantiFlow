@@ -163,7 +163,6 @@ export function CityAutocomplete({
         required={required}
         autoComplete="off"
         aria-autocomplete="list"
-        aria-expanded={showSuggestions}
         aria-controls="city-suggestions"
       />
       

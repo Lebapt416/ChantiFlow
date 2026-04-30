@@ -1,11 +1,10 @@
 'use client';
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo } from 'react';
 import { ChevronLeft, ChevronRight, Clock, X, AlertCircle } from 'lucide-react';
 
 // Constantes pour les limites de travail
 const MAX_WORKING_HOURS_PER_DAY = 8; // Maximum 8h de travail effectif par jour
-const LUNCH_BREAK_DURATION_HOURS = 1; // 1h de pause déjeuner obligatoire
 
 type PlanningTask = {
   taskId: string;
@@ -180,14 +179,6 @@ export function InteractiveCalendar({
     return grouped;
   }, [planning, weekDays]);
   
-  // Fonction pour obtenir le workerId principal (pour compatibilité)
-  const getMainWorkerId = (task: PlanningTask): string => {
-    if (task.assignedWorkerIds && task.assignedWorkerIds.length > 0) {
-      return task.assignedWorkerIds[0];
-    }
-    return task.assignedWorkerId || 'unassigned';
-  };
-
   const allWorkers = useMemo(() => {
     const workerMap = new Map<string, Worker>();
     workers.forEach((w) => workerMap.set(w.id, w));

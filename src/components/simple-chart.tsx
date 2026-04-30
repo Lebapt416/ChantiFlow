@@ -20,7 +20,7 @@ export function SimpleChart({ data, title }: Props) {
   const [animatedValues, setAnimatedValues] = useState(() => data.map(() => 0));
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
     setTimeout(() => {
       setAnimatedValues(data.map(() => 0));
       const timeout = setTimeout(() => {
@@ -28,7 +28,7 @@ export function SimpleChart({ data, title }: Props) {
       }, 50);
       return () => clearTimeout(timeout);
     }, 0);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [data]);
 
   return (

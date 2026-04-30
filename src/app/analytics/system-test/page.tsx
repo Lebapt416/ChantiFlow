@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { 
   TestTube, 
@@ -39,7 +38,6 @@ type TestReport = {
 const STORAGE_KEY = 'chantiflow_system_test_history';
 
 export default function SystemTestPage() {
-  const router = useRouter();
   const [currentTest, setCurrentTest] = useState<TestReport | null>(null);
   const [testHistory, setTestHistory] = useState<TestReport[]>([]);
   const [isTesting, setIsTesting] = useState(false);
@@ -157,7 +155,7 @@ export default function SystemTestPage() {
                   Tests Système
                 </h1>
                 <p className="mt-1 text-sm text-zinc-400">
-                  Vérifiez l'état de fonctionnement de tous les composants
+                  Vérifiez l&apos;état de fonctionnement de tous les composants
                 </p>
               </div>
             </div>
@@ -275,7 +273,7 @@ export default function SystemTestPage() {
                   Aucun test disponible
                 </h3>
                 <p className="text-zinc-400 mb-6">
-                  Cliquez sur "Lancer les tests" pour commencer
+                  Cliquez sur &quot;Lancer les tests&quot; pour commencer
                 </p>
                 <button
                   onClick={handleRunTests}
@@ -292,7 +290,7 @@ export default function SystemTestPage() {
                   Tests en cours...
                 </h3>
                 <p className="text-zinc-400">
-                  Veuillez patienter pendant l'exécution des tests
+                  Veuillez patienter pendant l&apos;exécution des tests
                 </p>
               </div>
             ) : displayReport ? (

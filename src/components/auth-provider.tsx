@@ -56,7 +56,7 @@ function clearLocalStorageSafely() {
  */
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading] = useState(false);
   const subscriptionRef = useRef<{ unsubscribe: () => void } | null>(null);
   const isMountedRef = useRef(true);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -70,9 +70,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const supabase = createSupabaseBrowserClient();
     let isMounted = true;
     isMountedRef.current = true;
-
-    // Rendre immédiatement pour optimiser le LCP
-    setIsLoading(false);
 
     // DISJONCTEUR DE SESSION : Timeout de 5 secondes
     // MAIS seulement si on est sur une page publique (pas pendant la connexion)
@@ -102,7 +99,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     // Vérification initiale de session (non-bloquante)
-    const sessionPromise = supabase.auth.getSession().then(({ data: { session }, error }) => {
+    supabase.auth.getSession().then(({ data: { session }, error }) => {
       // Annuler le timeout si la vérification réussit
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);

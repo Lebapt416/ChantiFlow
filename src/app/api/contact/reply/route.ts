@@ -4,7 +4,6 @@ import { randomUUID } from 'crypto';
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 const CONTACT_EMAIL = 'chantiflowct@gmail.com';
-const RESEND_FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'ChantiFlow <onboarding@resend.dev>';
 
 export async function POST(request: NextRequest) {
   try {
@@ -37,7 +36,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Envoyer la réponse
-    const { data, error } = await resend.emails.send({
+    const { error } = await resend.emails.send({
       from: `ChantiFlow <${CONTACT_EMAIL}>`,
       to: to,
       replyTo: CONTACT_EMAIL,

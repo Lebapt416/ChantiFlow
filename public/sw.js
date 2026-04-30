@@ -10,18 +10,6 @@ const STATIC_URLS = [
   '/manifest.json',
 ];
 
-// Types de ressources à mettre en cache dynamiquement
-const CACHEABLE_TYPES = [
-  'text/html',
-  'text/css',
-  'application/javascript',
-  'image/png',
-  'image/jpg',
-  'image/jpeg',
-  'image/svg+xml',
-  'application/json',
-];
-
 // Installation du service worker
 self.addEventListener('install', (event) => {
   console.log('[SW] Installation du service worker', CACHE_VERSION);

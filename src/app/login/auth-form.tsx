@@ -3,9 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useActionState } from 'react';
 import { useFormStatus } from 'react-dom';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { createSupabaseBrowserClient } from '@/lib/supabase/client';
 import { signInAction, signUpAction, type AuthState } from './actions';
 
 const initialState: AuthState = {};
@@ -26,7 +24,6 @@ function SubmitButton({ isSignUp }: { isSignUp: boolean }) {
 
 export function AuthForm() {
   const [isSignUp, setIsSignUp] = useState(false);
-  const router = useRouter();
   const [signInState, signInFormAction] = useActionState(signInAction, initialState);
   const [signUpState, signUpFormAction] = useActionState(signUpAction, initialState);
 

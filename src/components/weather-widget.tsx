@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Cloud, CloudRain, Sun, Lock } from 'lucide-react';
 import Link from 'next/link';
 
@@ -46,7 +46,7 @@ export function WeatherWidget({ location, isLocked = false }: WeatherWidgetProps
   const [showCityInput, setShowCityInput] = useState(!location);
 
   // Géocodage du code postal en coordonnées
-  const geocodePostalCode = async (code: string): Promise<{ lat: number; lon: number } | null> => {
+  const geocodePostalCode = useCallback(async (code: string): Promise<{ lat: number; lon: number } | null> => {
     if (!code || !code.trim()) {
       return null;
     }
@@ -84,10 +84,10 @@ export function WeatherWidget({ location, isLocked = false }: WeatherWidgetProps
       console.error('Erreur géocodage code postal:', err);
       return null;
     }
-  };
+  }, []);
 
   // Récupérer la météo depuis OpenMeteo
-  const fetchWeather = async (code: string) => {
+  const fetchWeather = useCallback(async (code: string) => {
     setLoading(true);
     setError(null);
 
@@ -128,13 +128,13 @@ export function WeatherWidget({ location, isLocked = false }: WeatherWidgetProps
     } finally {
       setLoading(false);
     }
-  };
+  }, [geocodePostalCode]);
 
   useEffect(() => {
     if (postalCode && !showCityInput) {
       fetchWeather(postalCode);
     }
-  }, [postalCode, showCityInput]);
+  }, [postalCode, showCityInput, fetchWeather]);
 
   const handleCitySubmit = (e: React.FormEvent) => {
     e.preventDefault();

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useRouter, usePathname } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { LayoutDashboard, User, Trash2, TestTube } from 'lucide-react';
 import {
   LineChart,
@@ -43,7 +43,6 @@ type AnalyticsDashboardProps = {
   avgTasksPerSite: number;
   avgWorkersPerSite: number;
   reportsWithPhotos: number;
-  reportsWithoutPhotos: number;
   totalHours: number;
   completedHours: number;
   topCreators: Array<{ name: string; sites: number }>;
@@ -101,7 +100,6 @@ export function AnalyticsDashboard({
   avgTasksPerSite,
   avgWorkersPerSite,
   reportsWithPhotos,
-  reportsWithoutPhotos,
   totalHours,
   completedHours,
   topCreators,
@@ -120,7 +118,6 @@ export function AnalyticsDashboard({
   const [lastUpdate, setLastUpdate] = useState(new Date());
   const [contactMessages, setContactMessages] = useState<ContactMessage[]>(initialContactMessages);
   const [deletingIds, setDeletingIds] = useState<Set<string>>(new Set());
-  const router = useRouter();
   const pathname = usePathname();
 
   // Actualiser les données toutes les 30 secondes (uniquement sur la page analytics principale)
@@ -273,7 +270,7 @@ export function AnalyticsDashboard({
                     Tests Système
                   </h2>
                   <p className="mt-1 text-sm text-zinc-400">
-                    Vérifiez l'état de fonctionnement de tous les composants avec historique
+                    Vérifiez l&apos;état de fonctionnement de tous les composants avec historique
                   </p>
                 </div>
               </div>
@@ -358,7 +355,7 @@ export function AnalyticsDashboard({
           <div className="mt-6">
             <h3 className="text-lg font-semibold mb-4 text-white">Évolution du MRR (30 derniers jours)</h3>
             <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={mrrByDay.map((day, index) => ({
+              <LineChart data={mrrByDay.map((day) => ({
                 date: formatDate(day.date),
                 MRR: day.mrr,
                 Plus: day.plus * 29,

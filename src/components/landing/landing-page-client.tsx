@@ -25,11 +25,9 @@ const PricingSection = dynamic(() => import('@/components/pricing-section').then
 
 type LandingPageClientProps = {
   faqEntries: Array<{ question: string; answer: string }>;
-  sectorHighlights: Array<{ title: string; description: string; iconName: string }>;
-  proofMetrics: Array<{ value: string; label: string; description: string }>;
 };
 
-export function LandingPageClient({ faqEntries, sectorHighlights, proofMetrics }: LandingPageClientProps) {
+export function LandingPageClient({ faqEntries }: LandingPageClientProps) {
   return (
     <div className="min-h-screen bg-white dark:bg-zinc-950">
       <HeroSection />

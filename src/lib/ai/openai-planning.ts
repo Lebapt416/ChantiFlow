@@ -1,6 +1,6 @@
 'use server';
 
-import { calculateDaysNeeded, MAX_WORKING_HOURS_PER_DAY, LUNCH_BREAK_DURATION_HOURS } from './work-rules';
+import { calculateDaysNeeded, MAX_WORKING_HOURS_PER_DAY } from './work-rules';
 
 type Task = {
   id: string;
@@ -169,7 +169,7 @@ Réponds UNIQUEMENT avec un JSON valide dans ce format:
     const startDate = new Date();
     let currentDate = new Date(startDate);
     
-    planning.orderedTasks = planning.orderedTasks.map((task, index) => {
+    planning.orderedTasks = planning.orderedTasks.map((task) => {
       const taskObj = tasks.find((t) => t.id === task.taskId);
       const duration = taskObj?.duration_hours || task.estimatedHours || 8;
       
@@ -225,8 +225,7 @@ Réponds UNIQUEMENT avec un JSON valide dans ce format:
             estimatedHours: task.estimatedHours || 8,
           })),
         };
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        await savePlanningForTraining(siteId, tasks, workers, adaptedPlanning as any, siteName, deadline);
+        await savePlanningForTraining(siteId, tasks, workers, adaptedPlanning, siteName, deadline);
       } catch (error) {
         console.error('[AI Training] Error saving planning for training:', error);
         // Ne pas bloquer si l'enregistrement échoue
@@ -244,66 +243,4 @@ Réponds UNIQUEMENT avec un JSON valide dans ce format:
   }
 }
 
-/**
- * Version basique sans IA (fallback ultime - ne devrait plus être utilisé)
- */
-function generateBasicPlanning(
-  tasks: Task[],
-  workers: Worker[],
-  deadline: string | null,
-): PlanningResult {
-  const startDate = new Date();
-  const sortedTasks = [...tasks].sort((a, b) => {
-    // Tâches de préparation en premier
-    const prepKeywords = ['fondation', 'structure', 'terrassement'];
-    const aIsPrep = prepKeywords.some((k) => a.title.toLowerCase().includes(k));
-    const bIsPrep = prepKeywords.some((k) => b.title.toLowerCase().includes(k));
-    if (aIsPrep && !bIsPrep) return -1;
-    if (!aIsPrep && bIsPrep) return 1;
-
-    // Tâches de finition en dernier
-    const finishKeywords = ['peinture', 'finition', 'nettoyage'];
-    const aIsFinish = finishKeywords.some((k) => a.title.toLowerCase().includes(k));
-    const bIsFinish = finishKeywords.some((k) => b.title.toLowerCase().includes(k));
-    if (aIsFinish && !bIsFinish) return 1;
-    if (!aIsFinish && bIsFinish) return -1;
-
-    return 0;
-  });
-
-  const orderedTasks = sortedTasks.map((task, index) => {
-    const duration = task.duration_hours || 8;
-    const daysNeeded = Math.ceil(duration / 8);
-
-    const taskStartDate = new Date(startDate);
-    taskStartDate.setDate(taskStartDate.getDate() + index);
-
-    const taskEndDate = new Date(taskStartDate);
-    taskEndDate.setDate(taskEndDate.getDate() + daysNeeded);
-
-    const requiredRole = task.required_role;
-    const assignedWorker = requiredRole
-      ? workers.find((w) => w.role?.toLowerCase() === requiredRole.toLowerCase())
-      : workers[0] || null;
-
-    const priority: 'high' | 'medium' | 'low' =
-      index === 0 ? 'high' : index >= sortedTasks.length - 2 ? 'low' : 'medium';
-
-    return {
-      taskId: task.id,
-      order: index + 1,
-      startDate: taskStartDate.toISOString().split('T')[0],
-      endDate: taskEndDate.toISOString().split('T')[0],
-      assignedWorkerId: assignedWorker?.id || null,
-      dependencies: [],
-      priority,
-    };
-  });
-
-  return {
-    orderedTasks,
-    warnings: [],
-    reasoning: 'Planning généré avec un algorithme de base (sans IA). Pour une analyse plus poussée, configurez GOOGLE_GEMINI_API_KEY.',
-  };
-}
 

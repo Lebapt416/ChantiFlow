@@ -32,7 +32,10 @@ export function AddTaskForm({ siteId }: Props) {
     if (state?.success) {
       const form = document.getElementById('add-task-form') as HTMLFormElement | null;
       form?.reset();
-      setRequiredRole('');
+      const timeoutId = window.setTimeout(() => {
+        setRequiredRole('');
+      }, 0);
+      return () => window.clearTimeout(timeoutId);
     }
   }, [state?.success]);
 

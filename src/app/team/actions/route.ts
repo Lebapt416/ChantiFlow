@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
-import { redirect } from 'next/navigation';
 import { sendTeamApprovalEmail, sendTeamRejectionEmail } from '@/lib/email';
 import { generateAccessCode } from '@/lib/access-code';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';

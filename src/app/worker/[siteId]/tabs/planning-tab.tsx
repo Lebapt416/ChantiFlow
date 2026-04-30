@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { createSupabaseBrowserClient } from '@/lib/supabase/client';
 import { getWorkerPlanning } from '../actions';
-import { CheckCircle2, XCircle, Calendar, Clock, AlertCircle, Eye } from 'lucide-react';
+import { Calendar, AlertCircle, Eye } from 'lucide-react';
 import { PlanningDetailModal } from './planning-detail-modal';
 import { ModernPlanningView } from '@/components/modern-planning-view';
 
@@ -85,19 +85,6 @@ export function PlanningTab({ siteId, workerId }: Props) {
     loadPlanning();
   }, [siteId, workerId]);
 
-  const handleValidate = async (taskId: string, validated: boolean) => {
-    // Mettre à jour l'état local
-    setPlanning((prev) =>
-      prev.map((task) =>
-        task.taskId === taskId ? { ...task, validated } : task,
-      ),
-    );
-
-    // Ici, on pourrait sauvegarder la validation dans la base de données
-    // Pour l'instant, on garde juste l'état local
-    console.log('Validation planning:', { taskId, validated });
-  };
-
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -119,16 +106,8 @@ export function PlanningTab({ siteId, workerId }: Props) {
     );
   }
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('fr-FR', {
-      day: 'numeric',
-      month: 'short',
-    });
-  };
-
   // Transformer les tâches en phases pour la vue moderne
-  const modernPhases = useMemo(() => {
+  const modernPhases = (() => {
     if (planning.length === 0) return [];
 
     // Grouper par tâche (chaque tâche = une phase pour l'employé)
@@ -182,7 +161,7 @@ export function PlanningTab({ siteId, workerId }: Props) {
         progress,
       };
     });
-  }, [planning]);
+  })();
 
   return (
     <div className="p-3 sm:p-4 md:p-6 space-y-4 sm:space-y-6">

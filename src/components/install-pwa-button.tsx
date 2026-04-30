@@ -11,7 +11,7 @@ export function InstallPwaButton() {
   useEffect(() => {
     // Vérifier si l'app est déjà installée
     if (window.matchMedia('(display-mode: standalone)').matches) {
-      // eslint-disable-next-line react-hooks/exhaustive-deps
+       
       setTimeout(() => setIsInstalled(true), 0);
       return;
     }

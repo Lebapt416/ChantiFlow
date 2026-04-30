@@ -25,7 +25,6 @@ export type SystemTestReport = {
  */
 export async function runSystemTests(): Promise<SystemTestReport> {
   const tests: TestResult[] = [];
-  const startTime = Date.now();
 
   // Test 1: Variables d'environnement Supabase
   await testSupabaseEnv(tests);

@@ -14,12 +14,6 @@ import {
   Calendar,
 } from 'lucide-react';
 
-type NavItem = {
-  href: string;
-  label: string;
-  icon: React.ComponentType<{ size?: number; strokeWidth?: number; className?: string }>;
-};
-
 export function MobileNav() {
   const pathname = usePathname();
 

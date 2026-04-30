@@ -3,6 +3,8 @@ import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
+type SupabaseCookieOptions = Record<string, string | number | boolean | undefined>;
+
 /**
  * Route API pour gérer le callback de réinitialisation de mot de passe
  * Supabase peut envoyer un code dans l'URL qui doit être échangé contre une session
@@ -29,7 +31,7 @@ export async function GET(request: NextRequest) {
         get(name: string) {
           return cookieStore.get(name)?.value;
         },
-        set(name: string, value: string, options?: any) {
+        set(name: string, value: string, options?: SupabaseCookieOptions) {
           try {
             cookieStore.set({
               name,
@@ -44,7 +46,7 @@ export async function GET(request: NextRequest) {
             // Ignorer les erreurs
           }
         },
-        remove(name: string, options?: any) {
+        remove(name: string, options?: SupabaseCookieOptions) {
           try {
             cookieStore.set({ name, value: '', ...options, maxAge: 0 });
           } catch {

@@ -98,7 +98,7 @@ export default function ContactPage() {
             className="inline-flex items-center gap-2 text-sm font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white transition-colors"
           >
             <ArrowLeft className="h-4 w-4" />
-            Retour à l'accueil
+            Retour à l&apos;accueil
           </Link>
         </div>
         

@@ -32,7 +32,7 @@ export function CompleteSiteButton({ siteId, siteName }: Props) {
   const [info, setInfo] = useState<string | null>(null);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
     setTimeout(() => {
       if (state?.error) {
         setError(state.error);

@@ -5,7 +5,19 @@ import { Check } from 'lucide-react';
 import { PricingButton } from './pricing-button';
 import { motion } from 'framer-motion';
 
-const plans = [
+type Plan = {
+  name: 'Basic' | 'Plus' | 'Pro';
+  priceMonthly: string;
+  priceAnnual: string;
+  description: string;
+  features: string[];
+  ctaMonthly: string;
+  ctaAnnual: string;
+  popular: boolean;
+  showAnnualBadge?: boolean;
+};
+
+const plans: Plan[] = [
   {
     name: 'Basic',
     priceMonthly: 'Gratuit',
@@ -136,7 +148,7 @@ export function PricingSection({ isAuthenticated = false, userEmail = null }: Pr
                   </span>
                 </div>
               )}
-              {(plan as any).showAnnualBadge && isAnnual && (
+              {plan.showAnnualBadge && isAnnual && (
                 <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-10">
                   <span className="rounded-full bg-gradient-to-r from-orange-500 to-red-500 px-5 py-2 text-xs font-bold text-white shadow-lg animate-pulse">
                     🔥 2 MOIS OFFERTS

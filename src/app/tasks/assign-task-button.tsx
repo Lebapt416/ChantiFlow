@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useTransition } from 'react';
-import { useFormStatus } from 'react-dom';
 import Link from 'next/link';
 import { UserPlus, X, Loader2, User } from 'lucide-react';
 import { assignTaskAction, type AssignTaskState } from './actions';
@@ -36,7 +35,7 @@ function SubmitButton({ isPending }: { isPending: boolean }) {
   );
 }
 
-export function AssignTaskButton({ taskId, siteId, currentWorkerId, availableWorkers }: Props) {
+export function AssignTaskButton({ taskId, currentWorkerId, availableWorkers }: Props) {
   const [isOpen, setIsOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [state, setState] = useState<AssignTaskState | null>(null);

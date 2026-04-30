@@ -1,6 +1,6 @@
 'use client';
 
-import { X, Calendar, Clock, User, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { X, Calendar, Clock, User, CheckCircle2 } from 'lucide-react';
 
 type PlanningTask = {
   taskId: string;

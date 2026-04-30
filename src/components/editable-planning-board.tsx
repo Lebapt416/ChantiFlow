@@ -19,9 +19,9 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { AlertTriangle, CalendarDays, ChevronLeft, ChevronRight, Clock, Edit3, MoreHorizontal } from 'lucide-react';
+import { AlertTriangle, CalendarDays, ChevronLeft, ChevronRight, MoreHorizontal } from 'lucide-react';
 import { updateTaskPlanningAction } from '@/app/actions/update-task-planning';
-import { MAX_WORKING_HOURS_PER_DAY, LUNCH_BREAK_DURATION_HOURS } from '@/lib/ai/work-rules';
+import { MAX_WORKING_HOURS_PER_DAY } from '@/lib/ai/work-rules';
 
 type Worker = {
   id: string;
@@ -127,13 +127,11 @@ function calculateTheoreticalProgress(dayStartTime: string, hoursForDay: number)
 function DroppableColumn({
   id,
   children,
-  isToday = false,
   label,
   dayNumber,
 }: {
   id: string;
   children: React.ReactNode;
-  isToday?: boolean;
   label?: string;
   dayNumber?: number;
 }) {
@@ -193,18 +191,9 @@ function SortableTaskCard({
     return 'todo';
   })();
 
-  const statusStyles: Record<'todo' | 'in_progress' | 'done', { border: string; progress: number; progressColor: string }> = {
-    todo: { border: 'border-l-zinc-300', progress: 0, progressColor: 'bg-zinc-300 dark:bg-zinc-600' },
-    in_progress: { border: 'border-l-blue-500', progress: 50, progressColor: 'bg-blue-500' },
-    done: { border: 'border-l-emerald-500', progress: 100, progressColor: 'bg-emerald-500' },
-  };
-
-  const config = statusStyles[statusKey];
-
+  const [nowMs, setNowMs] = useState(() => Date.now());
   const endDate = new Date(task.endDate);
-  const isOverdue = statusKey !== 'done' && endDate.getTime() < Date.now();
-
-  const badgeLabel = task.requiredRole || 'Polyvalent';
+  const isOverdue = statusKey !== 'done' && endDate.getTime() < nowMs;
 
   const workerIds =
     task.assignedWorkerIds?.length && task.assignedWorkerIds.length > 0
@@ -232,6 +221,13 @@ function SortableTaskCard({
 
     return () => clearInterval(interval);
   }, [task.dayStartTime, task.hoursForDay]);
+
+  useEffect(() => {
+    const interval = window.setInterval(() => {
+      setNowMs(Date.now());
+    }, 60000);
+    return () => window.clearInterval(interval);
+  }, []);
 
   // Déterminer la couleur de la barre selon le pourcentage
   const getProgressColor = () => {
@@ -369,7 +365,7 @@ function TaskEditModal({
       const end = new Date(task.endDate);
       const diffHours = Math.max(1, Math.round((end.getTime() - start.getTime()) / 36e5));
 
-      // eslint-disable-next-line react-hooks/exhaustive-deps
+       
       setTimeout(() => {
         setStartInput(start.toISOString().slice(0, 16));
         setDuration(diffHours);
@@ -771,7 +767,7 @@ export function EditablePlanningBoard({ siteId, initialPlanning, workers }: Prop
             onClick={goToToday}
             className="rounded-full px-3 py-1.5 text-xs transition hover:bg-white/50 dark:hover:bg-zinc-700/50"
           >
-            Aujourd'hui
+            Aujourd&apos;hui
           </button>
           <button
             type="button"
@@ -789,13 +785,10 @@ export function EditablePlanningBoard({ siteId, initialPlanning, workers }: Prop
           {weekDays.map((day, index) => {
             const key = day.toISOString().split('T')[0];
             const tasksForDay = tasksByDay[key] ?? [];
-            const isToday = new Date().toDateString() === day.toDateString();
-
             return (
               <DroppableColumn
                 key={key}
                 id={`day:${key}`}
-                isToday={isToday}
                 label={dayNames[index]}
                 dayNumber={day.getDate()}
               >

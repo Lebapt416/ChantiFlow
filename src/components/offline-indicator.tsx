@@ -1,6 +1,6 @@
 'use client';
 
-import { WifiOff, Wifi, Clock, CheckCircle2, AlertCircle } from 'lucide-react';
+import { WifiOff, Clock, CheckCircle2, AlertCircle } from 'lucide-react';
 import { useOfflineSync } from '@/hooks/useOfflineSync';
 import { useState, useEffect } from 'react';
 
@@ -19,8 +19,10 @@ export function OfflineIndicator() {
     
     // Si pas de rapports en attente, ne rien faire
     if (pendingCount === 0) {
-      setPriorityCounts({ high: 0, medium: 0, low: 0 });
-      return;
+      const timeoutId = window.setTimeout(() => {
+        setPriorityCounts({ high: 0, medium: 0, low: 0 });
+      }, 0);
+      return () => window.clearTimeout(timeoutId);
     }
     
     let isMounted = true;
@@ -50,7 +52,7 @@ export function OfflineIndicator() {
           };
           setPriorityCounts(counts);
         };
-      } catch (error) {
+      } catch {
         // Ignorer silencieusement les erreurs
       }
     };

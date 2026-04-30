@@ -39,10 +39,11 @@ export async function savePlanningResult(
   workers: Worker[],
   planning: PlanningResult,
   siteName: string,
-  deadline: string | null,
+  _deadline: string | null,
 ) {
   try {
-    const supabase = await createSupabaseServerClient();
+    await createSupabaseServerClient();
+    void _deadline;
     
     // Stocker le résultat dans une table d'entraînement (à créer dans Supabase)
     // Pour l'instant, on utilise la table reports ou on crée une nouvelle logique
@@ -71,7 +72,7 @@ export async function savePlanningResult(
  */
 export async function getLearningPatterns() {
   try {
-    const supabase = await createSupabaseServerClient();
+    await createSupabaseServerClient();
     
     // Récupérer les plannings précédents pour analyser les patterns
     // Pour l'instant, on retourne des patterns par défaut
@@ -109,11 +110,15 @@ export async function getLearningPatterns() {
  * Améliore l'algorithme local en utilisant les patterns appris
  */
 export async function enhanceLocalPlanningWithLearning(
-  tasks: Task[],
-  workers: Worker[],
-  deadline: string | null,
-  siteName: string,
+  _tasks: Task[],
+  _workers: Worker[],
+  _deadline: string | null,
+  _siteName: string,
 ) {
+  void _tasks;
+  void _workers;
+  void _deadline;
+  void _siteName;
   const patterns = await getLearningPatterns();
   
   if (!patterns) {

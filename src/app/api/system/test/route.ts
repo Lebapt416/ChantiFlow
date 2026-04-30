@@ -14,7 +14,7 @@ type TestResult = {
 
 export async function GET() {
   const results: TestResult[] = [];
-  const startTime = Date.now();
+  const suiteStartTime = Date.now();
 
   // Test 1: Variables d'environnement Supabase
   const testStart1 = Date.now();
@@ -46,7 +46,7 @@ export async function GET() {
   const testStart2 = Date.now();
   try {
     const adminClient = createSupabaseAdminClient();
-    const { data, error } = await adminClient.from('sites').select('id').limit(1);
+    const { error } = await adminClient.from('sites').select('id').limit(1);
 
     if (error) throw error;
 
@@ -312,7 +312,7 @@ export async function GET() {
   else if (score >= 50) grade = 'Moyen';
   else grade = 'Critique';
 
-  const totalDuration = Date.now() - startTime;
+  const totalDuration = Date.now() - suiteStartTime;
 
   return NextResponse.json({
     success: true,
