@@ -43,6 +43,7 @@ type AnalyticsDashboardProps = {
   avgTasksPerSite: number;
   avgWorkersPerSite: number;
   reportsWithPhotos: number;
+  reportsWithoutPhotos: number;
   totalHours: number;
   completedHours: number;
   topCreators: Array<{ name: string; sites: number }>;
@@ -100,6 +101,7 @@ export function AnalyticsDashboard({
   avgTasksPerSite,
   avgWorkersPerSite,
   reportsWithPhotos,
+  reportsWithoutPhotos,
   totalHours,
   completedHours,
   topCreators,
@@ -319,7 +321,7 @@ export function AnalyticsDashboard({
             <p className="text-sm text-zinc-400 mb-2">Rapports</p>
             <p className="text-3xl font-bold text-white">{totalReports}</p>
             <p className="text-xs text-zinc-500 mt-1">
-              {reportsWithPhotos} avec photos
+              {reportsWithPhotos} avec photos • {reportsWithoutPhotos} sans photo
             </p>
           </div>
         </div>

@@ -64,11 +64,29 @@ export async function middleware(request: NextRequest) {
     }
   );
 
-  // Vérifier la session (non-bloquant)
+  // Vérifier la session avec timeout strict pour éviter les timeouts Edge
+  const authTimeoutMs = 1500;
+  const authResult = await Promise.race([
+    supabase.auth.getUser(),
+    new Promise<{
+      data: { user: null };
+      error: { message: string };
+    }>((resolve) =>
+      setTimeout(
+        () =>
+          resolve({
+            data: { user: null },
+            error: { message: 'Auth timeout in middleware' },
+          }),
+        authTimeoutMs,
+      ),
+    ),
+  ]);
+
   const {
     data: { user },
     error: authError,
-  } = await supabase.auth.getUser();
+  } = authResult;
 
   const pathname = request.nextUrl.pathname;
   const authorizedUserId = 'e78e437e-a817-4da2-a091-a7f4e5e02583';
@@ -96,7 +114,14 @@ export async function middleware(request: NextRequest) {
   // Protection contre les boucles de redirection
   // Vérifier si on est déjà en train de rediriger vers la même page
   const referer = request.headers.get('referer');
-  const isRedirectLoop = referer && new URL(referer).pathname === pathname;
+  let isRedirectLoop = false;
+  if (referer) {
+    try {
+      isRedirectLoop = new URL(referer).pathname === pathname;
+    } catch {
+      isRedirectLoop = false;
+    }
+  }
 
   // Cas 1 : Utilisateur non authentifié tentant d'accéder à une route protégée
   if (!user && isProtectedPath && !isPublicPath) {
