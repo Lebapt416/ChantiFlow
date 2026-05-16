@@ -80,7 +80,6 @@ export function Footer() {
         <div className="mt-8 border-t border-zinc-200 pt-8 dark:border-zinc-800">
           <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
             <p className="text-sm text-zinc-600 dark:text-zinc-400">© 2025 ChantiFlow. Tous droits réservés.</p>
-            <p className="text-sm text-zinc-600 dark:text-zinc-400">ChantiFlow SAS</p>
           </div>
         </div>
       </div>

@@ -55,22 +55,12 @@ const softwareSchema = {
     priceCurrency: 'EUR',
     availability: 'https://schema.org/InStock',
   },
-  aggregateRating: {
-    '@type': 'AggregateRating',
-    ratingValue: '4.9',
-    reviewCount: '26',
-  },
   featureList: [
     'Planning intelligent',
     'QR codes équipe',
     'Rapports photo illimités',
     'Alertes retards',
   ],
-  creator: {
-    '@type': 'Organization',
-    name: 'ChantiFlow SAS',
-    url: baseUrl,
-  },
 };
 
 const faqSchema = {
