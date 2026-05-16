@@ -34,7 +34,7 @@ export default function RGPDPage() {
             </h2>
             <div className="space-y-2 text-zinc-600 dark:text-zinc-400">
               <p>
-                <strong className="text-zinc-900 dark:text-white">Responsable :</strong> ChantiFlow SAS
+                <strong className="text-zinc-900 dark:text-white">Responsable :</strong> Baptiste Carrier--Bruno (personne physique)
               </p>
               <p>
                 <strong className="text-zinc-900 dark:text-white">Contact :</strong>{' '}

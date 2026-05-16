@@ -23,6 +23,12 @@ export default function MentionsLegalesPage() {
           Mentions légales
         </h1>
 
+        <div className="mb-6 rounded-xl border border-amber-300 bg-amber-50 px-5 py-4 dark:border-amber-600 dark:bg-amber-950">
+          <p className="font-semibold text-amber-800 dark:text-amber-300">
+            ⚠️ ChantiFlow est actuellement en phase de pré-lancement. Aucune offre commerciale n&apos;est disponible. Aucune transaction n&apos;est traitée.
+          </p>
+        </div>
+
         <div className="space-y-8 rounded-3xl border border-zinc-200 bg-white p-8 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
           <section>
             <h2 className="mb-4 text-2xl font-semibold text-zinc-900 dark:text-white">
@@ -30,27 +36,21 @@ export default function MentionsLegalesPage() {
             </h2>
             <div className="space-y-2 text-zinc-600 dark:text-zinc-400">
               <p>
-                <strong className="text-zinc-900 dark:text-white">Raison sociale :</strong> ChantiFlow SAS
+                <strong className="text-zinc-900 dark:text-white">Responsable de publication :</strong> Baptiste Carrier--Bruno (personne physique, à titre non-commercial)
               </p>
               <p>
-                <strong className="text-zinc-900 dark:text-white">Forme juridique :</strong> Société par Actions Simplifiée
+                <strong className="text-zinc-900 dark:text-white">Statut :</strong> Projet en phase de pré-lancement — aucune transaction commerciale n&apos;est proposée à ce jour.
+              </p>
+              <p>
+                <strong className="text-zinc-900 dark:text-white">Localisation :</strong> Ramatuelle, France
               </p>
               <p>
                 <strong className="text-zinc-900 dark:text-white">Email :</strong>{' '}
                 <a
-                  href="mailto:contact@chantiflow.com"
+                  href="mailto:chantiflowct@gmail.com"
                   className="text-emerald-600 hover:underline dark:text-emerald-400"
                 >
-                  contact@chantiflow.com
-                </a>
-              </p>
-              <p>
-                <strong className="text-zinc-900 dark:text-white">Support technique :</strong>{' '}
-                <a
-                  href="mailto:admin@chantiflow.com"
-                  className="text-emerald-600 hover:underline dark:text-emerald-400"
-                >
-                  admin@chantiflow.com
+                  chantiflowct@gmail.com
                 </a>
               </p>
             </div>
@@ -61,7 +61,7 @@ export default function MentionsLegalesPage() {
               2. Directeur de publication
             </h2>
             <p className="text-zinc-600 dark:text-zinc-400">
-              Le directeur de publication est représenté par les fondateurs de ChantiFlow SAS.
+              Le directeur de publication est Baptiste Carrier--Bruno.
             </p>
           </section>
 
@@ -74,7 +74,7 @@ export default function MentionsLegalesPage() {
                 <strong className="text-zinc-900 dark:text-white">Hébergeur web :</strong> Vercel Inc.
               </p>
               <p>
-                <strong className="text-zinc-900 dark:text-white">Adresse :</strong> 340 S Lemon Ave #4133, Walnut, CA 91789, États-Unis
+                <strong className="text-zinc-900 dark:text-white">Adresse :</strong> 440 N Barranca Ave #4133, Covina, CA 91723, États-Unis
               </p>
               <p>
                 <strong className="text-zinc-900 dark:text-white">Base de données :</strong> Supabase (hébergement UE)
@@ -158,12 +158,12 @@ export default function MentionsLegalesPage() {
             <div className="space-y-4 text-zinc-600 dark:text-zinc-400">
               <p>
                 L&apos;ensemble du contenu de ce site (textes, images, logos, icônes, vidéos, graphismes) est la propriété
-                exclusive de ChantiFlow SAS, sauf mention contraire.
+                exclusive de Baptiste Carrier--Bruno, sauf mention contraire.
               </p>
               <p>
                 Toute reproduction, représentation, modification, publication, adaptation de tout ou partie des éléments du
                 site, quel que soit le moyen ou le procédé utilisé, est interdite, sauf autorisation écrite préalable de
-                ChantiFlow SAS.
+                Baptiste Carrier--Bruno.
               </p>
               <p>
                 Toute exploitation non autorisée du site ou de l&apos;un quelconque des éléments qu&apos;il contient sera
@@ -179,13 +179,13 @@ export default function MentionsLegalesPage() {
             </h2>
             <div className="space-y-4 text-zinc-600 dark:text-zinc-400">
               <p>
-                ChantiFlow SAS ne pourra être tenu responsable des dommages directs et indirects causés au matériel de
+                Baptiste Carrier--Bruno ne pourra être tenu responsable des dommages directs et indirects causés au matériel de
                 l&apos;utilisateur, lors de l&apos;accès au site ChantiFlow, et résultant soit de l&apos;utilisation d&apos;un
                 matériel ne répondant pas aux spécifications, soit de l&apos;apparition d&apos;un bug ou d&apos;une
                 incompatibilité.
               </p>
               <p>
-                ChantiFlow SAS ne pourra également être tenu responsable des dommages indirects consécutifs à
+                Baptiste Carrier--Bruno ne pourra également être tenu responsable des dommages indirects consécutifs à
                 l&apos;utilisation du site.
               </p>
             </div>

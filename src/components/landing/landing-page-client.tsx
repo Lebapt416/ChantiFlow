@@ -30,6 +30,9 @@ type LandingPageClientProps = {
 export function LandingPageClient({ faqEntries }: LandingPageClientProps) {
   return (
     <div className="min-h-screen bg-white dark:bg-zinc-950">
+      <div className="sticky top-0 z-50 flex h-9 items-center justify-center bg-amber-100 px-4 text-center text-xs font-medium text-amber-800 dark:bg-amber-900 dark:text-amber-200">
+        Version préliminaire — ChantiFlow est en phase de bêta privée. Inscription bientôt disponible.
+      </div>
       <HeroSection />
 
       {/* Sections statiques restantes */}
