@@ -2,6 +2,7 @@
 
 import { randomUUID } from 'crypto';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 import { writeWorkerSession } from '@/lib/worker-session';
 
 export type WorkerLoginState = {
@@ -30,10 +31,10 @@ export async function workerLoginAction(
     return { error: 'Format de code invalide. Format attendu: 4 chiffres + 4 lettres (ex: 1234ABCD).' };
   }
 
-  const supabase = await createSupabaseServerClient();
-
-  // Rechercher le worker uniquement par code d'accès
-  const { data: worker, error: workerError } = await supabase
+  // service_role pour bypass RLS — le worker n'est pas encore authentifié
+  // mais le code d'accès lui-même fait office de credential
+  const admin = createSupabaseAdminClient();
+  const { data: worker, error: workerError } = await admin
     .from('workers')
     .select('id, name, email, site_id, access_code, access_token')
     .eq('access_code', accessCode)
@@ -42,6 +43,9 @@ export async function workerLoginAction(
   if (workerError || !worker) {
     return { error: 'Code d\'accès incorrect.' };
   }
+
+  // Client anon pour les tables avec RLS publique (tasks)
+  const supabase = await createSupabaseServerClient();
 
   // Déterminer le siteId final
   let finalSiteId: string | null = null;
@@ -103,7 +107,7 @@ export async function workerLoginAction(
     accessToken = randomUUID();
     updates.access_token = accessToken;
   }
-  await supabase.from('workers').update(updates).eq('id', worker.id);
+  await admin.from('workers').update(updates).eq('id', worker.id);
 
   await writeWorkerSession({
     workerId: worker.id,
@@ -126,8 +130,9 @@ export async function loginWorkerWithToken(token: string): Promise<WorkerLoginSt
     return { error: 'Token manquant.' };
   }
 
-  const supabase = await createSupabaseServerClient();
-  const { data: worker, error } = await supabase
+  // service_role pour bypass RLS (même raison que workerLoginAction)
+  const admin = createSupabaseAdminClient();
+  const { data: worker, error } = await admin
     .from('workers')
     .select('id, name, email, site_id, access_token')
     .eq('access_token', sanitizedToken)
@@ -137,7 +142,7 @@ export async function loginWorkerWithToken(token: string): Promise<WorkerLoginSt
     return { error: 'Lien invalide ou expiré.' };
   }
 
-  await supabase
+  await admin
     .from('workers')
     .update({ last_login: new Date().toISOString() })
     .eq('id', worker.id);
