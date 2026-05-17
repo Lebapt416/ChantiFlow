@@ -223,6 +223,7 @@ export async function addWorkerAction(
         email: existingWorker.email,
         role: existingWorker.role,
         access_code: accessCode,
+        created_by: user.id,
       })
       .select('id, access_code')
       .single();
@@ -240,6 +241,7 @@ export async function addWorkerAction(
             name: existingWorker.name,
             email: existingWorker.email,
             role: existingWorker.role,
+            created_by: user.id,
           })
           .select('id')
           .single();
@@ -318,6 +320,7 @@ export async function addWorkerAction(
         email: email || null,
         role: role || null,
         access_code: accessCode,
+        created_by: user.id,
       })
       .select('id, access_code')
       .single();
@@ -335,6 +338,7 @@ export async function addWorkerAction(
             name,
             email: email || null,
             role: role || null,
+            created_by: user.id,
           })
           .select('id')
           .single();

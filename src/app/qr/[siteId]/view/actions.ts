@@ -33,6 +33,15 @@ export async function createTestWorkerAction(siteId: string): Promise<TestWorker
     // Créer un nouveau worker de test
     const accessCode = generateAccessCode();
 
+    const { data: siteRow } = await admin
+      .from('sites')
+      .select('created_by')
+      .eq('id', siteId)
+      .single();
+    if (!siteRow?.created_by) {
+      return { success: false, error: 'Site introuvable.' };
+    }
+
     // Essayer d'insérer avec access_code
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const insertData: any = {
@@ -40,6 +49,7 @@ export async function createTestWorkerAction(siteId: string): Promise<TestWorker
       name: 'Test Employé',
       email: 'test@chantiflow.com',
       role: 'Test',
+      created_by: siteRow.created_by,
     };
 
     // Ajouter access_code si possible

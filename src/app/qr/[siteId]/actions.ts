@@ -79,6 +79,7 @@ export async function submitReportAction(
           name: accountWorker.name || name || email,
           email,
           role: accountWorker.role || role || null,
+          created_by: site.created_by,
         })
         .select('id')
         .single();
@@ -99,6 +100,7 @@ export async function submitReportAction(
         name: name || email,
         email,
         role: role || null,
+        created_by: site.created_by,
       })
       .select('id')
       .single();
