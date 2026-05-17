@@ -23,7 +23,7 @@ Ce guide vous explique comment configurer l'API Google Gemini pour activer les f
 Ajoutez la clé API dans votre fichier `.env.local` :
 
 ```env
-GOOGLE_GEMINI_API_KEY=AIzaSyCbNl1_-rbLQegq27xeOxY91vBSBw9SQNM
+GOOGLE_GEMINI_API_KEY=<VOTRE_CLE_API_ICI>
 ```
 
 ### 2. Configuration Vercel
