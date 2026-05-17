@@ -5,6 +5,18 @@ import { NextRequest, NextResponse } from 'next/server';
  */
 export async function POST(request: NextRequest) {
   try {
+    // Auth required (sinon consomme du quota Gemini gratuitement)
+    const { createSupabaseServerClient } = await import('@/lib/supabase/server');
+    const supabase = await createSupabaseServerClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+      return NextResponse.json(
+        { error: 'Authentification requise.' },
+        { status: 401 }
+      );
+    }
+
     const body = await request.json();
     const { taskTitle, requiredRole, durationHours, reportCount } = body;
 

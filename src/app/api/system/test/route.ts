@@ -13,6 +13,18 @@ type TestResult = {
 };
 
 export async function GET() {
+  // Vérifier que l'utilisateur est admin
+  const { isAdmin } = await import('@/lib/admin');
+  const supabase = await createSupabaseServerClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user || !isAdmin(user.email)) {
+    return NextResponse.json(
+      { error: 'Non autorisé.' },
+      { status: 403 }
+    );
+  }
+
   const results: TestResult[] = [];
   const suiteStartTime = Date.now();
 
