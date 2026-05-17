@@ -3,6 +3,19 @@ import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 
 export async function DELETE(request: NextRequest) {
   try {
+    // Vérifier que l'utilisateur est admin
+    const { createSupabaseServerClient } = await import('@/lib/supabase/server');
+    const { isAdmin } = await import('@/lib/admin');
+    const supabase = await createSupabaseServerClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user || !isAdmin(user.email)) {
+      return NextResponse.json(
+        { error: 'Non autorisé.' },
+        { status: 403 }
+      );
+    }
+
     const { searchParams } = new URL(request.url);
     const messageId = searchParams.get('id');
 

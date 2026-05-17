@@ -7,6 +7,19 @@ const CONTACT_EMAIL = 'chantiflowct@gmail.com';
 
 export async function POST(request: NextRequest) {
   try {
+    // Vérifier que l'utilisateur est admin (sinon = open mail relay)
+    const { createSupabaseServerClient } = await import('@/lib/supabase/server');
+    const { isAdmin } = await import('@/lib/admin');
+    const supabase = await createSupabaseServerClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user || !isAdmin(user.email)) {
+      return NextResponse.json(
+        { error: 'Non autorisé.' },
+        { status: 403 }
+      );
+    }
+
     const body = await request.json();
     const { to, subject, message, originalMessage } = body;
 
