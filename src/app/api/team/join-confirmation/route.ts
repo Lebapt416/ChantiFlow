@@ -4,6 +4,28 @@ import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 
 export async function POST(request: NextRequest) {
   try {
+    // Vérifier que l'utilisateur est authentifié (sinon open mail relay)
+    const { createSupabaseServerClient } = await import('@/lib/supabase/server');
+    const supabase = await createSupabaseServerClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+      return NextResponse.json(
+        { error: 'Authentification requise.' },
+        { status: 401 }
+      );
+    }
+
+    // L'userId envoyé doit correspondre à l'utilisateur authentifié
+    // (évite que quelqu'un envoie des emails au nom d'un autre manager)
+    const bodyForAuth = await request.clone().json();
+    if (bodyForAuth.userId && bodyForAuth.userId !== user.id) {
+      return NextResponse.json(
+        { error: 'userId non autorisé.' },
+        { status: 403 }
+      );
+    }
+
     const { workerEmail, workerName, userId } = await request.json();
 
     console.log('📧 API join-confirmation appelée avec:', { workerEmail, workerName, userId });
