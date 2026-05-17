@@ -116,10 +116,8 @@ export async function signInAction(
 
     // Retourner l'URL de redirection au lieu de rediriger directement
     // (redirect() ne fonctionne pas toujours avec useActionState)
-    const authorizedUserId = 'e78e437e-a817-4da2-a091-a7f4e5e02583';
-    const redirectTo = (data.user.id === authorizedUserId || data.user.email === 'bcb83@icloud.com') 
-      ? '/analytics' 
-      : '/home';
+    const { isAdmin } = await import('@/lib/admin');
+    const redirectTo = isAdmin(data.user.email) ? '/analytics' : '/home';
 
     return { success: 'Connexion réussie', redirectTo };
   } catch (error) {
@@ -190,8 +188,8 @@ export async function signUpAction(
 
     if (data.user) {
       // Rediriger vers /analytics si c'est le compte admin analytics
-      const authorizedUserId = 'e78e437e-a817-4da2-a091-a7f4e5e02583';
-      if (data.user.id === authorizedUserId || data.user.email === 'bcb83@icloud.com') {
+      const { isAdmin } = await import('@/lib/admin');
+      if (isAdmin(data.user.email)) {
         redirect('/analytics');
       }
       

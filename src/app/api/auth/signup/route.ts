@@ -57,10 +57,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Si la session est créée, rediriger
-    const authorizedUserId = 'e78e437e-a817-4da2-a091-a7f4e5e02583';
-    const redirectTo = (data.user.id === authorizedUserId || data.user.email === 'bcb83@icloud.com') 
-      ? '/analytics' 
-      : '/home';
+    const { isAdmin } = await import('@/lib/admin');
+    const redirectTo = isAdmin(data.user.email) ? '/analytics' : '/home';
 
     return NextResponse.json({
       success: true,
