@@ -97,7 +97,7 @@ export default async function ReportDetailPage({ params }: Params) {
                   {task.title}
                 </h1>
                 {isTaskDone && (
-                  <div className="flex items-center gap-2 rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">
+                  <div className="flex items-center gap-2 rounded-sm bg-paper-2 px-3 py-1 text-xs font-semibold text-green border border-rule-soft">
                     <CheckCircle2 className="h-3.5 w-3.5" />
                     Tâche terminée
                   </div>
