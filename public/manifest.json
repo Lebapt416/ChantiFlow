@@ -4,8 +4,8 @@
   "description": "Planifie et pilote tes chantiers simplement",
   "start_url": "/worker/dashboard",
   "display": "standalone",
-  "background_color": "#18181b",
-  "theme_color": "#18181b",
+  "background_color": "#F1EBDF",
+  "theme_color": "#F1EBDF",
   "orientation": "any",
   "scope": "/",
   "icons": [
