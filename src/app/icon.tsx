@@ -3,39 +3,40 @@ import { ImageResponse } from "next/og";
 export const size = { width: 512, height: 512 };
 export const contentType = "image/png";
 
+/**
+ * App icon — logo mark Industrial Editorial
+ * Carré ink avec lettre C en paper.
+ * Next.js ImageResponse ne supporte pas <text> SVG — on utilise
+ * un div avec le caractère C via la syntaxe JSX/CSS d'ImageResponse.
+ */
 export default function Icon() {
   return new ImageResponse(
     (
-      <svg
-        width="512"
-        height="512"
-        viewBox="0 0 512 512"
-        role="img"
-        aria-label="Logo ChantiFlow"
+      <div
+        style={{
+          width: 512,
+          height: 512,
+          backgroundColor: "#161512",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          transform: "rotate(-3deg)",
+        }}
       >
-        <rect width="512" height="512" fill="#161512" />
-        <rect
-          x="80"
-          y="80"
-          width="352"
-          height="352"
-          fill="#161512"
-          stroke="#F1EBDF"
-          strokeWidth="16"
-          transform="rotate(-3 256 256)"
-        />
-        <text
-          x="256"
-          y="340"
-          textAnchor="middle"
-          fontFamily="monospace"
-          fontSize="240"
-          fontWeight="500"
-          fill="#F1EBDF"
+        <div
+          style={{
+            color: "#F1EBDF",
+            fontSize: 300,
+            fontWeight: 500,
+            fontFamily: "monospace",
+            lineHeight: 1,
+            marginTop: 20, // optical centering
+          }}
         >
           C
-        </text>
-      </svg>
+        </div>
+      </div>
     ),
+    { ...size },
   );
 }
