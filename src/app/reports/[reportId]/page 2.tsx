@@ -88,7 +88,7 @@ export default async function ReportDetailPage({ params }: Params) {
         </Link>
 
         {/* Carte principale */}
-        <div className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="rounded border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
           {/* En-tête avec statut */}
           <div className="mb-6 flex items-start justify-between">
             <div className="flex-1">

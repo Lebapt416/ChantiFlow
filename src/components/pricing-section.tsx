@@ -95,16 +95,16 @@ export function PricingSection({ isAuthenticated = false, userEmail = null }: Pr
 
         {/* Toggle Liquid Glass */}
         <div className="mt-8 flex items-center justify-center gap-4">
-          <span className={`text-sm font-medium transition-colors ${!isAnnual ? 'text-zinc-900 dark:text-white' : 'text-zinc-500 dark:text-zinc-400'}`}>
+          <span className={`text-sm font-medium transition-colors ${!isAnnual ? 'text-ink' : 'text-ink-3'}`}>
             Mensuel
           </span>
           <button
             onClick={() => setIsAnnual(!isAnnual)}
-            className="relative h-12 w-24 rounded-full border border-white/20 dark:border-zinc-700/50 bg-white/50 dark:bg-zinc-900/50 backdrop-blur-md shadow-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+            className="relative h-12 w-24 rounded-full border border-rule-soft bg-paper-2 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-orange"
             aria-label="Basculer entre mensuel et annuel"
           >
             <motion.div
-              className="absolute top-1 left-1 h-10 w-10 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 shadow-lg"
+              className="absolute top-1 left-1 h-10 w-10 rounded-full bg-orange"
               animate={{
                 x: isAnnual ? 48 : 0,
               }}
@@ -113,12 +113,10 @@ export function PricingSection({ isAuthenticated = false, userEmail = null }: Pr
                 stiffness: 500,
                 damping: 30,
               }}
-            >
-              <div className="absolute inset-0 rounded-full bg-white/20 backdrop-blur-sm" />
-            </motion.div>
+            />
           </button>
-          <span className={`text-sm font-medium transition-colors ${isAnnual ? 'text-zinc-900 dark:text-white' : 'text-zinc-500 dark:text-zinc-400'}`}>
-            Annuel <span className="text-emerald-600 dark:text-emerald-400">(-20%)</span>
+          <span className={`text-sm font-medium transition-colors ${isAnnual ? 'text-ink' : 'text-ink-3'}`}>
+            Annuel <span className="text-orange">(-20%)</span>
           </span>
         </div>
       </div>
@@ -135,22 +133,22 @@ export function PricingSection({ isAuthenticated = false, userEmail = null }: Pr
           return (
             <div
               key={plan.name}
-              className={`relative flex h-full flex-col rounded-3xl border border-white/20 dark:border-zinc-800/50 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md p-6 md:p-8 shadow-lg ${
+              className={`relative flex h-full flex-col rounded border border-rule-soft bg-paper p-6 md:p-8 ${
                 plan.popular
-                  ? 'border-emerald-500/50 dark:border-emerald-400/50 bg-emerald-50/80 dark:bg-emerald-900/20'
+                  ? 'border-orange bg-paper-2'
                   : ''
               }`}
             >
               {plan.popular && (
                 <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                  <span className="rounded-full bg-emerald-500 px-4 py-1 text-xs font-semibold text-white dark:bg-emerald-400 dark:text-zinc-900">
+                  <span className="rounded bg-orange px-4 py-1 text-xs font-semibold text-paper">
                     Populaire
                   </span>
                 </div>
               )}
               {plan.showAnnualBadge && isAnnual && (
                 <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-10">
-                  <span className="rounded-full bg-gradient-to-r from-orange-500 to-red-500 px-5 py-2 text-xs font-bold text-white shadow-lg animate-pulse">
+                  <span className="rounded-full bg-gradient-to-r from-orange-500 to-red-500 px-5 py-2 text-xs font-bold text-white animate-pulse">
                     🔥 2 MOIS OFFERTS
                   </span>
                 </div>
@@ -171,7 +169,7 @@ export function PricingSection({ isAuthenticated = false, userEmail = null }: Pr
                     )}
                   </div>
                   {monthlyEquivalent && (
-                    <span className="text-sm text-emerald-600 dark:text-emerald-400 font-medium">
+                    <span className="text-sm text-orange font-medium">
                       {monthlyEquivalent}
                     </span>
                   )}
@@ -184,8 +182,8 @@ export function PricingSection({ isAuthenticated = false, userEmail = null }: Pr
                     <Check
                       className={`mt-0.5 h-5 w-5 flex-shrink-0 ${
                         plan.popular
-                          ? 'text-emerald-600 dark:text-emerald-400'
-                          : 'text-zinc-600 dark:text-zinc-400'
+                          ? 'text-orange'
+                          : 'text-ink-2'
                       }`}
                     />
                     <span className="text-sm text-zinc-700 dark:text-zinc-300 font-medium">{feature}</span>

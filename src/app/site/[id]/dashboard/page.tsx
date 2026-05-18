@@ -127,12 +127,12 @@ export default async function SiteDashboardPage({ params }: Params) {
         {/* Résumé IA du chantier */}
         {aiSummary && (
           <section
-            className={`rounded-3xl border p-6 shadow-lg ${
+            className={`rounded border p-6 ${
               aiSummary.status === 'critical'
                 ? 'border-rose-300 bg-gradient-to-br from-rose-50 to-rose-100/50 dark:border-rose-700 dark:from-rose-900/30 dark:to-rose-800/20'
                 : aiSummary.status === 'warning'
                   ? 'border-amber-300 bg-gradient-to-br from-amber-50 to-amber-100/50 dark:border-amber-700 dark:from-amber-900/30 dark:to-amber-800/20'
-                  : 'border-emerald-300 bg-gradient-to-br from-emerald-50 to-emerald-100/50 dark:border-emerald-700 dark:from-emerald-900/30 dark:to-emerald-800/20'
+                  : 'border-orange bg-gradient-to-br from-orange to-orange/50 dark:border-orange dark:from-paper-2 dark:to-orange/20'
             }`}
           >
             <div className="flex items-start gap-4">
@@ -146,7 +146,7 @@ export default async function SiteDashboardPage({ params }: Params) {
                     <span className="text-3xl">🟠</span>
                   </div>
                 ) : (
-                  <div className="rounded-full bg-emerald-200 p-3 shadow-md dark:bg-emerald-800/50">
+                  <div className="rounded-full bg-orange p-3 shadow-md dark:bg-orange/50">
                     <span className="text-3xl">✨</span>
                   </div>
                 )}
@@ -156,7 +156,7 @@ export default async function SiteDashboardPage({ params }: Params) {
                   <h2 className="text-xl font-bold text-zinc-900 dark:text-white">
                     Analyse IA du chantier
                   </h2>
-                  <span className="rounded-full bg-white/80 px-2 py-0.5 text-xs font-semibold text-zinc-700 dark:bg-zinc-800/80 dark:text-zinc-300">
+                  <span className="rounded-full bg-paper px-2 py-0.5 text-xs font-semibold text-zinc-700 dark:bg-zinc-800/80 dark:text-zinc-300">
                     IA
                   </span>
                 </div>
@@ -166,7 +166,7 @@ export default async function SiteDashboardPage({ params }: Params) {
                       ? 'text-rose-900 dark:text-rose-100'
                       : aiSummary.status === 'warning'
                         ? 'text-amber-900 dark:text-amber-100'
-                        : 'text-emerald-900 dark:text-emerald-100'
+                        : 'text-ink dark:text-paper'
                   }`}
                 >
                   {aiSummary.summary}
@@ -178,12 +178,12 @@ export default async function SiteDashboardPage({ params }: Params) {
 
         {/* Stats du chantier */}
         <section className="grid gap-4 md:grid-cols-4">
-          <div className="rounded-2xl border border-zinc-100 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
+          <div className="rounded border border-zinc-100 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
             <p className="text-xs uppercase tracking-[0.3em] text-zinc-500">Tâches</p>
             <p className="mt-2 text-3xl font-semibold">{totalTasks}</p>
             <p className="text-sm text-zinc-500">total</p>
           </div>
-          <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5 dark:border-amber-500/30 dark:bg-amber-900/20">
+          <div className="rounded border border-amber-200 bg-amber-50 p-5 dark:border-amber-500/30 dark:bg-amber-900/20">
             <p className="text-xs uppercase tracking-[0.3em] text-amber-800 dark:text-amber-200">
               À traiter
             </p>
@@ -192,18 +192,18 @@ export default async function SiteDashboardPage({ params }: Params) {
             </p>
             <p className="text-sm text-amber-800/80 dark:text-amber-200">en attente</p>
           </div>
-          <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-5 dark:border-emerald-500/30 dark:bg-emerald-900/20">
-            <p className="text-xs uppercase tracking-[0.3em] text-emerald-800 dark:text-emerald-100">
+          <div className="rounded border border-rule-soft bg-paper-2 p-5 dark:border-orange/30 dark:bg-paper-2">
+            <p className="text-xs uppercase tracking-[0.3em] text-ink dark:text-paper">
               Terminées
             </p>
-            <p className="mt-2 text-3xl font-semibold text-emerald-900 dark:text-emerald-50">
+            <p className="mt-2 text-3xl font-semibold text-ink dark:text-orange">
               {doneTasks}
             </p>
-            <p className="text-sm text-emerald-800/80 dark:text-emerald-100">
+            <p className="text-sm text-ink/80 dark:text-paper">
               {progress}% complété
             </p>
           </div>
-          <div className="rounded-2xl border border-zinc-100 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
+          <div className="rounded border border-zinc-100 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
             <p className="text-xs uppercase tracking-[0.3em] text-zinc-500">Équipe</p>
             <p className="mt-2 text-3xl font-semibold">{workers?.length ?? 0}</p>
             <p className="text-sm text-zinc-500">membres</p>
@@ -211,7 +211,7 @@ export default async function SiteDashboardPage({ params }: Params) {
         </section>
 
         {/* Planning du jour */}
-        <section className="rounded-2xl border border-zinc-100 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900">
+        <section className="rounded border border-zinc-100 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900">
           <div className="mb-4 flex items-center justify-between">
             <div>
               <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">
@@ -278,7 +278,7 @@ export default async function SiteDashboardPage({ params }: Params) {
         <WeatherWidget location={site.postal_code || undefined} isLocked={!hasWeatherAccess} />
 
         {/* Section Rapports avec bouton PDF */}
-        <section className="rounded-2xl border border-zinc-100 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900">
+        <section className="rounded border border-zinc-100 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900">
           <div className="mb-4 flex items-center justify-between">
             <div>
               <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">Rapports</h3>

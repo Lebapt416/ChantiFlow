@@ -138,7 +138,7 @@ export function AuthForm() {
         ) : null}
         {currentState?.success ? (
           <div className="space-y-2">
-            <p className="text-sm text-emerald-400">{currentState.success}</p>
+            <p className="text-sm text-green">{currentState.success}</p>
             <p className="text-xs text-zinc-500 dark:text-zinc-400">Redirection en cours...</p>
           </div>
         ) : null}

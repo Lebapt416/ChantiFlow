@@ -63,7 +63,7 @@ export function ValidatedReportsList({
             <div className="flex items-center justify-between gap-3">
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
-                  <CheckCircle2 className="h-4 w-4 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
+                  <CheckCircle2 className="h-4 w-4 text-orange dark:text-green flex-shrink-0" />
                   <p className="text-sm font-semibold text-zinc-900 dark:text-white truncate">
                     {task?.title ?? 'Tâche inconnue'}
                   </p>

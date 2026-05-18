@@ -64,7 +64,7 @@ export function PDFButton({ siteId, isPro }: PDFButtonProps) {
     <button
       onClick={handleExport}
       disabled={loading}
-      className="flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+      className="flex items-center gap-2 rounded-lg bg-orange px-4 py-2 text-sm font-semibold text-white transition hover:bg-orange-dark active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
     >
       {loading ? (
         <Loader2 className="h-4 w-4 animate-spin" />

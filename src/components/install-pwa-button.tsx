@@ -92,10 +92,10 @@ export function InstallPwaButton() {
   return (
     <button
       onClick={handleInstallClick}
-      className="group/item relative flex items-center justify-center w-14 h-14 rounded-xl transition-all duration-200 text-white hover:text-white"
+      className="group/item relative flex items-center justify-center w-14 h-14 rounded transition-all duration-200 text-white hover:text-white"
       title="Installer l'application"
     >
-      <span className="absolute rounded-xl transition-all duration-200 top-0 bottom-0 left-2 right-0 bg-black/50 group-hover/item:bg-black/70 group-hover/item:left-3"></span>
+      <span className="absolute rounded transition-all duration-200 top-0 bottom-0 left-2 right-0 bg-black/50 group-hover/item:bg-black/70 group-hover/item:left-3"></span>
       <span className="relative z-10">
         <Download size={26} strokeWidth={3} className="group-hover/item:scale-110 transition-transform duration-200" />
       </span>

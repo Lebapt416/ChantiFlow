@@ -5,10 +5,10 @@ export default function JoinTeamSuccessPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-zinc-100 via-white to-zinc-50 p-6 text-zinc-900 dark:from-zinc-900 dark:via-zinc-800 dark:to-black dark:text-white flex items-center justify-center">
       <div className="w-full max-w-md">
-        <div className="rounded-3xl border border-zinc-200 bg-white/80 p-8 backdrop-blur dark:border-white/10 dark:bg-white/5 shadow-xl text-center">
+        <div className="rounded border border-zinc-200 bg-paper p-8    text-center">
           <div className="mb-6 flex justify-center">
-            <div className="rounded-full bg-emerald-100 p-4 dark:bg-emerald-900/30">
-              <CheckCircle className="h-12 w-12 text-emerald-600 dark:text-emerald-400" />
+            <div className="rounded-full bg-paper-2 p-4 dark:bg-paper-2">
+              <CheckCircle className="h-12 w-12 text-orange dark:text-green" />
             </div>
           </div>
           
@@ -35,7 +35,7 @@ export default function JoinTeamSuccessPage() {
           
           <Link
             href="/"
-            className="inline-block rounded-lg bg-emerald-600 px-6 py-3 text-base font-semibold text-white transition hover:bg-emerald-700"
+            className="inline-block rounded-lg bg-orange px-6 py-3 text-base font-semibold text-white transition hover:bg-orange-dark"
           >
             Retour à l&apos;accueil
           </Link>

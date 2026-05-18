@@ -95,7 +95,7 @@ export function ChangePlanButton({ plan, currentPlan, userEmail }: Props) {
 
   if (isCurrent) {
     return (
-      <div className="rounded-lg bg-emerald-600 px-3 py-2 text-center text-xs font-semibold text-white dark:bg-emerald-400 dark:text-zinc-900">
+      <div className="rounded-lg bg-orange px-3 py-2 text-center text-xs font-semibold text-white dark:bg-orange dark:text-zinc-900">
         Plan actuel
       </div>
     );
@@ -120,7 +120,7 @@ export function ChangePlanButton({ plan, currentPlan, userEmail }: Props) {
         <p className="mt-1 text-xs text-rose-500">{state.error}</p>
       )}
       {state?.success && (
-        <p className="mt-1 text-xs text-emerald-500">Plan mis à jour !</p>
+        <p className="mt-1 text-xs text-green">Plan mis à jour !</p>
       )}
     </div>
   );

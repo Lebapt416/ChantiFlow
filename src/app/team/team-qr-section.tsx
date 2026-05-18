@@ -17,7 +17,7 @@ export function TeamQrSection({ qrUrl }: Props) {
   }
 
   return (
-    <div className="rounded-2xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900">
+    <div className="rounded border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900">
       <div className="mb-4">
         <h3 className="text-lg font-semibold text-zinc-900 dark:text-white mb-2">
           QR code d&apos;inscription à l&apos;équipe
@@ -29,7 +29,7 @@ export function TeamQrSection({ qrUrl }: Props) {
 
       {/* QR Code - visible à l'écran */}
       <div className="mb-6 flex justify-center">
-        <div className="rounded-2xl border-2 border-zinc-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900 no-print">
+        <div className="rounded border-2 border-zinc-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900 no-print">
           <QRCodeSVG
             value={qrUrl}
             size={256}
@@ -42,7 +42,7 @@ export function TeamQrSection({ qrUrl }: Props) {
           </p>
         </div>
         {/* QR Code - visible uniquement à l'impression */}
-        <div className="rounded-2xl border-2 border-black bg-white p-6 print-qr-only" style={{ display: 'none' }}>
+        <div className="rounded border-2 border-black bg-white p-6 print-qr-only" style={{ display: 'none' }}>
           <QRCodeSVG
             value={qrUrl}
             size={256}
@@ -70,7 +70,7 @@ export function TeamQrSection({ qrUrl }: Props) {
       <div className="grid gap-3 sm:grid-cols-2 no-print">
         <button
           onClick={handleTest}
-          className="flex items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-emerald-700 active:scale-95"
+          className="flex items-center justify-center gap-2 rounded-lg bg-orange px-4 py-3 text-sm font-semibold text-white transition hover:bg-orange-dark active:scale-95"
         >
           <ExternalLink className="h-4 w-4" />
           <span>Test</span>

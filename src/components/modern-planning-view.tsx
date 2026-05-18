@@ -68,10 +68,10 @@ function getRoleColor(roleName: string | null | undefined): {
   // Recherche directe pour les métiers les plus courants (optimisation)
   const directMatches: Record<string, { labelColor: string; bgColor: string; borderColor: string; barColor: string; barNeonColor: string; category: string }> = {
     // Gros Œuvre
-    'macon': { labelColor: 'text-emerald-300', bgColor: 'bg-emerald-950/30', borderColor: 'border-zinc-700', barColor: 'bg-emerald-500', barNeonColor: 'shadow-[0_0_8px_rgba(16,185,129,0.6)]', category: 'Gros Œuvre' },
+    'macon': { labelColor: 'text-green', bgColor: 'bg-paper-2', borderColor: 'border-zinc-700', barColor: 'bg-paper-20', barNeonColor: 'shadow-[0_0_8px_rgba(16,185,129,0.6)]', category: 'Gros Œuvre' },
     'plombier': { labelColor: 'text-cyan-300', bgColor: 'bg-cyan-950/30', borderColor: 'border-zinc-700', barColor: 'bg-cyan-500', barNeonColor: 'shadow-[0_0_8px_rgba(6,182,212,0.6)]', category: 'Fluides & Tech' },
     'architecte': { labelColor: 'text-violet-300', bgColor: 'bg-violet-950/30', borderColor: 'border-zinc-700', barColor: 'bg-violet-500', barNeonColor: 'shadow-[0_0_8px_rgba(139,92,246,0.6)]', category: 'Études / Gestion' },
-    'salinier': { labelColor: 'text-emerald-300', bgColor: 'bg-emerald-950/30', borderColor: 'border-zinc-700', barColor: 'bg-emerald-500', barNeonColor: 'shadow-[0_0_8px_rgba(16,185,129,0.6)]', category: 'Gros Œuvre' },
+    'salinier': { labelColor: 'text-green', bgColor: 'bg-paper-2', borderColor: 'border-zinc-700', barColor: 'bg-paper-20', barNeonColor: 'shadow-[0_0_8px_rgba(16,185,129,0.6)]', category: 'Gros Œuvre' },
     'electricien': { labelColor: 'text-blue-300', bgColor: 'bg-blue-950/30', borderColor: 'border-zinc-700', barColor: 'bg-blue-500', barNeonColor: 'shadow-[0_0_8px_rgba(59,130,246,0.6)]', category: 'Fluides & Tech' },
     'peintre': { labelColor: 'text-fuchsia-300', bgColor: 'bg-fuchsia-950/30', borderColor: 'border-zinc-700', barColor: 'bg-fuchsia-500', barNeonColor: 'shadow-[0_0_8px_rgba(217,70,239,0.6)]', category: 'Finitions' },
     'grutier': { labelColor: 'text-orange-300', bgColor: 'bg-orange-950/30', borderColor: 'border-zinc-700', barColor: 'bg-orange-500', barNeonColor: 'shadow-[0_0_8px_rgba(249,115,22,0.6)]', category: 'TP / Engins' },
@@ -176,10 +176,10 @@ function getRoleColor(roleName: string | null | undefined): {
   // Catégorie 1: Gros Œuvre = Vert (emerald)
   if (checkKeywords(grosOeuvreKeywords)) {
     return { 
-      labelColor: 'text-emerald-300', 
-      bgColor: 'bg-emerald-950/30', 
+      labelColor: 'text-green', 
+      bgColor: 'bg-paper-2', 
       borderColor: 'border-zinc-700',
-      barColor: 'bg-emerald-500',
+      barColor: 'bg-paper-20',
       barNeonColor: 'shadow-[0_0_8px_rgba(16,185,129,0.6)]',
       category: 'Gros Œuvre'
     };
@@ -224,10 +224,10 @@ function getRoleColor(roleName: string | null | undefined): {
     }
     // Sols/Menuiserie = Vert (emerald)
     return { 
-      labelColor: 'text-emerald-300', 
-      bgColor: 'bg-emerald-950/30', 
+      labelColor: 'text-green', 
+      bgColor: 'bg-paper-2', 
       borderColor: 'border-zinc-700',
-      barColor: 'bg-emerald-500',
+      barColor: 'bg-paper-20',
       barNeonColor: 'shadow-[0_0_8px_rgba(16,185,129,0.6)]',
       category: 'Finitions'
     };
@@ -365,11 +365,11 @@ export function ModernPlanningView({ siteName, phases, isAheadOfSchedule = false
   };
 
   return (
-    <div className="relative overflow-hidden rounded-3xl border border-zinc-800/50 bg-zinc-900 p-6 shadow-2xl">
+    <div className="relative overflow-hidden rounded border border-zinc-800/50 bg-zinc-900 p-6 ">
       {/* Header avec icône et titre */}
       <div className="mb-6 flex items-start gap-4">
         {/* Icône calendrier */}
-        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-emerald-600">
+        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded bg-orange">
           <CalendarDays className="h-6 w-6 text-white" />
         </div>
         
@@ -390,7 +390,7 @@ export function ModernPlanningView({ siteName, phases, isAheadOfSchedule = false
       <div className="mb-6">
         <div className="h-1.5 w-full overflow-hidden rounded-full bg-zinc-800">
           <div
-            className="h-full rounded-full bg-emerald-500 transition-all duration-500"
+            className="h-full rounded-full bg-paper-20 transition-all duration-500"
             style={{ width: `${overallProgress}%` }}
           />
         </div>
@@ -409,7 +409,7 @@ export function ModernPlanningView({ siteName, phases, isAheadOfSchedule = false
           const getBadgeStyle = () => {
             switch (phase.status) {
               case 'completed':
-                return 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30';
+                return 'bg-paper-2 text-green border-orange/30';
               case 'delayed':
                 return 'bg-red-500/20 text-red-400 border-red-500/30';
               case 'in_progress':
@@ -423,7 +423,7 @@ export function ModernPlanningView({ siteName, phases, isAheadOfSchedule = false
           return (
             <div
               key={phase.id}
-              className="relative overflow-hidden rounded-xl border border-zinc-700 bg-zinc-900/80 p-4"
+              className="relative overflow-hidden rounded border border-zinc-700 bg-ink p-4"
             >
               {/* Barre verticale colorée à gauche avec effet néon */}
               <div className={`absolute left-0 top-0 bottom-0 w-1 ${roleColors.barColor} ${roleColors.barNeonColor}`} />
@@ -449,7 +449,7 @@ export function ModernPlanningView({ siteName, phases, isAheadOfSchedule = false
       {/* Légende des catégories */}
       <div className="mt-6 flex flex-wrap items-center gap-4 border-t border-zinc-800 pt-4">
         <div className="flex items-center gap-2">
-          <div className="h-3 w-3 rounded-full bg-emerald-500" />
+          <div className="h-3 w-3 rounded-full bg-paper-20" />
           <span className="text-xs text-zinc-300">Gros Œuvre</span>
         </div>
         <div className="flex items-center gap-2">
@@ -473,7 +473,7 @@ export function ModernPlanningView({ siteName, phases, isAheadOfSchedule = false
       {/* Message de statut IA en bas */}
       {showAIBadge && (
         <div className="flex items-center gap-2 text-sm text-white">
-          <div className="h-2 w-2 rounded-full bg-emerald-500" />
+          <div className="h-2 w-2 rounded-full bg-paper-20" />
           <span>IA recalcule automatiquement la fin du chantier</span>
         </div>
       )}

@@ -34,7 +34,7 @@ export function ThemeToggle() {
     <button
       type="button"
       onClick={toggleTheme}
-      className="inline-flex items-center gap-2 rounded-full border border-zinc-200 bg-white/80 px-4 py-2 text-sm font-medium text-zinc-700 shadow-lg shadow-black/10 transition hover:border-zinc-400 hover:text-zinc-900 dark:border-white/30 dark:bg-zinc-900/80 dark:text-white dark:hover:border-white/60"
+      className="inline-flex items-center gap-2 rounded border border-rule-soft bg-paper px-4 py-2 text-sm font-medium text-ink transition hover:border-rule hover:bg-paper-2"
     >
       <span role="img" aria-hidden="true">
         {theme === 'light' ? '🌙' : '☀️'}

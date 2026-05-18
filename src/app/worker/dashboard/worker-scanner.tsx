@@ -57,7 +57,7 @@ export function WorkerScanner() {
   };
 
   return (
-    <div className="rounded-3xl border border-zinc-200 bg-white p-6 shadow-lg dark:border-zinc-800 dark:bg-zinc-900">
+    <div className="rounded border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900">
       <div className="flex items-center justify-between gap-4">
         <div>
           <p className="text-xs uppercase tracking-[0.3em] text-zinc-500 dark:text-zinc-400">Connexion rapide</p>
@@ -70,7 +70,7 @@ export function WorkerScanner() {
           type="button"
           onClick={toggleScanner}
           className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold text-white transition active:scale-95 ${
-            isScanning ? 'bg-rose-600 hover:bg-rose-700' : 'bg-emerald-600 hover:bg-emerald-700'
+            isScanning ? 'bg-rose-600 hover:bg-rose-700' : 'bg-orange hover:bg-orange-dark'
           }`}
         >
           <Scan className="h-4 w-4" />
@@ -79,15 +79,15 @@ export function WorkerScanner() {
       </div>
 
       {isScanning && (
-        <div className="mt-6 overflow-hidden rounded-2xl border border-dashed border-emerald-200 bg-emerald-50/50 p-4 dark:border-emerald-800 dark:bg-emerald-900/10">
-          <div className="mb-2 flex items-center justify-between text-sm font-semibold text-emerald-700 dark:text-emerald-300">
+        <div className="mt-6 overflow-hidden rounded border border-dashed border-rule-soft bg-paper-2/50 p-4 dark:border-rule ">
+          <div className="mb-2 flex items-center justify-between text-sm font-semibold text-ink dark:text-green">
             <span className="flex items-center gap-2">
               <QrCode className="h-4 w-4" />
               Caméra active
             </span>
-            <span className="text-xs text-emerald-500 dark:text-emerald-200">Ajustez le QR au centre du cadre</span>
+            <span className="text-xs text-green dark:text-orange">Ajustez le QR au centre du cadre</span>
           </div>
-          <div className="w-full max-w-sm rounded-2xl">
+          <div className="w-full max-w-sm rounded">
             <WorkerQrReader
               constraints={{ facingMode: 'environment' }}
               scanDelay={700}
@@ -118,7 +118,7 @@ export function WorkerScanner() {
               handleScan(manual);
             }
           }}
-          className="inline-flex items-center gap-2 text-sm font-semibold text-emerald-700 hover:underline dark:text-emerald-300 disabled:opacity-60"
+          className="inline-flex items-center gap-2 text-sm font-semibold text-ink hover:underline dark:text-green disabled:opacity-60"
         >
           {isPending ? (
             <>
@@ -132,7 +132,7 @@ export function WorkerScanner() {
       </div>
 
       {message && (
-        <p className="mt-4 rounded-lg bg-emerald-50 px-3 py-2 text-sm font-medium text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-200">
+        <p className="mt-4 rounded-lg bg-paper-2 px-3 py-2 text-sm font-medium text-ink dark:bg-paper-2 dark:text-orange">
           {message}
         </p>
       )}

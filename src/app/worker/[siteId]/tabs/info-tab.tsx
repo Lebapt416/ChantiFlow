@@ -52,7 +52,7 @@ export function InfoTab({ siteId, workerId, workerName }: Props) {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="h-6 w-6 animate-spin rounded-full border-2 border-zinc-300 border-t-emerald-600"></div>
+        <div className="h-6 w-6 animate-spin rounded-full border-2 border-zinc-300 border-t-orange"></div>
       </div>
     );
   }

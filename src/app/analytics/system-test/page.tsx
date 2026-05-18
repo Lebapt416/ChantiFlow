@@ -138,7 +138,7 @@ export default function SystemTestPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950 text-white">
       {/* Header */}
-      <div className="border-b border-zinc-800 bg-black/80 backdrop-blur">
+      <div className="border-b border-zinc-800 bg-black/80 ">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
@@ -162,7 +162,7 @@ export default function SystemTestPage() {
             <button
               onClick={handleRunTests}
               disabled={isTesting}
-              className="px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              className="px-6 py-3 rounded bg-blue-600 hover:bg-blue-500 text-white font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
             >
               {isTesting ? (
                 <>
@@ -184,7 +184,7 @@ export default function SystemTestPage() {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Sidebar - Historique */}
           <div className="lg:col-span-1">
-            <div className="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 backdrop-blur sticky top-8">
+            <div className="rounded border border-zinc-800 bg-ink p-6  sticky top-8">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-semibold text-white flex items-center gap-2">
                   <Clock className="h-5 w-5" />
@@ -220,7 +220,7 @@ export default function SystemTestPage() {
                       <div className="flex items-center justify-between mb-1">
                         <span className={`text-xs font-semibold ${
                           test.summary.score >= 90
-                            ? 'text-emerald-400'
+                            ? 'text-green'
                             : test.summary.score >= 75
                             ? 'text-blue-400'
                             : test.summary.score >= 50
@@ -243,7 +243,7 @@ export default function SystemTestPage() {
                         })}
                       </p>
                       <div className="flex items-center gap-2 text-xs">
-                        <span className="text-emerald-400">
+                        <span className="text-green">
                           {test.summary.successTests} ✓
                         </span>
                         {test.summary.errorTests > 0 && (
@@ -267,7 +267,7 @@ export default function SystemTestPage() {
           {/* Main Content - Résultats */}
           <div className="lg:col-span-3">
             {!displayReport && !isTesting ? (
-              <div className="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-12 backdrop-blur text-center">
+              <div className="rounded border border-zinc-800 bg-ink p-12  text-center">
                 <TestTube className="h-16 w-16 text-zinc-600 mx-auto mb-4" />
                 <h3 className="text-xl font-semibold text-white mb-2">
                   Aucun test disponible
@@ -277,14 +277,14 @@ export default function SystemTestPage() {
                 </p>
                 <button
                   onClick={handleRunTests}
-                  className="px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold transition-colors inline-flex items-center gap-2"
+                  className="px-6 py-3 rounded bg-blue-600 hover:bg-blue-500 text-white font-semibold transition-colors inline-flex items-center gap-2"
                 >
                   <TestTube className="h-5 w-5" />
                   Lancer les tests
                 </button>
               </div>
             ) : isTesting ? (
-              <div className="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-12 backdrop-blur text-center">
+              <div className="rounded border border-zinc-800 bg-ink p-12  text-center">
                 <Loader2 className="h-16 w-16 text-blue-400 mx-auto mb-4 animate-spin" />
                 <h3 className="text-xl font-semibold text-white mb-2">
                   Tests en cours...
@@ -296,9 +296,9 @@ export default function SystemTestPage() {
             ) : displayReport ? (
               <div className="space-y-6">
                 {/* Résumé global */}
-                <div className={`rounded-2xl border-2 p-6 ${
+                <div className={`rounded border-2 p-6 ${
                   displayReport.summary.score >= 90
-                    ? 'border-emerald-500/50 bg-emerald-500/10'
+                    ? 'border-orange bg-paper-20/10'
                     : displayReport.summary.score >= 75
                     ? 'border-blue-500/50 bg-blue-500/10'
                     : displayReport.summary.score >= 50
@@ -312,7 +312,7 @@ export default function SystemTestPage() {
                       </h3>
                       <p className={`text-3xl font-bold ${
                         displayReport.summary.score >= 90
-                          ? 'text-emerald-400'
+                          ? 'text-green'
                           : displayReport.summary.score >= 75
                           ? 'text-blue-400'
                           : displayReport.summary.score >= 50
@@ -345,7 +345,7 @@ export default function SystemTestPage() {
                 </div>
 
                 {/* Détail des tests */}
-                <div className="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 backdrop-blur">
+                <div className="rounded border border-zinc-800 bg-ink p-6 ">
                   <h3 className="text-lg font-semibold text-white mb-4">
                     Détail des tests ({displayReport.results.length})
                   </h3>
@@ -355,7 +355,7 @@ export default function SystemTestPage() {
                         key={index}
                         className={`rounded-lg border p-4 ${
                           result.status === 'success'
-                            ? 'border-emerald-500/30 bg-emerald-500/5'
+                            ? 'border-orange/30 bg-paper-20/5'
                             : result.status === 'error'
                             ? 'border-red-500/30 bg-red-500/5'
                             : 'border-yellow-500/30 bg-yellow-500/5'
@@ -363,7 +363,7 @@ export default function SystemTestPage() {
                       >
                         <div className="flex items-start gap-3">
                           {result.status === 'success' && (
-                            <CheckCircle2 className="h-5 w-5 text-emerald-400 flex-shrink-0 mt-0.5" />
+                            <CheckCircle2 className="h-5 w-5 text-green flex-shrink-0 mt-0.5" />
                           )}
                           {result.status === 'error' && (
                             <XCircle className="h-5 w-5 text-red-400 flex-shrink-0 mt-0.5" />
@@ -375,7 +375,7 @@ export default function SystemTestPage() {
                             <h4 className="font-semibold text-white mb-1">{result.name}</h4>
                             <p className={`text-sm ${
                               result.status === 'success'
-                                ? 'text-emerald-300'
+                                ? 'text-green'
                                 : result.status === 'error'
                                 ? 'text-red-300'
                                 : 'text-yellow-300'

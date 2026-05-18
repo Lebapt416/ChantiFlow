@@ -46,10 +46,8 @@ export function OptimalPaymentButton({
         type="button"
         onClick={handleClick}
         disabled={isLoading || disabled}
-        className="group relative w-full overflow-hidden rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 p-4 text-white shadow-lg transition-all duration-300 hover:scale-[1.02] hover:shadow-blue-500/25 hover:from-blue-500 hover:to-indigo-500 disabled:cursor-not-allowed disabled:opacity-80 min-h-[72px]"
+        className="group relative w-full overflow-hidden rounded bg-orange p-4 text-paper transition-all duration-200 hover:bg-orange-dark disabled:cursor-not-allowed disabled:opacity-80 min-h-[72px]"
       >
-        <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-1000 group-hover:translate-x-full" />
-
         <div className="relative flex flex-wrap items-center justify-center gap-3 text-center text-lg font-semibold sm:flex-nowrap">
           {isLoading ? (
             <>
@@ -61,7 +59,7 @@ export function OptimalPaymentButton({
               <span className="flex-1 min-w-[120px]">
                 {ctaLabel} {showPlanName ? planName : ''}
               </span>
-              <span className="flex items-center justify-center rounded-md bg-white/20 px-2 py-0.5 text-sm">
+              <span className="flex items-center justify-center rounded bg-paper/20 px-2 py-0.5 text-sm">
                 {priceLabel ?? `${price}€ / mois`}
               </span>
               <CreditCard className="ml-1 h-5 w-5" />

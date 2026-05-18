@@ -35,8 +35,8 @@ export default async function SuccessPage({ searchParams }: SearchParams) {
       userEmail={user.email}
     >
       <div className="mx-auto max-w-2xl">
-        <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-8 text-center dark:border-emerald-800 dark:bg-emerald-900/20">
-          <CheckCircle2 className="mx-auto h-16 w-16 text-emerald-600 dark:text-emerald-400" />
+        <div className="rounded border border-rule-soft bg-paper-2 p-8 text-center dark:border-rule dark:bg-paper-2">
+          <CheckCircle2 className="mx-auto h-16 w-16 text-orange dark:text-green" />
           <h2 className="mt-4 text-2xl font-semibold text-zinc-900 dark:text-white">
             Paiement réussi !
           </h2>
@@ -54,7 +54,7 @@ export default async function SuccessPage({ searchParams }: SearchParams) {
           <div className="mt-6 flex gap-3 justify-center">
             <Link
               href="/account"
-              className="inline-block rounded-lg bg-emerald-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-emerald-700 dark:bg-emerald-400 dark:text-zinc-900 dark:hover:bg-emerald-300"
+              className="inline-block rounded-lg bg-orange px-6 py-3 text-sm font-semibold text-white transition hover:bg-orange-dark dark:bg-orange dark:text-zinc-900 dark:hover:bg-orange"
             >
               Voir mon compte
             </Link>

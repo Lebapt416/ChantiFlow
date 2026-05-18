@@ -43,7 +43,7 @@ export function AddTaskForm({ siteId }: Props) {
     <form
       id="add-task-form"
       action={formAction}
-      className="grid gap-4 rounded-2xl border border-zinc-100 bg-white p-6 shadow-lg shadow-black/5 md:grid-cols-2 dark:border-zinc-800 dark:bg-zinc-900"
+      className="grid gap-4 rounded border border-zinc-100 bg-white p-6 shadow-black/5 md:grid-cols-2 dark:border-zinc-800 dark:bg-zinc-900"
     >
       <input type="hidden" name="siteId" value={siteId} />
       <div className="space-y-2">
@@ -104,7 +104,7 @@ export function AddTaskForm({ siteId }: Props) {
         <p className="md:col-span-2 text-sm text-rose-400">{state.error}</p>
       ) : null}
       {state?.success ? (
-        <p className="md:col-span-2 text-sm text-emerald-400">
+        <p className="md:col-span-2 text-sm text-green">
           Tâche ajoutée.
         </p>
       ) : null}

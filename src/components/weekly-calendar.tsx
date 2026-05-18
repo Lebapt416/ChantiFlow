@@ -141,7 +141,7 @@ export function WeeklyCalendar({ planning, workers }: Props) {
   } ${weekDays[0].getFullYear()}`;
 
   return (
-    <div className="rounded-2xl border border-zinc-100 bg-white p-6 shadow-lg shadow-black/5 dark:border-zinc-800 dark:bg-zinc-900">
+    <div className="rounded border border-zinc-100 bg-white p-6 shadow-black/5 dark:border-zinc-800 dark:bg-zinc-900">
       {/* Header avec navigation */}
       <div className="mb-6 flex items-center justify-between">
         <div>
@@ -191,7 +191,7 @@ export function WeeklyCalendar({ planning, workers }: Props) {
                     key={day.toISOString()}
                     className={`min-w-[120px] border-b border-r border-zinc-200 bg-zinc-50 px-3 py-3 text-center text-xs font-semibold uppercase tracking-wider last:border-r-0 dark:border-zinc-700 dark:bg-zinc-900 ${
                       isToday
-                        ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-400'
+                        ? 'bg-paper-2 text-ink dark:bg-paper-2 dark:text-green'
                         : 'text-zinc-600 dark:text-zinc-400'
                     }`}
                   >
@@ -224,7 +224,7 @@ export function WeeklyCalendar({ planning, workers }: Props) {
                         key={day.toISOString()}
                         className={`min-w-[120px] border-r border-zinc-200 bg-white p-2 align-top last:border-r-0 dark:border-zinc-700 dark:bg-zinc-900 ${
                           isToday
-                            ? 'bg-emerald-50/50 dark:bg-emerald-900/10'
+                            ? 'bg-paper-2/50 '
                             : ''
                         }`}
                       >

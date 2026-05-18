@@ -23,9 +23,9 @@ export function SocialProofToast() {
         isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
       }`}
     >
-      <div className="flex items-center gap-3 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-4 py-3 shadow-lg backdrop-blur-sm">
-        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-900/30">
-          <User className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+      <div className="flex items-center gap-3 rounded border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-4 py-3 ">
+        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-paper-2 dark:bg-paper-2">
+          <User className="h-5 w-5 text-orange dark:text-green" />
         </div>
         <div className="flex-1">
           <p className="text-sm font-medium text-zinc-900 dark:text-white">

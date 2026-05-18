@@ -13,7 +13,7 @@ export default function PolitiqueConfidentialitePage() {
         <div className="mb-8">
           <Link
             href="/"
-            className="text-sm text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300"
+            className="text-sm text-orange hover:text-ink dark:text-green dark:hover:text-green"
           >
             ← Retour à l&apos;accueil
           </Link>
@@ -27,7 +27,7 @@ export default function PolitiqueConfidentialitePage() {
           nous collectons, utilisons et protégeons vos informations.
         </p>
 
-        <div className="space-y-8 rounded-3xl border border-zinc-200 bg-white p-8 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="space-y-8 rounded border border-zinc-200 bg-white p-8 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
           <section>
             <h2 className="mb-4 text-2xl font-semibold text-zinc-900 dark:text-white">
               1. Collecte des données
@@ -132,14 +132,14 @@ export default function PolitiqueConfidentialitePage() {
                 Pour exercer ces droits, contactez-nous à{' '}
                 <a
                   href="mailto:contact@chantiflow.com"
-                  className="text-emerald-600 hover:underline dark:text-emerald-400"
+                  className="text-orange hover:underline dark:text-green"
                 >
                   contact@chantiflow.com
                 </a>
                 . Pour plus de détails, consultez notre{' '}
                 <Link
                   href="/rgpd"
-                  className="text-emerald-600 hover:underline dark:text-emerald-400"
+                  className="text-orange hover:underline dark:text-green"
                 >
                   page RGPD
                 </Link>
@@ -239,7 +239,7 @@ export default function PolitiqueConfidentialitePage() {
               Pour toute question concernant cette politique de confidentialité, contactez-nous à{' '}
               <a
                 href="mailto:contact@chantiflow.com"
-                className="text-emerald-600 hover:underline dark:text-emerald-400"
+                className="text-orange hover:underline dark:text-green"
               >
                 contact@chantiflow.com
               </a>

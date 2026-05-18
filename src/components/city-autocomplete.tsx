@@ -168,7 +168,7 @@ export function CityAutocomplete({
       
       {isLoading && (
         <div className="absolute right-3 top-1/2 -translate-y-1/2">
-          <div className="h-4 w-4 animate-spin rounded-full border-2 border-zinc-300 border-t-emerald-600 dark:border-zinc-600 dark:border-t-emerald-400" />
+          <div className="h-4 w-4 animate-spin rounded-full border-2 border-zinc-300 border-t-orange dark:border-zinc-600 dark:border-t-orange" />
         </div>
       )}
 
@@ -176,7 +176,7 @@ export function CityAutocomplete({
         <div
           ref={suggestionsRef}
           id="city-suggestions"
-          className="absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-md border border-zinc-200 bg-white shadow-lg dark:border-zinc-700 dark:bg-zinc-900"
+          className="absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-md border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900"
           role="listbox"
         >
           {suggestions.map((city, index) => (
@@ -184,7 +184,7 @@ export function CityAutocomplete({
               key={`${city.code}-${index}`}
               type="button"
               onClick={() => handleSelectCity(city)}
-              className="w-full px-4 py-2 text-left text-sm text-zinc-900 hover:bg-emerald-50 dark:text-zinc-100 dark:hover:bg-emerald-900/20"
+              className="w-full px-4 py-2 text-left text-sm text-zinc-900 hover:bg-paper-2 dark:text-zinc-100 dark:hover:bg-paper-2"
               role="option"
               aria-selected={false}
             >
@@ -200,7 +200,7 @@ export function CityAutocomplete({
       )}
 
       {showSuggestions && suggestions.length === 0 && inputValue.length >= 2 && !isLoading && (
-        <div className="absolute z-50 mt-1 w-full rounded-md border border-zinc-200 bg-white p-4 text-sm text-zinc-600 shadow-lg dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-400">
+        <div className="absolute z-50 mt-1 w-full rounded-md border border-zinc-200 bg-white p-4 text-sm text-zinc-600 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-400">
           Aucun code postal trouvé. Vérifiez l&apos;orthographe ou entrez un code postal à 5 chiffres.
         </div>
       )}

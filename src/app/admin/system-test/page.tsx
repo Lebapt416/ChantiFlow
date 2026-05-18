@@ -37,13 +37,13 @@ export default function SystemTestPage() {
   }, []);
 
   const getScoreColor = (score: number) => {
-    if (score >= 18) return 'text-emerald-600 dark:text-emerald-400';
+    if (score >= 18) return 'text-orange dark:text-green';
     if (score >= 15) return 'text-yellow-600 dark:text-yellow-400';
     return 'text-red-600 dark:text-red-400';
   };
 
   const getScoreBgColor = (score: number) => {
-    if (score >= 18) return 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800';
+    if (score >= 18) return 'bg-paper-2 dark:bg-paper-2 border-rule-soft dark:border-rule';
     if (score >= 15) return 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800';
     return 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800';
   };
@@ -51,7 +51,7 @@ export default function SystemTestPage() {
   const getStatusIcon = (status: TestResult['status']) => {
     switch (status) {
       case 'success':
-        return <CheckCircle2 className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />;
+        return <CheckCircle2 className="h-5 w-5 text-orange dark:text-green" />;
       case 'error':
         return <XCircle className="h-5 w-5 text-red-600 dark:text-red-400" />;
       case 'warning':
@@ -62,7 +62,7 @@ export default function SystemTestPage() {
   const getStatusColor = (status: TestResult['status']) => {
     switch (status) {
       case 'success':
-        return 'border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-900/20';
+        return 'border-rule-soft dark:border-rule bg-paper-2 dark:bg-paper-2';
       case 'error':
         return 'border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20';
       case 'warning':
@@ -119,7 +119,7 @@ export default function SystemTestPage() {
 
         {/* Score global */}
         {report && (
-          <div className={`rounded-2xl border p-6 ${getScoreBgColor(report.overallScore)}`}>
+          <div className={`rounded border p-6 ${getScoreBgColor(report.overallScore)}`}>
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-zinc-600 dark:text-zinc-400">
@@ -132,7 +132,7 @@ export default function SystemTestPage() {
               <div className="text-right">
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
-                    <CheckCircle2 className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                    <CheckCircle2 className="h-4 w-4 text-orange dark:text-green" />
                     <span className="text-sm text-zinc-600 dark:text-zinc-400">
                       {report.passedTests} réussi{report.passedTests > 1 ? 's' : ''}
                     </span>

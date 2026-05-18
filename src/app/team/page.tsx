@@ -143,24 +143,24 @@ export default async function TeamPage() {
       primarySite={sites?.[0] ?? null}
     >
       <section className="grid gap-4 md:grid-cols-3">
-        <div className="rounded-2xl border border-zinc-100 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="rounded border border-zinc-100 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
           <p className="text-xs uppercase tracking-[0.3em] text-zinc-500">Membres</p>
           <p className="mt-2 text-3xl font-semibold">{workers?.length ?? 0}</p>
           <p className="text-sm text-zinc-500">collaborateurs actifs</p>
         </div>
-        <div className="rounded-2xl border border-zinc-100 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="rounded border border-zinc-100 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
           <p className="text-xs uppercase tracking-[0.3em] text-zinc-500">Chantiers</p>
           <p className="mt-2 text-3xl font-semibold">{sites?.length ?? 0}</p>
           <p className="text-sm text-zinc-500">sites assignés</p>
         </div>
-        <div className="rounded-2xl border border-zinc-100 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="rounded border border-zinc-100 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
           <p className="text-xs uppercase tracking-[0.3em] text-zinc-500">Rôles</p>
           <p className="mt-2 text-3xl font-semibold">{Object.keys(groupedByRole).length}</p>
           <p className="text-sm text-zinc-500">profils différents</p>
         </div>
       </section>
 
-      <section className="mt-8 rounded-3xl border border-zinc-100 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+      <section className="mt-8 rounded border border-zinc-100 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
       <h2 className="text-lg font-semibold text-zinc-900 dark:text-white">
         Répartition des métiers
       </h2>
@@ -169,7 +169,7 @@ export default async function TeamPage() {
           {highlightedRoles.map(([role, count]) => (
             <div
               key={role}
-              className="rounded-2xl border border-zinc-200 p-4 text-sm dark:border-zinc-700"
+              className="rounded border border-zinc-200 p-4 text-sm dark:border-zinc-700"
             >
               <p className="text-xs uppercase tracking-[0.3em] text-zinc-500 dark:text-zinc-400">
                 {role}
@@ -188,7 +188,7 @@ export default async function TeamPage() {
       )}
     </section>
 
-    <section className="mt-8 rounded-3xl border border-zinc-100 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+    <section className="mt-8 rounded border border-zinc-100 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
       <div className="mb-4 flex items-center justify-between">
         <div>
           <h2 className="text-lg font-semibold text-zinc-900 dark:text-white">
@@ -202,14 +202,14 @@ export default async function TeamPage() {
       <div className="mb-8">
         <Link
           href="/team/qr"
-          className="flex items-center justify-center gap-2 rounded-lg bg-emerald-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-emerald-700 active:scale-95"
+          className="flex items-center justify-center gap-2 rounded-lg bg-orange px-6 py-3 text-sm font-semibold text-white transition hover:bg-orange-dark active:scale-95"
         >
           <span>Voir le QR code d&apos;inscription</span>
         </Link>
       </div>
     </section>
 
-    <section className="mt-8 rounded-3xl border border-zinc-100 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+    <section className="mt-8 rounded border border-zinc-100 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
       <div className="mb-4 flex items-center justify-between">
         <div>
           <h2 className="text-lg font-semibold text-zinc-900 dark:text-white">
@@ -226,7 +226,7 @@ export default async function TeamPage() {
     </section>
 
     {activeSites.length > 0 && (
-      <section className="mt-8 rounded-3xl border border-zinc-100 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+      <section className="mt-8 rounded border border-zinc-100 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
         <div className="mb-4 flex items-center justify-between">
           <div>
             <h2 className="text-lg font-semibold text-zinc-900 dark:text-white">
@@ -246,7 +246,7 @@ export default async function TeamPage() {
       </section>
     )}
 
-    <section className="mt-8 rounded-3xl border border-zinc-100 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+    <section className="mt-8 rounded border border-zinc-100 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
       <div className="mb-4 flex items-center justify-between">
         <div>
           <h2 className="text-lg font-semibold text-zinc-900 dark:text-white">
@@ -270,7 +270,7 @@ export default async function TeamPage() {
                 {pendingWorkers.map((worker: any) => (
                   <div
                     key={worker.id}
-                    className="rounded-2xl border border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-900/20"
+                    className="rounded border border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-900/20"
                   >
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <div className="flex-1">
@@ -279,7 +279,7 @@ export default async function TeamPage() {
                             {worker.name}
                           </p>
                           {worker.access_code && (
-                            <span className="inline-flex items-center gap-1 rounded-md bg-emerald-100 px-2 py-0.5 text-xs font-mono font-semibold text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">
+                            <span className="inline-flex items-center gap-1 rounded-md bg-paper-2 px-2 py-0.5 text-xs font-mono font-semibold text-ink dark:bg-paper-2 dark:text-green">
                               {worker.access_code}
                               <CopyButton value={worker.access_code} />
                             </span>
@@ -303,7 +303,7 @@ export default async function TeamPage() {
                           <input type="hidden" name="workerId" value={worker.id} />
                           <button
                             type="submit"
-                            className="rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-emerald-700"
+                            className="rounded-lg bg-orange px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-orange-dark"
                           >
                             Valider
                           </button>
@@ -334,7 +334,7 @@ export default async function TeamPage() {
                 {approvedWorkers.map((worker: any) => (
                   <div
                     key={worker.id}
-                    className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 dark:border-emerald-800 dark:bg-emerald-900/20"
+                    className="rounded border border-rule-soft bg-paper-2 p-4 dark:border-rule dark:bg-paper-2"
                   >
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <div className="flex-1">
@@ -343,7 +343,7 @@ export default async function TeamPage() {
                             {worker.name}
                           </p>
                           {worker.access_code && (
-                            <span className="inline-flex items-center gap-1 rounded-md bg-emerald-100 px-2 py-0.5 text-xs font-mono font-semibold text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">
+                            <span className="inline-flex items-center gap-1 rounded-md bg-paper-2 px-2 py-0.5 text-xs font-mono font-semibold text-ink dark:bg-paper-2 dark:text-green">
                               {worker.access_code}
                               <CopyButton value={worker.access_code} />
                             </span>
@@ -357,7 +357,7 @@ export default async function TeamPage() {
                         </p>
                       </div>
                       <div className="flex flex-wrap items-center gap-2">
-                        <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                        <span className="text-xs font-semibold text-orange dark:text-green">
                           Disponible
                         </span>
                         <WorkerConnectionQrButton
@@ -388,7 +388,7 @@ export default async function TeamPage() {
           {siteWorkers.map((worker) => (
             <div
               key={worker.id}
-              className="rounded-2xl border border-zinc-200 p-4 dark:border-zinc-700"
+              className="rounded border border-zinc-200 p-4 dark:border-zinc-700"
             >
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div className="flex-1">
@@ -397,7 +397,7 @@ export default async function TeamPage() {
                       {worker.name}
                     </p>
                     {worker.access_code && (
-                      <span className="inline-flex items-center gap-1 rounded-md bg-emerald-100 px-2 py-0.5 text-xs font-mono font-semibold text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">
+                      <span className="inline-flex items-center gap-1 rounded-md bg-paper-2 px-2 py-0.5 text-xs font-mono font-semibold text-ink dark:bg-paper-2 dark:text-green">
                         {worker.access_code}
                         <CopyButton value={worker.access_code} />
                       </span>

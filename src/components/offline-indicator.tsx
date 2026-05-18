@@ -80,7 +80,7 @@ export function OfflineIndicator() {
 
   return (
     <div
-      className={`fixed bottom-4 right-4 z-50 rounded-lg border px-4 py-3 shadow-lg transition-all ${
+      className={`fixed bottom-4 right-4 z-50 rounded-lg border px-4 py-3 transition-all ${
         isOnline
           ? hasHighPriority
             ? 'border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-950/50'

@@ -58,7 +58,7 @@ export function TasksTab({ siteId }: Props) {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="h-6 w-6 animate-spin rounded-full border-2 border-zinc-300 border-t-emerald-600"></div>
+        <div className="h-6 w-6 animate-spin rounded-full border-2 border-zinc-300 border-t-orange"></div>
       </div>
     );
   }
@@ -131,7 +131,7 @@ export function TasksTab({ siteId }: Props) {
                       </p>
                     )}
                   </div>
-                  <CheckCircle2 className="h-5 w-5 text-emerald-500 flex-shrink-0 ml-2" />
+                  <CheckCircle2 className="h-5 w-5 text-orange flex-shrink-0 ml-2" />
                 </div>
               </button>
             ))}

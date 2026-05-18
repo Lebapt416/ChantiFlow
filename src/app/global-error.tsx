@@ -48,7 +48,7 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
     <html lang="fr">
       <body>
         <div className="flex min-h-screen flex-col items-center justify-center bg-zinc-50 px-4 dark:bg-zinc-900">
-          <div className="w-full max-w-md space-y-6 rounded-2xl border border-zinc-200 bg-white p-8 shadow-lg dark:border-zinc-800 dark:bg-zinc-950">
+          <div className="w-full max-w-md space-y-6 rounded border border-zinc-200 bg-white p-8 dark:border-zinc-800 dark:bg-zinc-950">
             <div className="flex items-center gap-3">
               <div className="flex h-12 w-12 items-center justify-center rounded-full bg-rose-100 dark:bg-rose-900/30">
                 <span className="text-2xl">⚠️</span>
@@ -82,7 +82,7 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
             <div className="flex gap-3">
               <button
                 onClick={reset}
-                className="flex-1 rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 dark:bg-emerald-500 dark:hover:bg-emerald-600"
+                className="flex-1 rounded-lg bg-orange px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-orange-dark focus:outline-none focus:ring-2 focus:ring-orange focus:ring-offset-2 dark:bg-paper-20 dark:hover:bg-orange"
               >
                 Réessayer
               </button>

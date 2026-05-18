@@ -31,7 +31,7 @@ export default async function QrHubPage() {
       userEmail={user.email}
       primarySite={sites?.[0] ?? null}
     >
-      <section className="rounded-3xl border border-zinc-100 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+      <section className="rounded border border-zinc-100 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
         <div className="mb-4 flex items-center justify-between">
           <div>
             <h2 className="text-lg font-semibold text-zinc-900 dark:text-white">
@@ -50,7 +50,7 @@ export default async function QrHubPage() {
                 className="flex items-center justify-between gap-4 rounded-lg border border-zinc-200 bg-white p-4 transition hover:border-zinc-300 hover:shadow-sm dark:border-zinc-700 dark:bg-zinc-900 dark:hover:border-zinc-600"
               >
                 <div className="flex items-center gap-3 flex-1 min-w-0">
-                  <QrCode className="h-5 w-5 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
+                  <QrCode className="h-5 w-5 text-orange dark:text-green flex-shrink-0" />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold text-zinc-900 dark:text-white truncate">
                       {site.name}
@@ -64,7 +64,7 @@ export default async function QrHubPage() {
                 </div>
                 <Link
                   href={`/qr/${site.id}/view`}
-                  className="flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-xs font-semibold text-white transition hover:bg-emerald-700 active:scale-95 shadow-sm hover:shadow-md whitespace-nowrap flex-shrink-0"
+                  className="flex items-center gap-2 rounded-lg bg-orange px-4 py-2 text-xs font-semibold text-white transition hover:bg-orange-dark active:scale-95 shadow-sm hover:shadow-md whitespace-nowrap flex-shrink-0"
                 >
                   <QrCode className="h-4 w-4" />
                   <span>Voir QR code</span>

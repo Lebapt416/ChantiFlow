@@ -141,7 +141,7 @@ export default function JoinTeamPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 p-6 text-white flex items-center justify-center">
       <div className="w-full max-w-md">
-        <div className="rounded-3xl border border-zinc-700/50 bg-zinc-800/90 p-8 backdrop-blur shadow-2xl">
+        <div className="rounded border border-zinc-700/50 bg-zinc-800/90 p-8  ">
           <h1 className="text-3xl font-bold text-center mb-2 text-zinc-100">
             Rejoindre l&apos;équipe
           </h1>
@@ -150,7 +150,7 @@ export default function JoinTeamPage() {
           </p>
 
           {success ? (
-            <div className="rounded-lg bg-emerald-900/30 p-4 text-sm text-emerald-300 text-center">
+            <div className="rounded-lg bg-paper-2 p-4 text-sm text-green text-center">
               <p className="font-semibold mb-2">✅ Inscription réussie !</p>
               <p>Vous allez être redirigé vers la page équipe...</p>
             </div>
@@ -166,7 +166,7 @@ export default function JoinTeamPage() {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Jean Dupont"
-                  className="w-full rounded-lg border-2 border-emerald-500/50 bg-zinc-900/50 px-4 py-3 text-zinc-100 placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors"
+                  className="w-full rounded-lg border-2 border-orange bg-ink px-4 py-3 text-zinc-100 placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-orange focus:border-orange transition-colors"
                   required
                   autoFocus
                 />
@@ -182,7 +182,7 @@ export default function JoinTeamPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="jean.dupont@example.com"
-                  className="w-full rounded-lg border border-zinc-600 bg-zinc-900/50 px-4 py-3 text-zinc-100 placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors"
+                  className="w-full rounded-lg border border-zinc-600 bg-ink px-4 py-3 text-zinc-100 placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-orange focus:border-orange transition-colors"
                 />
               </div>
 
@@ -196,7 +196,7 @@ export default function JoinTeamPage() {
                   value={role}
                   onChange={(e) => setRole(e.target.value)}
                   placeholder="Chef d'équipe"
-                  className="w-full rounded-lg border border-zinc-600 bg-zinc-900/50 px-4 py-3 text-zinc-100 placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors"
+                  className="w-full rounded-lg border border-zinc-600 bg-ink px-4 py-3 text-zinc-100 placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-orange focus:border-orange transition-colors"
                 />
               </div>
 
@@ -215,7 +215,7 @@ export default function JoinTeamPage() {
               <button
                 type="submit"
                 disabled={isPending || !name.trim()}
-                className="w-full rounded-lg bg-emerald-600 px-6 py-3 text-base font-semibold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-70 shadow-lg shadow-emerald-600/20"
+                className="w-full rounded-lg bg-orange px-6 py-3 text-base font-semibold text-white transition hover:bg-orange-dark disabled:cursor-not-allowed disabled:opacity-70 shadow-orange/20"
               >
                 {isPending ? 'Ajout en cours...' : 'Rejoindre l&apos;équipe'}
               </button>

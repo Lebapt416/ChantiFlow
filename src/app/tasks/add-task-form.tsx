@@ -40,7 +40,7 @@ export function AddTaskForm({ sites }: Props) {
 
   if (sites.length === 0) {
     return (
-      <div className="rounded-2xl border border-dashed border-zinc-200 p-6 text-center text-sm text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">
+      <div className="rounded border border-dashed border-zinc-200 p-6 text-center text-sm text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">
         Créez d&apos;abord un chantier pour ajouter des tâches.
       </div>
     );
@@ -50,7 +50,7 @@ export function AddTaskForm({ sites }: Props) {
     <form
       id="add-task-form"
       action={formAction}
-      className="grid gap-4 rounded-2xl border border-zinc-100 bg-white p-6 shadow-lg shadow-black/5 md:grid-cols-2 dark:border-zinc-800 dark:bg-zinc-900"
+      className="grid gap-4 rounded border border-zinc-100 bg-white p-6 shadow-black/5 md:grid-cols-2 dark:border-zinc-800 dark:bg-zinc-900"
     >
       <div className="space-y-2">
         <label
@@ -124,7 +124,7 @@ export function AddTaskForm({ sites }: Props) {
         <p className="md:col-span-2 text-sm text-rose-400">{state.error}</p>
       ) : null}
       {state?.success ? (
-        <p className="md:col-span-2 text-sm text-emerald-400">Tâche ajoutée.</p>
+        <p className="md:col-span-2 text-sm text-green">Tâche ajoutée.</p>
       ) : null}
     </form>
   );

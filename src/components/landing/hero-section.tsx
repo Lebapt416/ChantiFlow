@@ -12,12 +12,12 @@ function ProductScreenshot() {
     return (
       <div className="flex items-center justify-center h-full p-8">
         <div className="text-center">
-          <div className="w-24 h-24 mx-auto mb-4 rounded-lg bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center">
-            <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="w-24 h-24 mx-auto mb-4 rounded bg-orange flex items-center justify-center">
+            <svg className="w-12 h-12 text-paper" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
             </svg>
           </div>
-          <p className="text-sm text-zinc-500 dark:text-zinc-400">Capture d&apos;écran du planning</p>
+          <p className="text-sm text-ink-3">Capture d&apos;écran du planning</p>
         </div>
       </div>
     );
@@ -68,7 +68,7 @@ export function HeroSection() {
   if (!mounted) {
     return (
       <>
-        <header className="sticky top-0 z-50 border-b border-zinc-200/50 bg-white/80 backdrop-blur-md dark:border-zinc-800/50 dark:bg-zinc-950/80">
+        <header className="sticky top-0 z-50 border-b border-rule-soft bg-paper">
           <div className="mx-auto max-w-7xl px-6 py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -80,20 +80,20 @@ export function HeroSection() {
                   priority
                   className="h-10 w-10"
                 />
-                <span className="text-xl font-bold text-zinc-900 dark:text-white">
+                <span className="text-xl font-bold text-ink">
                   ChantiFlow
                 </span>
               </div>
               <nav className="flex items-center gap-6">
                 <Link
                   href="/login"
-                  className="text-sm font-medium text-zinc-600 transition hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
+                  className="text-sm font-medium text-ink-2 transition hover:text-ink"
                 >
                   Connexion
                 </Link>
                 <Link
                   href="/login"
-                  className="rounded-full bg-black px-5 py-2 text-sm font-semibold text-white transition hover:bg-zinc-800 dark:bg-white dark:text-black dark:hover:bg-zinc-200"
+                  className="rounded bg-ink px-5 py-2 text-sm font-semibold text-paper transition hover:bg-rule"
                 >
                   Commencer
                 </Link>
@@ -103,42 +103,34 @@ export function HeroSection() {
         </header>
 
         <section className="relative mx-auto max-w-7xl px-6 py-20 overflow-hidden">
-          <div className="absolute inset-0 -z-10 overflow-hidden">
-            <div className="absolute left-1/4 top-1/4 w-[600px] h-[600px] bg-emerald-500/20 dark:bg-emerald-400/20 rounded-full blur-3xl" />
-            <div className="absolute right-1/4 top-1/3 w-[500px] h-[500px] bg-blue-500/20 dark:bg-blue-400/20 rounded-full blur-3xl" />
-            <div className="absolute left-1/2 bottom-1/4 w-[550px] h-[550px] bg-purple-500/20 dark:bg-purple-400/20 rounded-full blur-3xl" />
-          </div>
-
           <div className="mx-auto max-w-4xl text-center">
-            <span className="inline-block rounded-full bg-emerald-100 dark:bg-emerald-900/30 px-4 py-1.5 text-sm font-semibold text-emerald-700 dark:text-emerald-400 border border-emerald-200/50 dark:border-emerald-800/50">
+            <span className="inline-block rounded bg-paper-2 px-4 py-1.5 text-sm font-semibold text-ink border border-rule-soft">
               Logiciel de gestion BTP
             </span>
-            <h1 className="relative mt-6 text-5xl font-extrabold tracking-tight sm:text-6xl lg:text-7xl">
-              <span className="bg-gradient-to-r from-emerald-600 via-emerald-500 to-cyan-500 bg-clip-text text-transparent dark:from-emerald-400 dark:via-emerald-300 dark:to-cyan-400">
-                Fini les retards de chantier.
-              </span>
+            <h1 className="relative mt-6 text-5xl font-extrabold tracking-tight sm:text-6xl lg:text-7xl text-ink">
+              Fini les retards de chantier.
             </h1>
-            <p className="mt-6 text-xl leading-8 text-zinc-700 dark:text-zinc-300 max-w-2xl mx-auto font-medium">
+            <p className="mt-6 text-xl leading-8 text-ink-2 max-w-2xl mx-auto font-medium">
               Le seul planning qui se met à jour tout seul quand une tâche prend du retard. Plus d&apos;appels le soir, plus de papier.
             </p>
             <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link
                 href="/login"
-                className="group relative overflow-hidden rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-500 px-8 py-4 text-lg font-bold text-white shadow-lg shadow-emerald-500/25 transition-all duration-300 hover:scale-105 hover:shadow-emerald-500/40 hover:from-emerald-500 hover:to-emerald-400 backdrop-blur-md border border-white/20 will-change-transform"
+                className="rounded bg-orange px-8 py-4 text-lg font-bold text-paper transition-colors duration-200 hover:bg-orange-dark"
               >
-                <span className="relative">Lancer mon 1er chantier</span>
+                Lancer mon 1er chantier
               </Link>
-            <Link
-              href="/contact"
-              className="group relative overflow-hidden rounded-xl border-2 border-white/20 dark:border-zinc-700/50 bg-white/30 dark:bg-zinc-900/30 backdrop-blur-md px-8 py-4 text-lg font-semibold text-zinc-900 dark:text-white shadow-lg transition-all duration-300 hover:scale-105 hover:bg-white/40 dark:hover:bg-zinc-800/40 hover:border-white/30 will-change-transform"
-            >
-              <span className="relative">Nous contacter</span>
-            </Link>
+              <Link
+                href="/contact"
+                className="rounded border border-rule px-8 py-4 text-lg font-semibold text-ink transition-colors duration-200 hover:bg-paper-2"
+              >
+                Nous contacter
+              </Link>
             </div>
             <div className="mt-16 relative">
-              <div className="relative mx-auto max-w-6xl rounded-2xl border border-white/20 dark:border-zinc-800/50 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md shadow-2xl shadow-emerald-500/20 overflow-hidden">
+              <div className="relative mx-auto max-w-6xl rounded border border-rule bg-paper overflow-hidden">
                 <div
-                  className="relative bg-zinc-100 dark:bg-zinc-950"
+                  className="relative bg-paper-2"
                   style={{
                     aspectRatio: "1353 / 768",
                     minHeight: "400px",
@@ -156,7 +148,7 @@ export function HeroSection() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 border-b border-zinc-200/50 bg-white/80 backdrop-blur-md dark:border-zinc-800/50 dark:bg-zinc-950/80">
+      <header className="sticky top-0 z-50 border-b border-rule-soft bg-paper">
         <div className="mx-auto max-w-7xl px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -168,20 +160,20 @@ export function HeroSection() {
                 priority
                 className="h-10 w-10"
               />
-              <span className="text-xl font-bold text-zinc-900 dark:text-white">
+              <span className="text-xl font-bold text-ink">
                 ChantiFlow
               </span>
             </div>
             <nav className="flex items-center gap-6">
               <Link
                 href="/login"
-                className="text-sm font-medium text-zinc-600 transition hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
+                className="text-sm font-medium text-ink-2 transition hover:text-ink"
               >
                 Connexion
               </Link>
               <Link
                 href="/login"
-                className="rounded-full bg-black px-5 py-2 text-sm font-semibold text-white transition hover:bg-zinc-800 dark:bg-white dark:text-black dark:hover:bg-zinc-200"
+                className="rounded bg-ink px-5 py-2 text-sm font-semibold text-paper transition hover:bg-rule"
               >
                 Commencer
               </Link>
@@ -191,49 +183,6 @@ export function HeroSection() {
       </header>
 
       <section className="relative mx-auto max-w-7xl px-6 py-20 overflow-hidden">
-        {/* Fond animé avec cercles colorés */}
-        <div className="absolute inset-0 -z-10 overflow-hidden">
-          <motion.div
-            className="absolute left-1/4 top-1/4 w-[600px] h-[600px] bg-emerald-500/20 dark:bg-emerald-400/20 rounded-full blur-3xl"
-            animate={{
-              x: [0, 100, 0],
-              y: [0, 50, 0],
-              scale: [1, 1.2, 1],
-            }}
-            transition={{
-              duration: 20,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
-          />
-          <motion.div
-            className="absolute right-1/4 top-1/3 w-[500px] h-[500px] bg-blue-500/20 dark:bg-blue-400/20 rounded-full blur-3xl"
-            animate={{
-              x: [0, -80, 0],
-              y: [0, 80, 0],
-              scale: [1, 1.1, 1],
-            }}
-            transition={{
-              duration: 25,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
-          />
-          <motion.div
-            className="absolute left-1/2 bottom-1/4 w-[550px] h-[550px] bg-purple-500/20 dark:bg-purple-400/20 rounded-full blur-3xl"
-            animate={{
-              x: [0, 60, 0],
-              y: [0, -60, 0],
-              scale: [1, 1.15, 1],
-            }}
-            transition={{
-              duration: 22,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
-          />
-        </div>
-
         <motion.div
           className="mx-auto max-w-4xl text-center"
           variants={containerVariants}
@@ -242,29 +191,27 @@ export function HeroSection() {
         >
           {/* Badge */}
           <motion.div variants={itemVariants}>
-            <span className="inline-block rounded-full bg-emerald-100 dark:bg-emerald-900/30 px-4 py-1.5 text-sm font-semibold text-emerald-700 dark:text-emerald-400 border border-emerald-200/50 dark:border-emerald-800/50">
+            <span className="inline-block rounded bg-paper-2 px-4 py-1.5 text-sm font-semibold text-ink border border-rule-soft">
               Logiciel de gestion BTP
             </span>
           </motion.div>
 
-          {/* Titre avec gradient agressif */}
+          {/* Titre */}
           <motion.h1
             variants={itemVariants}
-            className="relative mt-6 text-5xl font-extrabold tracking-tight sm:text-6xl lg:text-7xl"
+            className="relative mt-6 text-5xl font-extrabold tracking-tight sm:text-6xl lg:text-7xl text-ink"
           >
-            <span className="bg-gradient-to-r from-emerald-600 via-emerald-500 to-cyan-500 bg-clip-text text-transparent dark:from-emerald-400 dark:via-emerald-300 dark:to-cyan-400">
-              Fini les retards de chantier.
-            </span>
+            Fini les retards de chantier.
           </motion.h1>
 
           {/* Sous-titre */}
           <motion.p
             variants={itemVariants}
-            className="mt-6 text-xl leading-8 text-zinc-700 dark:text-zinc-300 max-w-2xl mx-auto font-medium"
+            className="mt-6 text-xl leading-8 text-ink-2 max-w-2xl mx-auto font-medium"
           >
             Le seul planning qui se met à jour tout seul quand une tâche prend du retard. Plus d&apos;appels le soir, plus de papier.
           </motion.p>
-          
+
           {/* Boutons */}
           <motion.div
             variants={itemVariants}
@@ -272,41 +219,26 @@ export function HeroSection() {
           >
             <Link
               href="/login"
-              className="group relative overflow-hidden rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-500 px-8 py-4 text-lg font-bold text-white shadow-lg shadow-emerald-500/25 transition-all duration-300 hover:scale-105 hover:shadow-emerald-500/40 hover:from-emerald-500 hover:to-emerald-400 backdrop-blur-md border border-white/20 will-change-transform"
+              className="rounded bg-orange px-8 py-4 text-lg font-bold text-paper transition-colors duration-200 hover:bg-orange-dark"
             >
-              <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-1000 group-hover:translate-x-full" />
               <span className="relative">Lancer mon 1er chantier</span>
             </Link>
-              <Link
-                href="/contact"
-                className="group relative overflow-hidden rounded-xl border-2 border-white/20 dark:border-zinc-700/50 bg-white/30 dark:bg-zinc-900/30 backdrop-blur-md px-8 py-4 text-lg font-semibold text-zinc-900 dark:text-white shadow-lg transition-all duration-300 hover:scale-105 hover:bg-white/40 dark:hover:bg-zinc-800/40 hover:border-white/30 will-change-transform"
-              >
-                <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/10 to-transparent transition-transform duration-1000 group-hover:translate-x-full" />
-                <span className="relative">Nous contacter</span>
-              </Link>
+            <Link
+              href="/contact"
+              className="rounded border border-rule px-8 py-4 text-lg font-semibold text-ink transition-colors duration-200 hover:bg-paper-2"
+            >
+              <span className="relative">Nous contacter</span>
+            </Link>
           </motion.div>
 
-          {/* Product screenshot avec rotation 3D */}
+          {/* Product screenshot */}
           <motion.div
             variants={itemVariants}
             className="mt-16 relative"
-            whileHover={{ scale: 1.02 }}
-            transition={{ type: "spring", stiffness: 300, damping: 30 }}
           >
-            <motion.div
-              className="relative mx-auto max-w-6xl rounded-2xl border border-white/20 dark:border-zinc-800/50 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md shadow-2xl shadow-emerald-500/20 overflow-hidden"
-              style={{
-                perspective: "1000px",
-                transformStyle: "preserve-3d",
-              }}
-              whileHover={{
-                rotateY: 2,
-                rotateX: -2,
-              }}
-              transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            >
+            <div className="relative mx-auto max-w-6xl rounded border border-rule bg-paper overflow-hidden">
               <div
-                className="relative bg-zinc-100 dark:bg-zinc-950"
+                className="relative bg-paper-2"
                 style={{
                   aspectRatio: "1353 / 768",
                   minHeight: "400px",
@@ -314,12 +246,10 @@ export function HeroSection() {
               >
                 <ProductScreenshot />
               </div>
-            </motion.div>
+            </div>
           </motion.div>
         </motion.div>
       </section>
     </>
   );
 }
-
-

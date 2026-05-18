@@ -52,7 +52,7 @@ export function AddWorkerForm({ siteId, availableWorkers }: Props) {
     <form
       id="add-worker-form"
       action={formAction}
-      className="space-y-4 rounded-2xl border border-zinc-100 bg-white p-6 shadow-lg shadow-black/5 dark:border-zinc-800 dark:bg-zinc-900"
+      className="space-y-4 rounded border border-zinc-100 bg-white p-6 shadow-black/5 dark:border-zinc-800 dark:bg-zinc-900"
     >
       <input type="hidden" name="siteId" value={siteId} />
       
@@ -161,7 +161,7 @@ export function AddWorkerForm({ siteId, availableWorkers }: Props) {
         <p className="text-sm text-rose-400">{state.error}</p>
       ) : null}
       {state?.success ? (
-        <p className="text-sm text-emerald-400">
+        <p className="text-sm text-green">
           Employé ajouté au chantier.
         </p>
       ) : null}

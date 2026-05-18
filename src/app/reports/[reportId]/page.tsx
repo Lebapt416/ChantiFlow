@@ -88,7 +88,7 @@ export default async function ReportDetailPage({ params }: Params) {
         </Link>
 
         {/* Carte principale */}
-        <div className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="rounded border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
           {/* En-tête avec statut */}
           <div className="mb-6 flex items-start justify-between">
             <div className="flex-1">
@@ -97,7 +97,7 @@ export default async function ReportDetailPage({ params }: Params) {
                   {task.title}
                 </h1>
                 {isTaskDone && (
-                  <div className="flex items-center gap-2 rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">
+                  <div className="flex items-center gap-2 rounded-full bg-orange px-3 py-1 text-xs font-semibold text-orange dark:bg-orange/30 dark:text-orange">
                     <CheckCircle2 className="h-3.5 w-3.5" />
                     Tâche terminée
                   </div>

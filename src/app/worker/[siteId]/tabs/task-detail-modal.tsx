@@ -101,8 +101,8 @@ export function TaskDetailModal({ taskId, siteId, isOpen, onClose }: Props) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-      <div className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl border border-zinc-200 bg-white shadow-xl dark:border-zinc-800 dark:bg-zinc-900">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 ">
+      <div className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded border border-zinc-200 bg-white  dark:border-zinc-800 dark:bg-zinc-900">
         {/* Header */}
         <div className="sticky top-0 z-10 flex items-center justify-between border-b border-zinc-200 bg-white px-4 py-3 dark:border-zinc-800 dark:bg-zinc-900">
           <h2 className="text-lg font-semibold text-zinc-900 dark:text-white">
@@ -120,7 +120,7 @@ export function TaskDetailModal({ taskId, siteId, isOpen, onClose }: Props) {
         <div className="p-4 sm:p-6 space-y-6">
           {isLoading ? (
             <div className="flex items-center justify-center py-12">
-              <div className="h-6 w-6 animate-spin rounded-full border-2 border-zinc-300 border-t-emerald-600"></div>
+              <div className="h-6 w-6 animate-spin rounded-full border-2 border-zinc-300 border-t-orange"></div>
             </div>
           ) : detail ? (
             <>
@@ -131,7 +131,7 @@ export function TaskDetailModal({ taskId, siteId, isOpen, onClose }: Props) {
                 </h3>
                 <div className="flex items-center gap-2">
                   {detail.task.status === 'done' ? (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">
+                    <span className="inline-flex items-center gap-1 rounded-full bg-orange px-2.5 py-1 text-xs font-semibold text-orange dark:bg-orange/30 dark:text-orange">
                       <CheckCircle2 className="h-3 w-3" />
                       Terminée
                     </span>
@@ -151,14 +151,14 @@ export function TaskDetailModal({ taskId, siteId, isOpen, onClose }: Props) {
 
               {/* Description IA */}
               {detail.aiDescription && (
-                <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 dark:border-emerald-900/60 dark:bg-emerald-900/20">
+                <div className="rounded-xl border border-orange bg-orange p-4 dark:border-orange/60 dark:bg-orange/20">
                   <div className="flex items-center gap-2 mb-2">
-                    <Sparkles className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-                    <h4 className="text-sm font-semibold text-emerald-900 dark:text-emerald-200">
+                    <Sparkles className="h-4 w-4 text-orange dark:text-orange" />
+                    <h4 className="text-sm font-semibold text-orange dark:text-orange">
                       Description générée par l&apos;IA
                     </h4>
                   </div>
-                  <p className="text-sm text-emerald-800 dark:text-emerald-300 leading-relaxed">
+                  <p className="text-sm text-orange dark:text-orange leading-relaxed">
                     {detail.aiDescription}
                   </p>
                 </div>

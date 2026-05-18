@@ -152,7 +152,7 @@ export default async function SiteReportsPage({ params }: Params) {
     >
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Colonne Rapports en attente */}
-        <section className="rounded-3xl border border-zinc-100 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+        <section className="rounded border border-zinc-100 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
           <div className="mb-4">
             <h2 className="text-lg font-semibold text-zinc-900 dark:text-white">
               Rapports en attente
@@ -173,7 +173,7 @@ export default async function SiteReportsPage({ params }: Params) {
         </section>
 
         {/* Colonne Rapports validés */}
-        <section className="rounded-3xl border border-zinc-100 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+        <section className="rounded border border-zinc-100 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
           <div className="mb-4">
             <h2 className="text-lg font-semibold text-zinc-900 dark:text-white">
               Rapports validés

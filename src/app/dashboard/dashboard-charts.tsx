@@ -38,7 +38,7 @@ export function DashboardCharts({
 
   return (
     <>
-      <div className="rounded-3xl border border-zinc-100 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+      <div className="rounded border border-zinc-100 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
         <h2 className="text-lg font-semibold text-zinc-900 dark:text-white">
           Prochaines deadlines
         </h2>
@@ -47,7 +47,7 @@ export function DashboardCharts({
             nextDeadlines.map((site) => (
               <li
                 key={site.id}
-                className="rounded-2xl border border-zinc-200 px-4 py-3 dark:border-zinc-700"
+                className="rounded border border-zinc-200 px-4 py-3 dark:border-zinc-700"
               >
                 <p className="text-sm font-semibold text-zinc-900 dark:text-white">
                   {site.name}
@@ -64,14 +64,14 @@ export function DashboardCharts({
               </li>
             ))
           ) : (
-            <li className="rounded-2xl border border-dashed border-zinc-200 px-4 py-3 text-sm text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">
+            <li className="rounded border border-dashed border-zinc-200 px-4 py-3 text-sm text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">
               Pas encore de date prévue.
             </li>
           )}
         </ul>
       </div>
 
-      <div className="rounded-3xl border border-zinc-100 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+      <div className="rounded border border-zinc-100 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
         <h2 className="mb-4 text-lg font-semibold text-zinc-900 dark:text-white">
           Répartition des tâches
         </h2>
@@ -79,7 +79,7 @@ export function DashboardCharts({
       </div>
 
       {sites.length > 0 && (
-        <div className="rounded-3xl border border-zinc-100 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="rounded border border-zinc-100 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-lg font-semibold text-zinc-900 dark:text-white">
               Chantiers actifs

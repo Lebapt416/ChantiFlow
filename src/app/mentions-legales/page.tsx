@@ -13,7 +13,7 @@ export default function MentionsLegalesPage() {
         <div className="mb-8">
           <Link
             href="/"
-            className="text-sm text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300"
+            className="text-sm text-orange hover:text-ink dark:text-green dark:hover:text-green"
           >
             ← Retour à l&apos;accueil
           </Link>
@@ -23,13 +23,13 @@ export default function MentionsLegalesPage() {
           Mentions légales
         </h1>
 
-        <div className="mb-6 rounded-xl border border-amber-300 bg-amber-50 px-5 py-4 dark:border-amber-600 dark:bg-amber-950">
+        <div className="mb-6 rounded border border-amber-300 bg-amber-50 px-5 py-4 dark:border-amber-600 dark:bg-amber-950">
           <p className="font-semibold text-amber-800 dark:text-amber-300">
             ⚠️ ChantiFlow est actuellement en phase de pré-lancement. Aucune offre commerciale n&apos;est disponible. Aucune transaction n&apos;est traitée.
           </p>
         </div>
 
-        <div className="space-y-8 rounded-3xl border border-zinc-200 bg-white p-8 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="space-y-8 rounded border border-zinc-200 bg-white p-8 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
           <section>
             <h2 className="mb-4 text-2xl font-semibold text-zinc-900 dark:text-white">
               1. Éditeur du site
@@ -48,7 +48,7 @@ export default function MentionsLegalesPage() {
                 <strong className="text-zinc-900 dark:text-white">Email :</strong>{' '}
                 <a
                   href="mailto:chantiflowct@gmail.com"
-                  className="text-emerald-600 hover:underline dark:text-emerald-400"
+                  className="text-orange hover:underline dark:text-green"
                 >
                   chantiflowct@gmail.com
                 </a>
@@ -85,7 +85,7 @@ export default function MentionsLegalesPage() {
                   href="https://vercel.com"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-emerald-600 hover:underline dark:text-emerald-400"
+                  className="text-orange hover:underline dark:text-green"
                 >
                   vercel.com
                 </a>
@@ -125,7 +125,7 @@ export default function MentionsLegalesPage() {
                 Pour exercer ces droits, vous pouvez nous contacter à l&apos;adresse{' '}
                 <a
                   href="mailto:contact@chantiflow.com"
-                  className="text-emerald-600 hover:underline dark:text-emerald-400"
+                  className="text-orange hover:underline dark:text-green"
                 >
                   contact@chantiflow.com
                 </a>
@@ -135,14 +135,14 @@ export default function MentionsLegalesPage() {
                 Pour plus d&apos;informations, consultez notre{' '}
                 <Link
                   href="/rgpd"
-                  className="text-emerald-600 hover:underline dark:text-emerald-400"
+                  className="text-orange hover:underline dark:text-green"
                 >
                   page dédiée au RGPD
                 </Link>
                 {' '}et notre{' '}
                 <Link
                   href="/politique-confidentialite"
-                  className="text-emerald-600 hover:underline dark:text-emerald-400"
+                  className="text-orange hover:underline dark:text-green"
                 >
                   politique de confidentialité
                 </Link>
@@ -209,7 +209,7 @@ export default function MentionsLegalesPage() {
               Pour toute question relative aux présentes mentions légales, vous pouvez nous contacter à l&apos;adresse{' '}
               <a
                 href="mailto:contact@chantiflow.com"
-                className="text-emerald-600 hover:underline dark:text-emerald-400"
+                className="text-orange hover:underline dark:text-green"
               >
                 contact@chantiflow.com
               </a>

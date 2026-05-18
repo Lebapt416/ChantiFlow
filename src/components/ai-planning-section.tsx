@@ -77,18 +77,18 @@ export function AIPlanningSection({ sites }: Props) {
   return (
     <div className="space-y-6">
       {/* Sélection du chantier */}
-      <section className="rounded-2xl border border-zinc-100 bg-white p-6 shadow-lg shadow-black/5 dark:border-zinc-800 dark:bg-zinc-900">
-        <h2 className="text-lg font-semibold text-zinc-900 dark:text-white">
+      <section className="rounded border border-rule-soft bg-paper p-6">
+        <h2 className="text-lg font-semibold text-ink">
           Sélectionner un chantier
         </h2>
-        <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+        <p className="mt-1 text-sm text-ink-3">
           Choisissez le chantier pour lequel vous souhaitez générer un planning optimisé
         </p>
         <div className="mt-4">
           <select
             value={selectedSiteId}
             onChange={(e) => setSelectedSiteId(e.target.value)}
-            className="w-full rounded-lg border border-zinc-200 bg-white px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black/60 dark:border-zinc-700 dark:bg-zinc-950 dark:text-white"
+            className="w-full rounded border border-rule-soft bg-paper px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange text-ink"
           >
             <option value="">-- Sélectionner un chantier --</option>
             {sites.map((site) => (
@@ -102,7 +102,7 @@ export function AIPlanningSection({ sites }: Props) {
           type="button"
           onClick={handleGenerate}
           disabled={isPending || !selectedSiteId}
-          className="mt-4 flex items-center gap-2 rounded-full bg-emerald-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-emerald-500 dark:hover:bg-emerald-600"
+          className="mt-4 flex items-center gap-2 rounded bg-orange px-6 py-3 text-sm font-semibold text-paper transition hover:bg-orange-dark disabled:cursor-not-allowed disabled:opacity-50"
         >
           {isPending ? (
             <>
@@ -120,7 +120,7 @@ export function AIPlanningSection({ sites }: Props) {
 
       {/* Résultats */}
       {error && (
-        <div className="rounded-xl border border-rose-200 bg-rose-50 p-4 dark:border-rose-900/60 dark:bg-rose-900/20">
+        <div className="rounded border border-rose-200 bg-rose-50 p-4 dark:border-rose-900/60 dark:bg-rose-900/20">
           <div className="flex items-start gap-3">
             <AlertCircle className="h-5 w-5 text-rose-600 dark:text-rose-400" />
             <div>
@@ -138,14 +138,14 @@ export function AIPlanningSection({ sites }: Props) {
           {/* Raisonnement de l'IA */}
           {result.reasoning && (
             <section
-              className={`rounded-2xl border p-6 ${
+              className={`rounded border p-6 ${
                 result.reasoning.includes('algorithme de base') ||
                 result.reasoning.includes('Erreur lors de l\'appel Gemini') ||
                 result.reasoning.includes('Gemini non disponible')
                   ? result.reasoning.includes('429') || result.reasoning.includes('Quota')
                     ? 'border-amber-200 bg-amber-50 dark:border-amber-900/60 dark:bg-amber-900/20'
                     : 'border-blue-200 bg-blue-50 dark:border-blue-900/60 dark:bg-blue-900/20'
-                  : 'border-emerald-200 bg-emerald-50 dark:border-emerald-900/60 dark:bg-emerald-900/20'
+                  : 'border-rule-soft bg-paper-2'
               }`}
             >
               <div className="flex items-start gap-3">
@@ -156,7 +156,7 @@ export function AIPlanningSection({ sites }: Props) {
                       ? result.reasoning.includes('429') || result.reasoning.includes('Quota')
                         ? 'text-amber-600 dark:text-amber-400'
                         : 'text-blue-600 dark:text-blue-400'
-                      : 'text-emerald-600 dark:text-emerald-400'
+                      : 'text-green'
                   }`}
                 />
                 <div className="flex-1">
@@ -165,9 +165,9 @@ export function AIPlanningSection({ sites }: Props) {
                       result.reasoning.includes('algorithme de base') ||
                       result.reasoning.includes('Erreur lors de l\'appel OpenAI')
                         ? result.reasoning.includes('429') || result.reasoning.includes('Quota')
-                          ? 'text-amber-900 dark:text-amber-100'
-                          : 'text-blue-900 dark:text-blue-100'
-                        : 'text-emerald-900 dark:text-emerald-100'
+                          ? 'text-warn'
+                          : 'text-blue'
+                        : 'text-green'
                     }`}
                   >
                     {result.reasoning.includes('429') || result.reasoning.includes('Quota')
@@ -186,7 +186,7 @@ export function AIPlanningSection({ sites }: Props) {
                         ? result.reasoning.includes('429') || result.reasoning.includes('Quota')
                           ? 'text-amber-800 dark:text-amber-200'
                           : 'text-blue-800 dark:text-blue-200'
-                        : 'text-emerald-800 dark:text-emerald-200'
+                        : 'text-green'
                     }`}
                   >
                     {result.reasoning.includes('Gemini non disponible') && !result.reasoning.includes('429')
@@ -196,7 +196,7 @@ export function AIPlanningSection({ sites }: Props) {
                   {(result.reasoning.includes('algorithme de base') ||
                     result.reasoning.includes('Erreur lors de l\'appel Gemini') ||
                     (result.reasoning.includes('Gemini non disponible') && result.reasoning.includes('429'))) && (
-                    <div className="mt-4 rounded-lg bg-white/50 p-3 text-xs dark:bg-black/20">
+                    <div className="mt-4 rounded bg-paper p-3 text-xs">
                       {result.reasoning.includes('429') || result.reasoning.includes('Quota') ? (
                         <>
                           <p className="font-semibold mb-2">⚠️ Quota Google Gemini dépassé</p>
@@ -226,9 +226,9 @@ export function AIPlanningSection({ sites }: Props) {
           )}
 
           {/* Planning généré */}
-          <section className="rounded-2xl border border-zinc-100 bg-white p-6 shadow-lg shadow-black/5 dark:border-zinc-800 dark:bg-zinc-900">
+          <section className="rounded border border-rule-soft bg-paper p-6">
             <div className="flex items-center gap-2">
-              <CheckCircle2 className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+              <CheckCircle2 className="h-5 w-5 text-green" />
               <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">
                 Planning généré ({result.orderedTasks.length} tâches)
               </h3>
@@ -238,9 +238,9 @@ export function AIPlanningSection({ sites }: Props) {
               {result.orderedTasks.map((item) => (
                 <div
                   key={item.taskId}
-                  className="flex items-start gap-4 rounded-xl border border-zinc-100 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-900"
+                  className="flex items-start gap-4 rounded border border-rule-soft bg-paper-2 p-4"
                 >
-                  <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-emerald-100 text-sm font-semibold text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400">
+                  <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded bg-paper text-sm font-semibold text-orange border border-orange">
                     {item.order}
                   </div>
                   <div className="flex-1">
@@ -290,7 +290,7 @@ export function AIPlanningSection({ sites }: Props) {
 
           {/* Avertissements */}
           {result.warnings.length > 0 && (
-            <section className="rounded-xl border border-amber-200 bg-amber-50 p-4 dark:border-amber-900/60 dark:bg-amber-900/20">
+            <section className="rounded border border-amber-200 bg-amber-50 p-4 dark:border-amber-900/60 dark:bg-amber-900/20">
               <div className="flex items-start gap-3">
                 <AlertCircle className="h-5 w-5 text-amber-600 dark:text-amber-400" />
                 <div>
@@ -312,7 +312,7 @@ export function AIPlanningSection({ sites }: Props) {
       )}
 
       {/* Info */}
-      <section className="rounded-xl border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-900">
+      <section className="rounded border border-rule-soft bg-paper-2 p-4">
         <p className="text-sm text-zinc-600 dark:text-zinc-400">
           💡 <strong>Astuce :</strong> L&apos;IA analyse vos tâches, identifie les dépendances, et
           génère un planning optimisé avec dates de début/fin et priorités. Les tâches sont

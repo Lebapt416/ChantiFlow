@@ -204,7 +204,7 @@ export default async function SitePlanningPage({ params }: Params) {
             />
             
             {/* Vue éditable détaillée (optionnelle, peut être masquée) */}
-            <details className="rounded-2xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
+            <details className="rounded border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
               <summary className="cursor-pointer text-sm font-medium text-zinc-700 dark:text-zinc-300">
                 Voir le planning détaillé (édition)
               </summary>
@@ -235,7 +235,7 @@ export default async function SitePlanningPage({ params }: Params) {
             </details>
           </div>
         ) : (
-          <div className="rounded-2xl border border-zinc-200 bg-white p-8 text-center dark:border-zinc-800 dark:bg-zinc-900">
+          <div className="rounded border border-zinc-200 bg-white p-8 text-center dark:border-zinc-800 dark:bg-zinc-900">
             <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-4">
               Aucun planning généré pour le moment.
             </p>

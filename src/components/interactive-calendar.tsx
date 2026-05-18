@@ -244,7 +244,7 @@ export function InteractiveCalendar({
 
   return (
     <>
-      <div className="rounded-2xl border border-zinc-100 bg-white p-6 shadow-lg shadow-black/5 dark:border-zinc-800 dark:bg-zinc-900">
+      <div className="rounded border border-zinc-100 bg-white p-6 shadow-black/5 dark:border-zinc-800 dark:bg-zinc-900">
         {/* Header avec navigation */}
         <div className="mb-6 flex items-center justify-between">
           <div>
@@ -293,7 +293,7 @@ export function InteractiveCalendar({
                       key={day.toISOString()}
                       className={`min-w-[120px] border-b border-r border-zinc-200 bg-zinc-50 px-3 py-3 text-center text-xs font-semibold uppercase tracking-wider last:border-r-0 dark:border-zinc-700 dark:bg-zinc-900 ${
                         isToday
-                          ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-400'
+                          ? 'bg-paper-2 text-ink dark:bg-paper-2 dark:text-green'
                           : 'text-zinc-600 dark:text-zinc-400'
                       }`}
                     >
@@ -340,7 +340,7 @@ export function InteractiveCalendar({
                           onDragOver={(e) => handleDragOver(e, worker.id, dayKey)}
                           onDrop={(e) => handleDrop(e, worker.id, dayKey)}
                           className={`min-w-[120px] border-r border-zinc-200 bg-white p-2 align-top last:border-r-0 dark:border-zinc-700 dark:bg-zinc-900 ${
-                            isToday ? 'bg-emerald-50/50 dark:bg-emerald-900/10' : ''
+                            isToday ? 'bg-paper-2/50 ' : ''
                           } ${isDragOver ? 'bg-blue-100 dark:bg-blue-900/30' : ''} ${
                             exceedsLimit ? 'bg-rose-50/50 dark:bg-rose-900/10' : ''
                           }`}
@@ -413,7 +413,7 @@ export function InteractiveCalendar({
       {/* Modal employé */}
       {selectedWorker && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-md rounded-2xl border border-zinc-200 bg-white p-6 shadow-xl dark:border-zinc-800 dark:bg-zinc-900">
+          <div className="w-full max-w-md rounded border border-zinc-200 bg-white p-6  dark:border-zinc-800 dark:bg-zinc-900">
             <div className="mb-4 flex items-center justify-between">
               <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">
                 {selectedWorker.name}
@@ -468,7 +468,7 @@ export function InteractiveCalendar({
                               </div>
                               <div className="h-1.5 rounded-full bg-zinc-200 dark:bg-zinc-800">
                                 <div
-                                  className="h-full rounded-full bg-emerald-500"
+                                  className="h-full rounded-full bg-paper-20"
                                   style={{ width: `${detail.progress || 0}%` }}
                                 />
                               </div>

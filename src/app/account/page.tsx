@@ -50,7 +50,7 @@ export default async function AccountPage() {
     >
       <div className="space-y-6">
         {/* Informations utilisateur */}
-        <section className="rounded-2xl border border-zinc-100 bg-white p-6 shadow-lg shadow-black/5 dark:border-zinc-800 dark:bg-zinc-900">
+        <section className="rounded border border-zinc-100 bg-white p-6 shadow-black/5 dark:border-zinc-800 dark:bg-zinc-900">
           <h2 className="text-lg font-semibold text-zinc-900 dark:text-white">
             Informations de connexion
           </h2>
@@ -75,10 +75,10 @@ export default async function AccountPage() {
         </section>
 
         {/* Plan actuel */}
-        <section className="rounded-2xl border border-zinc-100 bg-white p-6 shadow-lg shadow-black/5 dark:border-zinc-800 dark:bg-zinc-900">
+        <section className="rounded border border-zinc-100 bg-white p-6 shadow-black/5 dark:border-zinc-800 dark:bg-zinc-900">
           <h2 className="text-lg font-semibold text-zinc-900 dark:text-white">Plan actuel</h2>
           <div className="mt-4">
-            <div className="flex items-center justify-between rounded-xl border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-700 dark:bg-zinc-800">
+            <div className="flex items-center justify-between rounded border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-700 dark:bg-zinc-800">
               <div>
                 <p className="text-sm font-semibold text-zinc-900 dark:text-white">
                   {planNames[plan]}
@@ -108,7 +108,7 @@ export default async function AccountPage() {
         <AddOnsSection user={user} currentAddOns={addOns} plan={plan} />
 
         {/* Changer de plan */}
-        <section className="rounded-2xl border border-zinc-100 bg-white p-6 shadow-lg shadow-black/5 dark:border-zinc-800 dark:bg-zinc-900">
+        <section className="rounded border border-zinc-100 bg-white p-6 shadow-black/5 dark:border-zinc-800 dark:bg-zinc-900">
           <h2 className="text-lg font-semibold text-zinc-900 dark:text-white">Changer de plan</h2>
           <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
             Mettez à niveau votre abonnement pour accéder à plus de fonctionnalités.
@@ -119,9 +119,9 @@ export default async function AccountPage() {
               return (
                 <div
                   key={p}
-                  className={`rounded-xl border p-4 ${
+                  className={`rounded border p-4 ${
                     p === plan
-                      ? 'border-emerald-500 bg-emerald-50 dark:border-emerald-400 dark:bg-emerald-900/20'
+                      ? 'border-orange bg-paper-2 dark:border-orange dark:bg-paper-2'
                       : 'border-zinc-200 dark:border-zinc-700'
                   }`}
                 >
@@ -146,7 +146,7 @@ export default async function AccountPage() {
         </section>
 
         {/* Déconnexion */}
-        <section className="rounded-2xl border border-zinc-100 bg-white p-6 shadow-lg shadow-black/5 dark:border-zinc-800 dark:bg-zinc-900">
+        <section className="rounded border border-zinc-100 bg-white p-6 shadow-black/5 dark:border-zinc-800 dark:bg-zinc-900">
           <h2 className="text-lg font-semibold text-zinc-900 dark:text-white">Déconnexion</h2>
           <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
             Déconnectez-vous de votre compte ChantiFlow.

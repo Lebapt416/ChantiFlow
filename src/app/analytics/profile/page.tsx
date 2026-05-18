@@ -31,24 +31,24 @@ export default async function AnalyticsProfilePage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950 text-white">
       {/* Menu latéral */}
-      <aside className="fixed inset-y-0 left-0 z-20 w-16 flex-col items-center border-r border-zinc-800 bg-black/80 px-0 py-8 shadow-xl backdrop-blur flex">
+      <aside className="fixed inset-y-0 left-0 z-20 w-16 flex-col items-center border-r border-zinc-800 bg-black/80 px-0 py-8   flex">
         <nav className="flex flex-1 flex-col items-center gap-2 w-full">
           <Link
             href="/analytics"
-            className="group/item relative flex items-center justify-center w-14 h-14 rounded-xl transition-all duration-200 text-white hover:text-white"
+            className="group/item relative flex items-center justify-center w-14 h-14 rounded transition-all duration-200 text-white hover:text-white"
             title="Analytics"
           >
-            <span className="absolute rounded-xl transition-all duration-200 top-0 bottom-0 left-2 right-0 bg-black/50 group-hover/item:bg-black/70 group-hover/item:left-3"></span>
+            <span className="absolute rounded transition-all duration-200 top-0 bottom-0 left-2 right-0 bg-black/50 group-hover/item:bg-black/70 group-hover/item:left-3"></span>
             <span className="relative z-10">
               <LayoutDashboard size={26} strokeWidth={3} className="group-hover/item:scale-110 transition-transform duration-200" />
             </span>
           </Link>
           <Link
             href="/analytics/profile"
-            className="group/item relative flex items-center justify-center w-14 h-14 rounded-xl transition-all duration-200 bg-white text-black shadow-lg shadow-white/20"
+            className="group/item relative flex items-center justify-center w-14 h-14 rounded transition-all duration-200 bg-white text-black shadow-white/20"
             title="Profil"
           >
-            <span className="absolute rounded-xl transition-all duration-200 inset-0 bg-white"></span>
+            <span className="absolute rounded transition-all duration-200 inset-0 bg-white"></span>
             <span className="relative z-10">
               <User size={26} strokeWidth={3.5} />
             </span>
@@ -58,7 +58,7 @@ export default async function AnalyticsProfilePage() {
       <div className="ml-16">
         <div className="container mx-auto px-4 py-8">
           <div className="max-w-2xl mx-auto">
-            <div className="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-8 backdrop-blur">
+            <div className="rounded border border-zinc-800 bg-ink p-8 ">
               <h1 className="text-4xl font-bold mb-4">Profil Administrateur</h1>
               <div className="space-y-6">
                 <div>
@@ -67,7 +67,7 @@ export default async function AnalyticsProfilePage() {
                 </div>
                 <div>
                   <p className="text-sm text-zinc-400 mb-2">Description</p>
-                  <p className="text-2xl font-bold text-emerald-400">
+                  <p className="text-2xl font-bold text-green">
                     C&apos;est moi le patron babyyy
                   </p>
                 </div>

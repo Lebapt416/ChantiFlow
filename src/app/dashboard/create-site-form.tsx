@@ -46,7 +46,7 @@ export function CreateSiteForm({ onSuccess }: Props) {
     <form
       id="create-site-form"
       action={formAction}
-      className="space-y-4 rounded-2xl border border-zinc-100 bg-white p-6 shadow-lg shadow-black/5 dark:border-zinc-800 dark:bg-zinc-900"
+      className="space-y-4 rounded border border-zinc-100 bg-white p-6 shadow-black/5 dark:border-zinc-800 dark:bg-zinc-900"
     >
       {/* Nom du chantier */}
       <div className="space-y-2">
@@ -108,7 +108,7 @@ export function CreateSiteForm({ onSuccess }: Props) {
             <span className="text-rose-600 dark:text-rose-400">{state.error}</span>
           )}
           {state?.success && (
-            <span className="text-emerald-600 dark:text-emerald-400">
+            <span className="text-orange dark:text-green">
               Chantier créé avec succès.
             </span>
           )}

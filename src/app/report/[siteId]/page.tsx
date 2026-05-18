@@ -88,7 +88,7 @@ export default async function ReportPage({ params }: Params) {
         </Link>
       }
     >
-      <section className="mb-6 rounded-3xl border border-zinc-100 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+      <section className="mb-6 rounded border border-zinc-100 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
         <p className="text-sm text-zinc-500 dark:text-zinc-400">
           Dernier rapport reçu :{' '}
           {filteredReports[0]?.created_at
@@ -97,14 +97,14 @@ export default async function ReportPage({ params }: Params) {
         </p>
         <div className="mt-4 h-2 overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-800">
           <div
-            className="h-full rounded-full bg-emerald-500 transition-all"
+            className="h-full rounded-full bg-paper-20 transition-all"
             style={{ width: `${progress}%` }}
           />
         </div>
       </section>
 
       <div className="grid gap-6 lg:grid-cols-[1fr_0.7fr]">
-        <section className="space-y-4 rounded-2xl border border-zinc-100 bg-white p-6 shadow-lg shadow-black/5 dark:border-zinc-800 dark:bg-zinc-900">
+        <section className="space-y-4 rounded border border-zinc-100 bg-white p-6 shadow-black/5 dark:border-zinc-800 dark:bg-zinc-900">
           <h2 className="text-xl font-semibold text-zinc-900 dark:text-white">
             Rapports reçus
           </h2>
@@ -166,7 +166,7 @@ export default async function ReportPage({ params }: Params) {
           )}
         </section>
 
-        <section className="space-y-4 rounded-2xl border border-zinc-100 bg-white p-6 shadow-lg shadow-black/5 dark:border-zinc-800 dark:bg-zinc-900">
+        <section className="space-y-4 rounded border border-zinc-100 bg-white p-6 shadow-black/5 dark:border-zinc-800 dark:bg-zinc-900">
           <h2 className="text-xl font-semibold text-zinc-900 dark:text-white">
             Détails des tâches
           </h2>
@@ -184,7 +184,7 @@ export default async function ReportPage({ params }: Params) {
                     <span
                       className={`rounded-full px-3 py-1 text-xs font-semibold ${
                         task.status === 'done'
-                          ? 'bg-emerald-100 text-emerald-800'
+                          ? 'bg-paper-2 text-ink'
                           : 'bg-amber-100 text-amber-800'
                       }`}
                     >

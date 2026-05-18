@@ -67,7 +67,7 @@ export function ReportsList({
           return (
             <div
               key={report.id}
-              className="rounded-2xl border border-zinc-200 p-4 dark:border-zinc-700"
+              className="rounded border border-zinc-200 p-4 dark:border-zinc-700"
             >
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div className="flex-1">
@@ -76,7 +76,7 @@ export function ReportsList({
                       {task?.title ?? 'Tâche inconnue'}
                     </p>
                     {isTaskDone && (
-                      <CheckCircle2 className="h-4 w-4 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
+                      <CheckCircle2 className="h-4 w-4 text-orange dark:text-green flex-shrink-0" />
                     )}
                   </div>
                   <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
@@ -95,7 +95,7 @@ export function ReportsList({
                       handleReportClick(report);
                     }}
                     type="button"
-                    className="flex items-center justify-center gap-1.5 rounded-lg bg-emerald-600 px-4 py-2 text-xs font-semibold text-white transition-all hover:bg-emerald-700 active:scale-95 shadow-sm hover:shadow-md whitespace-nowrap min-w-[90px]"
+                    className="flex items-center justify-center gap-1.5 rounded-lg bg-orange px-4 py-2 text-xs font-semibold text-white transition-all hover:bg-orange-dark active:scale-95 shadow-sm hover:shadow-md whitespace-nowrap min-w-[90px]"
                     style={{ zIndex: 10 }}
                   >
                     <Eye className="h-4 w-4 flex-shrink-0" />
@@ -113,7 +113,7 @@ export function ReportsList({
                 </p>
               )}
               {report.photo_url && (
-                <div className="mt-3 overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-700">
+                <div className="mt-3 overflow-hidden rounded border border-zinc-200 dark:border-zinc-700">
                   <Image
                     src={report.photo_url}
                     alt="Photo rapport"
@@ -125,7 +125,7 @@ export function ReportsList({
                 </div>
               )}
               {isTaskDone && (
-                <div className="mt-3 flex items-center gap-2 text-xs text-emerald-600 dark:text-emerald-400">
+                <div className="mt-3 flex items-center gap-2 text-xs text-orange dark:text-green">
                   <CheckCircle2 className="h-4 w-4" />
                   <span className="font-medium">Tâche terminée</span>
                 </div>

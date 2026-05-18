@@ -49,7 +49,7 @@ export function CompleteSiteButton({ siteId, siteName }: Props) {
 
   if (showConfirm) {
     return (
-      <div className="rounded-2xl border border-rose-200 bg-rose-50 p-4 dark:border-rose-900/60 dark:bg-rose-900/20">
+      <div className="rounded border border-rose-200 bg-rose-50 p-4 dark:border-rose-900/60 dark:bg-rose-900/20">
         <p className="text-sm font-semibold text-rose-900 dark:text-rose-200">
           ⚠️ Confirmer la finalisation
         </p>
@@ -94,7 +94,7 @@ export function CompleteSiteButton({ siteId, siteName }: Props) {
         Terminer le chantier
       </button>
       {info && (
-        <p className="text-xs text-emerald-700 dark:text-emerald-300">
+        <p className="text-xs text-ink dark:text-green">
           {info}
         </p>
       )}

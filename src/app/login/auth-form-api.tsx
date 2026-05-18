@@ -183,7 +183,7 @@ export function AuthFormAPI() {
         )}
         {success && (
           <div className="space-y-2">
-            <p className="text-sm text-emerald-400">{success}</p>
+            <p className="text-sm text-green">{success}</p>
             {!isSignUp && (
               <p className="text-xs text-zinc-500 dark:text-zinc-400">Redirection en cours...</p>
             )}

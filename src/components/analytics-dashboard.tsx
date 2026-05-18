@@ -209,26 +209,26 @@ export function AnalyticsDashboard({
   }));
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950 text-white">
+    <div className="min-h-screen bg-ink text-paper">
       {/* Menu latéral */}
-      <aside className="fixed inset-y-0 left-0 z-20 w-16 flex-col items-center border-r border-zinc-800 bg-black/80 px-0 py-8 shadow-xl backdrop-blur flex">
+      <aside className="fixed inset-y-0 left-0 z-20 w-16 flex-col items-center border-r border-rule bg-ink px-0 py-8 flex">
         <nav className="flex flex-1 flex-col items-center gap-2 w-full">
           <Link
             href="/analytics"
-            className="group/item relative flex items-center justify-center w-14 h-14 rounded-xl transition-all duration-200 bg-white text-black shadow-lg shadow-white/20"
+            className="group/item relative flex items-center justify-center w-14 h-14 rounded transition-all duration-200 bg-paper text-ink"
             title="Analytics"
           >
-            <span className="absolute rounded-xl transition-all duration-200 inset-0 bg-white"></span>
+            <span className="absolute rounded transition-all duration-200 inset-0 bg-paper"></span>
             <span className="relative z-10">
               <LayoutDashboard size={26} strokeWidth={3.5} />
             </span>
           </Link>
           <Link
             href="/analytics/profile"
-            className="group/item relative flex items-center justify-center w-14 h-14 rounded-xl transition-all duration-200 text-white hover:text-white"
+            className="group/item relative flex items-center justify-center w-14 h-14 rounded transition-all duration-200 text-paper hover:text-paper"
             title="Profil"
           >
-            <span className="absolute rounded-xl transition-all duration-200 top-0 bottom-0 left-2 right-0 bg-black/50 group-hover/item:bg-black/70 group-hover/item:left-3"></span>
+            <span className="absolute rounded transition-all duration-200 top-0 bottom-0 left-2 right-0 bg-black/50 group-hover/item:bg-black/70 group-hover/item:left-3"></span>
             <span className="relative z-10">
               <User size={26} strokeWidth={3} className="group-hover/item:scale-110 transition-transform duration-200" />
             </span>
@@ -248,9 +248,9 @@ export function AnalyticsDashboard({
               </p>
             </div>
             <div className="text-right">
-              <div className="inline-flex items-center gap-2 rounded-full bg-emerald-500/20 px-4 py-2">
-                <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></div>
-                <span className="text-sm font-semibold text-emerald-400">En direct</span>
+              <div className="inline-flex items-center gap-2 rounded bg-green/20 px-4 py-2">
+                <div className="h-2 w-2 rounded-full bg-green animate-pulse"></div>
+                <span className="text-sm font-semibold text-green">En direct</span>
               </div>
             </div>
           </div>
@@ -260,11 +260,11 @@ export function AnalyticsDashboard({
         <div className="mb-8">
           <Link
             href="/analytics/system-test"
-            className="block rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 backdrop-blur hover:bg-zinc-900/70 transition-colors group"
+            className="block rounded border border-rule bg-ink/80 p-6 hover:bg-paper/5 transition-colors group"
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <div className="p-3 rounded-xl bg-blue-500/10 border border-blue-500/30 group-hover:bg-blue-500/20 transition-colors">
+                <div className="p-3 rounded bg-blue/10 border border-blue-500/30 group-hover:bg-blue-500/20 transition-colors">
                   <TestTube className="h-6 w-6 text-blue-400" />
                 </div>
                 <div>
@@ -285,11 +285,11 @@ export function AnalyticsDashboard({
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <div className="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 backdrop-blur">
+          <div className="rounded border border-rule bg-ink/80 p-6">
             <p className="text-sm text-zinc-400 mb-2">Utilisateurs</p>
             <p className="text-3xl font-bold text-white">{totalUsers}</p>
           </div>
-          <div className="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 backdrop-blur">
+          <div className="rounded border border-rule bg-ink/80 p-6">
             <p className="text-sm text-zinc-400 mb-2">Chantiers</p>
             <p className="text-3xl font-bold text-white">
               {activeSites} <span className="text-lg text-zinc-500">/ {totalSites}</span>
@@ -298,12 +298,12 @@ export function AnalyticsDashboard({
               {completedSites} terminés
             </p>
             {sitesGrowth !== 0 && (
-              <p className={`text-xs mt-1 ${sitesGrowth > 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+              <p className={`text-xs mt-1 ${sitesGrowth > 0 ? 'text-green' : 'text-red-400'}`}>
                 {sitesGrowth > 0 ? '↑' : '↓'} {Math.abs(sitesGrowth)}% vs semaine dernière
               </p>
             )}
           </div>
-          <div className="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 backdrop-blur">
+          <div className="rounded border border-rule bg-ink/80 p-6">
             <p className="text-sm text-zinc-400 mb-2">Tâches</p>
             <p className="text-3xl font-bold text-white">
               {doneTasks} <span className="text-lg text-zinc-500">/ {totalTasks}</span>
@@ -312,12 +312,12 @@ export function AnalyticsDashboard({
               {pendingTasks} en attente • {completionRate}% complété
             </p>
             {tasksGrowth !== 0 && (
-              <p className={`text-xs mt-1 ${tasksGrowth > 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+              <p className={`text-xs mt-1 ${tasksGrowth > 0 ? 'text-green' : 'text-red-400'}`}>
                 {tasksGrowth > 0 ? '↑' : '↓'} {Math.abs(tasksGrowth)}% vs semaine dernière
               </p>
             )}
           </div>
-          <div className="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 backdrop-blur">
+          <div className="rounded border border-rule bg-ink/80 p-6">
             <p className="text-sm text-zinc-400 mb-2">Rapports</p>
             <p className="text-3xl font-bold text-white">{totalReports}</p>
             <p className="text-xs text-zinc-500 mt-1">
@@ -327,10 +327,10 @@ export function AnalyticsDashboard({
         </div>
 
         {/* MRR Card - Prominent */}
-        <div className="rounded-2xl border-2 border-emerald-500/50 bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 p-6 backdrop-blur mb-8">
+        <div className="rounded border-2 border-orange bg-gradient-to-br from-orange/10 to-orange-dark/5 p-6 mb-8">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <p className="text-sm text-emerald-400 mb-2 font-semibold">MRR (Monthly Recurring Revenue)</p>
+              <p className="text-sm text-green mb-2 font-semibold">MRR (Monthly Recurring Revenue)</p>
               <p className="text-5xl font-bold text-white">{mrr}€</p>
               <p className="text-sm text-zinc-400 mt-2">
                 {plusUsers} Plus (29€) + {proUsers} Pro (79€) = {mrr}€/mois
@@ -414,24 +414,24 @@ export function AnalyticsDashboard({
 
         {/* Additional Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <div className="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 backdrop-blur">
+          <div className="rounded border border-rule bg-ink/80 p-6">
             <p className="text-sm text-zinc-400 mb-2">Taux de complétion</p>
             <p className="text-3xl font-bold text-white">{completionRate}%</p>
             <div className="mt-2 h-2 bg-zinc-800 rounded-full overflow-hidden">
               <div 
-                className="h-full bg-emerald-500 transition-all duration-500"
+                className="h-full bg-green transition-all duration-500"
                 style={{ width: `${completionRate}%` }}
               ></div>
             </div>
           </div>
-          <div className="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 backdrop-blur">
+          <div className="rounded border border-rule bg-ink/80 p-6">
             <p className="text-sm text-zinc-400 mb-2">Moyenne tâches/chantier</p>
             <p className="text-3xl font-bold text-white">{avgTasksPerSite}</p>
             <p className="text-xs text-zinc-500 mt-1">
               {avgWorkersPerSite} workers/chantier
             </p>
           </div>
-          <div className="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 backdrop-blur">
+          <div className="rounded border border-rule bg-ink/80 p-6">
             <p className="text-sm text-zinc-400 mb-2">Heures de travail</p>
             <p className="text-3xl font-bold text-white">
               {completedHours} <span className="text-lg text-zinc-500">/ {totalHours}h</span>
@@ -440,7 +440,7 @@ export function AnalyticsDashboard({
               {totalHours > 0 ? Math.round((completedHours / totalHours) * 100) : 0}% complété
             </p>
           </div>
-          <div className="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 backdrop-blur">
+          <div className="rounded border border-rule bg-ink/80 p-6">
             <p className="text-sm text-zinc-400 mb-2">Workers</p>
             <p className="text-3xl font-bold text-white">{totalWorkers}</p>
             <p className="text-xs text-zinc-500 mt-1">
@@ -451,13 +451,13 @@ export function AnalyticsDashboard({
 
         {/* Workers Stats */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-          <div className="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 backdrop-blur">
+          <div className="rounded border border-rule bg-ink/80 p-6">
             <p className="text-sm text-zinc-400 mb-2">Workers</p>
             <p className="text-3xl font-bold text-white">{totalWorkers}</p>
             <div className="mt-4 space-y-2">
               <div className="flex items-center justify-between">
                 <span className="text-sm text-zinc-400">Approuvés</span>
-                <span className="text-lg font-semibold text-emerald-400">{approvedWorkers}</span>
+                <span className="text-lg font-semibold text-green">{approvedWorkers}</span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm text-zinc-400">En attente</span>
@@ -465,7 +465,7 @@ export function AnalyticsDashboard({
               </div>
             </div>
           </div>
-          <div className="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 backdrop-blur">
+          <div className="rounded border border-rule bg-ink/80 p-6">
             <p className="text-sm text-zinc-400 mb-4">Répartition des rôles</p>
             <ResponsiveContainer width="100%" height={200}>
               <PieChart>
@@ -490,7 +490,7 @@ export function AnalyticsDashboard({
         </div>
 
         {/* Activity Chart */}
-        <div className="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 backdrop-blur mb-8">
+        <div className="rounded border border-rule bg-ink/80 p-6 mb-8">
           <h2 className="text-xl font-semibold mb-4">Activité des 30 derniers jours</h2>
           <ResponsiveContainer width="100%" height={400}>
             <LineChart data={activityData}>
@@ -539,7 +539,7 @@ export function AnalyticsDashboard({
 
         {/* Task Status Chart */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-          <div className="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 backdrop-blur">
+          <div className="rounded border border-rule bg-ink/80 p-6">
             <h2 className="text-xl font-semibold mb-4">Statut des tâches</h2>
             <ResponsiveContainer width="100%" height={300}>
               <PieChart>
@@ -567,7 +567,7 @@ export function AnalyticsDashboard({
             </ResponsiveContainer>
           </div>
 
-          <div className="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 backdrop-blur">
+          <div className="rounded border border-rule bg-ink/80 p-6">
             <h2 className="text-xl font-semibold mb-4">Top 10 chantiers par tâches</h2>
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={sitesByTasks}>
@@ -595,7 +595,7 @@ export function AnalyticsDashboard({
         </div>
 
         {/* Weekly Activity */}
-        <div className="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 backdrop-blur mb-8">
+        <div className="rounded border border-rule bg-ink/80 p-6 mb-8">
           <h2 className="text-xl font-semibold mb-4">Activité hebdomadaire (7 dernières semaines)</h2>
           <ResponsiveContainer width="100%" height={400}>
             <BarChart data={sitesByWeek.map((site, index) => ({
@@ -622,7 +622,7 @@ export function AnalyticsDashboard({
 
         {/* Tasks by Role */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-          <div className="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 backdrop-blur">
+          <div className="rounded border border-rule bg-ink/80 p-6">
             <h2 className="text-xl font-semibold mb-4">Tâches par rôle requis</h2>
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={tasksByRoleData.slice(0, 10)}>
@@ -647,13 +647,13 @@ export function AnalyticsDashboard({
             </ResponsiveContainer>
           </div>
 
-          <div className="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 backdrop-blur">
+          <div className="rounded border border-rule bg-ink/80 p-6">
             <h2 className="text-xl font-semibold mb-4">Top 5 créateurs de chantiers</h2>
             <div className="space-y-4">
               {topCreators.map((creator, index) => (
                 <div key={index} className="flex items-center justify-between p-4 rounded-lg bg-zinc-800/50">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold">
+                    <div className="w-8 h-8 rounded-full bg-green/20 flex items-center justify-center text-green font-bold">
                       {index + 1}
                     </div>
                     <div>
@@ -662,7 +662,7 @@ export function AnalyticsDashboard({
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="text-lg font-bold text-emerald-400">{creator.sites}</p>
+                    <p className="text-lg font-bold text-green">{creator.sites}</p>
                   </div>
                 </div>
               ))}
@@ -674,7 +674,7 @@ export function AnalyticsDashboard({
         </div>
 
         {/* Detailed Sites Table */}
-        <div className="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 backdrop-blur mb-8">
+        <div className="rounded border border-rule bg-ink/80 p-6 mb-8">
           <h2 className="text-xl font-semibold mb-4">Détails des chantiers</h2>
           <div className="overflow-x-auto">
             <table className="w-full">
@@ -692,13 +692,13 @@ export function AnalyticsDashboard({
                   <tr key={index} className="border-b border-zinc-800/50 hover:bg-zinc-800/30 transition-colors">
                     <td className="py-3 px-4 text-white font-medium">{site.name}</td>
                     <td className="py-3 px-4 text-right text-white">{site.tasks}</td>
-                    <td className="py-3 px-4 text-right text-emerald-400">{site.done}</td>
+                    <td className="py-3 px-4 text-right text-green">{site.done}</td>
                     <td className="py-3 px-4 text-right text-white">{site.workers}</td>
                     <td className="py-3 px-4 text-right">
                       <div className="flex items-center justify-end gap-2">
                         <div className="w-24 h-2 bg-zinc-800 rounded-full overflow-hidden">
                           <div 
-                            className="h-full bg-emerald-500 transition-all duration-500"
+                            className="h-full bg-green transition-all duration-500"
                             style={{ width: `${site.progress}%` }}
                           ></div>
                         </div>
@@ -722,7 +722,7 @@ export function AnalyticsDashboard({
 
       {/* Section Messages de Contact */}
       <div className="mb-8">
-        <div className="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 backdrop-blur">
+        <div className="rounded border border-rule bg-ink/80 p-6">
           <div className="mb-6 flex items-center justify-between">
             <div>
               <h2 className="text-2xl font-bold text-white">Messages de Contact</h2>
@@ -737,7 +737,7 @@ export function AnalyticsDashboard({
               contactMessages.map((msg) => (
                 <div
                   key={msg.id}
-                  className="rounded-xl border border-zinc-800 bg-zinc-950/50 p-5 hover:bg-zinc-900/50 transition-colors"
+                  className="rounded border border-rule/30 bg-paper/5 p-5 hover:bg-paper/10 transition-colors"
                 >
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex-1">
@@ -751,7 +751,7 @@ export function AnalyticsDashboard({
                       </div>
                       <a
                         href={`mailto:${msg.email}`}
-                        className="text-sm text-emerald-400 hover:text-emerald-300 transition-colors"
+                        className="text-sm text-green hover:text-green transition-colors"
                       >
                         {msg.email}
                       </a>
@@ -766,7 +766,7 @@ export function AnalyticsDashboard({
                       })}
                     </span>
                   </div>
-                  <div className="mt-3 p-3 rounded-lg bg-zinc-900/50 border border-zinc-800">
+                  <div className="mt-3 p-3 rounded-lg bg-paper/5 border border-zinc-800">
                     <p className="text-sm text-zinc-300 whitespace-pre-wrap leading-relaxed">
                       {msg.message}
                     </p>
@@ -774,7 +774,7 @@ export function AnalyticsDashboard({
                   <div className="mt-3 flex items-center gap-2">
                     <a
                       href={`mailto:${msg.email}?subject=Re: Votre message de contact&cc=chantiflowct@gmail.com`}
-                      className="text-xs px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white transition-colors"
+                      className="text-xs px-3 py-1.5 rounded-lg bg-orange hover:bg-green text-white transition-colors"
                       title="Répondre (utilisez chantiflowct@gmail.com comme expéditeur)"
                     >
                       Répondre

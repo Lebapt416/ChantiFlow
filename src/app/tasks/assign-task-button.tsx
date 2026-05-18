@@ -24,7 +24,7 @@ function SubmitButton({ isPending }: { isPending: boolean }) {
     <button
       type="submit"
       disabled={isPending}
-      className="rounded-md bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
+      className="rounded-md bg-orange px-3 py-1.5 text-xs font-medium text-white transition hover:bg-orange-dark disabled:cursor-not-allowed disabled:opacity-50"
     >
       {isPending ? (
         <Loader2 className="h-3 w-3 animate-spin" />
@@ -71,11 +71,11 @@ export function AssignTaskButton({ taskId, currentWorkerId, availableWorkers }: 
     <div className="relative inline-block z-10">
       {currentWorker ? (
         <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1.5 rounded-md bg-emerald-100 px-2 py-1 text-xs text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">
+          <div className="flex items-center gap-1.5 rounded-md bg-paper-2 px-2 py-1 text-xs text-ink dark:bg-paper-2 dark:text-green">
             <User className="h-3 w-3" />
             <span className="font-medium">{currentWorker.name}</span>
             {currentWorker.role && (
-              <span className="text-emerald-600 dark:text-emerald-500">
+              <span className="text-orange dark:text-green">
                 ({currentWorker.role})
               </span>
             )}
@@ -102,7 +102,7 @@ export function AssignTaskButton({ taskId, currentWorkerId, availableWorkers }: 
       )}
 
       {isOpen && (
-        <div className="absolute right-0 top-full z-10 mt-2 w-64 rounded-lg border border-zinc-200 bg-white p-3 shadow-lg dark:border-zinc-700 dark:bg-zinc-800">
+        <div className="absolute right-0 top-full z-10 mt-2 w-64 rounded-lg border border-zinc-200 bg-white p-3 dark:border-zinc-700 dark:bg-zinc-800">
           <div className="mb-2 flex items-center justify-between">
             <h4 className="text-xs font-semibold text-zinc-900 dark:text-white">
               Assigner à
@@ -126,7 +126,7 @@ export function AssignTaskButton({ taskId, currentWorkerId, availableWorkers }: 
               </p>
               <Link
                 href="/team"
-                className="block rounded-md bg-emerald-600 px-3 py-1.5 text-center text-xs font-medium text-white transition hover:bg-emerald-700"
+                className="block rounded-md bg-orange px-3 py-1.5 text-center text-xs font-medium text-white transition hover:bg-orange-dark"
               >
                 Aller à l&apos;équipe →
               </Link>
@@ -138,7 +138,7 @@ export function AssignTaskButton({ taskId, currentWorkerId, availableWorkers }: 
               <div className="space-y-2">
                 <select
                   name="workerId"
-                  className="w-full rounded-md border border-zinc-200 bg-white px-2 py-1.5 text-xs shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:border-zinc-600 dark:bg-zinc-900 dark:text-white"
+                  className="w-full rounded-md border border-zinc-200 bg-white px-2 py-1.5 text-xs shadow-sm focus:outline-none focus:ring-2 focus:ring-orange dark:border-zinc-600 dark:bg-zinc-900 dark:text-white"
                   defaultValue={currentWorkerId || ''}
                 >
                   <option value="">Aucun (désassigner)</option>
@@ -166,7 +166,7 @@ export function AssignTaskButton({ taskId, currentWorkerId, availableWorkers }: 
                     </div>
                   )}
                   {state?.success && (
-                    <div className="rounded-md bg-emerald-50 p-2 text-xs text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300">
+                    <div className="rounded-md bg-paper-2 p-2 text-xs text-ink dark:bg-paper-2 dark:text-green">
                       ✅ Assignation mise à jour avec succès
                     </div>
                   )}

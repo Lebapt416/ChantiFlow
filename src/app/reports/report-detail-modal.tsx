@@ -81,7 +81,7 @@ export function ReportDetailModal({
       }}
     >
       <div 
-        className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl border border-zinc-200 bg-white shadow-xl dark:border-zinc-800 dark:bg-zinc-900"
+        className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded border border-zinc-200 bg-white  dark:border-zinc-800 dark:bg-zinc-900"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -112,7 +112,7 @@ export function ReportDetailModal({
                 {task.title}
               </p>
               {isValidated && (
-                <div className="mt-2 flex items-center gap-2 text-emerald-600 dark:text-emerald-400">
+                <div className="mt-2 flex items-center gap-2 text-orange dark:text-green">
                   <CheckCircle2 className="h-4 w-4" />
                   <span className="text-sm font-medium">Tâche terminée</span>
                 </div>
@@ -188,7 +188,7 @@ export function ReportDetailModal({
               <h3 className="text-sm font-semibold text-zinc-500 dark:text-zinc-400 mb-3">
                 Photo
               </h3>
-              <div className="overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-700">
+              <div className="overflow-hidden rounded border border-zinc-200 dark:border-zinc-700">
                 <Image
                   src={report.photo_url}
                   alt="Photo du rapport"
@@ -209,7 +209,7 @@ export function ReportDetailModal({
           )}
 
           {state?.success && (
-            <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800 dark:border-emerald-900/60 dark:bg-emerald-900/20 dark:text-emerald-200">
+            <div className="rounded-lg border border-rule-soft bg-paper-2 p-4 text-sm text-ink dark:border-orange/60 dark:bg-paper-2 dark:text-orange">
               ✓ {state.message}
             </div>
           )}
@@ -230,7 +230,7 @@ export function ReportDetailModal({
               <button
                 type="submit"
                 disabled={isPending}
-                className="w-full rounded-lg bg-emerald-600 px-6 py-3 text-base font-semibold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-70 flex items-center justify-center gap-2"
+                className="w-full rounded-lg bg-orange px-6 py-3 text-base font-semibold text-white transition hover:bg-orange-dark disabled:cursor-not-allowed disabled:opacity-70 flex items-center justify-center gap-2"
               >
                 <CheckCircle2 className="h-5 w-5" />
                 {isPending ? 'Validation...' : 'Valider le rapport et terminer la tâche'}
@@ -240,8 +240,8 @@ export function ReportDetailModal({
         )}
 
         {isValidated && (
-          <div className="sticky bottom-0 border-t border-zinc-200 bg-emerald-50 px-6 py-4 dark:border-zinc-800 dark:bg-emerald-900/20">
-            <div className="flex items-center justify-center gap-2 text-emerald-700 dark:text-emerald-400">
+          <div className="sticky bottom-0 border-t border-zinc-200 bg-paper-2 px-6 py-4 dark:border-zinc-800 dark:bg-paper-2">
+            <div className="flex items-center justify-center gap-2 text-ink dark:text-green">
               <CheckCircle2 className="h-5 w-5" />
               <span className="font-semibold">Rapport validé et tâche terminée</span>
             </div>

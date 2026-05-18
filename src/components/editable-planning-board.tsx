@@ -139,9 +139,9 @@ function DroppableColumn({
   return (
     <div
       ref={setNodeRef}
-      className={`flex-1 rounded-2xl border border-zinc-200/50 bg-zinc-50/50 p-4 shadow-sm backdrop-blur-sm transition ${
-        isOver ? 'ring-2 ring-emerald-400/60' : ''
-      } dark:border-zinc-700/30 dark:bg-zinc-900/30`}
+      className={`flex-1 rounded border border-zinc-200/50 bg-zinc-50/50 p-4 shadow-sm  transition ${
+        isOver ? 'ring-2 ring-orange/60' : ''
+      } dark:border-zinc-700/30 `}
     >
       <div className="mb-4 flex items-center justify-between">
         <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
@@ -154,7 +154,7 @@ function DroppableColumn({
       <div className="space-y-2">{children}</div>
       <button
         type="button"
-        className="mt-3 w-full rounded-lg border border-dashed border-zinc-300/50 px-3 py-2 text-[11px] text-zinc-400 transition-all hover:border-emerald-300 hover:bg-white/50 hover:text-emerald-600 dark:border-zinc-700/50 dark:hover:bg-zinc-800/50"
+        className="mt-3 w-full rounded-lg border border-dashed border-zinc-300/50 px-3 py-2 text-[11px] text-zinc-400 transition-all hover:border-orange hover:bg-paper hover:text-orange  dark:hover:bg-zinc-800/50"
       >
         + Ajouter une tâche
       </button>
@@ -233,7 +233,7 @@ function SortableTaskCard({
   const getProgressColor = () => {
     if (theoreticalProgress < 10) return 'bg-zinc-300 dark:bg-zinc-600';
     if (theoreticalProgress < 90) return 'bg-blue-500';
-    return 'bg-emerald-500';
+    return 'bg-paper-20';
   };
 
   const progressColor = getProgressColor();
@@ -242,7 +242,7 @@ function SortableTaskCard({
   const priorityColors: Record<'high' | 'medium' | 'low', { bg: string; shadow: string }> = {
     high: { bg: 'bg-rose-500', shadow: 'shadow-rose-500/50' },
     medium: { bg: 'bg-amber-500', shadow: 'shadow-amber-500/50' },
-    low: { bg: 'bg-emerald-500', shadow: 'shadow-emerald-500/50' },
+    low: { bg: 'bg-paper-20', shadow: '' },
   };
 
   const priorityConfig = priorityColors[task.priority || 'medium'];
@@ -251,14 +251,14 @@ function SortableTaskCard({
   const getCardClassName = () => {
     if (isOverlay) {
       // Mode overlay : carte qui flotte
-      return 'group relative overflow-hidden rounded-xl border border-white/20 bg-white/100 p-4 shadow-2xl ring-1 ring-emerald-500/50 rotate-2 scale-105 cursor-grabbing dark:border-zinc-700/50 dark:bg-zinc-900/100';
+      return 'group relative overflow-hidden rounded border border-rule-soft bg-paper/100 p-4  ring-1 ring-orange/50 rotate-2 scale-105 cursor-grabbing  dark:bg-zinc-900/100';
     }
     if (isDragging) {
       // Mode dragging : carte originale (fantôme)
-      return 'group relative overflow-hidden rounded-xl border-0 bg-white/30 p-4 shadow-none backdrop-blur-md transition-all duration-300 dark:bg-zinc-900/30 opacity-30';
+      return 'group relative overflow-hidden rounded border-0 bg-paper p-4 shadow-none  transition-all duration-300  opacity-30';
     }
     // Mode normal
-    return 'group relative overflow-hidden rounded-xl border border-white/20 bg-white/80 p-4 shadow-sm backdrop-blur-md transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg dark:border-zinc-700/50 dark:bg-zinc-900/80';
+    return 'group relative overflow-hidden rounded border border-rule-soft bg-paper p-4 shadow-sm  transition-all duration-300 hover:-translate-y-0.5 hover: ';
   };
 
   return (
@@ -270,7 +270,7 @@ function SortableTaskCard({
     >
       {/* Indicateur de statut latéral (néon) */}
       <div
-        className={`absolute left-0 top-0 bottom-0 w-1 ${priorityConfig.bg} ${priorityConfig.shadow} shadow-lg`}
+        className={`absolute left-0 top-0 bottom-0 w-1 ${priorityConfig.bg} ${priorityConfig.shadow}`}
       />
 
       {/* Header */}
@@ -326,7 +326,7 @@ function SortableTaskCard({
       {/* Avatar en bas à droite */}
       {assignedWorkers.length > 0 && (
         <div className="absolute bottom-3 right-3">
-          <div className="h-7 w-7 rounded-full border-2 border-white bg-gradient-to-br from-emerald-400 to-emerald-600 text-[10px] font-semibold uppercase text-white shadow-lg shadow-emerald-500/30 dark:border-zinc-900">
+          <div className="h-7 w-7 rounded-full border-2 border-white bg-gradient-to-br from-orange to-orange text-[10px] font-semibold uppercase text-white  dark:border-zinc-900">
             <div className="flex h-full w-full items-center justify-center">
               {assignedWorkers[0]?.name ? assignedWorkers[0].name.slice(0, 2) : 'OU'}
             </div>
@@ -378,7 +378,7 @@ function TaskEditModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="w-full max-w-md rounded-2xl border border-zinc-200 bg-white p-6 shadow-xl dark:border-zinc-700 dark:bg-zinc-900">
+      <div className="w-full max-w-md rounded border border-zinc-200 bg-white p-6  dark:border-zinc-700 dark:bg-zinc-900">
         <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">
           Modifier {task.taskTitle}
         </h3>
@@ -453,7 +453,7 @@ function TaskEditModal({
                 workerId,
               });
             }}
-            className="rounded-lg bg-emerald-600 px-4 py-2 font-semibold text-white transition hover:bg-emerald-700 disabled:opacity-50"
+            className="rounded-lg bg-orange px-4 py-2 font-semibold text-white transition hover:bg-orange-dark disabled:opacity-50"
           >
             {isSaving ? 'Sauvegarde…' : 'Enregistrer'}
           </button>
@@ -748,16 +748,16 @@ export function EditablePlanningBoard({ siteId, initialPlanning, workers }: Prop
   };
 
   return (
-    <div className="relative space-y-4 overflow-hidden rounded-3xl border border-white/10 bg-white/40 p-4 shadow-inner backdrop-blur-3xl dark:bg-zinc-900/40">
+    <div className="relative space-y-4 overflow-hidden rounded border border-white/10 bg-paper p-4 shadow-inner -3xl dark:bg-zinc-900/40">
       <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top,_rgba(59,130,246,0.15),_transparent_40%),_radial-gradient(circle_at_bottom,_rgba(16,185,129,0.15),_transparent_45%)]" />
       
       {/* Barre de navigation Liquid Glass */}
       <div className="flex items-center justify-center">
-        <div className="flex items-center gap-4 rounded-full border border-white/20 bg-white/40 px-4 py-2 text-sm font-medium text-zinc-700 shadow-sm backdrop-blur-md dark:bg-zinc-800/40 dark:text-zinc-200">
+        <div className="flex items-center gap-4 rounded-full border border-rule-soft bg-paper px-4 py-2 text-sm font-medium text-zinc-700 shadow-sm   dark:text-zinc-200">
           <button
             type="button"
             onClick={goToPreviousWeek}
-            className="rounded-full p-1.5 transition hover:bg-white/50 dark:hover:bg-zinc-700/50"
+            className="rounded-full p-1.5 transition hover:bg-paper dark:hover:bg-zinc-700/50"
             aria-label="Semaine précédente"
           >
             <ChevronLeft className="h-4 w-4" />
@@ -765,14 +765,14 @@ export function EditablePlanningBoard({ siteId, initialPlanning, workers }: Prop
           <button
             type="button"
             onClick={goToToday}
-            className="rounded-full px-3 py-1.5 text-xs transition hover:bg-white/50 dark:hover:bg-zinc-700/50"
+            className="rounded-full px-3 py-1.5 text-xs transition hover:bg-paper dark:hover:bg-zinc-700/50"
           >
             Aujourd&apos;hui
           </button>
           <button
             type="button"
             onClick={goToNextWeek}
-            className="rounded-full p-1.5 transition hover:bg-white/50 dark:hover:bg-zinc-700/50"
+            className="rounded-full p-1.5 transition hover:bg-paper dark:hover:bg-zinc-700/50"
             aria-label="Semaine suivante"
           >
             <ChevronRight className="h-4 w-4" />
@@ -809,7 +809,7 @@ export function EditablePlanningBoard({ siteId, initialPlanning, workers }: Prop
                     </div>
                   </SortableContext>
                 ) : (
-                  <div className="rounded-lg border border-dashed border-zinc-300/50 p-4 text-center text-xs text-zinc-400 dark:border-zinc-700/50 dark:text-zinc-500">
+                  <div className="rounded-lg border border-dashed border-zinc-300/50 p-4 text-center text-xs text-zinc-400  dark:text-zinc-500">
                     Glissez une tâche ici
                   </div>
                 )}

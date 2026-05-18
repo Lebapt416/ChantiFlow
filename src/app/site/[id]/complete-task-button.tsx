@@ -8,7 +8,7 @@ function CompleteTaskSubmit({ disabled }: { disabled?: boolean }) {
   return (
     <button
       type="submit"
-      className="rounded-full border border-emerald-600 px-3 py-1 text-xs font-semibold text-emerald-700 transition hover:bg-emerald-50 disabled:opacity-60 dark:border-emerald-400 dark:text-emerald-200 dark:hover:bg-emerald-900/30"
+      className="rounded-full border border-orange px-3 py-1 text-xs font-semibold text-ink transition hover:bg-paper-2 disabled:opacity-60 dark:border-orange dark:text-orange dark:hover:bg-paper-2"
       disabled={pending || disabled}
     >
       {pending ? '...' : 'Terminer'}

@@ -21,7 +21,7 @@ export default async function CancelPage() {
       userEmail={user.email}
     >
       <div className="mx-auto max-w-2xl">
-        <div className="rounded-2xl border border-zinc-200 bg-white p-8 text-center dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="rounded border border-zinc-200 bg-white p-8 text-center dark:border-zinc-800 dark:bg-zinc-900">
           <XCircle className="mx-auto h-16 w-16 text-zinc-400" />
           <h2 className="mt-4 text-2xl font-semibold text-zinc-900 dark:text-white">
             Paiement annulé

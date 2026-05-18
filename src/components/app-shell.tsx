@@ -69,9 +69,9 @@ export function AppShell({
   }, [pathname]);
 
   return (
-    <div className="min-h-screen bg-zinc-50 text-zinc-900 dark:bg-zinc-950 dark:text-white">
+    <div className="min-h-screen bg-paper text-ink">
       <div className="lg:flex">
-        <aside className="fixed inset-y-0 left-0 z-20 hidden w-16 flex-col items-center border-r border-zinc-800 bg-black/80 px-0 py-8 shadow-xl backdrop-blur dark:border-zinc-700 dark:bg-black/80 lg:flex">
+        <aside className="fixed inset-y-0 left-0 z-20 hidden w-16 flex-col items-center border-r border-rule bg-ink px-0 py-8 lg:flex">
           <nav className="flex flex-1 flex-col items-center gap-2 w-full">
             {navItems.map((item) => {
               const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
@@ -79,14 +79,14 @@ export function AppShell({
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`group/item relative flex items-center justify-center w-14 h-14 rounded-xl transition-all duration-200 ${
+                  className={`group/item relative flex items-center justify-center w-14 h-14 rounded transition-all duration-200 ${
                     active
-                      ? 'bg-white text-black shadow-lg shadow-white/20'
+                      ? 'bg-white text-black shadow-white/20'
                       : 'text-white hover:text-white'
                   }`}
                   title={item.label}
                 >
-                  <span className={`absolute rounded-xl transition-all duration-200 ${
+                  <span className={`absolute rounded transition-all duration-200 ${
                     active
                       ? 'inset-0 bg-white'
                       : 'top-0 bottom-0 left-2 right-0 bg-black/50 group-hover/item:bg-black/70 group-hover/item:left-3'
@@ -99,7 +99,7 @@ export function AppShell({
                     />
                   </span>
                   {/* Tooltip pour affichage au survol */}
-                  <span className="pointer-events-none absolute left-full ml-3 z-50 whitespace-nowrap rounded-lg bg-zinc-900 px-3 py-1.5 text-xs font-medium text-white opacity-0 shadow-xl transition-all duration-200 group-hover/item:opacity-100 group-hover/item:translate-x-0 -translate-x-1 dark:bg-zinc-100 dark:text-zinc-900">
+                  <span className="pointer-events-none absolute left-full ml-3 z-50 whitespace-nowrap rounded-lg bg-zinc-900 px-3 py-1.5 text-xs font-medium text-white opacity-0  transition-all duration-200 group-hover/item:opacity-100 group-hover/item:translate-x-0 -translate-x-1 dark:bg-zinc-100 dark:text-zinc-900">
                     {item.label}
                     <span className="absolute right-full top-1/2 -mr-1 h-2 w-2 -translate-y-1/2 rotate-45 bg-zinc-900 dark:bg-zinc-100"></span>
                   </span>
@@ -113,7 +113,7 @@ export function AppShell({
           </nav>
         </aside>
         <div className="min-h-screen flex-1 transition-all duration-300 ease-in-out lg:ml-16">
-          <header className="sticky top-0 z-10 border-b border-zinc-200 bg-white/80 px-4 py-4 backdrop-blur dark:border-zinc-800 dark:bg-zinc-950/80">
+          <header className="sticky top-0 z-10 border-b border-rule-soft bg-paper px-4 py-4">
             <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
               <div className="flex items-center gap-3">
                 <div>

@@ -76,8 +76,8 @@ export function PlanningDetailModal({ planning, siteName, isOpen, onClose }: Pro
   const endDate = sortedPlanning[sortedPlanning.length - 1]?.endDate;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-      <div className="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-2xl border border-zinc-200 bg-white shadow-xl dark:border-zinc-800 dark:bg-zinc-900">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 ">
+      <div className="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded border border-zinc-200 bg-white  dark:border-zinc-800 dark:bg-zinc-900">
         {/* Header */}
         <div className="sticky top-0 z-10 flex items-center justify-between border-b border-zinc-200 bg-white px-4 py-3 dark:border-zinc-800 dark:bg-zinc-900">
           <div>
@@ -100,14 +100,14 @@ export function PlanningDetailModal({ planning, siteName, isOpen, onClose }: Pro
         <div className="p-4 sm:p-6 space-y-4">
           {/* Vue d'ensemble */}
           {startDate && endDate && (
-            <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 dark:border-emerald-900/60 dark:bg-emerald-900/20">
+            <div className="rounded-xl border border-orange bg-orange p-4 dark:border-orange/60 dark:bg-orange/20">
               <div className="flex items-center gap-2 mb-2">
-                <Calendar className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
-                <h3 className="text-sm font-semibold text-emerald-900 dark:text-emerald-200">
+                <Calendar className="h-5 w-5 text-orange dark:text-orange" />
+                <h3 className="text-sm font-semibold text-orange dark:text-orange">
                   Période du planning
                 </h3>
               </div>
-              <p className="text-sm text-emerald-800 dark:text-emerald-300">
+              <p className="text-sm text-orange dark:text-orange">
                 Du {formatDate(startDate)} au {formatDate(endDate)}
               </p>
             </div>
@@ -130,7 +130,7 @@ export function PlanningDetailModal({ planning, siteName, isOpen, onClose }: Pro
                         {task.taskTitle}
                       </h3>
                       {task.validated && (
-                        <CheckCircle2 className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                        <CheckCircle2 className="h-4 w-4 text-orange dark:text-orange" />
                       )}
                     </div>
                     <div className="flex items-center gap-2 mb-2">

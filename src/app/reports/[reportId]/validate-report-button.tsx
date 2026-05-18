@@ -35,7 +35,7 @@ export function ValidateReportButton({ reportId, taskId }: Props) {
     <button
       onClick={handleValidate}
       disabled={isPending}
-      className="w-full rounded-lg bg-emerald-600 px-6 py-3 text-base font-semibold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-70 flex items-center justify-center gap-2"
+      className="w-full rounded-lg bg-orange px-6 py-3 text-base font-semibold text-white transition hover:bg-orange disabled:cursor-not-allowed disabled:opacity-70 flex items-center justify-center gap-2"
     >
       <CheckCircle2 className="h-5 w-5" />
       {isPending ? 'Validation...' : 'Valider le rapport et terminer la tâche'}

@@ -70,10 +70,10 @@ export default async function WorkerDashboardPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-zinc-50 via-white to-zinc-100 pb-32 dark:from-zinc-950 dark:via-zinc-900 dark:to-zinc-950">
-      <header className="border-b border-white/60 bg-white/80 px-4 py-6 backdrop-blur dark:border-zinc-900/60 dark:bg-zinc-900/80">
+      <header className="border-b border-white/60 bg-paper px-4 py-6  dark:border-zinc-900/60 ">
         <div className="mx-auto flex max-w-5xl flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex items-center gap-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-zinc-900 shadow-lg shadow-black/10 dark:bg-white">
+            <div className="flex h-12 w-12 items-center justify-center rounded bg-zinc-900 shadow-black/10 dark:bg-white">
               <Image src="/logo.svg" alt="ChantiFlow" width={32} height={32} priority className="h-8 w-8" />
             </div>
             <div>
@@ -86,7 +86,7 @@ export default async function WorkerDashboardPage() {
           </div>
           <Link
             href="/worker/scanner"
-            className="inline-flex items-center gap-2 rounded-full bg-emerald-600 px-4 py-2 text-xs font-semibold text-white transition hover:bg-emerald-700"
+            className="inline-flex items-center gap-2 rounded-full bg-orange px-4 py-2 text-xs font-semibold text-white transition hover:bg-orange-dark"
           >
             Scanner un nouveau chantier
           </Link>
@@ -94,7 +94,7 @@ export default async function WorkerDashboardPage() {
       </header>
 
       <main className="mx-auto flex max-w-5xl flex-col gap-6 px-4 py-8">
-        <section className="rounded-3xl border border-zinc-200 bg-white/90 p-6 shadow-lg shadow-black/5 dark:border-zinc-800 dark:bg-zinc-900/90">
+        <section className="rounded border border-rule-soft bg-paper p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs uppercase tracking-[0.3em] text-zinc-500 dark:text-zinc-400">En cours</p>
@@ -109,7 +109,7 @@ export default async function WorkerDashboardPage() {
               inProgressSites.map(({ site, nextTaskDate, tasksCount }) => (
                 <div
                   key={site.id}
-                  className="flex flex-col gap-3 rounded-2xl border border-zinc-200 bg-zinc-50/80 p-4 dark:border-zinc-800 dark:bg-zinc-900/60"
+                  className="flex flex-col gap-3 rounded border border-zinc-200 bg-zinc-50/80 p-4 dark:border-zinc-800 dark:bg-zinc-900/60"
                 >
                   <div>
                     <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">{site.name || 'Chantier'}</h3>
@@ -130,7 +130,7 @@ export default async function WorkerDashboardPage() {
           </div>
         </section>
 
-        <section className="rounded-3xl border border-zinc-200 bg-white/90 p-6 shadow-lg shadow-black/5 dark:border-zinc-800 dark:bg-zinc-900/90">
+        <section className="rounded border border-rule-soft bg-paper p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs uppercase tracking-[0.3em] text-zinc-500 dark:text-zinc-400">Terminés</p>
@@ -145,7 +145,7 @@ export default async function WorkerDashboardPage() {
               completedSites.map(({ site }) => (
                 <div
                   key={site.id}
-                  className="rounded-2xl border border-zinc-200 bg-zinc-50/80 p-4 text-sm text-zinc-600 dark:border-zinc-800 dark:bg-zinc-900/60 dark:text-zinc-300"
+                  className="rounded border border-zinc-200 bg-zinc-50/80 p-4 text-sm text-zinc-600 dark:border-zinc-800 dark:bg-zinc-900/60 dark:text-zinc-300"
                 >
                   <p className="text-base font-semibold text-zinc-900 dark:text-white">{site.name || 'Chantier'}</p>
                   <p className="text-xs text-zinc-500 dark:text-zinc-400">

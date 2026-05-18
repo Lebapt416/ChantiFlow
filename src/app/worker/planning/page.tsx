@@ -58,10 +58,10 @@ export default async function WorkerPlanningPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-zinc-50 via-white to-zinc-100 pb-32 dark:from-zinc-950 dark:via-zinc-900 dark:to-zinc-950">
-      <header className="border-b border-white/80 bg-white/90 px-4 py-6 backdrop-blur dark:border-zinc-900/60 dark:bg-zinc-900/80">
+      <header className="border-b border-rule-soft bg-paper px-4 py-6">
         <div className="mx-auto flex max-w-5xl flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex items-center gap-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-zinc-900 shadow-lg shadow-black/10 dark:bg-white">
+            <div className="flex h-12 w-12 items-center justify-center rounded bg-zinc-900 shadow-black/10 dark:bg-white">
               <Image src="/logo.svg" alt="ChantiFlow" width={32} height={32} priority className="h-8 w-8" />
             </div>
             <div>
@@ -78,7 +78,7 @@ export default async function WorkerPlanningPage() {
       <main className="mx-auto flex max-w-5xl flex-col gap-6 px-4 py-8">
         {planning.length ? (
           <div className="space-y-6">
-            <div className="rounded-3xl border border-zinc-200 bg-white/90 p-6 dark:border-zinc-800 dark:bg-zinc-900/90">
+            <div className="rounded border border-rule-soft bg-paper p-6">
               <p className="text-xs uppercase tracking-[0.3em] text-zinc-500 dark:text-zinc-400">Timeline</p>
               <h2 className="text-2xl font-semibold text-zinc-900 dark:text-white">
                 Vos {planning.length} prochaines missions
@@ -86,7 +86,7 @@ export default async function WorkerPlanningPage() {
               <ol className="mt-6 space-y-4 border-l-2 border-dashed border-zinc-200 pl-6 dark:border-zinc-800">
                 {planning.map((entry) => (
                   <li key={entry.id} className="relative pl-6">
-                    <span className="absolute left-[-14px] top-1.5 h-3 w-3 rounded-full bg-emerald-500 ring-4 ring-emerald-100 dark:ring-emerald-900/40" />
+                    <span className="absolute left-[-14px] top-1.5 h-3 w-3 rounded-full bg-paper-20 ring-4 ring-orange dark:ring-orange/40" />
                     <div className="flex items-center justify-between">
                       <p className="text-sm font-semibold text-zinc-900 dark:text-white">
                         {entry.title || 'Tâche à venir'}
@@ -103,7 +103,7 @@ export default async function WorkerPlanningPage() {
             </div>
           </div>
         ) : (
-          <section className="rounded-3xl border border-dashed border-zinc-200 bg-white/80 p-6 text-center shadow-inner dark:border-zinc-800 dark:bg-zinc-950/40">
+          <section className="rounded border border-dashed border-zinc-200 bg-paper p-6 text-center shadow-inner dark:border-zinc-800 dark:bg-zinc-950/40">
             <p className="text-lg font-semibold text-zinc-900 dark:text-white">Aucune mission planifiée</p>
             <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
               Rejoignez un chantier en scannant son QR code pour voir votre planning.

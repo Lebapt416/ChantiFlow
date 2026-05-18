@@ -11,7 +11,7 @@ export function FaqSection({ entries }: FaqSectionProps) {
   return (
     <section className="mx-auto max-w-7xl px-6 py-20">
       <div className="mx-auto max-w-3xl text-center">
-        <p className="text-sm font-semibold uppercase tracking-widest text-emerald-600 dark:text-emerald-400">
+        <p className="text-sm font-semibold uppercase tracking-widest text-orange dark:text-green">
           FAQ ChantiFlow
         </p>
         <h2 className="mt-4 text-3xl font-bold tracking-tight text-zinc-900 dark:text-white sm:text-4xl">
@@ -25,7 +25,7 @@ export function FaqSection({ entries }: FaqSectionProps) {
         {entries.map((entry) => (
           <div
             key={entry.question}
-            className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900"
+            className="rounded border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900"
           >
             <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">{entry.question}</h3>
             <p className="mt-2 text-sm leading-6 text-zinc-600 dark:text-zinc-400">{entry.answer}</p>

@@ -11,7 +11,7 @@ type ClientStatus =
 
 const STATUS_STYLES: Record<string, string> = {
   loading: 'bg-zinc-400',
-  connected: 'bg-emerald-500',
+  connected: 'bg-paper-20',
   error: 'bg-rose-500',
   missing_config: 'bg-amber-400',
 };

@@ -90,7 +90,7 @@ export function SiteCard({ site, stats }: Props) {
   };
 
   return (
-    <div className="flex-shrink-0 w-80 rounded-2xl border border-zinc-200 bg-white p-6 shadow-lg shadow-black/5 transition hover:shadow-xl dark:border-zinc-800 dark:bg-zinc-900">
+    <div className="flex-shrink-0 w-80 rounded border border-zinc-200 bg-white p-6 shadow-black/5 transition hover: dark:border-zinc-800 dark:bg-zinc-900">
       <div className="mb-4 flex items-start justify-between">
         <div className="flex-1">
           <div className="mb-2 flex items-center gap-2">
@@ -99,7 +99,7 @@ export function SiteCard({ site, stats }: Props) {
               {site.name}
             </h3>
             {isCompleted && (
-              <CheckCircle2 className="h-4 w-4 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
+              <CheckCircle2 className="h-4 w-4 text-orange dark:text-green flex-shrink-0" />
             )}
           </div>
           {site.deadline ? (
@@ -123,7 +123,7 @@ export function SiteCard({ site, stats }: Props) {
         </div>
         <div className="rounded-lg border border-zinc-100 bg-zinc-50 p-2 text-center dark:border-zinc-800 dark:bg-zinc-800">
           <p className="text-xs text-zinc-500 dark:text-zinc-400">Terminées</p>
-          <p className="mt-1 text-lg font-semibold text-emerald-600 dark:text-emerald-400">
+          <p className="mt-1 text-lg font-semibold text-orange dark:text-green">
             {stats.done}
           </p>
         </div>
@@ -142,7 +142,7 @@ export function SiteCard({ site, stats }: Props) {
         </div>
         <div className="h-2 rounded-full bg-zinc-200 dark:bg-zinc-800">
           <div
-            className="h-full rounded-full bg-emerald-500 transition-all"
+            className="h-full rounded-full bg-paper-20 transition-all"
             style={{ width: `${progress}%` }}
           />
         </div>
@@ -156,7 +156,7 @@ export function SiteCard({ site, stats }: Props) {
       )}
 
       {success && (
-        <div className="mb-3 rounded-lg border border-emerald-200 bg-emerald-50 p-2 text-xs text-emerald-800 dark:border-emerald-900/60 dark:bg-emerald-900/20 dark:text-emerald-200">
+        <div className="mb-3 rounded-lg border border-rule-soft bg-paper-2 p-2 text-xs text-ink dark:border-orange/60 dark:bg-paper-2 dark:text-orange">
           {success}
         </div>
       )}
@@ -175,7 +175,7 @@ export function SiteCard({ site, stats }: Props) {
             <button
               onClick={() => setShowCompleteConfirm(true)}
               disabled={isCompleting || isDeleting}
-              className="w-full flex items-center justify-center gap-2 rounded-lg bg-emerald-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-70"
+              className="w-full flex items-center justify-center gap-2 rounded-lg bg-orange px-3 py-2 text-xs font-semibold text-white transition hover:bg-orange-dark disabled:cursor-not-allowed disabled:opacity-70"
             >
               {isCompleting ? (
                 <>
@@ -211,7 +211,7 @@ export function SiteCard({ site, stats }: Props) {
         )}
 
         {isCompleted && (
-          <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-center text-xs font-semibold text-emerald-700 dark:border-emerald-800 dark:bg-emerald-900/20 dark:text-emerald-400">
+          <div className="rounded-lg border border-rule-soft bg-paper-2 px-3 py-2 text-center text-xs font-semibold text-ink dark:border-rule dark:bg-paper-2 dark:text-green">
             ✓ Chantier terminé
           </div>
         )}
@@ -220,7 +220,7 @@ export function SiteCard({ site, stats }: Props) {
       {/* Modal de confirmation suppression */}
       {showDeleteConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-md rounded-2xl border border-zinc-200 bg-white p-6 shadow-xl dark:border-zinc-800 dark:bg-zinc-900">
+          <div className="w-full max-w-md rounded border border-zinc-200 bg-white p-6  dark:border-zinc-800 dark:bg-zinc-900">
             <h3 className="text-lg font-semibold text-zinc-900 dark:text-white mb-2">
               Supprimer le chantier
             </h3>
@@ -250,7 +250,7 @@ export function SiteCard({ site, stats }: Props) {
       {/* Modal de confirmation terminaison */}
       {showCompleteConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-md rounded-2xl border border-zinc-200 bg-white p-6 shadow-xl dark:border-zinc-800 dark:bg-zinc-900">
+          <div className="w-full max-w-md rounded border border-zinc-200 bg-white p-6  dark:border-zinc-800 dark:bg-zinc-900">
             <h3 className="text-lg font-semibold text-zinc-900 dark:text-white mb-2">
               Terminer le chantier
             </h3>
@@ -268,7 +268,7 @@ export function SiteCard({ site, stats }: Props) {
               <button
                 onClick={handleComplete}
                 disabled={isCompleting}
-                className="flex-1 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-70"
+                className="flex-1 rounded-lg bg-orange px-4 py-2 text-sm font-semibold text-white transition hover:bg-orange-dark disabled:cursor-not-allowed disabled:opacity-70"
               >
                 {isCompleting ? 'Terminaison...' : 'Terminer'}
               </button>

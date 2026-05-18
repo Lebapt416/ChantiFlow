@@ -13,7 +13,7 @@ export default function RGPDPage() {
         <div className="mb-8">
           <Link
             href="/"
-            className="text-sm text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300"
+            className="text-sm text-orange hover:text-ink dark:text-green dark:hover:text-green"
           >
             ← Retour à l&apos;accueil
           </Link>
@@ -27,7 +27,7 @@ export default function RGPDPage() {
           données personnelles.
         </p>
 
-        <div className="space-y-8 rounded-3xl border border-zinc-200 bg-white p-8 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="space-y-8 rounded border border-zinc-200 bg-white p-8 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
           <section>
             <h2 className="mb-4 text-2xl font-semibold text-zinc-900 dark:text-white">
               1. Responsable du traitement
@@ -40,7 +40,7 @@ export default function RGPDPage() {
                 <strong className="text-zinc-900 dark:text-white">Contact :</strong>{' '}
                 <a
                   href="mailto:contact@chantiflow.com"
-                  className="text-emerald-600 hover:underline dark:text-emerald-400"
+                  className="text-orange hover:underline dark:text-green"
                 >
                   contact@chantiflow.com
                 </a>
@@ -245,7 +245,7 @@ export default function RGPDPage() {
                 Pour exercer ces droits, contactez-nous à{' '}
                 <a
                   href="mailto:contact@chantiflow.com"
-                  className="text-emerald-600 hover:underline dark:text-emerald-400"
+                  className="text-orange hover:underline dark:text-green"
                 >
                   contact@chantiflow.com
                 </a>
@@ -291,7 +291,7 @@ export default function RGPDPage() {
                 Pour plus d&apos;informations, consultez notre{' '}
                 <Link
                   href="/politique-confidentialite"
-                  className="text-emerald-600 hover:underline dark:text-emerald-400"
+                  className="text-orange hover:underline dark:text-green"
                 >
                   politique de confidentialité
                 </Link>
@@ -314,7 +314,7 @@ export default function RGPDPage() {
                   <strong className="text-zinc-900 dark:text-white">Email :</strong>{' '}
                   <a
                     href="mailto:contact@chantiflow.com"
-                    className="text-emerald-600 hover:underline dark:text-emerald-400"
+                    className="text-orange hover:underline dark:text-green"
                   >
                     contact@chantiflow.com
                   </a>
@@ -323,7 +323,7 @@ export default function RGPDPage() {
                   <strong className="text-zinc-900 dark:text-white">Support :</strong>{' '}
                   <a
                     href="mailto:admin@chantiflow.com"
-                    className="text-emerald-600 hover:underline dark:text-emerald-400"
+                    className="text-orange hover:underline dark:text-green"
                   >
                     admin@chantiflow.com
                   </a>

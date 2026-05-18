@@ -83,7 +83,7 @@ export async function DashboardContent({ userId, userMetadata }: DashboardConten
             <h2 className="text-xl font-semibold text-zinc-900 dark:text-white">
               Chantiers en cours
             </h2>
-            <span className="rounded-full bg-emerald-100 px-2 py-1 text-xs font-semibold text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">
+            <span className="rounded-full bg-paper-2 px-2 py-1 text-xs font-semibold text-ink dark:bg-paper-2 dark:text-green">
               {activeSites.length}
             </span>
           </div>
@@ -104,7 +104,7 @@ export async function DashboardContent({ userId, userMetadata }: DashboardConten
       {completedSites.length > 0 && (
         <div className="mb-8">
           <div className="mb-4 flex items-center gap-2">
-            <CheckCircle2 className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+            <CheckCircle2 className="h-5 w-5 text-orange dark:text-green" />
             <h2 className="text-xl font-semibold text-zinc-900 dark:text-white">
               Chantiers terminés
             </h2>
@@ -138,7 +138,7 @@ export async function DashboardContent({ userId, userMetadata }: DashboardConten
       </div>
 
       {sitesArray.length === 0 && (
-        <div className="rounded-2xl border border-zinc-200 bg-white p-8 text-center dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="rounded border border-zinc-200 bg-white p-8 text-center dark:border-zinc-800 dark:bg-zinc-900">
           <p className="text-sm text-zinc-500 dark:text-zinc-400">
             Aucun chantier pour le moment. Créez votre premier chantier pour commencer.
           </p>

@@ -94,12 +94,12 @@ export default async function SiteTasksPage({ params }: Params) {
       <div className="space-y-6">
         {/* Stats */}
         <section className="grid gap-4 md:grid-cols-3">
-          <div className="rounded-2xl border border-zinc-100 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
+          <div className="rounded border border-zinc-100 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
             <p className="text-xs uppercase tracking-[0.3em] text-zinc-500">Total</p>
             <p className="mt-2 text-3xl font-semibold">{tasks?.length ?? 0}</p>
             <p className="text-sm text-zinc-500">tâches</p>
           </div>
-          <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5 dark:border-amber-500/30 dark:bg-amber-900/20">
+          <div className="rounded border border-amber-200 bg-amber-50 p-5 dark:border-amber-500/30 dark:bg-amber-900/20">
             <p className="text-xs uppercase tracking-[0.3em] text-amber-800 dark:text-amber-200">
               À traiter
             </p>
@@ -108,19 +108,19 @@ export default async function SiteTasksPage({ params }: Params) {
             </p>
             <p className="text-sm text-amber-800/80 dark:text-amber-200">en attente</p>
           </div>
-          <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-5 dark:border-emerald-500/30 dark:bg-emerald-900/20">
-            <p className="text-xs uppercase tracking-[0.3em] text-emerald-800 dark:text-emerald-100">
+          <div className="rounded border border-rule-soft bg-paper-2 p-5 dark:border-orange/30 dark:bg-paper-2">
+            <p className="text-xs uppercase tracking-[0.3em] text-ink dark:text-paper">
               Terminées
             </p>
-            <p className="mt-2 text-3xl font-semibold text-emerald-900 dark:text-emerald-50">
+            <p className="mt-2 text-3xl font-semibold text-ink dark:text-orange">
               {doneTasks.length}
             </p>
-            <p className="text-sm text-emerald-800/80 dark:text-emerald-100">clôturées</p>
+            <p className="text-sm text-ink/80 dark:text-paper">clôturées</p>
           </div>
         </section>
 
         {/* Ajouter une tâche */}
-        <section className="rounded-3xl border border-zinc-100 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+        <section className="rounded border border-zinc-100 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
           <div className="mb-4">
             <h2 className="text-lg font-semibold text-zinc-900 dark:text-white">
               Ajouter une tâche
@@ -133,7 +133,7 @@ export default async function SiteTasksPage({ params }: Params) {
         </section>
 
         {/* Tâches en cours */}
-        <section className="rounded-3xl border border-zinc-100 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+        <section className="rounded border border-zinc-100 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
           <div className="mb-4">
             <h2 className="text-lg font-semibold text-zinc-900 dark:text-white">
               Tâches en cours
@@ -147,7 +147,7 @@ export default async function SiteTasksPage({ params }: Params) {
               {pendingTasks.map((task) => (
                 <div
                   key={task.id}
-                  className="rounded-2xl border border-zinc-200 p-4 dark:border-zinc-700"
+                  className="rounded border border-zinc-200 p-4 dark:border-zinc-700"
                 >
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <div className="flex-1 min-w-0">
@@ -176,14 +176,14 @@ export default async function SiteTasksPage({ params }: Params) {
               ))}
             </div>
           ) : (
-            <p className="rounded-2xl border border-dashed border-zinc-200 p-6 text-center text-sm text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">
+            <p className="rounded border border-dashed border-zinc-200 p-6 text-center text-sm text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">
               Aucune tâche en attente pour le moment.
             </p>
           )}
         </section>
 
         {/* Historique */}
-        <section className="rounded-3xl border border-zinc-100 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+        <section className="rounded border border-zinc-100 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
           <h2 className="text-lg font-semibold text-zinc-900 dark:text-white">
             Historique récent
           </h2>
@@ -192,7 +192,7 @@ export default async function SiteTasksPage({ params }: Params) {
               {doneTasks.slice(0, 6).map((task) => (
                 <li
                   key={task.id}
-                  className="rounded-2xl border border-zinc-200 p-4 text-sm text-zinc-600 dark:border-zinc-700 dark:text-zinc-300"
+                  className="rounded border border-zinc-200 p-4 text-sm text-zinc-600 dark:border-zinc-700 dark:text-zinc-300"
                 >
                   ✅ <span className="font-semibold text-zinc-900 dark:text-white">{task.title}</span>{' '}
                   terminé

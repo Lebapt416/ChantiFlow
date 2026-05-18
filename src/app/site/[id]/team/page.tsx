@@ -123,17 +123,17 @@ export default async function SiteTeamPage({ params }: Params) {
       )}
 
       <section className="grid gap-4 md:grid-cols-3">
-        <div className="rounded-2xl border border-zinc-100 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="rounded border border-zinc-100 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
           <p className="text-xs uppercase tracking-[0.3em] text-zinc-500">Membres</p>
           <p className="mt-2 text-3xl font-semibold">{totalWorkers}</p>
           <p className="text-sm text-zinc-500">sur ce chantier</p>
         </div>
-        <div className="rounded-2xl border border-zinc-100 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="rounded border border-zinc-100 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
           <p className="text-xs uppercase tracking-[0.3em] text-zinc-500">Avec email</p>
           <p className="mt-2 text-3xl font-semibold">{workersWithEmail}</p>
           <p className="text-sm text-zinc-500">membres contactables</p>
         </div>
-        <div className="rounded-2xl border border-zinc-100 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="rounded border border-zinc-100 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
           <p className="text-xs uppercase tracking-[0.3em] text-zinc-500">Rôles</p>
           <p className="mt-2 text-3xl font-semibold">{Object.keys(groupedByRole).length}</p>
           <p className="text-sm text-zinc-500">profils différents</p>
@@ -141,7 +141,7 @@ export default async function SiteTeamPage({ params }: Params) {
       </section>
 
       {Object.keys(groupedByRole).length > 0 && (
-        <section className="mt-8 rounded-3xl border border-zinc-100 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+        <section className="mt-8 rounded border border-zinc-100 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
           <h2 className="text-lg font-semibold text-zinc-900 dark:text-white mb-4">
             Répartition des métiers
           </h2>
@@ -149,7 +149,7 @@ export default async function SiteTeamPage({ params }: Params) {
             {Object.entries(groupedByRole).map(([role, count]) => (
               <div
                 key={role}
-                className="rounded-2xl border border-zinc-200 p-4 text-sm dark:border-zinc-700"
+                className="rounded border border-zinc-200 p-4 text-sm dark:border-zinc-700"
               >
                 <p className="text-xs uppercase tracking-[0.3em] text-zinc-500 dark:text-zinc-400">
                   {role}
@@ -165,7 +165,7 @@ export default async function SiteTeamPage({ params }: Params) {
       )}
 
       {!isCompleted && (
-        <section className="mt-8 rounded-3xl border border-zinc-100 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+        <section className="mt-8 rounded border border-zinc-100 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
           <div className="mb-4 flex items-center justify-between">
             <div>
               <h2 className="text-lg font-semibold text-zinc-900 dark:text-white">
@@ -182,7 +182,7 @@ export default async function SiteTeamPage({ params }: Params) {
         </section>
       )}
 
-      <section className="mt-8 rounded-3xl border border-zinc-100 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+      <section className="mt-8 rounded border border-zinc-100 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
         <div className="mb-4 flex items-center justify-between">
           <div>
             <h2 className="text-lg font-semibold text-zinc-900 dark:text-white">
@@ -199,7 +199,7 @@ export default async function SiteTeamPage({ params }: Params) {
             {siteWorkers.map((worker) => (
               <div
                 key={worker.id}
-                className="rounded-2xl border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-700 dark:bg-zinc-900/50"
+                className="rounded border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-700 "
               >
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div className="flex-1">
@@ -217,7 +217,7 @@ export default async function SiteTeamPage({ params }: Params) {
                     {worker.access_code ? (
                       <div className="mt-2 flex flex-wrap items-center gap-2 text-xs">
                         <span className="text-zinc-600 dark:text-zinc-400">Code d&apos;accès :</span>
-                        <span className="font-mono font-semibold text-emerald-600 dark:text-emerald-400">
+                        <span className="font-mono font-semibold text-orange dark:text-green">
                           {worker.access_code}
                         </span>
                         <CopyButton value={worker.access_code} />

@@ -52,7 +52,7 @@ export function WorkerTasksList({ tasks, groups }: Props) {
       {groupsWithTasks.map((group) => (
         <section
           key={group.key}
-          className="rounded-3xl border border-zinc-200 bg-white/90 p-6 shadow-lg shadow-black/5 dark:border-zinc-800 dark:bg-zinc-900/90"
+          className="rounded border border-rule-soft bg-paper p-6"
         >
           <div className="flex items-center justify-between">
             <div>
@@ -70,7 +70,7 @@ export function WorkerTasksList({ tasks, groups }: Props) {
                   key={task.id}
                   type="button"
                   onClick={() => setSelectedTask(task)}
-                  className="w-full rounded-2xl border border-zinc-200 bg-zinc-50/70 px-4 py-3 text-left transition hover:border-emerald-300 dark:border-zinc-700 dark:bg-zinc-900/60"
+                  className="w-full rounded border border-zinc-200 bg-zinc-50/70 px-4 py-3 text-left transition hover:border-orange dark:border-zinc-700 dark:bg-zinc-900/60"
                 >
                   <div className="flex items-center justify-between text-xs text-zinc-500 dark:text-zinc-400">
                     <span>{task.siteName}</span>
@@ -90,7 +90,7 @@ export function WorkerTasksList({ tasks, groups }: Props) {
       ))}
 
       {!groupsWithTasks.length ? (
-        <section className="rounded-3xl border border-dashed border-zinc-200 bg-white/80 p-6 text-center shadow-inner dark:border-zinc-800 dark:bg-zinc-950/40">
+        <section className="rounded border border-dashed border-zinc-200 bg-paper p-6 text-center shadow-inner dark:border-zinc-800 dark:bg-zinc-950/40">
           <p className="text-lg font-semibold text-zinc-900 dark:text-white">Aucune mission pour le moment</p>
           <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
             Scannez un chantier pour recevoir vos premières tâches.
@@ -100,7 +100,7 @@ export function WorkerTasksList({ tasks, groups }: Props) {
 
       {selectedTask ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4 py-10">
-          <div className="w-full max-w-lg rounded-3xl border border-zinc-700 bg-zinc-900/95 p-6 text-white shadow-2xl">
+          <div className="w-full max-w-lg rounded border border-zinc-700 bg-zinc-900/95 p-6 text-white ">
             <div className="mb-4 flex items-center justify-between">
               <div>
                 <p className="text-xs uppercase tracking-[0.3em] text-zinc-400">{selectedTask.siteName}</p>
@@ -109,7 +109,7 @@ export function WorkerTasksList({ tasks, groups }: Props) {
               <button
                 type="button"
                 onClick={() => setSelectedTask(null)}
-                className="rounded-full border border-white/20 p-2 text-zinc-300 transition hover:text-white"
+                className="rounded-full border border-rule-soft p-2 text-zinc-300 transition hover:text-white"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -134,14 +134,14 @@ export function WorkerTasksList({ tasks, groups }: Props) {
               {selectedTask.siteId ? (
                 <Link
                   href={`/worker/${selectedTask.siteId}`}
-                  className="inline-flex w-full items-center justify-center rounded-2xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-500"
+                  className="inline-flex w-full items-center justify-center rounded bg-orange px-4 py-2 text-sm font-semibold text-white transition hover:bg-paper-20"
                 >
                   Ouvrir ce chantier
                 </Link>
               ) : null}
               <button
                 type="button"
-                className="inline-flex w-full items-center justify-center rounded-2xl border border-white/20 px-4 py-2 text-sm font-semibold text-white transition hover:border-white/40"
+                className="inline-flex w-full items-center justify-center rounded border border-rule-soft px-4 py-2 text-sm font-semibold text-white transition hover:border-white/40"
                 onClick={() => setSelectedTask(null)}
               >
                 Fermer

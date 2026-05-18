@@ -25,7 +25,7 @@ export function CreateSiteCard({ canCreate, limitReason, currentCount, maxSites 
 
   if (!canCreate) {
     return (
-      <div className="flex-shrink-0 w-80 rounded-2xl border-2 border-dashed border-amber-300 bg-amber-50 p-6 shadow-lg shadow-black/5 dark:border-amber-700 dark:bg-amber-900/20">
+      <div className="flex-shrink-0 w-80 rounded border-2 border-dashed border-amber-300 bg-amber-50 p-6 shadow-black/5 dark:border-amber-700 dark:bg-amber-900/20">
         <div className="flex h-full flex-col items-center justify-center text-center">
           <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full border-2 border-amber-300 bg-white dark:border-amber-700 dark:bg-zinc-800">
             <Plus className="h-8 w-8 text-amber-500 dark:text-amber-400" />
@@ -49,7 +49,7 @@ export function CreateSiteCard({ canCreate, limitReason, currentCount, maxSites 
 
   if (isFormOpen) {
     return (
-      <div className="flex-shrink-0 w-80 rounded-2xl border-2 border-zinc-300 bg-white p-6 shadow-lg shadow-black/5 dark:border-zinc-700 dark:bg-zinc-900">
+      <div className="flex-shrink-0 w-80 rounded border-2 border-zinc-300 bg-white p-6 shadow-black/5 dark:border-zinc-700 dark:bg-zinc-900">
         <div className="mb-4 flex items-center justify-between">
           <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">
             Nouveau chantier
@@ -74,7 +74,7 @@ export function CreateSiteCard({ canCreate, limitReason, currentCount, maxSites 
     <button
       type="button"
       onClick={() => setIsFormOpen(true)}
-      className="flex-shrink-0 w-80 rounded-2xl border-2 border-dashed border-zinc-300 bg-zinc-50 p-6 shadow-lg shadow-black/5 transition hover:border-zinc-400 hover:bg-zinc-100 hover:shadow-xl hover:scale-105 dark:border-zinc-700 dark:bg-zinc-900 dark:hover:border-zinc-600"
+      className="flex-shrink-0 w-80 rounded border-2 border-dashed border-zinc-300 bg-zinc-50 p-6 shadow-black/5 transition hover:border-zinc-400 hover:bg-zinc-100 hover:  dark:border-zinc-700 dark:bg-zinc-900 dark:hover:border-zinc-600"
     >
       <div className="flex h-full flex-col items-center justify-center text-center">
         <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full border-2 border-zinc-300 bg-white dark:border-zinc-700 dark:bg-zinc-800">

@@ -56,7 +56,7 @@ export default async function QrCodeViewPage({ params }: Params) {
         </Link>
 
         {/* Carte principale */}
-        <div className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="rounded border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
           <div className="mb-6 no-print">
             <h2 className="text-xl font-bold text-zinc-900 dark:text-white mb-2">
               {site.name}

@@ -137,7 +137,7 @@ export function ReportForm({ siteId, tasks, workers }: Props) {
     <form
       id="employee-report-form"
       onSubmit={handleSubmit}
-      className="space-y-4 rounded-2xl border border-zinc-200 bg-white/80 p-6 backdrop-blur dark:border-white/30 dark:bg-white/70"
+      className="space-y-4 rounded border border-zinc-200 bg-paper p-6  "
     >
       <input type="hidden" name="siteId" value={siteId} />
       <div className="space-y-2">
@@ -204,7 +204,7 @@ export function ReportForm({ siteId, tasks, workers }: Props) {
             ))}
         </datalist>
         {matchedWorker ? (
-          <p className="text-xs text-emerald-500 dark:text-emerald-300">
+          <p className="text-xs text-green dark:text-green">
             {matchedWorker.name} reconnu ({matchedWorker.role ?? 'rôle inconnu'})
           </p>
         ) : (
@@ -317,7 +317,7 @@ export function ReportForm({ siteId, tasks, workers }: Props) {
         <p className="text-sm text-rose-400">{state.error}</p>
       ) : null}
       {state?.success ? (
-        <p className="text-sm text-emerald-400">Rapport envoyé ✅</p>
+        <p className="text-sm text-green">Rapport envoyé ✅</p>
       ) : null}
     </form>
   );

@@ -25,7 +25,7 @@ export function CopyButton({ value }: Props) {
       onClick={handleCopy}
       className={`rounded-full border px-3 py-1 text-xs font-semibold transition ${
         copied
-          ? 'border-emerald-500 text-emerald-600 dark:border-emerald-400 dark:text-emerald-300'
+          ? 'border-orange text-orange dark:border-orange dark:text-green'
           : 'border-zinc-200 text-zinc-700 hover:border-zinc-900 hover:text-zinc-900 dark:border-zinc-600 dark:text-zinc-200 dark:hover:border-white dark:hover:text-white'
       }`}
     >

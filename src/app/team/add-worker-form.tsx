@@ -36,7 +36,7 @@ export function AddWorkerForm({}: Props) {
     <form
       id="add-worker-form"
       action={formAction}
-      className="grid gap-4 rounded-2xl border border-zinc-100 bg-white p-6 shadow-lg shadow-black/5 md:grid-cols-3 dark:border-zinc-800 dark:bg-zinc-900"
+      className="grid gap-4 rounded border border-zinc-100 bg-white p-6 shadow-black/5 md:grid-cols-3 dark:border-zinc-800 dark:bg-zinc-900"
     >
       <div className="space-y-2">
         <label
@@ -89,7 +89,7 @@ export function AddWorkerForm({}: Props) {
         <p className="md:col-span-3 text-sm text-rose-400">{state.error}</p>
       ) : null}
       {state?.success ? (
-        <p className="md:col-span-3 text-sm text-emerald-400">
+        <p className="md:col-span-3 text-sm text-green">
           Membre ajouté à votre équipe. Vous pourrez l&apos;assigner à un chantier plus tard.
         </p>
       ) : null}

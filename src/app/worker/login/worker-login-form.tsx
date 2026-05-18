@@ -15,7 +15,7 @@ function SubmitButton({ isPending }: { isPending: boolean }) {
     <button
       type="submit"
       disabled={isPending}
-      className="w-full rounded-md bg-emerald-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50 flex items-center justify-center gap-2"
+      className="w-full rounded-md bg-orange px-4 py-2.5 text-sm font-medium text-white transition hover:bg-orange-dark disabled:cursor-not-allowed disabled:opacity-50 flex items-center justify-center gap-2"
     >
       {isPending ? (
         <>
@@ -71,7 +71,7 @@ export function WorkerLoginForm({ tokenError }: { tokenError?: string | null }) 
           required
           maxLength={8}
           pattern="[0-9]{4}[A-Z]{4}"
-          className="w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-center text-lg font-mono font-bold tracking-widest shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:border-zinc-600 dark:bg-zinc-800 dark:text-white uppercase"
+          className="w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-center text-lg font-mono font-bold tracking-widest shadow-sm focus:outline-none focus:ring-2 focus:ring-orange dark:border-zinc-600 dark:bg-zinc-800 dark:text-white uppercase"
           style={{ letterSpacing: '0.3em' }}
           autoFocus
           onChange={(e) => {

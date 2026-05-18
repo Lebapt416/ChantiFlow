@@ -12,7 +12,7 @@ export default function LoginPage({
 }) {
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-50 px-4 py-12 dark:bg-zinc-950">
-      <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-2xl shadow-black/5 dark:bg-zinc-900">
+      <div className="w-full max-w-md rounded bg-white p-8  shadow-black/5 dark:bg-zinc-900">
         <div className="mb-8 space-y-4 text-center">
           <Image
             src="/vercel.svg"
@@ -34,7 +34,7 @@ export default function LoginPage({
           </div>
         </div>
         {searchParams?.reset === 'success' && (
-          <div className="mb-4 rounded-md bg-emerald-50 p-3 text-sm text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-400">
+          <div className="mb-4 rounded-md bg-paper-2 p-3 text-sm text-ink dark:bg-paper-2 dark:text-green">
             Mot de passe réinitialisé avec succès ! Vous pouvez maintenant vous connecter.
           </div>
         )}

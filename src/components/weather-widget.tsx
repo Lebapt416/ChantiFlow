@@ -149,14 +149,14 @@ export function WeatherWidget({ location, isLocked = false }: WeatherWidgetProps
 
   if (isLocked) {
     return (
-      <div className="relative rounded-2xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900">
-        <div className="absolute inset-0 z-10 flex items-center justify-center rounded-2xl bg-zinc-900/80 backdrop-blur-sm">
+      <div className="relative rounded border border-rule-soft bg-paper p-6">
+        <div className="absolute inset-0 z-10 flex items-center justify-center rounded bg-ink/80">
           <div className="text-center">
             <Lock className="mx-auto h-8 w-8 text-white" />
             <p className="mt-2 text-sm font-semibold text-white">Fonctionnalité Plus</p>
             <Link
               href="/account"
-              className="mt-2 inline-block rounded-lg bg-emerald-600 px-4 py-2 text-xs font-semibold text-white transition hover:bg-emerald-700"
+              className="mt-2 inline-block rounded bg-orange px-4 py-2 text-xs font-semibold text-paper transition hover:bg-orange-dark"
             >
               Passer à Plus
             </Link>
@@ -165,7 +165,7 @@ export function WeatherWidget({ location, isLocked = false }: WeatherWidgetProps
         <div className="opacity-30 blur-sm">
           <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">Météo du chantier</h3>
           <div className="mt-4 grid grid-cols-2 gap-4">
-            <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-700 dark:bg-zinc-800">
+            <div className="rounded border border-rule-soft bg-paper-2 p-4">
               <p className="text-xs text-zinc-500">Aujourd&apos;hui</p>
               <div className="mt-2 flex items-center gap-2">
                 <Sun className="h-6 w-6 text-yellow-500" />
@@ -173,7 +173,7 @@ export function WeatherWidget({ location, isLocked = false }: WeatherWidgetProps
               </div>
               <p className="mt-1 text-xs text-zinc-500">0% pluie</p>
             </div>
-            <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-700 dark:bg-zinc-800">
+            <div className="rounded border border-rule-soft bg-paper-2 p-4">
               <p className="text-xs text-zinc-500">Demain</p>
               <div className="mt-2 flex items-center gap-2">
                 <Cloud className="h-6 w-6 text-gray-400" />
@@ -189,7 +189,7 @@ export function WeatherWidget({ location, isLocked = false }: WeatherWidgetProps
 
   if (showCityInput) {
     return (
-      <div className="rounded-2xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900">
+      <div className="rounded border border-rule-soft bg-paper p-6">
         <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">Météo du chantier</h3>
         <form onSubmit={handleCitySubmit} className="mt-4">
           <input
@@ -199,14 +199,14 @@ export function WeatherWidget({ location, isLocked = false }: WeatherWidgetProps
             placeholder="Entrez le code postal (ex: 75001)"
             pattern="\d{5}"
             maxLength={5}
-            className="w-full rounded-lg border border-zinc-300 px-4 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
+            className="w-full rounded border border-rule-soft px-4 py-2 text-sm bg-paper text-ink"
           />
           <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-400">
             Code postal à 5 chiffres (ex: 75001 pour Paris)
           </p>
           <button
             type="submit"
-            className="mt-2 w-full rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700"
+            className="mt-2 w-full rounded bg-orange px-4 py-2 text-sm font-semibold text-paper transition hover:bg-orange-dark"
           >
             Charger la météo
           </button>
@@ -216,7 +216,7 @@ export function WeatherWidget({ location, isLocked = false }: WeatherWidgetProps
   }
 
   return (
-    <div className="rounded-2xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900">
+    <div className="rounded border border-rule-soft bg-paper p-6">
       <div className="mb-4 flex items-center justify-between">
         <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">Météo du chantier</h3>
         <button
@@ -236,7 +236,7 @@ export function WeatherWidget({ location, isLocked = false }: WeatherWidgetProps
           {error}
           <button
             onClick={() => fetchWeather(postalCode)}
-            className="ml-2 text-emerald-600 hover:underline"
+            className="ml-2 text-orange hover:underline"
           >
             Réessayer
           </button>
@@ -245,7 +245,7 @@ export function WeatherWidget({ location, isLocked = false }: WeatherWidgetProps
 
       {!loading && !error && weather.today && weather.tomorrow && (
         <div className="grid grid-cols-2 gap-4">
-          <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-700 dark:bg-zinc-800">
+          <div className="rounded border border-rule-soft bg-paper-2 p-4">
             <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Aujourd&apos;hui</p>
             <div className="mt-2 flex items-center gap-2">
               {getWeatherIcon(weather.today.weatherCode, weather.today.precipitation)}
@@ -262,7 +262,7 @@ export function WeatherWidget({ location, isLocked = false }: WeatherWidgetProps
             </p>
           </div>
 
-          <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-700 dark:bg-zinc-800">
+          <div className="rounded border border-rule-soft bg-paper-2 p-4">
             <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Demain</p>
             <div className="mt-2 flex items-center gap-2">
               {getWeatherIcon(weather.tomorrow.weatherCode, weather.tomorrow.precipitation)}

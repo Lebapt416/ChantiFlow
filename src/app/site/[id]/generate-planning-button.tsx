@@ -25,7 +25,7 @@ export function GeneratePlanningButton({ siteId }: Props) {
         type="button"
         onClick={handleClick}
         disabled={isPending}
-        className="flex items-center gap-2 rounded-full bg-emerald-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-emerald-500 dark:hover:bg-emerald-600"
+        className="flex items-center gap-2 rounded-full bg-orange px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-orange-dark disabled:cursor-not-allowed disabled:opacity-50 dark:bg-paper-20 dark:hover:bg-orange"
       >
         <Sparkles className="h-4 w-4" />
         {isPending ? 'Génération en cours...' : 'Générer le planning IA'}
@@ -36,11 +36,11 @@ export function GeneratePlanningButton({ siteId }: Props) {
       )}
 
       {state.success && state.planning && (
-        <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 dark:border-emerald-900/60 dark:bg-emerald-900/20">
-          <p className="text-sm font-semibold text-emerald-900 dark:text-emerald-100">
+        <div className="rounded-xl border border-rule-soft bg-paper-2 p-4 dark:border-orange/60 dark:bg-paper-2">
+          <p className="text-sm font-semibold text-ink dark:text-paper">
             Planning généré avec succès !
           </p>
-          <p className="mt-2 text-xs text-emerald-700 dark:text-emerald-300">
+          <p className="mt-2 text-xs text-ink dark:text-green">
             {state.planning.orderedTasks.length} tâches classées par ordre logique
           </p>
           {state.planning.warnings.length > 0 && (
