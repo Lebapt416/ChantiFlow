@@ -6,7 +6,7 @@ import { HeroSection } from './hero-section-optimized';
 // Lazy load tous les composants non essentiels au FCP
 const FeaturesSection = dynamic(() => import('./features-section').then(mod => ({ default: mod.FeaturesSection })), {
   ssr: false,
-  loading: () => <div className="h-96" />, // Placeholder pour éviter layout shift
+  loading: () => <div className="h-96" />,
 });
 
 const FaqSection = dynamic(() => import('./faq-section').then(mod => ({ default: mod.FaqSection })), {
@@ -29,14 +29,12 @@ type LandingPageClientProps = {
 
 export function LandingPageClient({ faqEntries }: LandingPageClientProps) {
   return (
-    <div className="min-h-screen bg-white dark:bg-zinc-950">
-      <div className="sticky top-0 z-50 flex h-9 items-center justify-center bg-amber-100 px-4 text-center text-xs font-medium text-amber-800 dark:bg-amber-900 dark:text-amber-200">
-        Version préliminaire — ChantiFlow est en phase de bêta privée. Inscription bientôt disponible.
+    <div className="min-h-screen bg-paper">
+      <div className="bg-ink py-2.5 text-center font-mono text-[11px] tracking-widest text-paper uppercase relative z-10">
+        <span className="inline-block w-1.5 h-1.5 rounded-full bg-orange mr-2.5 align-middle" style={{animation: 'pulse 2.4s ease-in-out infinite'}} />
+        Bêta privée · Inscription sur invitation · Prochaine vague — juin 2026
       </div>
       <HeroSection />
-
-      {/* Sections statiques restantes */}
-      {/* ... autres sections ... */}
 
       {/* Features Section */}
       <FeaturesSection />
@@ -52,4 +50,3 @@ export function LandingPageClient({ faqEntries }: LandingPageClientProps) {
     </div>
   );
 }
-
