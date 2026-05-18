@@ -54,7 +54,6 @@ export function AppShell({
         { href: `/site/${siteId}/team`, label: 'Équipe', icon: UsersRound },
         { href: `/site/${siteId}/reports`, label: 'Rapports', icon: FileText },
         { href: `/site/${siteId}/qr`, label: 'QR code', icon: QrCode },
-        { href: '/account', label: 'Mon compte', icon: User },
       ];
     }
 
@@ -64,77 +63,86 @@ export function AppShell({
       { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
       { href: '/qr', label: 'QR codes', icon: QrCode },
       { href: '/team', label: 'Équipe générale', icon: UsersRound },
-      { href: '/account', label: 'Mon compte', icon: User },
     ];
   }, [pathname]);
 
   return (
     <div className="min-h-screen bg-paper text-ink">
       <div className="lg:flex">
-        <aside className="fixed inset-y-0 left-0 z-20 hidden w-16 flex-col items-center border-r border-rule bg-ink px-0 py-8 lg:flex">
-          <nav className="flex flex-1 flex-col items-center gap-2 w-full">
+        {/* Sidebar */}
+        <aside className="fixed inset-y-0 left-0 z-20 hidden w-56 flex-col border-r border-rule bg-ink lg:flex">
+          {/* Logo */}
+          <div className="px-5 py-5 border-b border-rule">
+            <Link href="/home" className="flex items-center gap-3">
+              <div
+                className="w-8 h-8 bg-paper text-ink flex items-center justify-center font-mono text-base font-medium flex-shrink-0"
+                style={{ transform: 'rotate(-3deg)' }}
+              >
+                C
+              </div>
+              <span
+                className="font-serif text-lg font-semibold text-paper"
+                style={{ letterSpacing: '-0.02em', fontVariationSettings: '"opsz" 144, "SOFT" 50' }}
+              >
+                ChantiFlow
+              </span>
+            </Link>
+          </div>
+
+          {/* Nav items */}
+          <nav className="flex-1 overflow-y-auto py-4">
             {navItems.map((item) => {
               const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
               return (
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`group/item relative flex items-center justify-center w-14 h-14 rounded transition-all duration-200 ${
+                  className={`flex items-center gap-3 px-5 py-2.5 text-[13px] font-medium transition-colors duration-150 border-l-2 ${
                     active
-                      ? 'bg-white text-black shadow-white/20'
-                      : 'text-white hover:text-white'
+                      ? 'bg-paper/10 text-paper border-orange'
+                      : 'text-paper/60 border-transparent hover:text-paper hover:border-paper/30'
                   }`}
-                  title={item.label}
                 >
-                  <span className={`absolute rounded transition-all duration-200 ${
-                    active
-                      ? 'inset-0 bg-white'
-                      : 'top-0 bottom-0 left-2 right-0 bg-black/50 group-hover/item:bg-black/70 group-hover/item:left-3'
-                  }`}></span>
-                  <span className="relative z-10">
-                    <item.icon 
-                      size={26} 
-                      strokeWidth={active ? 3.5 : 3}
-                      className={active ? '' : 'group-hover/item:scale-110 transition-transform duration-200'}
-                    />
-                  </span>
-                  {/* Tooltip pour affichage au survol */}
-                  <span className="pointer-events-none absolute left-full ml-3 z-50 whitespace-nowrap rounded-lg bg-zinc-900 px-3 py-1.5 text-xs font-medium text-white opacity-0  transition-all duration-200 group-hover/item:opacity-100 group-hover/item:translate-x-0 -translate-x-1 dark:bg-zinc-100 dark:text-zinc-900">
-                    {item.label}
-                    <span className="absolute right-full top-1/2 -mr-1 h-2 w-2 -translate-y-1/2 rotate-45 bg-zinc-900 dark:bg-zinc-100"></span>
-                  </span>
+                  <item.icon size={16} strokeWidth={active ? 2.5 : 1.5} />
+                  {item.label}
                 </Link>
               );
             })}
-            {/* Bouton d'installation PWA */}
-            <div className="mt-auto pt-4">
+          </nav>
+
+          {/* User / bottom */}
+          <div className="px-5 py-4 border-t border-rule">
+            {userEmail && (
+              <div className="font-mono text-[10px] uppercase tracking-widest text-paper/40 truncate">
+                {userEmail}
+              </div>
+            )}
+            <Link
+              href="/account"
+              className="mt-1 font-mono text-[10px] uppercase tracking-widest text-paper/60 hover:text-paper transition-colors"
+            >
+              → Mon compte
+            </Link>
+            <div className="mt-3">
               <InstallPwaButton />
             </div>
-          </nav>
+          </div>
         </aside>
-        <div className="min-h-screen flex-1 transition-all duration-300 ease-in-out lg:ml-16">
-          <header className="sticky top-0 z-10 border-b border-rule-soft bg-paper px-4 py-4">
-            <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-              <div className="flex items-center gap-3">
-                <div>
-                  <p className="text-xs uppercase tracking-[0.4em] text-zinc-500 dark:text-zinc-400">
-                    ChantiFlow
-                  </p>
-                  <h1 className="text-2xl font-semibold">{heading}</h1>
-                  {subheading ? (
-                    <p className="text-sm text-zinc-500 dark:text-zinc-400">{subheading}</p>
-                  ) : null}
-                </div>
-              </div>
-              <div className="flex items-center gap-3">
-                {actions}
-                {userEmail ? (
-                  <div className="rounded-full border border-zinc-200 px-4 py-2 text-sm font-medium text-zinc-700 dark:border-zinc-700 dark:text-zinc-200">
-                    {userEmail}
-                  </div>
-                ) : null}
-              </div>
+
+        {/* Main content */}
+        <div className="min-h-screen flex-1 lg:ml-56">
+          <header className="sticky top-0 z-10 border-b border-rule bg-paper px-6 py-4 flex items-center justify-between">
+            <div>
+              <p className="font-mono text-[10px] uppercase tracking-widest text-ink-3">ChantiFlow</p>
+              <h1
+                className="font-serif text-2xl font-normal text-ink mt-0.5"
+                style={{ fontVariationSettings: '"opsz" 60, "SOFT" 30' }}
+              >
+                {heading}
+              </h1>
+              {subheading && <p className="text-sm text-ink-2 mt-0.5">{subheading}</p>}
             </div>
+            <div className="flex items-center gap-3">{actions}</div>
           </header>
           <main className="px-4 py-8 lg:px-10 pb-24 md:pb-8">{children}</main>
         </div>
@@ -143,4 +151,3 @@ export function AppShell({
     </div>
   );
 }
-

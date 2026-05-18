@@ -1,4 +1,3 @@
-import Image from 'next/image';
 import { AuthFormAPI } from './auth-form-api';
 
 export const metadata = {
@@ -11,36 +10,94 @@ export default function LoginPage({
   searchParams: { reset?: string };
 }) {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 px-4 py-12 dark:bg-zinc-950">
-      <div className="w-full max-w-md rounded bg-white p-8  shadow-black/5 dark:bg-zinc-900">
-        <div className="mb-8 space-y-4 text-center">
-          <Image
-            src="/vercel.svg"
-            alt="Logo ChantiFlow"
-            width={48}
-            height={48}
-            className="mx-auto dark:invert"
-          />
-          <div>
-            <p className="text-sm uppercase tracking-[0.3em] text-zinc-500 dark:text-zinc-400">
-              Chantiflow
-            </p>
-            <h1 className="text-2xl font-semibold text-zinc-900 dark:text-white">
-              Espace chef de chantier
-            </h1>
-            <p className="text-sm text-zinc-500 dark:text-zinc-400">
-              Connecte-toi ou crée un compte pour commencer.
-            </p>
+    <div className="flex min-h-screen">
+
+      {/* Left column — editorial quote, hidden on mobile */}
+      <div className="hidden lg:flex lg:w-1/2 flex-col justify-between bg-paper-2 p-16 border-r border-rule">
+
+        {/* Logo */}
+        <div className="flex items-center gap-3">
+          <div
+            className="w-8 h-8 bg-ink text-paper flex items-center justify-center font-mono text-base font-medium"
+            style={{ transform: 'rotate(-3deg)' }}
+          >
+            C
           </div>
+          <span
+            className="font-serif text-xl font-semibold text-ink"
+            style={{ letterSpacing: '-0.02em', fontVariationSettings: '"opsz" 144, "SOFT" 50' }}
+          >
+            ChantiFlow
+          </span>
         </div>
-        {searchParams?.reset === 'success' && (
-          <div className="mb-4 rounded-md bg-paper-2 p-3 text-sm text-ink dark:bg-paper-2 dark:text-green">
-            Mot de passe réinitialisé avec succès ! Vous pouvez maintenant vous connecter.
+
+        {/* Editorial quote */}
+        <div>
+          <div className="font-mono text-[10px] uppercase tracking-widest text-ink-3 mb-6">
+            Chapitre · Accès
           </div>
-        )}
-        <AuthFormAPI />
+          <blockquote
+            className="font-serif text-[42px] font-normal leading-[1.05] tracking-tight text-ink"
+            style={{ fontVariationSettings: '"opsz" 144, "SOFT" 30' }}
+          >
+            Le chantier ne s&apos;arrête pas.<br />
+            <em
+              className="italic font-light text-orange"
+              style={{ fontVariationSettings: '"opsz" 144, "SOFT" 100' }}
+            >
+              Votre planning
+            </em>{' '}
+            non plus.
+          </blockquote>
+          <p className="mt-6 text-[15px] text-ink-2 max-w-sm leading-relaxed">
+            Gérez vos chantiers, planifiez vos équipes et suivez l&apos;avancement — depuis le bureau ou le terrain.
+          </p>
+        </div>
+
+        {/* Bottom mono label */}
+        <div className="font-mono text-[10px] uppercase tracking-widest text-ink-3">
+          Hébergement UE · RGPD ✓ · Données chiffrées
+        </div>
+      </div>
+
+      {/* Right column — form */}
+      <div className="flex w-full flex-col justify-center bg-paper px-8 py-12 lg:w-1/2 lg:px-20">
+
+        {/* Mobile logo */}
+        <div className="mb-10 flex items-center gap-3 lg:hidden">
+          <div
+            className="w-8 h-8 bg-ink text-paper flex items-center justify-center font-mono text-base font-medium"
+            style={{ transform: 'rotate(-3deg)' }}
+          >
+            C
+          </div>
+          <span className="font-serif text-xl font-semibold text-ink">ChantiFlow</span>
+        </div>
+
+        <div className="w-full max-w-sm">
+          <p className="font-mono text-[10px] uppercase tracking-widest text-ink-3 mb-2">
+            Espace chef de chantier
+          </p>
+          <h1
+            className="font-serif text-[32px] font-normal text-ink mb-1"
+            style={{ fontVariationSettings: '"opsz" 60, "SOFT" 30' }}
+          >
+            Connexion
+          </h1>
+          <p className="text-[15px] text-ink-2 mb-8">
+            Connecte-toi ou crée un compte pour commencer.
+          </p>
+
+          {/* Reset success banner */}
+          {searchParams?.reset === 'success' && (
+            <div className="mb-6 border border-green bg-paper-2 px-4 py-3 font-mono text-[12px] tracking-wide text-green">
+              ✓ Mot de passe réinitialisé avec succès.
+            </div>
+          )}
+
+          <AuthFormAPI />
+        </div>
       </div>
     </div>
   );
 }
-

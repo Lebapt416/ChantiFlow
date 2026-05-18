@@ -12,7 +12,7 @@ function SubmitButton() {
   return (
     <button
       type="submit"
-      className="w-full rounded-md bg-black py-2 text-white transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-70"
+      className="w-full bg-orange text-paper px-6 py-3 font-medium text-[15px] transition-colors hover:bg-orange-dark disabled:opacity-60 disabled:cursor-not-allowed"
       disabled={pending}
     >
       {pending ? 'Connexion...' : 'Se connecter'}
@@ -28,7 +28,7 @@ export function SignInForm() {
       <div className="space-y-2">
         <label
           htmlFor="email"
-          className="text-sm font-medium text-zinc-600 dark:text-zinc-300"
+          className="block font-mono text-[11px] uppercase tracking-widest text-ink-2 mb-2"
         >
           Email
         </label>
@@ -37,14 +37,14 @@ export function SignInForm() {
           name="email"
           type="email"
           placeholder="chef@chantiflow.com"
-          className="w-full rounded-md border border-zinc-200 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-black/60 dark:border-zinc-700 dark:bg-zinc-950 dark:text-white"
+          className="w-full px-4 py-3 bg-paper border border-rule text-ink font-sans focus:outline-none focus:border-orange transition-colors"
           required
         />
       </div>
       <div className="space-y-2">
         <label
           htmlFor="password"
-          className="text-sm font-medium text-zinc-600 dark:text-zinc-300"
+          className="block font-mono text-[11px] uppercase tracking-widest text-ink-2 mb-2"
         >
           Mot de passe
         </label>
@@ -53,15 +53,14 @@ export function SignInForm() {
           name="password"
           type="password"
           placeholder="••••••••"
-          className="w-full rounded-md border border-zinc-200 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-black/60 dark:border-zinc-700 dark:bg-zinc-950 dark:text-white"
+          className="w-full px-4 py-3 bg-paper border border-rule text-ink font-sans focus:outline-none focus:border-orange transition-colors"
           required
         />
       </div>
       {state?.error ? (
-        <p className="text-sm text-rose-400">{state.error}</p>
+        <p className="text-sm text-danger mt-2">{state.error}</p>
       ) : null}
       <SubmitButton />
     </form>
   );
 }
-

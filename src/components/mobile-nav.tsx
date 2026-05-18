@@ -47,8 +47,8 @@ export function MobileNav() {
   }, [pathname]);
 
   return (
-    <nav className="fixed bottom-4 left-4 right-4 z-50 md:hidden">
-      <div className="flex items-center justify-around bg-paper border border-rule-soft rounded px-2 py-3 overflow-x-auto scrollbar-hide">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden border-t border-rule bg-ink">
+      <div className="flex items-stretch justify-around overflow-x-auto scrollbar-hide">
         {navItems.map((item) => {
           const isActive =
             pathname === item.href || pathname.startsWith(`${item.href}/`);
@@ -57,51 +57,19 @@ export function MobileNav() {
             <Link
               key={item.href}
               href={item.href}
-              className={`relative flex flex-col items-center justify-center gap-1 px-2 py-2 rounded transition-all duration-300 flex-shrink-0 ${
+              className={`relative flex flex-col items-center justify-center gap-1 px-3 py-3 flex-shrink-0 transition-colors duration-150 ${
                 isActive
-                  ? 'text-orange'
-                  : 'text-ink-2 hover:text-ink'
+                  ? 'text-paper border-t-2 border-orange'
+                  : 'text-paper/50 hover:text-paper/80 border-t-2 border-transparent'
               }`}
             >
-              {/* Fond actif avec glow premium */}
-              {isActive && (
-                <span className="absolute inset-0 bg-paper-2 rounded" />
-              )}
-              
-              {/* Icône */}
-              <span
-                className={`relative z-10 transition-all duration-300 ${
-                  isActive
-                    ? 'scale-110 drop-'
-                    : 'scale-100 active:scale-95'
-                }`}
-              >
-                <item.icon
-                  size={22}
-                  strokeWidth={isActive ? 2.5 : 2}
-                  className={
-                    isActive
-                      ? 'drop-shadow-sm filter brightness-110'
-                      : 'transition-opacity duration-200'
-                  }
-                />
-              </span>
-
-              {/* Label */}
-              <span
-                className={`relative z-10 text-[10px] font-semibold transition-all duration-300 ${
-                  isActive
-                    ? 'text-orange font-bold'
-                    : 'text-ink-3'
-                }`}
-              >
+              <item.icon
+                size={20}
+                strokeWidth={isActive ? 2.5 : 1.5}
+              />
+              <span className="font-mono text-[9px] uppercase tracking-widest">
                 {item.label}
               </span>
-
-              {/* Indicateur actif (point en bas avec glow) */}
-              {isActive && (
-                <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-orange" />
-              )}
             </Link>
           );
         })}
@@ -109,4 +77,3 @@ export function MobileNav() {
     </nav>
   );
 }
-
