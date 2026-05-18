@@ -1,80 +1,122 @@
 @import "tailwindcss";
 
-html {
-  scroll-behavior: smooth;
-  scroll-padding-top: 80px; /* Espace pour le header fixe */
-  -webkit-overflow-scrolling: touch; /* Scroll fluide sur iOS */
-}
+/* ─────────────────────────────────────────────────────────────
+   DESIGN TOKENS — Industrial Editorial
+   Tailwind v4 : @theme définit les utilitaires (bg-paper, text-ink…)
+   :root       : variables CSS accessibles partout (emails, JS dynamique)
+───────────────────────────────────────────────────────────────*/
 
-* {
-  scroll-margin-top: 80px; /* Marge pour les ancres */
+@theme {
+  /* Couleurs */
+  --color-paper:       #F1EBDF;
+  --color-paper-2:     #E8E1D2;
+  --color-ink:         #161512;
+  --color-ink-2:       #5A554B;
+  --color-ink-3:       #8A8478;
+  --color-rule:        #3A352D;
+  --color-rule-soft:   #C9BFAC;
+  --color-orange:      #E85D1F;
+  --color-orange-dark: #B23D0A;
+  --color-blue:        #1E3A8A;
+  --color-blue-soft:   #3B5BB8;
+  --color-green:       #2F5D3A;
+  --color-warn:        #B58105;
+  --color-danger:      #9F1D1D;
+
+  /* Typographie */
+  --font-serif: var(--font-fraunces), Georgia, 'Times New Roman', serif;
+  --font-sans:  var(--font-bricolage), system-ui, sans-serif;
+  --font-mono:  var(--font-jbmono), 'JetBrains Mono', monospace;
 }
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Tokens CSS pour emails et éléments dynamiques */
+  --paper:        #F1EBDF;
+  --paper-2:      #E8E1D2;
+  --ink:          #161512;
+  --ink-2:        #5A554B;
+  --ink-3:        #8A8478;
+  --rule:         #3A352D;
+  --rule-soft:    #C9BFAC;
+  --orange:       #E85D1F;
+  --orange-dark:  #B23D0A;
+  --blue:         #1E3A8A;
+  --blue-soft:    #3B5BB8;
+  --green:        #2F5D3A;
+  --warn:         #B58105;
+  --danger:       #9F1D1D;
+
+  /* Tokens système (héritage) */
+  --background: var(--paper);
+  --foreground: var(--ink);
 }
 
-html[data-theme='light'] {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
+/* App authentifiée : dark mode inversé */
 html[data-theme='dark'] {
-  --background: #0a0a0a;
-  --foreground: #ededed;
+  --background: var(--ink);
+  --foreground: var(--paper);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-/* Utiliser les préférences du navigateur, sombre par défaut */
 @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  :root:not([data-theme]) {
+    --background: var(--ink);
+    --foreground: var(--paper);
   }
 }
 
-/* Par défaut, mode sombre si pas de préférence */
-:root:not([data-theme]) {
-  --background: #0a0a0a;
-  --foreground: #ededed;
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 80px;
+  -webkit-overflow-scrolling: touch;
+}
+
+* {
+  scroll-margin-top: 80px;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
-  overscroll-behavior-y: smooth; /* Évite les rebonds */
+  font-family: var(--font-sans, system-ui, sans-serif);
+  overscroll-behavior-y: smooth;
+  position: relative;
 }
 
-/* Styles d'impression pour les QR codes */
+/* Grain papier subtil — superposé via pseudo-élément */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.35;
+  z-index: 1;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.09 0 0 0 0 0.08 0 0 0 0 0.07 0 0 0 0.12 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+
+/* ─────────────────────────────────────────────────────────────
+   IMPRESSION — QR codes
+───────────────────────────────────────────────────────────────*/
 @media print {
   body * {
     visibility: hidden;
   }
-  
+
   .print-qr-only,
   .print-qr-only * {
     visibility: visible;
   }
-  
+
   .print-qr-only {
     position: absolute;
     left: 0;
     top: 0;
     width: 100%;
   }
-  
+
   .no-print {
     display: none !important;
   }
-  
+
   @page {
     margin: 1cm;
     size: A4;

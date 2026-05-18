@@ -1,23 +1,29 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Fraunces, Bricolage_Grotesque, JetBrains_Mono } from "next/font/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { PwaRegister } from "@/components/pwa-register";
 import { AuthProvider } from "@/components/auth-provider";
 import { OfflineIndicator } from "@/components/offline-indicator";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const fraunces = Fraunces({
   subsets: ["latin"],
+  variable: "--font-fraunces",
   display: "swap",
-  preload: true,
+  axes: ["opsz", "SOFT"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const bricolage = Bricolage_Grotesque({
   subsets: ["latin"],
+  variable: "--font-bricolage",
   display: "swap",
-  preload: false, // Moins prioritaire
+});
+
+const jbMono = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-jbmono",
+  display: "swap",
+  weight: ["400", "500"],
 });
 
 const appBaseUrl = process.env.NEXT_PUBLIC_APP_BASE_URL ?? "https://www.chantiflow.com";
@@ -26,8 +32,8 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "white" },
-    { media: "(prefers-color-scheme: dark)", color: "#18181b" },
+    { media: "(prefers-color-scheme: light)", color: "#F1EBDF" },
+    { media: "(prefers-color-scheme: dark)", color: "#161512" },
   ],
 };
 
@@ -103,7 +109,7 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-title" content="ChantiFlow" />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[var(--background)] text-[var(--foreground)]`}
+        className={`${fraunces.variable} ${bricolage.variable} ${jbMono.variable} antialiased bg-[var(--background)] text-[var(--foreground)]`}
       >
         <AuthProvider>
           {children}
