@@ -93,24 +93,24 @@ export default async function WorkerTasksPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-zinc-50 via-white to-zinc-100 pb-32 dark:from-zinc-950 dark:via-zinc-900 dark:to-zinc-950">
-      <header className="border-b border-rule-soft bg-paper px-4 py-6">
+    <div className="min-h-screen bg-paper pb-32 dark:bg-ink">
+      <header className="border-b border-rule-soft bg-paper px-4 py-6 dark:border-rule dark:bg-ink">
         <div className="mx-auto flex max-w-5xl flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex items-center gap-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded bg-zinc-900 shadow-black/10 dark:bg-white">
+            <div className="flex h-12 w-12 items-center justify-center rounded bg-ink dark:bg-paper">
               <Image src="/logo.svg" alt="ChantiFlow" width={32} height={32} priority className="h-8 w-8" />
             </div>
             <div>
-              <p className="text-xs uppercase tracking-[0.4em] text-zinc-500 dark:text-zinc-400">ChantiFlow</p>
-              <h1 className="text-2xl font-semibold text-zinc-900 dark:text-white">Mes tâches</h1>
-              <p className="text-sm text-zinc-500 dark:text-zinc-400">
+              <p className="font-mono text-[10px] uppercase tracking-widest text-ink-3">ChantiFlow</p>
+              <h1 className="font-serif text-[24px] text-ink dark:text-paper">Mes tâches</h1>
+              <p className="text-sm text-ink-3">
                 Retrouvez l’ensemble de vos missions ({tasksWithMeta.length}) et validez vos actions en direct.
               </p>
             </div>
           </div>
           <Link
             href="/worker/scanner"
-            className="inline-flex items-center gap-2 rounded-full bg-orange px-4 py-2 text-xs font-semibold text-white transition hover:bg-orange-dark"
+            className="inline-flex items-center gap-2 border border-orange px-4 py-2 font-mono text-[10px] uppercase tracking-widest text-orange transition hover:bg-paper-2"
           >
             Scanner un chantier
           </Link>

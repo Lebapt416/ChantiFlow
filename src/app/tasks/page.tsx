@@ -56,7 +56,6 @@ export default async function TasksPage() {
 
   if (siteIds.length > 0) {
     try {
-      // Récupérer les workers assignés aux chantiers
       const { data: siteWorkers, error: siteWorkersError } = await supabase
         .from('workers')
         .select('id, name, email, role, site_id, created_by')
@@ -66,8 +65,6 @@ export default async function TasksPage() {
         console.error('Erreur récupération workers des chantiers:', siteWorkersError);
       }
 
-      // Récupérer les workers au niveau du compte (sans site_id)
-      // Gérer le cas où created_by n'existe pas encore
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let accountWorkers: any[] = [];
       try {
@@ -78,7 +75,6 @@ export default async function TasksPage() {
           .is('site_id', null);
 
         if (accountWorkersError) {
-          // Si la colonne created_by n'existe pas, essayer sans filtre
           if (accountWorkersError.message.includes('created_by') || accountWorkersError.code === '42703') {
             console.warn('Colonne created_by non trouvée, récupération sans filtre');
             const { data: allWorkersData } = await supabase
@@ -94,18 +90,14 @@ export default async function TasksPage() {
         console.error('Erreur récupération workers du compte:', error);
       }
 
-      // Combiner et dédupliquer
       const allWorkers = [
         ...(siteWorkers ?? []),
         ...accountWorkers,
       ];
 
-      // Filtrer pour ne garder que ceux de l'utilisateur et dédupliquer par ID
       const workerMap = new Map<string, typeof availableWorkers[0]>();
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       allWorkers.forEach((worker: any) => {
-        // Si created_by existe, vérifier qu'il appartient à l'utilisateur
-        // Sinon, inclure tous les workers (pour compatibilité)
         if (!worker.created_by || worker.created_by === user.id) {
           if (!workerMap.has(worker.id)) {
             workerMap.set(worker.id, {
@@ -134,10 +126,10 @@ export default async function TasksPage() {
       primarySite={sites?.[0] ?? null}
     >
       <section className="grid gap-4 md:grid-cols-3">
-        <div className="rounded border border-zinc-100 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
-          <p className="text-xs uppercase tracking-[0.3em] text-zinc-500">Total</p>
-          <p className="mt-2 text-3xl font-semibold">{tasks?.length ?? 0}</p>
-          <p className="text-sm text-zinc-500">tâches recensées</p>
+        <div className="rounded border border-rule-soft bg-paper p-5 dark:border-rule dark:bg-ink">
+          <p className="text-xs uppercase tracking-[0.3em] text-ink-3">Total</p>
+          <p className="mt-2 text-3xl font-semibold text-ink dark:text-paper">{tasks?.length ?? 0}</p>
+          <p className="text-sm text-ink-3">tâches recensées</p>
         </div>
         <div className="rounded border border-amber-200 bg-amber-50 p-5 dark:border-amber-500/30 dark:bg-amber-900/20">
           <p className="text-xs uppercase tracking-[0.3em] text-amber-800 dark:text-amber-200">
@@ -163,13 +155,13 @@ export default async function TasksPage() {
         </div>
       </section>
 
-      <section className="mt-8 rounded border border-zinc-100 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+      <section className="mt-8 rounded border border-rule-soft bg-paper p-6 dark:border-rule dark:bg-ink">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h2 className="text-lg font-semibold text-zinc-900 dark:text-white">
+            <h2 className="font-serif text-[22px] text-ink dark:text-paper">
               Ajouter une tâche
             </h2>
-            <p className="text-sm text-zinc-500 dark:text-zinc-400">
+            <p className="text-sm text-ink-3">
               Créez une nouvelle tâche pour un chantier.
             </p>
           </div>
@@ -179,13 +171,13 @@ export default async function TasksPage() {
         </div>
       </section>
 
-      <section className="mt-8 rounded border border-zinc-100 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+      <section className="mt-8 rounded border border-rule-soft bg-paper p-6 dark:border-rule dark:bg-ink">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h2 className="text-lg font-semibold text-zinc-900 dark:text-white">
+            <h2 className="font-serif text-[22px] text-ink dark:text-paper">
               Tâches en cours
             </h2>
-            <p className="text-sm text-zinc-500 dark:text-zinc-400">
+            <p className="text-sm text-ink-3">
               Filtre automatiquement par statut & site.
             </p>
           </div>
@@ -198,14 +190,14 @@ export default async function TasksPage() {
               return (
                 <div
                   key={task.id}
-                  className="rounded border border-zinc-200 p-4 dark:border-zinc-700"
+                  className="rounded border border-rule-soft p-4 dark:border-rule"
                 >
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-zinc-900 dark:text-white">
+                      <p className="text-sm font-semibold text-ink dark:text-paper">
                         {task.title}
                       </p>
-                      <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                      <p className="text-xs text-ink-3">
                         {siteMap[task.site_id]?.name ?? 'Site inconnu'} •{' '}
                         {task.required_role || 'Rôle libre'}
                       </p>
@@ -219,7 +211,7 @@ export default async function TasksPage() {
                       />
                       <Link
                         href={`/site/${task.site_id}`}
-                        className="text-xs font-semibold text-black hover:underline dark:text-white whitespace-nowrap"
+                        className="font-mono text-[10px] uppercase tracking-widest text-ink-2 hover:text-ink whitespace-nowrap"
                       >
                         Voir le chantier →
                       </Link>
@@ -230,7 +222,7 @@ export default async function TasksPage() {
                       ⚠️ Aucun membre d&apos;équipe disponible. Ajoutez des membres dans la page &quot;Équipe&quot;.
                     </p>
                   )}
-                  <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-400">
+                  <p className="mt-2 text-xs text-ink-3">
                     Créée le{' '}
                     {task.created_at
                       ? new Date(task.created_at).toLocaleDateString('fr-FR', {
@@ -247,14 +239,14 @@ export default async function TasksPage() {
             })}
           </div>
         ) : (
-          <p className="rounded border border-dashed border-zinc-200 p-6 text-center text-sm text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">
+          <p className="rounded border border-dashed border-rule-soft p-6 text-center text-sm text-ink-3 dark:border-rule">
             Aucune tâche en attente pour le moment.
           </p>
         )}
       </section>
 
-      <section className="mt-8 rounded border border-zinc-100 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-        <h2 className="text-lg font-semibold text-zinc-900 dark:text-white">
+      <section className="mt-8 rounded border border-rule-soft bg-paper p-6 dark:border-rule dark:bg-ink">
+        <h2 className="font-serif text-[22px] text-ink dark:text-paper">
           Historique récent
         </h2>
         {doneTasks.length ? (
@@ -262,15 +254,15 @@ export default async function TasksPage() {
             {doneTasks.slice(0, 6).map((task) => (
               <li
                 key={task.id}
-                className="rounded border border-zinc-200 p-4 text-sm text-zinc-600 dark:border-zinc-700 dark:text-zinc-300"
+                className="rounded border border-rule-soft p-4 text-sm text-ink-2 dark:border-rule"
               >
-                ✅ <span className="font-semibold text-zinc-900 dark:text-white">{task.title}</span>{' '}
+                ✅ <span className="font-semibold text-ink dark:text-paper">{task.title}</span>{' '}
                 terminé sur {siteMap[task.site_id]?.name ?? 'site inconnu'}
               </li>
             ))}
           </ul>
         ) : (
-          <p className="mt-3 text-sm text-zinc-500 dark:text-zinc-400">
+          <p className="mt-3 text-sm text-ink-3">
             Aucune tâche clôturée récemment.
           </p>
         )}
@@ -278,4 +270,3 @@ export default async function TasksPage() {
     </AppShell>
   );
 }
-

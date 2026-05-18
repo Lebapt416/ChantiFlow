@@ -30,7 +30,7 @@ function SubmitButton() {
   return (
     <button
       type="submit"
-      className="w-full rounded-md bg-black py-2 text-sm font-semibold text-white transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-70 dark:bg-white dark:text-black dark:hover:bg-zinc-200"
+      className="w-full rounded border border-rule-soft py-2 text-sm font-semibold text-ink transition hover:bg-paper-2 disabled:cursor-not-allowed disabled:opacity-70 dark:border-rule dark:text-paper"
       disabled={pending}
     >
       {pending ? 'Envoi...' : 'Envoyer le rapport'}
@@ -142,7 +142,7 @@ export function ReportForm({ siteId, tasks, workers }: Props) {
       <input type="hidden" name="siteId" value={siteId} />
       <div className="space-y-2">
         <label
-          className="text-sm font-semibold text-zinc-800 dark:text-zinc-100"
+          className="text-sm font-semibold text-ink dark:text-paper"
           htmlFor="taskId"
         >
           Tâche
@@ -150,7 +150,7 @@ export function ReportForm({ siteId, tasks, workers }: Props) {
         <select
           name="taskId"
           id="taskId"
-          className="w-full rounded-md border border-zinc-200 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-black/60 dark:border-zinc-700 dark:bg-zinc-950 dark:text-white"
+          className="w-full rounded border border-rule-soft px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange text-ink bg-paper dark:border-rule dark:bg-ink dark:text-paper"
           required
         >
           <option value="">Sélectionne une tâche</option>
@@ -164,7 +164,7 @@ export function ReportForm({ siteId, tasks, workers }: Props) {
 
       <div className="space-y-2">
         <label
-          className="text-sm font-semibold text-zinc-800 dark:text-zinc-100"
+          className="text-sm font-semibold text-ink dark:text-paper"
           htmlFor="email"
         >
           Email professionnel
@@ -174,7 +174,7 @@ export function ReportForm({ siteId, tasks, workers }: Props) {
           name="email"
           type="email"
           placeholder="prenom@entreprise.com"
-          className="w-full rounded-md border border-zinc-200 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-black/60 dark:border-zinc-700 dark:bg-zinc-950 dark:text-white"
+          className="w-full rounded border border-rule-soft px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange text-ink bg-paper dark:border-rule dark:bg-ink dark:text-paper"
           required
           value={email}
           onChange={(event) => {
@@ -217,7 +217,7 @@ export function ReportForm({ siteId, tasks, workers }: Props) {
       <div className="grid gap-4 md:grid-cols-2">
         <div className="space-y-2">
           <label
-            className="text-sm font-semibold text-zinc-800 dark:text-zinc-100"
+            className="text-sm font-semibold text-ink dark:text-paper"
             htmlFor="name"
           >
             Nom complet
@@ -226,14 +226,14 @@ export function ReportForm({ siteId, tasks, workers }: Props) {
             id="name"
             name="name"
             placeholder="Camille Dupont"
-            className="w-full rounded-md border border-zinc-200 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-black/60 dark:border-zinc-700 dark:bg-zinc-950 dark:text-white"
+            className="w-full rounded border border-rule-soft px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange text-ink bg-paper dark:border-rule dark:bg-ink dark:text-paper"
             value={name}
             onChange={(event) => setName(event.target.value)}
           />
         </div>
         <div className="space-y-2">
           <label
-            className="text-sm font-semibold text-zinc-800 dark:text-zinc-100"
+            className="text-sm font-semibold text-ink dark:text-paper"
             htmlFor="role"
           >
             Métier / rôle
@@ -242,7 +242,7 @@ export function ReportForm({ siteId, tasks, workers }: Props) {
             id="role"
             name="role"
             placeholder="Électricien·ne"
-            className="w-full rounded-md border border-zinc-200 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-black/60 dark:border-zinc-700 dark:bg-zinc-950 dark:text-white"
+            className="w-full rounded border border-rule-soft px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange text-ink bg-paper dark:border-rule dark:bg-ink dark:text-paper"
             value={role}
             onChange={(event) => setRole(event.target.value)}
             onBlur={(event) => {
@@ -256,7 +256,7 @@ export function ReportForm({ siteId, tasks, workers }: Props) {
 
       <div className="space-y-2">
         <label
-          className="text-sm font-semibold text-zinc-800 dark:text-zinc-100"
+          className="text-sm font-semibold text-ink dark:text-paper"
           htmlFor="description"
         >
           Rapport texte
@@ -266,13 +266,13 @@ export function ReportForm({ siteId, tasks, workers }: Props) {
           name="description"
           rows={4}
           placeholder="Décris brièvement l’avancement, les incidents, le matériel utilisé..."
-          className="w-full rounded-md border border-zinc-200 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-black/60 dark:border-zinc-700 dark:bg-zinc-950 dark:text-white"
+          className="w-full rounded border border-rule-soft px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange text-ink bg-paper dark:border-rule dark:bg-ink dark:text-paper"
         />
       </div>
 
       <div className="space-y-2">
         <label
-          className="text-sm font-semibold text-zinc-800 dark:text-zinc-100"
+          className="text-sm font-semibold text-ink dark:text-paper"
           htmlFor="photo"
         >
           Photo (optionnel)
@@ -282,21 +282,21 @@ export function ReportForm({ siteId, tasks, workers }: Props) {
           name="photo"
           type="file"
           accept="image/*"
-          className="w-full rounded-md border border-dashed border-zinc-300 px-3 py-2 text-sm text-zinc-500 dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-200"
+          className="w-full rounded border border-dashed border-rule-soft px-3 py-2 text-sm text-ink-3 dark:border-rule dark:bg-ink dark:text-ink-2"
           onChange={(e) => {
             photoFileRef.current = e.target.files?.[0] || null;
           }}
         />
-        <p className="text-xs text-zinc-500 dark:text-zinc-300">
+        <p className="text-xs text-ink-3">
           Formats acceptés: JPG, PNG. Taille max définie par Supabase Storage.
         </p>
       </div>
 
-      <label className="flex items-center gap-2 text-sm text-zinc-700 dark:text-zinc-200">
+      <label className="flex items-center gap-2 text-sm text-ink-2">
         <input
           type="checkbox"
           name="mark_done"
-          className="rounded border-zinc-300 dark:border-zinc-600"
+          className="rounded border-rule-soft dark:border-rule"
         />
         Marquer la tâche comme terminée
       </label>
@@ -304,17 +304,17 @@ export function ReportForm({ siteId, tasks, workers }: Props) {
       <SubmitButton />
 
       {!isOnline && (
-        <div className="rounded-md border border-amber-200 bg-amber-50 p-3 dark:border-amber-800 dark:bg-amber-950/50">
-          <p className="text-sm font-semibold text-amber-900 dark:text-amber-100">
+        <div className="rounded border border-warn bg-paper-2 p-3">
+          <p className="text-sm font-semibold text-warn">
             ⚠️ Mode Hors-ligne
           </p>
-          <p className="text-xs text-amber-700 dark:text-amber-300">
+          <p className="text-xs text-ink-2">
             Votre rapport sera sauvegardé localement et synchronisé automatiquement dès que vous serez en ligne.
           </p>
         </div>
       )}
       {state?.error ? (
-        <p className="text-sm text-rose-400">{state.error}</p>
+        <p className="text-sm text-danger">{state.error}</p>
       ) : null}
       {state?.success ? (
         <p className="text-sm text-green">Rapport envoyé ✅</p>

@@ -152,12 +152,12 @@ export default async function SiteReportsPage({ params }: Params) {
     >
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Colonne Rapports en attente */}
-        <section className="rounded border border-zinc-100 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+        <section className="rounded border border-rule-soft bg-paper p-6 dark:border-rule dark:bg-ink">
           <div className="mb-4">
-            <h2 className="text-lg font-semibold text-zinc-900 dark:text-white">
+            <h2 className="font-serif text-[22px] text-ink dark:text-paper">
               Rapports en attente
             </h2>
-            <p className="text-sm text-zinc-500 dark:text-zinc-400">
+            <p className="text-sm text-ink-3">
               {pendingReports.length > 0
                 ? `${pendingReports.length} rapport${pendingReports.length > 1 ? 's' : ''} en attente de validation`
                 : 'Aucun rapport en attente'}
@@ -173,12 +173,12 @@ export default async function SiteReportsPage({ params }: Params) {
         </section>
 
         {/* Colonne Rapports validés */}
-        <section className="rounded border border-zinc-100 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+        <section className="rounded border border-rule-soft bg-paper p-6 dark:border-rule dark:bg-ink">
           <div className="mb-4">
-            <h2 className="text-lg font-semibold text-zinc-900 dark:text-white">
+            <h2 className="font-serif text-[22px] text-ink dark:text-paper">
               Rapports validés
             </h2>
-            <p className="text-sm text-zinc-500 dark:text-zinc-400">
+            <p className="text-sm text-ink-3">
               {validatedReports.length > 0
                 ? `${validatedReports.length} rapport${validatedReports.length > 1 ? 's' : ''} validé${validatedReports.length > 1 ? 's' : ''}`
                 : 'Aucun rapport validé'}
@@ -196,4 +196,3 @@ export default async function SiteReportsPage({ params }: Params) {
     </AppShell>
   );
 }
-

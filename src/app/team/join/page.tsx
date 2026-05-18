@@ -26,7 +26,6 @@ export default function JoinTeamPage() {
     }
 
     startTransition(async () => {
-      // Récupérer l'ID de l'utilisateur depuis l'URL ou les paramètres
       const urlParams = new URLSearchParams(window.location.search);
       const userId = urlParams.get('userId');
 
@@ -37,7 +36,6 @@ export default function JoinTeamPage() {
 
       const supabase = createSupabaseBrowserClient();
 
-      // Vérifier si un worker avec le même email existe déjà pour ce compte
       if (email) {
         const { data: existingWorker } = await supabase
           .from('workers')
@@ -53,28 +51,20 @@ export default function JoinTeamPage() {
         }
       }
 
-      // Récupérer les infos du manager pour l'email (via une action serveur)
-      // Pour l'instant, on passe undefined pour managerName
-
-      // Créer un worker au niveau du compte (sans site_id) avec status 'pending'
-      // Essayer d'abord avec status, puis sans si la colonne n'existe pas
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const insertData: any = {
         created_by: userId,
         name: name.trim(),
         email: email.trim() || null,
         role: role.trim() || null,
-        site_id: null, // Worker au niveau du compte
+        site_id: null,
       };
 
-      // Essayer d'ajouter avec status 'pending'
       insertData.status = 'pending';
       const { error: insertError } = await supabase
         .from('workers')
         .insert(insertData);
 
-      // Si l'erreur est liée à la colonne status, on ne peut pas créer le worker correctement
-      // Il faut que la migration SQL soit exécutée
       if (insertError && (insertError.message.includes('status') || insertError.message.includes('column'))) {
         setError('La colonne status n\'existe pas dans la base de données. Veuillez exécuter la migration SQL migration-worker-status.sql dans Supabase pour activer le système de validation.');
         return;
@@ -89,13 +79,11 @@ export default function JoinTeamPage() {
         return;
       }
 
-      // Envoyer un email de confirmation si l'email est fourni
       if (email && email.trim()) {
         try {
           console.log('📧 Tentative d\'envoi email de confirmation à:', email.trim());
           console.log('📧 Données envoyées:', { workerEmail: email.trim(), workerName: name.trim(), userId });
-          
-          // Appel à l'API pour envoyer l'email (car c'est une fonction serveur)
+
           const emailResponse = await fetch('/api/team/join-confirmation', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -115,7 +103,7 @@ export default function JoinTeamPage() {
           } else {
             const emailResult = await emailResponse.json();
             console.log('📧 Résultat API:', emailResult);
-            
+
             if (!emailResult.success) {
               console.error('❌ Erreur envoi email confirmation:', emailResult.error || 'Erreur inconnue');
               setEmailError(`Erreur lors de l'envoi de l'email: ${emailResult.error || 'Erreur inconnue'}. Votre inscription a été enregistrée.`);
@@ -139,25 +127,25 @@ export default function JoinTeamPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 p-6 text-white flex items-center justify-center">
+    <div className="min-h-screen bg-ink p-6 text-paper flex items-center justify-center">
       <div className="w-full max-w-md">
-        <div className="rounded border border-zinc-700/50 bg-zinc-800/90 p-8  ">
-          <h1 className="text-3xl font-bold text-center mb-2 text-zinc-100">
+        <div className="border border-rule bg-ink p-8">
+          <h1 className="font-serif text-[32px] text-paper text-center mb-2">
             Rejoindre l&apos;équipe
           </h1>
-          <p className="text-sm text-zinc-400 text-center mb-8">
+          <p className="font-mono text-[10px] uppercase tracking-widest text-ink-3 text-center mb-8">
             Remplissez vos informations pour rejoindre l&apos;équipe. Vous serez ajouté au catalogue et pourrez être assigné à des chantiers.
           </p>
 
           {success ? (
-            <div className="rounded-lg bg-paper-2 p-4 text-sm text-green text-center">
+            <div className="border border-green bg-paper-2 p-4 font-mono text-[10px] uppercase tracking-widest text-green text-center">
               <p className="font-semibold mb-2">✅ Inscription réussie !</p>
               <p>Vous allez être redirigé vers la page équipe...</p>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
-                <label htmlFor="name" className="block text-sm font-semibold text-zinc-300 mb-2">
+                <label htmlFor="name" className="block font-mono text-[10px] uppercase tracking-widest text-ink-3 mb-2">
                   Nom complet *
                 </label>
                 <input
@@ -166,14 +154,14 @@ export default function JoinTeamPage() {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Jean Dupont"
-                  className="w-full rounded-lg border-2 border-orange bg-ink px-4 py-3 text-zinc-100 placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-orange focus:border-orange transition-colors"
+                  className="w-full border-2 border-orange bg-ink px-4 py-3 text-paper placeholder:text-ink-3 focus:outline-none focus:ring-2 focus:ring-orange transition-colors"
                   required
                   autoFocus
                 />
               </div>
 
               <div>
-                <label htmlFor="email" className="block text-sm font-semibold text-zinc-300 mb-2">
+                <label htmlFor="email" className="block font-mono text-[10px] uppercase tracking-widest text-ink-3 mb-2">
                   Email
                 </label>
                 <input
@@ -182,12 +170,12 @@ export default function JoinTeamPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="jean.dupont@example.com"
-                  className="w-full rounded-lg border border-zinc-600 bg-ink px-4 py-3 text-zinc-100 placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-orange focus:border-orange transition-colors"
+                  className="w-full border border-rule bg-ink px-4 py-3 text-paper placeholder:text-ink-3 focus:outline-none focus:ring-2 focus:ring-orange transition-colors"
                 />
               </div>
 
               <div>
-                <label htmlFor="role" className="block text-sm font-semibold text-zinc-300 mb-2">
+                <label htmlFor="role" className="block font-mono text-[10px] uppercase tracking-widest text-ink-3 mb-2">
                   Métier
                 </label>
                 <input
@@ -196,18 +184,18 @@ export default function JoinTeamPage() {
                   value={role}
                   onChange={(e) => setRole(e.target.value)}
                   placeholder="Chef d'équipe"
-                  className="w-full rounded-lg border border-zinc-600 bg-ink px-4 py-3 text-zinc-100 placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-orange focus:border-orange transition-colors"
+                  className="w-full border border-rule bg-ink px-4 py-3 text-paper placeholder:text-ink-3 focus:outline-none focus:ring-2 focus:ring-orange transition-colors"
                 />
               </div>
 
               {error && (
-                <div className="rounded-lg bg-rose-900/30 p-3 text-sm text-rose-300">
+                <div className="border border-danger bg-paper-2 p-3 font-mono text-[10px] text-danger">
                   {error}
                 </div>
               )}
 
               {emailError && (
-                <div className="rounded-lg bg-amber-900/30 p-3 text-sm text-amber-300">
+                <div className="border border-warn bg-paper-2 p-3 font-mono text-[10px] text-warn">
                   ⚠️ {emailError}
                 </div>
               )}
@@ -215,9 +203,9 @@ export default function JoinTeamPage() {
               <button
                 type="submit"
                 disabled={isPending || !name.trim()}
-                className="w-full rounded-lg bg-orange px-6 py-3 text-base font-semibold text-white transition hover:bg-orange-dark disabled:cursor-not-allowed disabled:opacity-70 shadow-orange/20"
+                className="w-full border border-orange bg-orange px-6 py-3 font-mono text-[11px] uppercase tracking-widest text-paper transition hover:bg-orange-dark disabled:cursor-not-allowed disabled:opacity-70"
               >
-                {isPending ? 'Ajout en cours...' : 'Rejoindre l&apos;équipe'}
+                {isPending ? 'Ajout en cours...' : 'Rejoindre l\'équipe'}
               </button>
             </form>
           )}
@@ -226,4 +214,3 @@ export default function JoinTeamPage() {
     </div>
   );
 }
-

@@ -11,7 +11,7 @@ function SubmitButton() {
   return (
     <button
       type="submit"
-      className="rounded-md bg-black px-4 py-2 text-sm font-medium text-white transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-70 dark:bg-white dark:text-black dark:hover:bg-zinc-200"
+      className="rounded border border-rule-soft px-4 py-2 text-sm font-medium text-ink-2 transition hover:text-ink hover:border-rule disabled:cursor-not-allowed disabled:opacity-70 dark:border-rule dark:text-ink-2"
       disabled={pending}
     >
       {pending ? 'Ajout...' : 'Ajouter'}
@@ -40,7 +40,7 @@ export function AddTaskForm({ sites }: Props) {
 
   if (sites.length === 0) {
     return (
-      <div className="rounded border border-dashed border-zinc-200 p-6 text-center text-sm text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">
+      <div className="rounded border border-dashed border-rule-soft p-6 text-center text-sm text-ink-3 dark:border-rule">
         Créez d&apos;abord un chantier pour ajouter des tâches.
       </div>
     );
@@ -50,19 +50,19 @@ export function AddTaskForm({ sites }: Props) {
     <form
       id="add-task-form"
       action={formAction}
-      className="grid gap-4 rounded border border-zinc-100 bg-white p-6 shadow-black/5 md:grid-cols-2 dark:border-zinc-800 dark:bg-zinc-900"
+      className="grid gap-4 rounded border border-rule-soft bg-paper p-6 md:grid-cols-2 dark:border-rule dark:bg-ink"
     >
       <div className="space-y-2">
         <label
           htmlFor="siteId"
-          className="text-sm font-medium text-zinc-600 dark:text-zinc-300"
+          className="text-sm font-medium text-ink-2"
         >
           Chantier
         </label>
         <select
           id="siteId"
           name="siteId"
-          className="w-full rounded-md border border-zinc-200 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-black/60 dark:border-zinc-700 dark:bg-zinc-950 dark:text-white"
+          className="w-full rounded border border-rule-soft px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange text-ink bg-paper dark:border-rule dark:bg-ink dark:text-paper"
           required
         >
           <option value="">-- Sélectionner un chantier --</option>
@@ -76,7 +76,7 @@ export function AddTaskForm({ sites }: Props) {
       <div className="space-y-2">
         <label
           htmlFor="title"
-          className="text-sm font-medium text-zinc-600 dark:text-zinc-300"
+          className="text-sm font-medium text-ink-2"
         >
           Titre
         </label>
@@ -84,14 +84,14 @@ export function AddTaskForm({ sites }: Props) {
           id="title"
           name="title"
           placeholder="Couler la dalle"
-          className="w-full rounded-md border border-zinc-200 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-black/60 dark:border-zinc-700 dark:bg-zinc-950 dark:text-white"
+          className="w-full rounded border border-rule-soft px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange text-ink bg-paper dark:border-rule dark:bg-ink dark:text-paper"
           required
         />
       </div>
       <div className="space-y-2">
         <label
           htmlFor="required_role"
-          className="text-sm font-medium text-zinc-600 dark:text-zinc-300"
+          className="text-sm font-medium text-ink-2"
         >
           Rôle requis
         </label>
@@ -99,13 +99,13 @@ export function AddTaskForm({ sites }: Props) {
           id="required_role"
           name="required_role"
           placeholder="Maçon"
-          className="w-full rounded-md border border-zinc-200 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-black/60 dark:border-zinc-700 dark:bg-zinc-950 dark:text-white"
+          className="w-full rounded border border-rule-soft px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange text-ink bg-paper dark:border-rule dark:bg-ink dark:text-paper"
         />
       </div>
       <div className="space-y-2">
         <label
           htmlFor="duration_hours"
-          className="text-sm font-medium text-zinc-600 dark:text-zinc-300"
+          className="text-sm font-medium text-ink-2"
         >
           Durée (heures)
         </label>
@@ -114,14 +114,14 @@ export function AddTaskForm({ sites }: Props) {
           name="duration_hours"
           type="number"
           min="1"
-          className="w-full rounded-md border border-zinc-200 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-black/60 dark:border-zinc-700 dark:bg-zinc-950 dark:text-white"
+          className="w-full rounded border border-rule-soft px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange text-ink bg-paper dark:border-rule dark:bg-ink dark:text-paper"
         />
       </div>
       <div className="flex items-end">
         <SubmitButton />
       </div>
       {state?.error ? (
-        <p className="md:col-span-2 text-sm text-rose-400">{state.error}</p>
+        <p className="md:col-span-2 text-sm text-danger">{state.error}</p>
       ) : null}
       {state?.success ? (
         <p className="md:col-span-2 text-sm text-green">Tâche ajoutée.</p>
@@ -129,4 +129,3 @@ export function AddTaskForm({ sites }: Props) {
     </form>
   );
 }
-

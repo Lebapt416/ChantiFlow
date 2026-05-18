@@ -14,7 +14,7 @@ function SubmitButton() {
   return (
     <button
       type="submit"
-      className="rounded-md bg-black px-4 py-2 text-sm font-medium text-white transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-70 dark:bg-white dark:text-black dark:hover:bg-zinc-200"
+      className="border border-rule-soft px-4 py-2 text-sm font-medium text-ink-2 transition hover:text-ink hover:border-rule disabled:cursor-not-allowed disabled:opacity-70 dark:border-rule dark:text-ink-2"
       disabled={pending}
     >
       {pending ? 'Création...' : 'Créer'}
@@ -46,13 +46,13 @@ export function CreateSiteForm({ onSuccess }: Props) {
     <form
       id="create-site-form"
       action={formAction}
-      className="space-y-4 rounded border border-zinc-100 bg-white p-6 shadow-black/5 dark:border-zinc-800 dark:bg-zinc-900"
+      className="space-y-4 rounded border border-rule-soft bg-paper p-6 dark:border-rule dark:bg-ink"
     >
       {/* Nom du chantier */}
       <div className="space-y-2">
         <label
           htmlFor="name"
-          className="text-sm font-medium text-zinc-600 dark:text-zinc-300"
+          className="text-sm font-medium text-ink-2"
         >
           Nom du chantier
         </label>
@@ -60,7 +60,7 @@ export function CreateSiteForm({ onSuccess }: Props) {
           id="name"
           name="name"
           placeholder="Résidence Soleil"
-          className="w-full rounded-md border border-zinc-200 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-black/60 dark:border-zinc-700 dark:bg-zinc-950 dark:text-white"
+          className="w-full rounded border border-rule-soft px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange text-ink bg-paper dark:border-rule dark:bg-ink dark:text-paper"
           required
         />
       </div>
@@ -69,7 +69,7 @@ export function CreateSiteForm({ onSuccess }: Props) {
       <div className="space-y-2">
         <label
           htmlFor="deadline"
-          className="text-sm font-medium text-zinc-600 dark:text-zinc-300"
+          className="text-sm font-medium text-ink-2"
         >
           Deadline
         </label>
@@ -77,7 +77,7 @@ export function CreateSiteForm({ onSuccess }: Props) {
           id="deadline"
           name="deadline"
           type="date"
-          className="w-full rounded-md border border-zinc-200 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-black/60 dark:border-zinc-700 dark:bg-zinc-950 dark:text-white"
+          className="w-full rounded border border-rule-soft px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange text-ink bg-paper dark:border-rule dark:bg-ink dark:text-paper"
           required
         />
       </div>
@@ -86,7 +86,7 @@ export function CreateSiteForm({ onSuccess }: Props) {
       <div className="space-y-2">
         <label
           htmlFor="postal_code"
-          className="text-sm font-medium text-zinc-600 dark:text-zinc-300"
+          className="text-sm font-medium text-ink-2"
         >
           Code postal du chantier
         </label>
@@ -94,18 +94,18 @@ export function CreateSiteForm({ onSuccess }: Props) {
           id="postal_code"
           name="postal_code"
           placeholder="Ex: 75001, 69001, 13001... ou tapez le nom de la ville"
-          className="w-full rounded-md border border-zinc-200 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-black/60 dark:border-zinc-700 dark:bg-zinc-950 dark:text-white"
+          className="w-full rounded border border-rule-soft px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange text-ink bg-paper dark:border-rule dark:bg-ink dark:text-paper"
         />
-        <p className="text-xs text-zinc-500 dark:text-zinc-400">
+        <p className="text-xs text-ink-3">
           🌤️ Le code postal permet à l&apos;IA d&apos;optimiser le planning selon la météo locale (tous les codes postaux de France sont supportés)
         </p>
       </div>
 
       {/* Bouton de soumission */}
       <div className="flex items-center justify-between pt-2">
-        <div className="text-xs text-zinc-500 dark:text-zinc-400">
+        <div className="text-xs text-ink-3">
           {state?.error && (
-            <span className="text-rose-600 dark:text-rose-400">{state.error}</span>
+            <span className="text-danger">{state.error}</span>
           )}
           {state?.success && (
             <span className="text-orange dark:text-green">
@@ -118,4 +118,3 @@ export function CreateSiteForm({ onSuccess }: Props) {
     </form>
   );
 }
-

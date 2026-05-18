@@ -146,7 +146,7 @@ export default function ContactPage() {
         )}
 
         {/* Contact Form */}
-        <div className="rounded border border-zinc-200 bg-white p-8 dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="rounded border border-rule-soft bg-paper p-8 dark:border-rule dark:bg-ink">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
               <div>
@@ -163,7 +163,7 @@ export default function ContactPage() {
                   required
                   value={formData.name}
                   onChange={handleChange}
-                  className="w-full rounded-lg border border-zinc-300 px-4 py-3 text-zinc-900 shadow-sm focus:border-orange focus:outline-none focus:ring-2 focus:ring-paper-2 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
+                  className="w-full rounded border border-rule-soft px-4 py-3 text-ink focus:border-orange focus:outline-none focus:ring-2 focus:ring-orange bg-paper dark:border-rule dark:bg-ink dark:text-paper"
                   placeholder="Jean Dupont"
                 />
               </div>
@@ -182,7 +182,7 @@ export default function ContactPage() {
                   required
                   value={formData.email}
                   onChange={handleChange}
-                  className="w-full rounded-lg border border-zinc-300 px-4 py-3 text-zinc-900 shadow-sm focus:border-orange focus:outline-none focus:ring-2 focus:ring-paper-2 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
+                  className="w-full rounded border border-rule-soft px-4 py-3 text-ink focus:border-orange focus:outline-none focus:ring-2 focus:ring-orange bg-paper dark:border-rule dark:bg-ink dark:text-paper"
                   placeholder="jean.dupont@example.com"
                 />
               </div>

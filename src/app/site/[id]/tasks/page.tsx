@@ -94,10 +94,10 @@ export default async function SiteTasksPage({ params }: Params) {
       <div className="space-y-6">
         {/* Stats */}
         <section className="grid gap-4 md:grid-cols-3">
-          <div className="rounded border border-zinc-100 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
-            <p className="text-xs uppercase tracking-[0.3em] text-zinc-500">Total</p>
-            <p className="mt-2 text-3xl font-semibold">{tasks?.length ?? 0}</p>
-            <p className="text-sm text-zinc-500">tâches</p>
+          <div className="rounded border border-rule-soft bg-paper p-5 dark:border-rule dark:bg-ink">
+            <p className="text-xs uppercase tracking-[0.3em] text-ink-3">Total</p>
+            <p className="mt-2 text-3xl font-semibold text-ink dark:text-paper">{tasks?.length ?? 0}</p>
+            <p className="text-sm text-ink-3">tâches</p>
           </div>
           <div className="rounded border border-amber-200 bg-amber-50 p-5 dark:border-amber-500/30 dark:bg-amber-900/20">
             <p className="text-xs uppercase tracking-[0.3em] text-amber-800 dark:text-amber-200">
@@ -120,12 +120,12 @@ export default async function SiteTasksPage({ params }: Params) {
         </section>
 
         {/* Ajouter une tâche */}
-        <section className="rounded border border-zinc-100 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+        <section className="rounded border border-rule-soft bg-paper p-6 dark:border-rule dark:bg-ink">
           <div className="mb-4">
-            <h2 className="text-lg font-semibold text-zinc-900 dark:text-white">
+            <h2 className="font-serif text-[22px] text-ink dark:text-paper">
               Ajouter une tâche
             </h2>
-            <p className="text-sm text-zinc-500 dark:text-zinc-400">
+            <p className="text-sm text-ink-3">
               Créez une nouvelle tâche pour ce chantier.
             </p>
           </div>
@@ -133,12 +133,12 @@ export default async function SiteTasksPage({ params }: Params) {
         </section>
 
         {/* Tâches en cours */}
-        <section className="rounded border border-zinc-100 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+        <section className="rounded border border-rule-soft bg-paper p-6 dark:border-rule dark:bg-ink">
           <div className="mb-4">
-            <h2 className="text-lg font-semibold text-zinc-900 dark:text-white">
+            <h2 className="font-serif text-[22px] text-ink dark:text-paper">
               Tâches en cours
             </h2>
-            <p className="text-sm text-zinc-500 dark:text-zinc-400">
+            <p className="text-sm text-ink-3">
               Tâches en attente de réalisation.
             </p>
           </div>
@@ -147,14 +147,14 @@ export default async function SiteTasksPage({ params }: Params) {
               {pendingTasks.map((task) => (
                 <div
                   key={task.id}
-                  className="rounded border border-zinc-200 p-4 dark:border-zinc-700"
+                  className="rounded border border-rule-soft p-4 dark:border-rule"
                 >
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-zinc-900 dark:text-white">
+                      <p className="text-sm font-semibold text-ink dark:text-paper">
                         {task.title}
                       </p>
-                      <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                      <p className="text-xs text-ink-3">
                         {task.required_role || 'Rôle libre'}
                         {task.duration_hours
                           ? ` • Durée estimée ${task.duration_hours}h`
@@ -176,15 +176,15 @@ export default async function SiteTasksPage({ params }: Params) {
               ))}
             </div>
           ) : (
-            <p className="rounded border border-dashed border-zinc-200 p-6 text-center text-sm text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">
+            <p className="rounded border border-dashed border-rule-soft p-6 text-center text-sm text-ink-3 dark:border-rule">
               Aucune tâche en attente pour le moment.
             </p>
           )}
         </section>
 
         {/* Historique */}
-        <section className="rounded border border-zinc-100 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-          <h2 className="text-lg font-semibold text-zinc-900 dark:text-white">
+        <section className="rounded border border-rule-soft bg-paper p-6 dark:border-rule dark:bg-ink">
+          <h2 className="font-serif text-[22px] text-ink dark:text-paper">
             Historique récent
           </h2>
           {doneTasks.length ? (
@@ -192,15 +192,15 @@ export default async function SiteTasksPage({ params }: Params) {
               {doneTasks.slice(0, 6).map((task) => (
                 <li
                   key={task.id}
-                  className="rounded border border-zinc-200 p-4 text-sm text-zinc-600 dark:border-zinc-700 dark:text-zinc-300"
+                  className="rounded border border-rule-soft p-4 text-sm text-ink-2 dark:border-rule dark:text-ink-2"
                 >
-                  ✅ <span className="font-semibold text-zinc-900 dark:text-white">{task.title}</span>{' '}
+                  ✅ <span className="font-semibold text-ink dark:text-paper">{task.title}</span>{' '}
                   terminé
                 </li>
               ))}
             </ul>
           ) : (
-            <p className="mt-3 text-sm text-zinc-500 dark:text-zinc-400">
+            <p className="mt-3 text-sm text-ink-3">
               Aucune tâche clôturée récemment.
             </p>
           )}
@@ -209,4 +209,3 @@ export default async function SiteTasksPage({ params }: Params) {
     </AppShell>
   );
 }
-

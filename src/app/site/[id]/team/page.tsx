@@ -66,12 +66,11 @@ export default async function SiteTeamPage({ params }: Params) {
     .select('id, name, email, role, created_at, access_code, status')
     .eq('site_id', id)
     .order('created_at', { ascending: false });
-  
-  // Log pour debug
-  console.log('[SiteTeamPage] Workers récupérés:', siteWorkersData?.map(w => ({ 
-    name: w.name, 
-    email: w.email, 
-    access_code: w.access_code 
+
+  console.log('[SiteTeamPage] Workers récupérés:', siteWorkersData?.map(w => ({
+    name: w.name,
+    email: w.email,
+    access_code: w.access_code
   })));
   const siteWorkers: TeamMember[] = (siteWorkersData ?? []).map((worker) => ({
     ...worker,
@@ -117,47 +116,47 @@ export default async function SiteTeamPage({ params }: Params) {
       primarySite={site}
     >
       {isCompleted && (
-        <div className="mb-6 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800 dark:border-amber-800 dark:bg-amber-900/20 dark:text-amber-200">
-          ⚠️ Ce chantier est terminé. Vous ne pouvez plus ajouter de membres.
+        <div className="mb-6 border border-warn bg-paper-2 p-4 font-mono text-[11px] uppercase tracking-widest text-warn">
+          ⚠ Ce chantier est terminé. Vous ne pouvez plus ajouter de membres.
         </div>
       )}
 
       <section className="grid gap-4 md:grid-cols-3">
-        <div className="rounded border border-zinc-100 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
-          <p className="text-xs uppercase tracking-[0.3em] text-zinc-500">Membres</p>
-          <p className="mt-2 text-3xl font-semibold">{totalWorkers}</p>
-          <p className="text-sm text-zinc-500">sur ce chantier</p>
+        <div className="rounded border border-rule-soft bg-paper p-5 dark:border-rule dark:bg-ink">
+          <p className="text-xs uppercase tracking-[0.3em] text-ink-3">Membres</p>
+          <p className="mt-2 text-3xl font-semibold text-ink dark:text-paper">{totalWorkers}</p>
+          <p className="text-sm text-ink-3">sur ce chantier</p>
         </div>
-        <div className="rounded border border-zinc-100 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
-          <p className="text-xs uppercase tracking-[0.3em] text-zinc-500">Avec email</p>
-          <p className="mt-2 text-3xl font-semibold">{workersWithEmail}</p>
-          <p className="text-sm text-zinc-500">membres contactables</p>
+        <div className="rounded border border-rule-soft bg-paper p-5 dark:border-rule dark:bg-ink">
+          <p className="text-xs uppercase tracking-[0.3em] text-ink-3">Avec email</p>
+          <p className="mt-2 text-3xl font-semibold text-ink dark:text-paper">{workersWithEmail}</p>
+          <p className="text-sm text-ink-3">membres contactables</p>
         </div>
-        <div className="rounded border border-zinc-100 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
-          <p className="text-xs uppercase tracking-[0.3em] text-zinc-500">Rôles</p>
-          <p className="mt-2 text-3xl font-semibold">{Object.keys(groupedByRole).length}</p>
-          <p className="text-sm text-zinc-500">profils différents</p>
+        <div className="rounded border border-rule-soft bg-paper p-5 dark:border-rule dark:bg-ink">
+          <p className="text-xs uppercase tracking-[0.3em] text-ink-3">Rôles</p>
+          <p className="mt-2 text-3xl font-semibold text-ink dark:text-paper">{Object.keys(groupedByRole).length}</p>
+          <p className="text-sm text-ink-3">profils différents</p>
         </div>
       </section>
 
       {Object.keys(groupedByRole).length > 0 && (
-        <section className="mt-8 rounded border border-zinc-100 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-          <h2 className="text-lg font-semibold text-zinc-900 dark:text-white mb-4">
+        <section className="mt-8 rounded border border-rule-soft bg-paper p-6 dark:border-rule dark:bg-ink">
+          <h2 className="font-serif text-[22px] text-ink dark:text-paper mb-4">
             Répartition des métiers
           </h2>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {Object.entries(groupedByRole).map(([role, count]) => (
               <div
                 key={role}
-                className="rounded border border-zinc-200 p-4 text-sm dark:border-zinc-700"
+                className="rounded border border-rule-soft p-4 text-sm dark:border-rule"
               >
-                <p className="text-xs uppercase tracking-[0.3em] text-zinc-500 dark:text-zinc-400">
+                <p className="text-xs uppercase tracking-[0.3em] text-ink-3">
                   {role}
                 </p>
-                <p className="mt-2 text-2xl font-semibold text-zinc-900 dark:text-white">
+                <p className="mt-2 text-2xl font-semibold text-ink dark:text-paper">
                   {count}
                 </p>
-                <p className="text-xs text-zinc-500 dark:text-zinc-400">personnes</p>
+                <p className="text-xs text-ink-3">personnes</p>
               </div>
             ))}
           </div>
@@ -165,13 +164,13 @@ export default async function SiteTeamPage({ params }: Params) {
       )}
 
       {!isCompleted && (
-        <section className="mt-8 rounded border border-zinc-100 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+        <section className="mt-8 rounded border border-rule-soft bg-paper p-6 dark:border-rule dark:bg-ink">
           <div className="mb-4 flex items-center justify-between">
             <div>
-              <h2 className="text-lg font-semibold text-zinc-900 dark:text-white">
+              <h2 className="font-serif text-[22px] text-ink dark:text-paper">
                 Ajouter un membre au chantier
               </h2>
-              <p className="text-sm text-zinc-500 dark:text-zinc-400">
+              <p className="text-sm text-ink-3">
                 Ajoutez un membre de votre équipe ou créez un nouveau membre pour ce chantier.
               </p>
             </div>
@@ -182,13 +181,13 @@ export default async function SiteTeamPage({ params }: Params) {
         </section>
       )}
 
-      <section className="mt-8 rounded border border-zinc-100 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+      <section className="mt-8 rounded border border-rule-soft bg-paper p-6 dark:border-rule dark:bg-ink">
         <div className="mb-4 flex items-center justify-between">
           <div>
-            <h2 className="text-lg font-semibold text-zinc-900 dark:text-white">
+            <h2 className="font-serif text-[22px] text-ink dark:text-paper">
               Membres du chantier
             </h2>
-            <p className="text-sm text-zinc-500 dark:text-zinc-400">
+            <p className="text-sm text-ink-3">
               Liste de tous les membres assignés à ce chantier.
             </p>
           </div>
@@ -199,34 +198,34 @@ export default async function SiteTeamPage({ params }: Params) {
             {siteWorkers.map((worker) => (
               <div
                 key={worker.id}
-                className="rounded border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-700 "
+                className="rounded border border-rule-soft bg-paper-2 p-4 dark:border-rule"
               >
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div className="flex-1">
-                    <p className="text-sm font-semibold text-zinc-900 dark:text-white">
+                    <p className="text-sm font-semibold text-ink dark:text-paper">
                       {worker.name}
                     </p>
-                    <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                    <p className="text-xs text-ink-3">
                       {worker.role ?? 'Rôle non défini'}
                     </p>
                     {worker.email && (
-                      <p className="text-xs text-zinc-400 dark:text-zinc-500">
+                      <p className="text-xs text-ink-3">
                         {worker.email}
                       </p>
                     )}
                     {worker.access_code ? (
                       <div className="mt-2 flex flex-wrap items-center gap-2 text-xs">
-                        <span className="text-zinc-600 dark:text-zinc-400">Code d&apos;accès :</span>
+                        <span className="text-ink-2">Code d&apos;accès :</span>
                         <span className="font-mono font-semibold text-orange dark:text-green">
                           {worker.access_code}
                         </span>
                         <CopyButton value={worker.access_code} />
-                        <span className="text-zinc-500 dark:text-zinc-500 text-[10px]">
+                        <span className="text-ink-3 text-[10px]">
                           (envoyé par email)
                         </span>
                       </div>
                     ) : (
-                      <div className="mt-2 text-xs text-zinc-500 dark:text-zinc-400">
+                      <div className="mt-2 text-xs text-ink-3">
                         Code d&apos;accès : <span className="italic">Non généré (sera créé lors de l&apos;assignation d&apos;une tâche)</span>
                       </div>
                     )}
@@ -244,7 +243,7 @@ export default async function SiteTeamPage({ params }: Params) {
             ))}
           </div>
         ) : (
-          <p className="text-sm text-zinc-500 dark:text-zinc-400">
+          <p className="text-sm text-ink-3">
             Aucun membre assigné à ce chantier pour le moment.
           </p>
         )}
@@ -252,4 +251,3 @@ export default async function SiteTeamPage({ params }: Params) {
     </AppShell>
   );
 }
-

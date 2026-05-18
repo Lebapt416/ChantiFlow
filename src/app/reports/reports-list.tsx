@@ -48,7 +48,7 @@ export function ReportsList({
 
   if (reports.length === 0) {
     return (
-      <p className="text-sm text-zinc-500 dark:text-zinc-400">
+      <p className="text-sm text-ink-3">
         Aucun rapport pour le moment.
       </p>
     );
@@ -67,24 +67,24 @@ export function ReportsList({
           return (
             <div
               key={report.id}
-              className="rounded border border-zinc-200 p-4 dark:border-zinc-700"
+              className="rounded border border-rule-soft p-4 dark:border-rule"
             >
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
-                    <p className="text-sm font-semibold text-zinc-900 dark:text-white">
+                    <p className="text-sm font-semibold text-ink dark:text-paper">
                       {task?.title ?? 'Tâche inconnue'}
                     </p>
                     {isTaskDone && (
                       <CheckCircle2 className="h-4 w-4 text-orange dark:text-green flex-shrink-0" />
                     )}
                   </div>
-                  <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
+                  <p className="text-xs text-ink-3 mt-1">
                     {siteName}
                   </p>
                 </div>
                 <div className="flex items-center gap-3 flex-shrink-0">
-                  <p className="text-xs text-zinc-500 dark:text-zinc-400 whitespace-nowrap">
+                  <p className="text-xs text-ink-3 whitespace-nowrap">
                     {new Date(report.created_at ?? '').toLocaleString('fr-FR')}
                   </p>
                   <button
@@ -95,7 +95,7 @@ export function ReportsList({
                       handleReportClick(report);
                     }}
                     type="button"
-                    className="flex items-center justify-center gap-1.5 rounded-lg bg-orange px-4 py-2 text-xs font-semibold text-white transition-all hover:bg-orange-dark active:scale-95 shadow-sm hover:shadow-md whitespace-nowrap min-w-[90px]"
+                    className="flex items-center justify-center gap-1.5 border border-orange px-4 py-2 font-mono text-[10px] uppercase tracking-widest text-orange transition hover:bg-paper-2 whitespace-nowrap min-w-[90px]"
                     style={{ zIndex: 10 }}
                   >
                     <Eye className="h-4 w-4 flex-shrink-0" />
@@ -103,17 +103,17 @@ export function ReportsList({
                   </button>
                 </div>
               </div>
-              <p className="mt-2 text-xs text-zinc-400 dark:text-zinc-500">
+              <p className="mt-2 text-xs text-ink-3">
                 {worker?.name ?? 'Employé inconnu'} •{' '}
                 {worker?.role ?? 'Rôle non renseigné'}
               </p>
               {report.description && (
-                <p className="mt-3 text-sm text-zinc-700 dark:text-zinc-200 line-clamp-2">
+                <p className="mt-3 text-sm text-ink-2 line-clamp-2">
                   {report.description}
                 </p>
               )}
               {report.photo_url && (
-                <div className="mt-3 overflow-hidden rounded border border-zinc-200 dark:border-zinc-700">
+                <div className="mt-3 overflow-hidden rounded border border-rule-soft dark:border-rule">
                   <Image
                     src={report.photo_url}
                     alt="Photo rapport"

@@ -24,7 +24,7 @@ function SubmitButton({ isPending }: { isPending: boolean }) {
     <button
       type="submit"
       disabled={isPending}
-      className="rounded-md bg-orange px-3 py-1.5 text-xs font-medium text-white transition hover:bg-orange-dark disabled:cursor-not-allowed disabled:opacity-50"
+      className="border border-orange px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest text-orange transition hover:bg-paper-2 disabled:cursor-not-allowed disabled:opacity-50"
     >
       {isPending ? (
         <Loader2 className="h-3 w-3 animate-spin" />
@@ -50,14 +50,11 @@ export function AssignTaskButton({ taskId, currentWorkerId, availableWorkers }: 
       setState(result);
       if (result.success) {
         setIsOpen(false);
-        // Réinitialiser l'état après un court délai
         setTimeout(() => setState(null), 2000);
       }
     });
   }
 
-  // Toujours afficher le bouton, même s'il n'y a pas de workers
-  // Debug: afficher les infos en console
   if (typeof window !== 'undefined') {
     console.log('[AssignTaskButton]', {
       taskId,
@@ -71,11 +68,11 @@ export function AssignTaskButton({ taskId, currentWorkerId, availableWorkers }: 
     <div className="relative inline-block z-10">
       {currentWorker ? (
         <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1.5 rounded-md bg-paper-2 px-2 py-1 text-xs text-ink dark:bg-paper-2 dark:text-green">
+          <div className="flex items-center gap-1.5 border border-rule-soft bg-paper-2 px-2 py-1 font-mono text-[10px] text-ink">
             <User className="h-3 w-3" />
             <span className="font-medium">{currentWorker.name}</span>
             {currentWorker.role && (
-              <span className="text-orange dark:text-green">
+              <span className="text-orange">
                 ({currentWorker.role})
               </span>
             )}
@@ -83,7 +80,7 @@ export function AssignTaskButton({ taskId, currentWorkerId, availableWorkers }: 
           <button
             type="button"
             onClick={() => setIsOpen(!isOpen)}
-            className="rounded-md p-1.5 text-xs text-zinc-500 transition hover:bg-zinc-100 hover:text-zinc-700 dark:hover:bg-zinc-800 dark:hover:text-zinc-300"
+            className="p-1.5 text-ink-3 transition hover:text-ink"
             title="Modifier l'assignation"
           >
             <UserPlus className="h-4 w-4" />
@@ -93,7 +90,7 @@ export function AssignTaskButton({ taskId, currentWorkerId, availableWorkers }: 
         <button
           type="button"
           onClick={() => setIsOpen(!isOpen)}
-          className="flex items-center gap-1.5 rounded-md border border-zinc-300 bg-white px-3 py-1.5 text-xs font-medium text-zinc-700 transition hover:bg-zinc-50 hover:border-zinc-400 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700 dark:hover:border-zinc-500"
+          className="flex items-center gap-1.5 border border-rule-soft px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest text-ink-2 transition hover:text-ink hover:border-rule dark:border-rule dark:text-ink-2"
           title="Assigner cette tâche à un membre de l'équipe"
         >
           <UserPlus className="h-4 w-4" />
@@ -102,9 +99,9 @@ export function AssignTaskButton({ taskId, currentWorkerId, availableWorkers }: 
       )}
 
       {isOpen && (
-        <div className="absolute right-0 top-full z-10 mt-2 w-64 rounded-lg border border-zinc-200 bg-white p-3 dark:border-zinc-700 dark:bg-zinc-800">
+        <div className="absolute right-0 top-full z-10 mt-2 w-64 border border-rule-soft bg-paper p-3 dark:border-rule dark:bg-ink">
           <div className="mb-2 flex items-center justify-between">
-            <h4 className="text-xs font-semibold text-zinc-900 dark:text-white">
+            <h4 className="font-mono text-[10px] uppercase tracking-widest text-ink-3">
               Assigner à
             </h4>
             <button
@@ -113,7 +110,7 @@ export function AssignTaskButton({ taskId, currentWorkerId, availableWorkers }: 
                 setIsOpen(false);
                 setState(null);
               }}
-              className="rounded p-0.5 text-zinc-500 transition hover:bg-zinc-100 hover:text-zinc-700 dark:hover:bg-zinc-700 dark:hover:text-zinc-300"
+              className="p-0.5 text-ink-3 transition hover:text-ink"
             >
               <X className="h-3 w-3" />
             </button>
@@ -121,12 +118,12 @@ export function AssignTaskButton({ taskId, currentWorkerId, availableWorkers }: 
 
           {availableWorkers.length === 0 ? (
             <div className="space-y-2">
-              <p className="text-xs text-zinc-500 dark:text-zinc-400">
+              <p className="text-xs text-ink-3">
                 Aucun membre d&apos;équipe disponible. Ajoutez des membres dans la page &quot;Équipe&quot;.
               </p>
               <Link
                 href="/team"
-                className="block rounded-md bg-orange px-3 py-1.5 text-center text-xs font-medium text-white transition hover:bg-orange-dark"
+                className="block border border-orange px-3 py-1.5 text-center font-mono text-[10px] uppercase tracking-widest text-orange transition hover:bg-paper-2"
               >
                 Aller à l&apos;équipe →
               </Link>
@@ -134,11 +131,11 @@ export function AssignTaskButton({ taskId, currentWorkerId, availableWorkers }: 
           ) : (
             <form action={handleSubmit}>
               <input type="hidden" name="taskId" value={taskId} />
-              
+
               <div className="space-y-2">
                 <select
                   name="workerId"
-                  className="w-full rounded-md border border-zinc-200 bg-white px-2 py-1.5 text-xs shadow-sm focus:outline-none focus:ring-2 focus:ring-orange dark:border-zinc-600 dark:bg-zinc-900 dark:text-white"
+                  className="w-full rounded border border-rule-soft bg-paper px-2 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-orange text-ink dark:border-rule dark:bg-ink dark:text-paper"
                   defaultValue={currentWorkerId || ''}
                 >
                   <option value="">Aucun (désassigner)</option>
@@ -151,7 +148,7 @@ export function AssignTaskButton({ taskId, currentWorkerId, availableWorkers }: 
 
                 <div className="flex flex-col gap-2">
                   {state?.error && (
-                    <div className="rounded-md bg-rose-50 p-2 text-xs text-rose-700 dark:bg-rose-900/30 dark:text-rose-300">
+                    <div className="border border-danger p-2 font-mono text-[10px] text-danger">
                       {state.error}
                       {state.error.includes('assigned_worker_id') && (
                         <div className="mt-1">
@@ -166,7 +163,7 @@ export function AssignTaskButton({ taskId, currentWorkerId, availableWorkers }: 
                     </div>
                   )}
                   {state?.success && (
-                    <div className="rounded-md bg-paper-2 p-2 text-xs text-ink dark:bg-paper-2 dark:text-green">
+                    <div className="border border-rule-soft bg-paper-2 p-2 font-mono text-[10px] text-ink">
                       ✅ Assignation mise à jour avec succès
                     </div>
                   )}
@@ -182,4 +179,3 @@ export function AssignTaskButton({ taskId, currentWorkerId, availableWorkers }: 
     </div>
   );
 }
-

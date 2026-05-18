@@ -50,24 +50,24 @@ export default async function AccountPage() {
     >
       <div className="space-y-6">
         {/* Informations utilisateur */}
-        <section className="rounded border border-zinc-100 bg-white p-6 shadow-black/5 dark:border-zinc-800 dark:bg-zinc-900">
-          <h2 className="text-lg font-semibold text-zinc-900 dark:text-white">
+        <section className="rounded border border-rule-soft bg-paper p-6 dark:border-rule dark:bg-ink">
+          <h2 className="font-serif text-[22px] text-ink dark:text-paper">
             Informations de connexion
           </h2>
           <div className="mt-4 space-y-3">
             <div>
-              <p className="text-xs uppercase tracking-[0.3em] text-zinc-500 dark:text-zinc-400">
+              <p className="text-xs uppercase tracking-[0.3em] text-ink-3">
                 Email
               </p>
-              <p className="mt-1 text-sm font-medium text-zinc-900 dark:text-white">
+              <p className="mt-1 text-sm font-medium text-ink dark:text-paper">
                 {user.email}
               </p>
             </div>
             <div>
-              <p className="text-xs uppercase tracking-[0.3em] text-zinc-500 dark:text-zinc-400">
+              <p className="text-xs uppercase tracking-[0.3em] text-ink-3">
                 ID utilisateur
               </p>
-              <p className="mt-1 text-xs font-mono text-zinc-500 dark:text-zinc-400">
+              <p className="mt-1 text-xs font-mono text-ink-3">
                 {user.id}
               </p>
             </div>
@@ -75,21 +75,21 @@ export default async function AccountPage() {
         </section>
 
         {/* Plan actuel */}
-        <section className="rounded border border-zinc-100 bg-white p-6 shadow-black/5 dark:border-zinc-800 dark:bg-zinc-900">
-          <h2 className="text-lg font-semibold text-zinc-900 dark:text-white">Plan actuel</h2>
+        <section className="rounded border border-rule-soft bg-paper p-6 dark:border-rule dark:bg-ink">
+          <h2 className="font-serif text-[22px] text-ink dark:text-paper">Plan actuel</h2>
           <div className="mt-4">
-            <div className="flex items-center justify-between rounded border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-700 dark:bg-zinc-800">
+            <div className="flex items-center justify-between border border-rule-soft bg-paper-2 p-4 dark:border-rule">
               <div>
-                <p className="text-sm font-semibold text-zinc-900 dark:text-white">
+                <p className="text-sm font-semibold text-ink dark:text-paper">
                   {planNames[plan]}
                 </p>
-                <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+                <p className="mt-1 text-xs text-ink-3">
                   {planPrices[plan]}
                 </p>
               </div>
               <div className="text-right">
-                <p className="text-xs text-zinc-500 dark:text-zinc-400">Limites actuelles :</p>
-                <ul className="mt-1 space-y-1 text-xs text-zinc-600 dark:text-zinc-300">
+                <p className="text-xs text-ink-3">Limites actuelles :</p>
+                <ul className="mt-1 space-y-1 text-xs text-ink-2">
                   <li>
                     • {limits.maxSites === Infinity ? 'Chantiers illimités' : `${limits.maxSites} chantier${limits.maxSites > 1 ? 's' : ''} max`}
                     {addOns.extra_sites ? ` (+${addOns.extra_sites * 2} via add-ons)` : ''}
@@ -108,9 +108,9 @@ export default async function AccountPage() {
         <AddOnsSection user={user} currentAddOns={addOns} plan={plan} />
 
         {/* Changer de plan */}
-        <section className="rounded border border-zinc-100 bg-white p-6 shadow-black/5 dark:border-zinc-800 dark:bg-zinc-900">
-          <h2 className="text-lg font-semibold text-zinc-900 dark:text-white">Changer de plan</h2>
-          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+        <section className="rounded border border-rule-soft bg-paper p-6 dark:border-rule dark:bg-ink">
+          <h2 className="font-serif text-[22px] text-ink dark:text-paper">Changer de plan</h2>
+          <p className="mt-1 text-sm text-ink-3">
             Mettez à niveau votre abonnement pour accéder à plus de fonctionnalités.
           </p>
           <div className="mt-4 grid gap-4 md:grid-cols-3">
@@ -122,18 +122,18 @@ export default async function AccountPage() {
                   className={`rounded border p-4 ${
                     p === plan
                       ? 'border-orange bg-paper-2 dark:border-orange dark:bg-paper-2'
-                      : 'border-zinc-200 dark:border-zinc-700'
+                      : 'border-rule-soft dark:border-rule'
                   }`}
                 >
                   <div className="mb-3">
-                    <p className="text-sm font-semibold text-zinc-900 dark:text-white">
+                    <p className="text-sm font-semibold text-ink dark:text-paper">
                       {planNames[p]}
                     </p>
-                    <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+                    <p className="mt-1 text-xs text-ink-3">
                       {planPrices[p]}
                     </p>
                   </div>
-                  <ul className="mb-4 space-y-1 text-xs text-zinc-600 dark:text-zinc-300">
+                  <ul className="mb-4 space-y-1 text-xs text-ink-2">
                     <li>• {planLimits.maxSites === Infinity ? 'Chantiers illimités' : `${planLimits.maxSites} chantier${planLimits.maxSites > 1 ? 's' : ''} max`}</li>
                     <li>• {planLimits.maxWorkers === Infinity ? 'Employés illimités' : `${planLimits.maxWorkers} employé${planLimits.maxWorkers > 1 ? 's' : ''} max`}</li>
                     <li>• {planFeatures[p][2]}</li>
@@ -146,9 +146,9 @@ export default async function AccountPage() {
         </section>
 
         {/* Déconnexion */}
-        <section className="rounded border border-zinc-100 bg-white p-6 shadow-black/5 dark:border-zinc-800 dark:bg-zinc-900">
-          <h2 className="text-lg font-semibold text-zinc-900 dark:text-white">Déconnexion</h2>
-          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+        <section className="rounded border border-rule-soft bg-paper p-6 dark:border-rule dark:bg-ink">
+          <h2 className="font-serif text-[22px] text-ink dark:text-paper">Déconnexion</h2>
+          <p className="mt-1 text-sm text-ink-3">
             Déconnectez-vous de votre compte ChantiFlow.
           </p>
           <div className="mt-4">
@@ -159,4 +159,3 @@ export default async function AccountPage() {
     </AppShell>
   );
 }
-

@@ -69,24 +69,24 @@ export default async function WorkerDashboardPage() {
   const completedSites = siteSummaries.filter((summary) => summary.completed);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-zinc-50 via-white to-zinc-100 pb-32 dark:from-zinc-950 dark:via-zinc-900 dark:to-zinc-950">
-      <header className="border-b border-white/60 bg-paper px-4 py-6  dark:border-zinc-900/60 ">
+    <div className="min-h-screen bg-paper pb-32 dark:bg-ink">
+      <header className="border-b border-rule-soft bg-paper px-4 py-6 dark:border-rule dark:bg-ink">
         <div className="mx-auto flex max-w-5xl flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex items-center gap-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded bg-zinc-900 shadow-black/10 dark:bg-white">
+            <div className="flex h-12 w-12 items-center justify-center rounded bg-ink dark:bg-paper">
               <Image src="/logo.svg" alt="ChantiFlow" width={32} height={32} priority className="h-8 w-8" />
             </div>
             <div>
-              <p className="text-xs uppercase tracking-[0.4em] text-zinc-500 dark:text-zinc-400">ChantiFlow</p>
-              <h1 className="text-2xl font-semibold text-zinc-900 dark:text-white">Mes chantiers</h1>
-              <p className="text-sm text-zinc-500 dark:text-zinc-400">
+              <p className="font-mono text-[10px] uppercase tracking-widest text-ink-3">ChantiFlow</p>
+              <h1 className="font-serif text-[24px] text-ink dark:text-paper">Mes chantiers</h1>
+              <p className="text-sm text-ink-3">
                 Bonjour {worker.name || 'compagnon'} — voici tous les sites que vous avez scannés.
               </p>
             </div>
           </div>
           <Link
             href="/worker/scanner"
-            className="inline-flex items-center gap-2 rounded-full bg-orange px-4 py-2 text-xs font-semibold text-white transition hover:bg-orange-dark"
+            className="inline-flex items-center gap-2 border border-orange px-4 py-2 font-mono text-[10px] uppercase tracking-widest text-orange transition hover:bg-paper-2"
           >
             Scanner un nouveau chantier
           </Link>
@@ -94,13 +94,13 @@ export default async function WorkerDashboardPage() {
       </header>
 
       <main className="mx-auto flex max-w-5xl flex-col gap-6 px-4 py-8">
-        <section className="rounded border border-rule-soft bg-paper p-6">
+        <section className="rounded border border-rule-soft bg-paper p-6 dark:border-rule dark:bg-ink">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs uppercase tracking-[0.3em] text-zinc-500 dark:text-zinc-400">En cours</p>
-              <h2 className="text-2xl font-semibold text-zinc-900 dark:text-white">Chantiers actifs</h2>
+              <p className="font-mono text-[10px] uppercase tracking-widest text-ink-3">En cours</p>
+              <h2 className="font-serif text-[22px] text-ink dark:text-paper">Chantiers actifs</h2>
             </div>
-            <span className="rounded-full bg-zinc-100 px-4 py-1 text-xs font-semibold text-zinc-600 dark:bg-zinc-800 dark:text-zinc-200">
+            <span className="rounded-sm border border-rule-soft font-mono text-[10px] uppercase tracking-widest px-2 py-0.5 text-ink-3">
               {inProgressSites.length} actif(s)
             </span>
           </div>
@@ -109,34 +109,34 @@ export default async function WorkerDashboardPage() {
               inProgressSites.map(({ site, nextTaskDate, tasksCount }) => (
                 <div
                   key={site.id}
-                  className="flex flex-col gap-3 rounded border border-zinc-200 bg-zinc-50/80 p-4 dark:border-zinc-800 dark:bg-zinc-900/60"
+                  className="flex flex-col gap-3 rounded border border-rule-soft bg-paper-2 p-4 dark:border-rule"
                 >
                   <div>
-                    <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">{site.name || 'Chantier'}</h3>
-                    <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                    <h3 className="font-serif text-[18px] text-ink dark:text-paper">{site.name || 'Chantier'}</h3>
+                    <p className="text-xs text-ink-3">
                       {tasksCount} tâche(s) assignée(s)
                     </p>
                   </div>
-                  <p className="text-sm text-zinc-600 dark:text-zinc-300">
+                  <p className="text-sm text-ink-2">
                     Prochaine mission : {nextTaskDate ? formatDate(nextTaskDate) : 'à définir'}
                   </p>
                 </div>
               ))
             ) : (
-              <p className="text-sm text-zinc-500 dark:text-zinc-400">
+              <p className="text-sm text-ink-3">
                 Aucun chantier actif pour le moment. Scannez un QR code pour en ajouter un nouveau.
               </p>
             )}
           </div>
         </section>
 
-        <section className="rounded border border-rule-soft bg-paper p-6">
+        <section className="rounded border border-rule-soft bg-paper p-6 dark:border-rule dark:bg-ink">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs uppercase tracking-[0.3em] text-zinc-500 dark:text-zinc-400">Terminés</p>
-              <h2 className="text-2xl font-semibold text-zinc-900 dark:text-white">Chantiers archivés</h2>
+              <p className="font-mono text-[10px] uppercase tracking-widest text-ink-3">Terminés</p>
+              <h2 className="font-serif text-[22px] text-ink dark:text-paper">Chantiers archivés</h2>
             </div>
-            <span className="rounded-full bg-zinc-100 px-4 py-1 text-xs font-semibold text-zinc-600 dark:bg-zinc-800 dark:text-zinc-200">
+            <span className="rounded-sm border border-rule-soft font-mono text-[10px] uppercase tracking-widest px-2 py-0.5 text-ink-3">
               {completedSites.length} terminé(s)
             </span>
           </div>
@@ -145,16 +145,16 @@ export default async function WorkerDashboardPage() {
               completedSites.map(({ site }) => (
                 <div
                   key={site.id}
-                  className="rounded border border-zinc-200 bg-zinc-50/80 p-4 text-sm text-zinc-600 dark:border-zinc-800 dark:bg-zinc-900/60 dark:text-zinc-300"
+                  className="rounded border border-rule-soft bg-paper-2 p-4 text-sm text-ink-2 dark:border-rule"
                 >
-                  <p className="text-base font-semibold text-zinc-900 dark:text-white">{site.name || 'Chantier'}</p>
-                  <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                  <p className="font-serif text-[16px] text-ink dark:text-paper">{site.name || 'Chantier'}</p>
+                  <p className="text-xs text-ink-3">
                     Terminé le {site.completed_at ? formatDate(site.completed_at) : 'date inconnue'}
                   </p>
                 </div>
               ))
             ) : (
-              <p className="text-sm text-zinc-500 dark:text-zinc-400">
+              <p className="text-sm text-ink-3">
                 Aucun chantier clôturé pour l&apos;instant.
               </p>
             )}
@@ -179,4 +179,3 @@ function formatDate(date?: string | null) {
     return 'Non définie';
   }
 }
-

@@ -2,7 +2,6 @@ import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { SiteCard } from '@/app/sites/site-card';
 import { CreateSiteCard } from '@/app/sites/create-site-card';
 import { getUserPlan, getPlanLimits, canCreateSite, getUserAddOns } from '@/lib/plans';
-import { CheckCircle2 } from 'lucide-react';
 
 type DashboardContentProps = {
   userId: string;
@@ -62,6 +61,12 @@ export async function DashboardContent({ userId, userMetadata }: DashboardConten
   const activeSites = sitesArray.filter((site) => !site.completed_at);
   const completedSites = sitesArray.filter((site) => site.completed_at);
 
+  // Total tasks in progress across all active sites
+  const totalTasksInProgress = activeSites.reduce((sum, site) => {
+    const stats = siteStats[site.id];
+    return sum + (stats ? stats.tasks - stats.done : 0);
+  }, 0);
+
   // Vérifier les limites du plan (en parallèle)
   const user = { id: userId, user_metadata: userMetadata ?? undefined };
   const [plan, addOns, canCreateData] = await Promise.all([
@@ -76,14 +81,41 @@ export async function DashboardContent({ userId, userMetadata }: DashboardConten
 
   return (
     <>
+      {/* Stats bar */}
+      <div className="grid grid-cols-3 border-b border-rule-soft mb-10 divide-x divide-rule-soft">
+        <div className="py-6 pr-8">
+          <div className="font-serif text-[48px] leading-none tracking-tight text-ink" style={{fontVariationSettings: '"opsz" 144'}}>
+            {activeSites.length}
+          </div>
+          <div className="mt-2 font-mono text-[10px] uppercase tracking-widest text-ink-3">Chantiers actifs</div>
+        </div>
+        <div className="py-6 px-8">
+          <div className="font-serif text-[48px] leading-none tracking-tight text-ink" style={{fontVariationSettings: '"opsz" 144'}}>
+            {totalTasksInProgress}
+          </div>
+          <div className="mt-2 font-mono text-[10px] uppercase tracking-widest text-ink-3">Tâches en cours</div>
+        </div>
+        <div className="py-6 pl-8">
+          <div className="font-serif text-[48px] leading-none tracking-tight text-ink" style={{fontVariationSettings: '"opsz" 144'}}>
+            {completedSites.length}
+          </div>
+          <div className="mt-2 font-mono text-[10px] uppercase tracking-widest text-ink-3">Terminés</div>
+        </div>
+      </div>
+
+      {/* Plan limit banner */}
+      {!canCreate && limitReason && (
+        <div className="border border-warn bg-paper-2 px-4 py-3 font-mono text-[11px] tracking-widest text-warn uppercase mb-6">
+          ⚠ Limite de plan atteinte · {limitReason}
+        </div>
+      )}
+
       {/* Chantiers en cours */}
       {activeSites.length > 0 && (
         <div className="mb-8">
-          <div className="mb-4 flex items-center gap-2">
-            <h2 className="text-xl font-semibold text-zinc-900 dark:text-white">
-              Chantiers en cours
-            </h2>
-            <span className="rounded-full bg-paper-2 px-2 py-1 text-xs font-semibold text-ink dark:bg-paper-2 dark:text-green">
+          <div className="mb-4 flex items-center gap-3">
+            <p className="font-mono text-[11px] uppercase tracking-widest text-ink-3">Chantiers en cours</p>
+            <span className="rounded-sm border border-rule-soft font-mono text-[10px] uppercase tracking-widest px-2 py-0.5 text-ink-3">
               {activeSites.length}
             </span>
           </div>
@@ -103,12 +135,9 @@ export async function DashboardContent({ userId, userMetadata }: DashboardConten
       {/* Chantiers terminés */}
       {completedSites.length > 0 && (
         <div className="mb-8">
-          <div className="mb-4 flex items-center gap-2">
-            <CheckCircle2 className="h-5 w-5 text-orange dark:text-green" />
-            <h2 className="text-xl font-semibold text-zinc-900 dark:text-white">
-              Chantiers terminés
-            </h2>
-            <span className="rounded-full bg-zinc-100 px-2 py-1 text-xs font-semibold text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
+          <div className="mb-4 flex items-center gap-3">
+            <p className="font-mono text-[11px] uppercase tracking-widest text-ink-3">Chantiers terminés</p>
+            <span className="rounded-sm border border-rule-soft font-mono text-[10px] uppercase tracking-widest px-2 py-0.5 text-ink-3">
               {completedSites.length}
             </span>
           </div>
@@ -138,8 +167,8 @@ export async function DashboardContent({ userId, userMetadata }: DashboardConten
       </div>
 
       {sitesArray.length === 0 && (
-        <div className="rounded border border-zinc-200 bg-white p-8 text-center dark:border-zinc-800 dark:bg-zinc-900">
-          <p className="text-sm text-zinc-500 dark:text-zinc-400">
+        <div className="border border-rule-soft bg-paper p-8 text-center">
+          <p className="text-sm text-ink-3">
             Aucun chantier pour le moment. Créez votre premier chantier pour commencer.
           </p>
         </div>
@@ -147,4 +176,3 @@ export async function DashboardContent({ userId, userMetadata }: DashboardConten
     </>
   );
 }
-

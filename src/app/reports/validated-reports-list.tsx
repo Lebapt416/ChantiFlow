@@ -40,7 +40,7 @@ export function ValidatedReportsList({
   if (reports.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center">
-        <p className="text-sm text-zinc-500 dark:text-zinc-400">
+        <p className="text-sm text-ink-3">
           Aucun rapport validé pour le moment.
         </p>
       </div>
@@ -58,20 +58,20 @@ export function ValidatedReportsList({
           <Link
             key={report.id}
             href={`/reports/${report.id}`}
-            className="block rounded-lg border border-zinc-200 bg-white p-4 transition hover:border-zinc-300 hover:shadow-sm dark:border-zinc-700 dark:bg-zinc-900 dark:hover:border-zinc-600"
+            className="block rounded border border-rule-soft bg-paper p-4 transition hover:bg-paper-2 dark:border-rule dark:bg-ink dark:hover:bg-paper-2/10"
           >
             <div className="flex items-center justify-between gap-3">
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="h-4 w-4 text-orange dark:text-green flex-shrink-0" />
-                  <p className="text-sm font-semibold text-zinc-900 dark:text-white truncate">
+                  <p className="text-sm font-semibold text-ink dark:text-paper truncate">
                     {task?.title ?? 'Tâche inconnue'}
                   </p>
                 </div>
-                <p className="text-xs text-zinc-500 dark:text-zinc-400 truncate mt-1">
+                <p className="text-xs text-ink-3 truncate mt-1">
                   {siteName} • {worker?.name ?? 'Employé inconnu'}
                 </p>
-                <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-1">
+                <p className="text-xs text-ink-3 mt-1">
                   {new Date(report.created_at).toLocaleDateString('fr-FR', {
                     day: '2-digit',
                     month: 'short',
@@ -81,7 +81,7 @@ export function ValidatedReportsList({
                 </p>
               </div>
               <div className="flex items-center gap-2 flex-shrink-0">
-                <Eye className="h-4 w-4 text-zinc-400 dark:text-zinc-500" />
+                <Eye className="h-4 w-4 text-ink-3" />
               </div>
             </div>
           </Link>
@@ -91,7 +91,7 @@ export function ValidatedReportsList({
       {totalCount > 10 && (
         <Link
           href="/reports/validated"
-          className="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-3 text-sm font-semibold text-zinc-700 transition hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
+          className="flex items-center justify-center gap-2 border border-rule-soft bg-paper px-4 py-3 font-mono text-[10px] uppercase tracking-widest text-ink-2 transition hover:bg-paper-2 hover:text-ink dark:border-rule dark:bg-ink"
         >
           <span>Voir tous les rapports validés</span>
           <ArrowRight className="h-4 w-4" />
@@ -100,4 +100,3 @@ export function ValidatedReportsList({
     </div>
   );
 }
-
