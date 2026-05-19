@@ -22,12 +22,14 @@ type PrimarySite = {
 };
 
 type AppShellProps = {
-  heading: string;
+  heading?: string;
   subheading?: string;
   userEmail?: string | null;
   children: ReactNode;
   primarySite?: PrimarySite | null;
   actions?: ReactNode;
+  /** Si true : pas de sticky header, pas de padding sur le main (la page gère son propre layout) */
+  noHeader?: boolean;
 };
 
 export function AppShell({
@@ -36,6 +38,7 @@ export function AppShell({
   userEmail,
   children,
   actions,
+  noHeader = false,
 }: AppShellProps) {
   const pathname = usePathname();
 
@@ -131,20 +134,22 @@ export function AppShell({
 
         {/* Main content */}
         <div className="min-h-screen flex-1 lg:ml-56">
-          <header className="sticky top-0 z-10 border-b border-rule bg-paper px-6 py-4 flex items-center justify-between">
-            <div>
-              <p className="font-mono text-[10px] uppercase tracking-widest text-ink-3">ChantiFlow</p>
-              <h1
-                className="font-serif text-2xl font-normal text-ink mt-0.5"
-                style={{ fontVariationSettings: '"opsz" 60, "SOFT" 30' }}
-              >
-                {heading}
-              </h1>
-              {subheading && <p className="text-sm text-ink-2 mt-0.5">{subheading}</p>}
-            </div>
-            <div className="flex items-center gap-3">{actions}</div>
-          </header>
-          <main className="px-4 py-8 lg:px-10 pb-24 md:pb-8">{children}</main>
+          {!noHeader && heading && (
+            <header className="sticky top-0 z-10 border-b border-rule bg-paper px-6 py-4 flex items-center justify-between">
+              <div>
+                <p className="font-mono text-[10px] uppercase tracking-widest text-ink-3">ChantiFlow</p>
+                <h1
+                  className="font-serif text-2xl font-normal text-ink mt-0.5"
+                  style={{ fontVariationSettings: '"opsz" 60, "SOFT" 30' }}
+                >
+                  {heading}
+                </h1>
+                {subheading && <p className="text-sm text-ink-2 mt-0.5">{subheading}</p>}
+              </div>
+              <div className="flex items-center gap-3">{actions}</div>
+            </header>
+          )}
+          <main className={noHeader ? '' : 'px-4 py-8 lg:px-10 pb-24 md:pb-8'}>{children}</main>
         </div>
       </div>
       <MobileNav />

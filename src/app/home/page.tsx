@@ -26,8 +26,7 @@ export default async function HomePage() {
   // Les données chargent ensuite via Suspense Streaming
   return (
     <AppShell
-      heading="Mes chantiers"
-      subheading="Gérez tous vos chantiers depuis cette page"
+      noHeader={true}
       userEmail={user.email}
     >
       <Suspense fallback={<HomeLoading />}>
